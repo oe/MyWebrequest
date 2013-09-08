@@ -1,0 +1,28 @@
+{
+  "name": "Net Conn",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Control your network connection",
+  "icons": {
+    "16": "img/icon16.png",
+    "48": "img/icon48.png",
+    "128": "img/icon128.png"
+  },
+  "options_page": "options/index.html",
+  "homepage_url": "http://www.evecalm.com",
+  "browser_action": {
+    "default_icon": "img/icon48.png",
+    "default_title": "Have a Nice Day!",
+    "default_popup": "popup/index.html"
+  },
+  "permissions": ["*://*/*","webRequest","webRequestBlocking","tabs","bookmarks","cookies","notifications"],
+  "background": {
+    "page":"background/index.html"
+  },
+  "update_url":"http://app.evecalm.com/neuhelper/neuhelper-update.xml",
+  "web_accessible_resources": [
+    "img/icon16.png",
+    "img/icon48.png",
+    "img/icon128.png"
+  ]
+}
