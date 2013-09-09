@@ -1,26 +1,11 @@
 (function  () {
-	var reqFilter = {
-			urls:
-			[
-				// '*://*.baidu.com/*',
-				'http://*.wikipedia.org/*',
-				'http://*.wordpress.com/*'
-			]
-		},
-		hdrFilter = {
-			urls:
-			[
-				'http://*.baidu.com/*'
-			]
-		},
-		logFilter = {
-			urls:
-			[
-				'*://*/*'
-			]
-		},
+	var blockrule = {},
+		hstsrule = {},
+		referrule = {},
+		logrule = {},
 		logNum = 0;
 
+	var pattern = /^(\*|https|http):\/\/(\*((\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4})?|([a-zA-Z0-9]+\.)+[a-zA-Z]{2,4})\/$/;
 	function blockReq (details) {
 		return {cancel: true};
 	}
@@ -29,35 +14,17 @@
 		return {redirectUrl:details.url.replace('http://','https://')};
 	}
 
-	function modifyRequest (details) {
-		var type = '';
-		switch(type) {
-			// cancel request
-			case 'block':
-				return {cancel: true};
-				break;
-			// force https link
-			case 'hsts':
-				return {redirectUrl:details.url.replace('http://','https://')};
-				break;
-		}
-	}
-
-	function modifyHeaders (details) {
+	function modifyReferer (details) {
 		var headers = details.requestHeaders,
 			len = headers.length,
-			type = '';
-		switch(type) {
-			case 'referer':
-				while (len--) {
-					if (headers[len].name === 'Referer') {
-						headers[len].value = newReferer;
-						break;
-					}
-				}
+			type = '',
+			newReferer = '';
+		while (len--) {
+			if (headers[len].name === 'Referer') {
+				//delete referrer
+				headers.splice(len,1);
 				break;
-			case 'a':
-				break;
+			}
 		}
 		return {requestHeaders: headers};
 	}
@@ -68,108 +35,121 @@
 	}
 
 	//execute init when browser opened
-	function init () {
-		var onoff = JSON.parse(localStorage.onoff || {}),
+	(function init () {
+		var onoff = JSON.parse(localStorage.onoff || '{}'),
 			reqApi = chrome.webRequest;
-		reqFilter = JSON.parse(localStorage.reqfilter || {});
-		hdrFilter = JSON.parse(localStorage.hdrfilter || {});
-		logFilter = JSON.parse(localStorage.logfilter || {});
+		blockrule.urls = JSON.parse(localStorage.blockrule || '[]');
+		hstsrule.urls = JSON.parse(localStorage.hstsrule || '[]');
+		referrule.urls = JSON.parse(localStorage.referrule || '[]');
+		logrule.urls = JSON.parse(localStorage.logrule || '[]');
 
-		if (/*reqFilter is available*/true && onoff.reqfilter) {
-			reqApi.onBeforeRequest.addListener(modifyRequest,reqFilter,['blocking']);
+		if (onoff.blockrule && blockrule.urls.length) {
+			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
 		} else {
-			onoff.reqfilter = false;
+			onoff.blockrule = false;
 		}
 
-		if (/*hdrFilter is available*/true && onoff.hdrfilter) {
-			reqApi.onBeforeSendHeaders.addListener(modifyHeaders,hdrFilter,['requestHeaders']);
+		if (onoff.hstsrule && hstsrule.urls.length) {
+			reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
 		} else {
-			onoff.hdrfilter = false;
+			onoff.hstsrule = false;
 		}
 
-		if (/*logFilter is available*/true && onoff.logfilter) {
-			reqApi.onSendHeaders.addListener(logHeaders,reqFilter,['requestHeaders']);
+		if (onoff.referrule && referrule.urls.length) {
+			reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
 		} else {
-			onoff.logfilter = false;
+			onoff.referrule = false;
+		}
+
+		if (onoff.logrule && logrule.urls.length) {
+			reqApi.onSendHeaders.addListener(logHeaders,logrule,['requestHeaders']);
+		} else {
+			onoff.logrule = false;
 		}
 
 		localStorage.onoff = JSON.stringify(onoff);
-	}
+	})();
 
 	window.addEventListener("storage", function  (event){
 		var type = event.key,
 			reqApi = chrome.webRequest,
-			newData = JSON.parse(event.newValue || {}),
-			oldData = JSON.parse(event.oldValue || {}),
-			onoff = JSON.parse(localStorage.onoff || {});
+			newData = JSON.parse(event.newValue || '[]'),
+			oldData = JSON.parse(event.oldValue || '[]'),
+			onoff = JSON.parse(localStorage.onoff || '[]');
 
 		switch(type) {
-			case 'reqfilter':
-				reqFilter = newData;
-				if(/*if filter is *not* available*/true && onoff.reqfilter){
-					onoff.reqfilter = false;
-					reqApi.onBeforeRequest.removeListener(modifyRequest);
-					localStorage.onoff = JSON.stringify(onoff);
-
+			case 'blockrule':
+				blockrule.urls = newData;
+				if (onoff.blockrule) {
+					reqApi.onBeforeRequest.removeListener(blockReq);
+					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
+					}, 0,blockReq,blockrule);
 				}
 				break;
-			case 'hdrfilter':
-				hdrFilter = newData;
-				if(/*if filter is *not* available*/true && onoff.hdrfilter){
-					onoff.hdrfilter = false;
-					reqApi.onBeforeSendHeaders.removeListener(modifyHeaders);
-					localStorage.onoff = JSON.stringify(onoff);
-
+			case 'hstsrule':
+				hstsrule.urls = newData;
+				if (onoff.hstsrule) {
+					reqApi.onBeforeRequest.removeListener(hstsReq);
+					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
+					}, 0,hstsReq,hstsrule);
 				}
 				break;
-			case 'logfilter':
-				logFilter = newData;
-				if(/*if filter is *not* available*/true && onoff.logfilter){
-					onoff.logfilter = false;
-					reqApi.onSendHeaders.removeListener(logHeaders);
-					localStorage.onoff = JSON.stringify(onoff);
+			case 'referrule':
+				referrule.urls = newData;
+				if (onoff.referrule) {
+					reqApi.onBeforeRequest.removeListener(modifyReferer);
+					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(fn,filter,['requestHeaders','blocking']);
+					}, 0,modifyReferer,referrule);
+				}
+				break;
+			case 'logrule':
+				logrule.urls = newData;
+				if (onoff.logrule) {
+					reqApi.onBeforeRequest.removeListener(logHeaders);
+					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(fn,filter,['requestHeaders']);
+					}, 0,logHeaders,logrule);
 				}
 				break;
 			case 'onoff':
-				if (newData.reqfilter !== oldData.reqfilter) {
-					if (newData.reqfilter) {
-						if (/*filter available*/true) {
-							reqApi.onBeforeRequest.addListener(modifyRequest,reqFilter,['blocking']);
-						} else {
-							newData.reqfilter = false;
-							localStorage.onoff = JSON.stringify(newData);
-						}
+				if (newData.blockrule !== oldData.blockrule) {
+					if (newData.blockrule) {
+						reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
+						console.log('off event block on');
 					} else {
-						reqApi.onBeforeRequest.removeListener(modifyRequest);
+						reqApi.onBeforeRequest.removeListener(blockReq);
+						console.log('off event block off');
 					}
 				}
-				if (newData.hdrfilter !== oldData.hdrfilter) {
-					if (newData.hdrfilter) {
-						if (/*filter available*/true) {
-							reqApi.onBeforeSendHeaders.addListener(modifyHeaders,hdrFilter,['requestHeaders']);
-						} else {
-							newData.hdrfilter = false;
-							localStorage.onoff = JSON.stringify(newData);
-						}
+				if (newData.hstsrule !== oldData.hstsrule) {
+					if (newData.hstsrule) {
+						reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
 					} else {
-						reqApi.onBeforeSendHeaders.removeListener(modifyHeaders);
+						reqApi.onBeforeRequest.removeListener(hstsReq);
 					}
 				}
-				if (newData.logfilter !== oldData.logfilter) {
-					if (newData.logfilter) {
-						if (/*filter available*/true) {
-							reqApi.onSendHeaders.addListener(logHeaders,reqFilter,['requestHeaders']);
-						} else {
-							newData.logfilter = false;
-							localStorage.onoff = JSON.stringify(newData);
-
-						}
+				if (newData.referrule !== oldData.referrule) {
+					if (newData.referrule) {
+						console.log(' event rerfer on');
+						reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
 					} else {
+						console.log(' event rerfer off');
+						reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
+					}
+				}
+				if (newData.logrule !== oldData.logrule) {
+					if (newData.logrule) {
+						console.log(' event log on')
+						reqApi.onSendHeaders.addListener(logHeaders,logrule,['requestHeaders']);
+					} else {
+						console.log(' event log off');
 						reqApi.onSendHeaders.removeListener(logHeaders);
 					}
 				}
 				break;
 		}
 	});
-
 })()
