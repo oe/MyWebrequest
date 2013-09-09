@@ -145,7 +145,7 @@
 			reqApi = chrome.webRequest,
 			newData = JSON.parse(event.newValue || '[]'),
 			oldData = JSON.parse(event.oldValue || '[]'),
-			onoff = JSON.parse(localStorage.onoff || '[]');
+			onoff = JSON.parse(localStorage.onoff || '{}');
 
 		switch(type) {
 			case 'blockrule':
