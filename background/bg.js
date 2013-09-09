@@ -3,9 +3,64 @@
 		hstsrule = {},
 		referrule = {},
 		logrule = {},
-		logNum = 0;
+		logNum = 0,
+		requestCache = {};
 
 	var pattern = /^(\*|https|http):\/\/(\*((\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4})?|([a-zA-Z0-9]+\.)+[a-zA-Z]{2,4})\/$/;
+
+	function cloneObj (o) {
+		var obj,i;
+		if (Array.isArray(o)) {
+			if (o.length > 1) {
+				obj = [];
+			} else {
+				return o[0];
+			}
+		} else {
+			obj = {};
+		}
+		for (i in o) {
+			if (o.hasOwnProperty(i)) {
+				obj[i] = o[i] instanceof Object ? cloneObj(o[i]) : o[i];
+			}
+		}
+		return obj;
+	}
+
+	function formatQueryBody (url) {
+		var obj = {},i,arr,tmp,formated = {};
+		i = url.indexOf('?');
+		if (i === -1) {
+			return {error: 'No query data'};
+		}
+		url = url.substr(++i);
+		obj.sourceData = url;
+		arr = url.split('&');
+		i = arr.length;
+		// obj.formatedData = {};
+		try{
+			while (i--) {
+				tmp = arr[i].split('=');
+				if (tmp.length < 2) {
+					throw new Error('error')
+				}
+				formated[decodeURIComponent(tmp[0])] = decodeURIComponent(tmp[1]);
+			}
+			obj.formatedData = formated;
+		} catch(e) {
+			obj.error = e.message;
+		}
+		return obj;
+	}
+
+	function formatHeaders (headers) {
+		var obj = {},i = headers.length;
+		while (i--) {
+			obj[headers[i].name] = headers[i].value;
+		}
+		return obj;
+	}
+
 	function blockReq (details) {
 		return {cancel: true};
 	}
@@ -29,9 +84,23 @@
 		return {requestHeaders: headers};
 	}
 
-	function logHeaders (details) {
+	function logBody (details) {
+		//only post data in requestbody,get data is in url
+		if (details.requestBody) {
+			requestCache[details.requestId] = cloneObj(details.requestBody);
+		}
+	}
+
+	function logRequest (details) {
+		var id = details.requestId;
 		++logNum;
+		if (requestCache[id]) {
+			details.requestBody = requestCache[id];
+		}
+		details.requestHeaders = formatHeaders(details.requestHeaders);
+		details.queryBody = formatQueryBody(details.url);
 		console.log('%c%d %o','color: #086', logNum, details);
+		delete requestCache[id];
 	}
 
 	//execute init when browser opened
@@ -62,7 +131,8 @@
 		}
 
 		if (onoff.logrule && logrule.urls.length) {
-			reqApi.onSendHeaders.addListener(logHeaders,logrule,['requestHeaders']);
+			reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
+			reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
 		} else {
 			onoff.logrule = false;
 		}
@@ -108,10 +178,12 @@
 			case 'logrule':
 				logrule.urls = newData;
 				if (onoff.logrule) {
-					reqApi.onBeforeRequest.removeListener(logHeaders);
+					reqApi.onBeforeRequest.removeListener(logBody);
+					reqApi.onBeforeRequest.removeListener(logRequest);
 					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
 						reqApi.onBeforeRequest.addListener(fn,filter,['requestHeaders']);
-					}, 0,logHeaders,logrule);
+					}, 0,logRequest,logrule);
 				}
 				break;
 			case 'onoff':
@@ -143,10 +215,12 @@
 				if (newData.logrule !== oldData.logrule) {
 					if (newData.logrule) {
 						console.log(' event log on')
-						reqApi.onSendHeaders.addListener(logHeaders,logrule,['requestHeaders']);
+						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
+						reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
 					} else {
 						console.log(' event log off');
-						reqApi.onSendHeaders.removeListener(logHeaders);
+						reqApi.onBeforeRequest.removeListener(logBody);
+						reqApi.onSendHeaders.removeListener(logRequest);
 					}
 				}
 				break;
