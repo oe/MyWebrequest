@@ -1,0 +1,9 @@
+{
+  "appName":  {
+    "message": "Hello My Webrequest",
+    "description": "The extension name."
+  },
+  "appDesc": {
+  	"message": "Control your browser's network connection."
+  }
+}

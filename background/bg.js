@@ -42,13 +42,17 @@
 			while (i--) {
 				tmp = arr[i].split('=');
 				if (tmp.length < 2) {
-					throw new Error('error')
+					throw new Error('Somme data not key-value paired is found the query string.')
 				}
 				formated[decodeURIComponent(tmp[0])] = decodeURIComponent(tmp[1]);
 			}
 			obj.formatedData = formated;
 		} catch(e) {
-			obj.error = e.message;
+			if (e instanceof URIError) {
+				obj.error = 'The query string is not encoded with utf-8, this can\'t be decoded by now.';
+			} else {
+				obj.error = e.message;
+			}
 		}
 		return obj;
 	}

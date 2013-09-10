@@ -1,8 +1,9 @@
 {
-  "name": "Net Conn",
+  "name": "__MSG_appName__",
   "version": "0.1",
   "manifest_version": 2,
-  "description": "Control your network connection",
+  "description": "__MSG_appDesc__",
+  "default_locale": "en",
   "icons": {
     "16": "img/icon16.png",
     "48": "img/icon48.png",
@@ -15,7 +16,7 @@
     "default_title": "Have a Nice Day!",
     "default_popup": "popup/index.html"
   },
-  "permissions": ["*://*/*","webRequest","webRequestBlocking","tabs","bookmarks","cookies","notifications"],
+  "permissions": ["*://*/*","webRequest","webRequestBlocking","notifications"],
   "background": {
     "page":"background/index.html"
   },

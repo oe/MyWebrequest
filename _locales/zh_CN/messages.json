@@ -1,0 +1,9 @@
+{
+	"appName":  {
+		"message": "你好 My Webrequest",
+		"description": "The extension name."
+	},
+	"appDesc": {
+		"message": "自定义浏览器的网络请求。"
+	}
+}
