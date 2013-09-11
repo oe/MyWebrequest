@@ -24,24 +24,71 @@
 				Account settings
 			</div>
 			<div class="setting-content">
-				<div class="input">
-					<label class="span-1" for="nickname">昵称</label>
-					<input type="text" id="nickname" placeholder="昵称">
-					<span class="warning"></span>
+				<div class="input-area">
+					<div class="input-wrapper protocol">
+						<label class="label" for="b-protocol">Protocol</label>
+						<select id="b-protocol" class="input" >
+							<option value="*">*</option>
+							<option value="http">http</option>
+							<option value="https">https</option>
+						</select>
+					</div>
+					<div class="input-wrapper separator">
+						<label class="label">&nbsp;</label>
+						<div class="input">://</div>
+					</div>
+					<div class="input-wrapper host">
+						<label class="label" for="b-host">Host</label>
+						<input id="b-host" class="input" >
+					</div>
+					<div class="input-wrapper separator">
+						<label class="label">&nbsp;</label>
+						<div class="input">/</div>
+					</div>
+					<div class="input-wrapper path">
+						<label class="label" for="b-path">Path</label>
+						<input id="b-path" class="input" >
+					</div>
+					<div class="input-wrapper separator">
+						<label class="label">&nbsp;</label>
+						<button class="input">Add Rule</button>
+					</div>
 				</div>
-				<div class="input">
-					<label class="span-1" for="username">用户名</label>
-					<input type="text" id="username" placeholder="您的用户名">
-					<span class="warning"></span>
+				<div class="tips">
 				</div>
-				<div class="input">
-					<label class="span-1" for="password">密码</label>
-					<input type="password" id="password" placeholder="登陆密码">
-					<span class="warning"></span>
-				</div>
-				<div class="input">
-					<input type="button" class="pull-span-1 btn btn-info" id="save-account" value="保存">
-					<span class="info"></span>
+				<div class="list-wrapper">
+					<div class="list-content">
+						<div class="list-header">
+							<div class="row-num">NO.</div>
+							<div class="rule">Rule</div>
+							<div class="options">
+								<span>Previous</span><span>Next</span><span>Remove</span>
+							</div>
+						</div>
+						<ol class="list-body">
+							<li>
+								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
+									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
+								</span>
+								<span class="li-options">delete</span>
+							</li>
+							<li>
+								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
+									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
+								</span>
+								<span class="li-delete">delete</span>
+							</li>
+							<li>
+								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
+									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
+								</span>
+								<span class="li-options">delete</span>
+							</li>
+						</ol>
+					</div>
+					<div class="rule-guide">
+						<p>"*" means everything.</p>
+					</div>
 				</div>
 			</div>
 		</div>

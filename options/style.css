@@ -4,18 +4,6 @@ body{
 	font-family: 'Lucida Grande', sans-serif;
 }
 
-@-webkit-keyframes fadeInLeft {
-	0% {
-		opacity: 0;
-		-webkit-transform: translateX(-20px);
-	}
-
-	100% {
-		opacity: 1;
-		-webkit-transform: translateX(0);
-	}
-}
-
 .sidebar{
 	position: fixed;
 	top: 0;
@@ -40,7 +28,6 @@ section{
 }
 section:target{
 	visibility: visible;
-	animation: fadeInLeft .2s linear;
 	left: 150px;
 }
 .sidebar .title{
@@ -84,12 +71,10 @@ section:target{
 	color: #333;
 }
 
-
 .setting-item{
 
 }
-
-.setting-item .setting-content{
+.setting-item .setting-content,.setting-item .list-wrapper{
 	margin: 10px 0;
 	padding: 5px 0 8px;
 }
@@ -101,3 +86,132 @@ section:target{
 	font-weight: normal;
 }
 
+.input-area:after{
+	content: '';
+	display: block;
+	float: none;
+	clear: both;
+}
+
+.input-area .input-wrapper{
+	float: left;
+}
+
+.input-wrapper .label,.input-wrapper .input{
+	display: block;
+	width: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.input-wrapper.separator{
+	margin: 0 4px;
+}
+
+.input-wrapper.protocol{
+	width: 10%;
+}
+
+.input-wrapper.host{
+	width: 25%;
+}
+
+.input-wrapper.path{
+	width: 30%;
+}
+
+.setting-content .tips{
+	height: 30px;
+	width: 100%;
+}
+.list-wrapper > div{
+	float: left;
+}
+.list-wrapper:after{
+	content: '';
+	display: block;
+	float: none;
+	clear: both;
+}
+
+.list-content{
+	width: 71%;
+}
+.rule-guide{
+	width: 29%;
+}
+.list-header{
+	padding: 5px 0 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.list-header:after{
+	content: '';
+	display: block;
+	float: none;
+	clear: both;
+}
+
+.list-header>div{
+	float: left;
+}
+
+.list-header .row-num{
+	width: 20%;
+}
+
+.list-header .rule{
+	width: 38%;
+}
+
+.list-header .options{
+	width: 42%;
+	text-align: right;
+}
+
+.list-body{
+	counter-reset:li;
+	list-style: none;
+	font-size: 14px;
+	margin: 0;
+	padding-left: 0;
+
+}
+
+.list-body li{
+	position: relative;
+	padding: 8px;
+	/*width: 100%;*/
+	padding-left: 20%;
+	color: #555;
+}
+
+.list-body li:before{
+	content:counter(li)  '.';
+    counter-increment:li;
+    position: absolute;
+    left: 0;
+    color: #999;
+}
+
+.list-body li span{
+	display: inline-block;
+}
+
+.list-body .li-rule{
+	width: 80%;
+	white-space:nowrap;
+	overflow:hidden;
+	text-overflow:ellipsis;
+}
+
+.list-body .li-delete{
+	width: 18%;
+	text-align: center;
+	cursor: pointer;
+}
+
+.list-body li:nth-child(odd){
+	background-color: whitesmoke;
+}
