@@ -173,9 +173,9 @@
 			case 'referrule':
 				referrule.urls = newData;
 				if (onoff.referrule) {
-					reqApi.onBeforeRequest.removeListener(modifyReferer);
+					reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
 					setTimeout(function (fn,filter) {
-						reqApi.onBeforeRequest.addListener(fn,filter,['requestHeaders','blocking']);
+						reqApi.onBeforeSendHeaders.addListener(fn,filter,['requestHeaders','blocking']);
 					}, 0,modifyReferer,referrule);
 				}
 				break;
@@ -183,10 +183,10 @@
 				logrule.urls = newData;
 				if (onoff.logrule) {
 					reqApi.onBeforeRequest.removeListener(logBody);
-					reqApi.onBeforeRequest.removeListener(logRequest);
+					reqApi.onSendHeaders.removeListener(logRequest);
 					setTimeout(function (fn,filter) {
 						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
-						reqApi.onBeforeRequest.addListener(fn,filter,['requestHeaders']);
+						reqApi.onSendHeaders.addListener(fn,filter,['requestHeaders']);
 					}, 0,logRequest,logrule);
 				}
 				break;
