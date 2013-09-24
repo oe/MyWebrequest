@@ -3,8 +3,20 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Popup</title>
+	<link rel="stylesheet" href="./style.css">
 </head>
 <body>
-	<h1>hello</h1>
+	<div id="tips-wraper">
+		<div id="prompt" i18n-content="pop-prompt">Current page url's QRCode</div>
+		<span id="action-tip" i18n-content="pop-action-tip">(double click to edit content)</span>
+	</div>
+	<div id="code">
+		<textarea id="text"></textarea>
+		<button id="make" i18n-content="pop-make">Make QRCode</button>
+		<a href="../options/index.html#qrcode" target="_blank">more...</a>
+		<div id="qrcode"></div>
+	</div>
+	<script src="/common/qrcode.js"></script>
+	<script src="./popup.js"></script>
 </body>
 </html>

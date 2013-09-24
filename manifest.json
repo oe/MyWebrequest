@@ -16,7 +16,7 @@
     "default_title": "Have a Nice Day!",
     "default_popup": "popup/index.html"
   },
-  "permissions": ["*://*/*","webRequest","webRequestBlocking","notifications"],
+  "permissions": ["*://*/*","webRequest","webRequestBlocking","notifications","tabs"],
   "background": {
     "page":"background/index.html"
   },
