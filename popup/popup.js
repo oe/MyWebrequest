@@ -9,7 +9,6 @@ var qrelm = document.getElementById('qrcode'),
 		height : 200
 	});
 	//set correct Level to the lowest
-	qrcode._htOption.correctLevel = QRCode.CorrectLevel.L;
 chrome.tabs.query({
     active: true,
     lastFocusedWindow: true
