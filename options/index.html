@@ -6,97 +6,90 @@
 	<link rel="stylesheet" type="text/css" href="style.css" media="all">
 </head>
 <body>
-	<div class="sidebar">
-		<div class="title">
+	<aside>
+		<div class="app-name">
 			My Webrequest
 		</div>
-		<div class="arrow"></div>
 		<ul class="nav">
-			<li><a href="#block">Block Request</a></li>
-			<li><a href="#hsts">HTST Request</a></li>
-			<li><a href="#refer">Change Referer</a></li>
-			<li><a href="#log">Log Request</a></li>
+			<li class="current"><a href="#block">Block</a></li>
+			<li><a href="#hsts">HTST</a></li>
+			<li><a href="#refer">Referer</a></li>
+			<li><a href="#log">Log</a></li>
+			<li><a href="#qrcode">QRCode</a></li>
 		</ul>
-	</div>
+	</aside>
 	<section id="block">
-		<div class="setting-item">
-			<div class="title">
-				Account settings
+		<div class="setting-title">
+			Block <i>Block website that U don't like</i>
+		</div>
+		<div class="setting-content">
+			<div class="rule-switch">
+				<input type="checkbox" class="switch-input" id="switch-block">
+				<label for="switch-block">Enable Block</label>
 			</div>
-			<div class="setting-content">
-				<div class="input-area">
-					<div class="input-wrapper protocol">
-						<label class="label" for="b-protocol">Protocol</label>
-						<select id="b-protocol" class="input" >
-							<option value="*">*</option>
-							<option value="http">http</option>
-							<option value="https">https</option>
-						</select>
-					</div>
-					<div class="input-wrapper separator">
-						<label class="label">&nbsp;</label>
-						<div class="input">://</div>
-					</div>
-					<div class="input-wrapper host">
-						<label class="label" for="b-host">Host</label>
-						<input id="b-host" class="input" >
-					</div>
-					<div class="input-wrapper separator">
-						<label class="label">&nbsp;</label>
-						<div class="input">/</div>
-					</div>
-					<div class="input-wrapper path">
-						<label class="label" for="b-path">Path</label>
-						<input id="b-path" class="input" >
-					</div>
-					<div class="input-wrapper separator">
-						<label class="label">&nbsp;</label>
-						<button class="input">Add Rule</button>
-					</div>
+			<div class="item-title">Add rule</div>
+			<div class="rule-field">
+				<div class="input-field field-block protocol">
+					<label class="label" for="b-protocol">Protocol</label>
+					<select id="b-protocol" class="input" >
+						<option value="*">*</option>
+						<option value="http">http</option>
+						<option value="https">https</option>
+					</select>
 				</div>
-				<div class="tips">
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">://</div>
 				</div>
-				<div class="list-wrapper">
-					<div class="list-content">
-						<div class="list-header">
-							<div class="row-num">NO.</div>
-							<div class="rule">Rule</div>
-							<div class="options">
-								<span>Previous</span><span>Next</span><span>Remove</span>
-							</div>
-						</div>
-						<ol class="list-body">
-							<li>
-								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
-									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
-								</span>
-								<span class="li-options">delete</span>
-							</li>
-							<li>
-								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
-									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
-								</span>
-								<span class="li-delete">delete</span>
-							</li>
-							<li>
-								<span class="li-rule" title="http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj">
-									http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj
-								</span>
-								<span class="li-options">delete</span>
-							</li>
-						</ol>
-					</div>
-					<div class="rule-guide">
-						<p>"*" means everything.</p>
-					</div>
+				<div class="input-field field-block host">
+					<label class="label" for="b-host">Host</label>
+					<input id="b-host" class="input" placeholder="required">
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">/</div>
+				</div>
+				<div class="input-field field-block path">
+					<label class="label" for="b-path">Path</label>
+					<input id="b-path" class="input" placeholder="optional">
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<button class="input" onclick="alert('Ha')">Add Rule</button>
 				</div>
 			</div>
+			<div class="tips">
+			</div>
+			<div class="item-title">Manage rules</div>
+			<table class="rules">
+				<thead>
+					<tr>
+						<th width="7%"><input type="checkbox" name="" id=""></th>
+						<th width="78%">Rule</th>
+						<th width="15%">delete</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr class="checked">
+						<td><input type="checkbox" value="dd"> </td>
+						<td title="ssss">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj</td>
+						<td>delete</td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" value="dd"></td>
+						<td title="sdsdfsdf">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfjsdsdfsfsdsss</td>
+						<td>delete</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 	<section id="hsts">
 		<div class="setting-item">
 			<div class="title">
-				Configure auto-punch
+				HTST
 			</div>
 			<div class="setting-content">
 
@@ -106,7 +99,7 @@
 	<section id="refer">
 		<div class="setting-item">
 			<div class="title">
-				Log of auto-punch
+				Referer
 			</div>
 			<div class="setting-content">
 			</div>
@@ -115,10 +108,18 @@
 	<section id="log">
 		<div class="setting-item">
 			<div class="title">
-				Log of auto-punch
+				Log
 			</div>
 			<div class="setting-content">
 			</div>
+		</div>
+	</section>
+	<section id="qrcode">
+		<div class="setting-title">
+			QRCode <i>Generate QR Code</i>
+		</div>
+		<div class="setting-content">
+			hello
 		</div>
 	</section>
 	<script type="text/javascript" src="opt.js"></script>

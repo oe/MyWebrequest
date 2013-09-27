@@ -7,15 +7,16 @@
 </head>
 <body>
 	<div id="tips-wraper">
-		<div id="prompt" i18n-content="pop-prompt">Current page url's QRCode</div>
-		<span id="action-tip" i18n-content="pop-action-tip">(double click to edit content)</span>
+		<div id="prompt" i18n-content="pop_prompt"></div>
+		<span id="action-tip" i18n-content="pop_action_tip"></span>
 	</div>
 	<div id="code">
 		<textarea id="text"></textarea>
-		<button id="make" i18n-content="pop-make">Make QRCode</button>
-		<a href="../options/index.html#qrcode" target="_blank">more...</a>
+		<button id="make" i18n-content="pop_make_btn"></button>
+		<a href="../options/index.html#qrcode" target="_blank" i18n-content="pop_more_link"></a>
 		<div id="qrcode"></div>
 	</div>
+	<script src="/common/i18n.js"></script>
 	<script src="/common/qrcode.js"></script>
 	<script src="./popup.js"></script>
 </body>

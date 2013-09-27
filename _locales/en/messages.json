@@ -1,9 +1,32 @@
 {
   "appName":  {
-    "message": "Hello My Webrequest",
-    "description": "The extension name."
+    "message": "Hello My Webrequest"
+  },
+  "iconTitle": {
+  	"message": "Get current page's QRCode"
   },
   "appDesc": {
   	"message": "Control your browser's network connection."
+  },
+  "pop_prompt": {
+  	"message": "Current page url's QRCode"
+  },
+  "pop_action_tip": {
+  	"message": "(double click QRCode to edit)"
+  },
+  "pop_get_new": {
+  	"message": "You've got a new QRCode"
+  },
+  "pop_edit_promp": {
+  	"message": "Edit QRCode content"
+  },
+  "pop_edit_tip": {
+  	"message": "(Don't type too much)"
+  },
+  "pop_make_btn": {
+  	"message": "Make QRCode"
+  },
+  "pop_more_link": {
+  	"message": "more..."
   }
 }

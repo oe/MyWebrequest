@@ -1,9 +1,32 @@
 {
-	"appName":  {
-		"message": "你好 My Webrequest",
-		"description": "The extension name."
-	},
-	"appDesc": {
-		"message": "自定义浏览器的网络请求。"
-	}
+  "appName":  {
+    "message": "你好 My Webrequest"
+  },
+  "iconTitle": {
+  	"message": "获取当前页面地址的二维码"
+  },
+  "appDesc": {
+  	"message": "控制你的浏览器的请求"
+  },
+  "pop_prompt": {
+  	"message": "当前页面地址的二维码"
+  },
+  "pop_action_tip": {
+  	"message": "(双击二维码编辑内容)"
+  },
+  "pop_get_new": {
+  	"message": "新二维码生成啦"
+  },
+  "pop_edit_promp": {
+  	"message": "编辑二维码内容"
+  },
+  "pop_edit_tip": {
+  	"message": "(别输入太多文字)"
+  },
+  "pop_make_btn": {
+  	"message": "生成二维码"
+  },
+  "pop_more_link": {
+  	"message": "更多..."
+  }
 }

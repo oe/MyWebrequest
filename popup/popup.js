@@ -23,7 +23,7 @@ chrome.tabs.query({
 });
 
 function makeQRCode () {
-	prompt.innerHTML = 'You\'ve got a new QRCode'
+	prompt.innerHTML = chrome.i18n.getMessage('pop_get_new');
 	content = text.value;
 	try {
     	qrcode.makeCode(content);
@@ -32,13 +32,13 @@ function makeQRCode () {
     	qrelm.innerHTML = '<code>' + e.message + '</code>';
     }
 	qrelm.style.display = 'block';
-	actionTip.innerText = '(double click to edit content)';
+	actionTip.innerText = chrome.i18n.getMessage('pop_action_tip');
 	qrelm.focus();
 }
 
 qrelm.addEventListener('dblclick',function (e) {
-	prompt.innerText = 'Edit QRCode content';
-	actionTip.innerText = '(Don\'t type too much)';
+	prompt.innerText = chrome.i18n.getMessage('pop_edit_promp');
+	actionTip.innerText = chrome.i18n.getMessage('pop_edit_tip');
 	this.style.display = 'none';
 	text.value = content;
 	text.select();
