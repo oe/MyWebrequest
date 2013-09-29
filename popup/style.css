@@ -28,7 +28,7 @@ body {
     background-clip:padding-box;
     background-color:rgba(0,0,0,.2);
     min-height:28px;
-    padding-top:100
+    padding-top:100px;
 }
 ::-webkit-scrollbar-thumb:hover {
     -webkit-box-shadow:inset 1px 1px 1px rgba(0,0,0,.25);
@@ -85,13 +85,7 @@ a {
 	box-shadow: 2px 2px 3px rgba(223,223,223,.6), -2px -2px 3px rgba(223,223,223,.6);
 }
 #make {
-	background-color: rgb(143, 207, 0);
-	border-radius: 3px;
-	border: none;
-	box-shadow: rgba(45, 155, 220, 0.631373) 0px 0px 11px 0px, rgba(0, 0, 0, 0.2) 0px 1px 2px 0px;
-	color: rgb(255, 255, 255);
-	vertical-align: middle;
-	padding: 4px;
+	font-size: 14px;
 }
 #make:active {
 	box-shadow: rgba(0, 0, 0, 0.298039) 0px 1px 3px 0px inset;

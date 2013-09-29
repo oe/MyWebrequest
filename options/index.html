@@ -3,6 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 	<title>Options</title>
+	<link rel="stylesheet" href="/common/widgets.css">
 	<link rel="stylesheet" type="text/css" href="style.css" media="all">
 </head>
 <body>
@@ -10,12 +11,13 @@
 		<div class="app-name">
 			My Webrequest
 		</div>
-		<ul class="nav">
-			<li class="current"><a href="#block">Block</a></li>
+		<ul class="nav" id="nav">
+			<li ><a href="#block">Block</a></li>
 			<li><a href="#hsts">HTST</a></li>
 			<li><a href="#refer">Referer</a></li>
 			<li><a href="#log">Log</a></li>
 			<li><a href="#qrcode">QRCode</a></li>
+			<li><a href="#help">Help</a></li>
 		</ul>
 	</aside>
 	<section id="block">
@@ -53,47 +55,45 @@
 					<label class="label" for="b-path">Path</label>
 					<input id="b-path" class="input" placeholder="optional">
 				</div>
-				<div class="input-field field-block separator">
+				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
-					<button class="input" onclick="alert('Ha')">Add Rule</button>
+					<button class="input">Add Rule</button>
 				</div>
 			</div>
 			<div class="tips">
 			</div>
-			<div class="item-title">Manage rules</div>
+			<div class="item-title">
+				<span>Manage rules</span>
+				<span class="rule-cunt">(15 rules)</span>
+			</div>
 			<table class="rules">
 				<thead>
 					<tr>
 						<th width="7%"><input type="checkbox" name="" id=""></th>
 						<th width="78%">Rule</th>
-						<th width="15%">delete</th>
+						<th width="15%"><button class="multi-delete">delete</button></th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr class="checked">
+					<tr>
 						<td><input type="checkbox" value="dd"> </td>
 						<td title="ssss">
 							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj</td>
-						<td>delete</td>
+						<td class="delete">delete</td>
 					</tr>
 					<tr>
 						<td><input type="checkbox" value="dd"></td>
 						<td title="sdsdfsdf">
 							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfjsdsdfsfsdsss</td>
-						<td>delete</td>
+						<td class="delete">delete</td>
 					</tr>
 				</tbody>
 			</table>
 		</div>
 	</section>
 	<section id="hsts">
-		<div class="setting-item">
-			<div class="title">
-				HTST
-			</div>
-			<div class="setting-content">
-
-			</div>
+		<div class="setting-title">
+			HTST <i>Force HTTPS connection to some website.</i>
 		</div>
 	</section>
 	<section id="refer">
@@ -122,6 +122,33 @@
 			hello
 		</div>
 	</section>
+	<section id="help">
+		<div class="setting-title">
+			QRCode <i>Generate QR Code</i>
+		</div>
+		<div class="setting-content">
+			hello
+		</div>
+	</section>
+	<div id="overlay-wrapper" class="animated" hidden>
+		<div id="overlay-box">
+			<div id="overlay" class="dialog">
+				<div class="dialog-close cancel"></div>
+				<div class="dialog-title">
+					Are sure delete all?
+				</div>
+				<div class="dialog-content">
+					You've choosed 15 rules,are sure to deleted them all?<br>
+					The operation will take effect immediately.
+				</div>
+				<div class="dialog-btns">
+					<button class="ok">OK</button>
+					<button class="cancel">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="/common/jquery.min.js"></script>
 	<script type="text/javascript" src="opt.js"></script>
 </body>
 </html>
