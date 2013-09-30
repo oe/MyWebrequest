@@ -13,7 +13,7 @@
 		</div>
 		<ul class="nav" id="nav">
 			<li ><a href="#block">Block</a></li>
-			<li><a href="#hsts">HTST</a></li>
+			<li><a href="#hsts">HSTS</a></li>
 			<li><a href="#refer">Referer</a></li>
 			<li><a href="#log">Log</a></li>
 			<li><a href="#qrcode">QRCode</a></li>
@@ -93,25 +93,215 @@
 	</section>
 	<section id="hsts">
 		<div class="setting-title">
-			HTST <i>Force HTTPS connection to some website.</i>
+			HSTS <i>Force HTTPS connection to some website.</i>
+		</div>
+		<div class="setting-content">
+			<div class="rule-switch">
+				<input type="checkbox" class="switch-input" id="switch-hsts">
+				<label for="switch-hsts">Enable HTST</label>
+			</div>
+			<div class="item-title">Add rule</div>
+			<div class="rule-field">
+				<div class="input-field field-block protocol">
+					<label class="label" for="b-protocol">Protocol</label>
+					<select id="b-protocol" class="input" >
+						<option value="*">*</option>
+						<option value="http">http</option>
+						<option value="https">https</option>
+					</select>
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">://</div>
+				</div>
+				<div class="input-field field-block host">
+					<label class="label" for="b-host">Host</label>
+					<input id="b-host" class="input" placeholder="required">
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">/</div>
+				</div>
+				<div class="input-field field-block path">
+					<label class="label" for="b-path">Path</label>
+					<input id="b-path" class="input" placeholder="optional">
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input">Add Rule</button>
+				</div>
+			</div>
+			<div class="tips">
+			</div>
+			<div class="item-title">
+				<span>Manage rules</span>
+				<span class="rule-cunt">(15 rules)</span>
+			</div>
+			<table class="rules">
+				<thead>
+					<tr>
+						<th width="7%"><input type="checkbox" name="" id=""></th>
+						<th width="78%">Rule</th>
+						<th width="15%"><button class="multi-delete">delete</button></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="checkbox" value="dd"> </td>
+						<td title="ssss">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj</td>
+						<td class="delete">delete</td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" value="dd"></td>
+						<td title="sdsdfsdf">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfjsdsdfsfsdsss</td>
+						<td class="delete">delete</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 	<section id="refer">
-		<div class="setting-item">
-			<div class="title">
-				Referer
+		<div class="setting-title">
+			Referer <i>Help U view hotlinking images</i>
+		</div>
+		<div class="setting-content">
+			<div class="rule-switch">
+				<input type="checkbox" class="switch-input" id="switch-refer">
+				<label for="switch-refer">Enable Referer</label>
 			</div>
-			<div class="setting-content">
+			<div class="item-title">Add rule</div>
+			<div class="rule-field">
+				<div class="input-field field-block protocol">
+					<label class="label" for="b-protocol">Protocol</label>
+					<select id="b-protocol" class="input" >
+						<option value="*">*</option>
+						<option value="http">http</option>
+						<option value="https">https</option>
+					</select>
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">://</div>
+				</div>
+				<div class="input-field field-block host">
+					<label class="label" for="b-host">Host</label>
+					<input id="b-host" class="input" placeholder="required">
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">/</div>
+				</div>
+				<div class="input-field field-block path">
+					<label class="label" for="b-path">Path</label>
+					<input id="b-path" class="input" placeholder="optional">
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input">Add Rule</button>
+				</div>
 			</div>
+			<div class="tips">
+			</div>
+			<div class="item-title">
+				<span>Manage rules</span>
+				<span class="rule-cunt">(15 rules)</span>
+			</div>
+			<table class="rules">
+				<thead>
+					<tr>
+						<th width="7%"><input type="checkbox" name="" id=""></th>
+						<th width="78%">Rule</th>
+						<th width="15%"><button class="multi-delete">delete</button></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="checkbox" value="dd"> </td>
+						<td title="ssss">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj</td>
+						<td class="delete">delete</td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" value="dd"></td>
+						<td title="sdsdfsdf">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfjsdsdfsfsdsss</td>
+						<td class="delete">delete</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 	<section id="log">
-		<div class="setting-item">
-			<div class="title">
-				Log
+		<div class="setting-title">
+			Log <i>Help U inspecting the webrequests</i>
+		</div>
+		<div class="setting-content">
+			<div class="rule-switch">
+				<input type="checkbox" class="switch-input" id="switch-log">
+				<label for="switch-log">Enable Log</label>
 			</div>
-			<div class="setting-content">
+			<div class="item-title">Add rule</div>
+			<div class="rule-field">
+				<div class="input-field field-block protocol">
+					<label class="label" for="b-protocol">Protocol</label>
+					<select id="b-protocol" class="input" >
+						<option value="*">*</option>
+						<option value="http">http</option>
+						<option value="https">https</option>
+					</select>
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">://</div>
+				</div>
+				<div class="input-field field-block host">
+					<label class="label" for="b-host">Host</label>
+					<input id="b-host" class="input" placeholder="required">
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">/</div>
+				</div>
+				<div class="input-field field-block path">
+					<label class="label" for="b-path">Path</label>
+					<input id="b-path" class="input" placeholder="optional">
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input">Add Rule</button>
+				</div>
 			</div>
+			<div class="tips">
+			</div>
+			<div class="item-title">
+				<span>Manage rules</span>
+				<span class="rule-cunt">(15 rules)</span>
+			</div>
+			<table class="rules">
+				<thead>
+					<tr>
+						<th width="7%"><input type="checkbox" name="" id=""></th>
+						<th width="78%">Rule</th>
+						<th width="15%"><button class="multi-delete">delete</button></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="checkbox" value="dd"> </td>
+						<td title="ssss">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfj</td>
+						<td class="delete">delete</td>
+					</tr>
+					<tr>
+						<td><input type="checkbox" value="dd"></td>
+						<td title="sdsdfsdf">
+							http://www.baidu.com/abcdefghijklmnopqrstuvwxyzaasdfsdlfjsldfjsdsdfsfsdsss</td>
+						<td class="delete">delete</td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
 	</section>
 	<section id="qrcode">
@@ -124,7 +314,7 @@
 	</section>
 	<section id="help">
 		<div class="setting-title">
-			QRCode <i>Generate QR Code</i>
+			Help <i>There must be something U need to know</i>
 		</div>
 		<div class="setting-content">
 			hello

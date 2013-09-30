@@ -6,7 +6,7 @@
   	"message": "Get current page's QRCode"
   },
   "appDesc": {
-  	"message": "Control your browser's network connection."
+  	"message": "Control your browser's web request."
   },
   "pop_prompt": {
   	"message": "Current page url's QRCode"

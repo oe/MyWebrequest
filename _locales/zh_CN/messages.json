@@ -6,7 +6,7 @@
   	"message": "获取当前页面地址的二维码"
   },
   "appDesc": {
-  	"message": "控制你的浏览器的请求"
+  	"message": "控制你的浏览器的网络请求"
   },
   "pop_prompt": {
   	"message": "当前页面地址的二维码"
