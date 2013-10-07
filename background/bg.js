@@ -111,10 +111,10 @@
 	(function init () {
 		var onoff = JSON.parse(localStorage.onoff || '{}'),
 			reqApi = chrome.webRequest;
-		blockrule.urls = JSON.parse(localStorage.blockrule || '[]');
-		hstsrule.urls = JSON.parse(localStorage.hstsrule || '[]');
-		referrule.urls = JSON.parse(localStorage.referrule || '[]');
-		logrule.urls = JSON.parse(localStorage.logrule || '[]');
+		blockrule.urls = JSON.parse(localStorage.block || '[]');
+		hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
+		referrule.urls = JSON.parse(localStorage.refer || '[]');
+		logrule.urls = JSON.parse(localStorage.log || '[]');
 
 		if (onoff.blockrule && blockrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
@@ -152,7 +152,7 @@
 			onoff = JSON.parse(localStorage.onoff || '{}');
 
 		switch(type) {
-			case 'blockrule':
+			case 'block':
 				blockrule.urls = newData;
 				if (onoff.blockrule) {
 					reqApi.onBeforeRequest.removeListener(blockReq);
@@ -161,7 +161,7 @@
 					}, 0,blockReq,blockrule);
 				}
 				break;
-			case 'hstsrule':
+			case 'hsts':
 				hstsrule.urls = newData;
 				if (onoff.hstsrule) {
 					reqApi.onBeforeRequest.removeListener(hstsReq);
@@ -170,7 +170,7 @@
 					}, 0,hstsReq,hstsrule);
 				}
 				break;
-			case 'referrule':
+			case 'refer':
 				referrule.urls = newData;
 				if (onoff.referrule) {
 					reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
@@ -179,7 +179,7 @@
 					}, 0,modifyReferer,referrule);
 				}
 				break;
-			case 'logrule':
+			case 'log':
 				logrule.urls = newData;
 				if (onoff.logrule) {
 					reqApi.onBeforeRequest.removeListener(logBody);

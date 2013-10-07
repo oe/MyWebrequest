@@ -28,5 +28,11 @@
   },
   "pop_more_link": {
   	"message": "更多..."
+  },
+  "opt_delete_text": {
+    "message": "删除"
+  },
+  "opt_no_rules": {
+    "message": "您还没添加任何规则。"
   }
 }

@@ -28,5 +28,20 @@
   },
   "pop_more_link": {
   	"message": "more..."
+  },
+  "opt_delete_text": {
+    "message": "delete"
+  },
+  "opt_rule_unit": {
+    "message": "rules"
+  },
+  "opt_no_rules": {
+    "message": "You haven't added any rules yet."
+  },
+  "opt_deldlg_title": {
+    "message": "Are you sure to delete?"
+  },
+  "opt_deldlg_content": {
+    "message": "You've chosed xx rule(s), are you sure to delete them all?"
   }
 }

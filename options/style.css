@@ -170,6 +170,7 @@ section:target{
 }
 
 .setting-content .item-title .rule-cunt {
+	display: inline;
 	font-size: 0.8em;
 	color: #999;
 }
@@ -291,6 +292,10 @@ table.rules tbody tr:hover td:nth-child(3) {
 }
 table.rules tbody tr td:nth-child(3):hover {
 	color: red;
+}
+
+.align-center {
+	text-align: center;
 }
 
 @-webkit-keyframes fadeInDown {
