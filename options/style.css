@@ -197,6 +197,7 @@ section:target{
 	display: block;
 	float: none;
 	clear: both;
+	margin-bottom: 20px;
 }
 .rule-field .field-block{
 	float: left;
@@ -221,9 +222,39 @@ section:target{
 	width: 30%;
 }
 
-.setting-content .tips{
+/*.setting-content .tips{
 	height: 30px;
 	width: 100%;
+}*/
+
+.arrow_box {
+	position: relative;
+	background: #d5c744;
+	border: 2px solid #f5d362;
+}
+.arrow_box:after, .arrow_box:before {
+	bottom: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_box:after {
+	border-color: rgba(213, 199, 68, 0);
+	border-bottom-color: #d5c744;
+	border-width: 10px;
+	left: 50%;
+	margin-left: -10px;
+}
+.arrow_box:before {
+	border-color: rgba(245, 211, 98, 0);
+	border-bottom-color: #f5d362;
+	border-width: 13px;
+	left: 50%;
+	margin-left: -13px;
 }
 
 table.rules {
@@ -257,14 +288,14 @@ table.rules tbody tr {
     border-bottom: 1px solid #ccc;
 }
 
-table.rules tbody tr:nth-child(odd) {
+/*table.rules tbody tr:nth-child(odd) {
+	background-color: whitesmoke;
+}*/
+table.rules tbody tr.checked {
 	background-color: whitesmoke;
 }
-table.rules tbody tr.checked {
-	background-color: #ddd;
-}
 table.rules tbody tr:hover {
-	background-color: #cecece;
+	background-color: #ddd;
 }
 
 

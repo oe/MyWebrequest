@@ -73,10 +73,38 @@ $(function ($) {
 		}
 	});
 
+	//input box [host] enter key
+	$('.rule-field').on('keyup','input[name="host"]',function (e) {
+		var $path;
+		if (e.keyCode === 13) {
+			$path = $(this).parents('.rule-field').find('input[name="path"]');
+			if ($path.val() === '') {
+				$path.focus();
+			} else {
+				$(this).parents('.rule-field').find('.add-rule').click();
+			}
+		}
+	});
+
+	//input box [path]
+	$('.rule-field').on('keyup','input[name="path"]',function (e) {
+		if (e.keyCode === 13) {
+			$(this).parents('.rule-field').find('.add-rule').click();
+		}
+	});
+
 	//add rule
-	$('section .add-rule').on('click',function (e) {
+	$('.rule-field').on('click','.add-rule',function (e) {
 		var secId = $(this).parents('section').attr('id'),
-			data = getRuleValues(secId),
+			$ruleField = $(this).parents('.rule-field'),
+			$protocol = $ruleField.find('select[name="protocol"]'),
+			$host = $ruleField.find('input[name="host"]'),
+			$path = $ruleField.find('input[name="path"]'),
+			data ={
+				protocol: $protocol.val().trim(),
+				host: $host.val().trim(),
+				path: $path.val().trim()
+			},
 			hostReg = /^(\*((\.[a-z0-9-]+)*\.[a-z]{2,4})?|([a-z0-9-]+\.)+[a-z]{2,4})$/,
 			pathReg = /^[\*a-z]*$/,
 			dlg = {},
@@ -110,6 +138,7 @@ $(function ($) {
 		}
 		rule = data.protocol + '://' + data.host + '/' + data.path;
 		//TODO:check whether the rule is duplicated
+		
 		str = '<tr>';
 		str +=		'<td><input type="checkbox" value="' + 12 + '"> </td>';
 		str +=		'<td title="' + rule + '">';
@@ -118,10 +147,15 @@ $(function ($) {
 		str += '</tr>';
 		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
 			$tbody.html(str);
+			$tbody.parent().find('thead input,thead button').prop('disabled',false);
 		} else {
 			$tbody.prepend(str);
 		}
 		//TODO ADD rule to localStorage
+
+		$host.val('');
+		$path.val('');
+		$host.focus();
 	});
 
 	//delete multi function
@@ -129,7 +163,7 @@ $(function ($) {
 		var secId = $(this).parents('section').attr('id'),
 			len = $(this).parents('table').find('tbody input:checked').length,
 			config;
-		if (!len) {
+		if (len) {
 			config = {
 				title: chrome.i18n.getMessage('opt_deldlg_title'),
 				content: chrome.i18n.getMessage('opt_deldlg_content').replace('xx',len),
@@ -166,6 +200,7 @@ $(function ($) {
 			trCunt = $tbody.find('tr').length;
 			if (!trCunt) {
 				$tbody.html(TABNODATATR);
+				$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			} else if (trCunt === $tbody.find('input:checked').length) {
 				$tbody.parent().find('thead input[type="checkbox"]').prop('checked',true);
 			}
@@ -211,22 +246,11 @@ $(function ($) {
 		}
 		$('#' + secId + ' .rule-cunt-num').text(cunt);
 		if (!str) {
-			str = TABNODATATR;//'<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>';
+			$tbody.parent().find('thead input,thead button').prop('disabled',true);
+			str = TABNODATATR;
 		}
 		$tbody.html(str);
 	}
-
-	function getRuleValues (secId) {
-		var data = {},
-			$ruleField = $('#' + secId + ' .rule-field');
-		if (!$ruleField.length) return data;
-
-		data.protocol = $ruleField.find('select[name="protocol"]').val().trim();
-		data.host = $ruleField.find('input[name="host"]').val().trim();
-		data.path = $ruleField.find('input[name="path"]').val().trim();
-		return data;
-	}
-
 
 	function deleteRules (secId) {
 		var $tbody = $('#' + secId + ' tbody'),
@@ -236,13 +260,23 @@ $(function ($) {
 				}).get(),
 			ruleObj = rules[secId],
 			len = keys.length;
-		if (!len) {
-			$checkTrs.map(function () {
-				$(this).parents('tr').remove();
-			});
-			while (len--) {
-				delete ruleObj[keys[len]];
+		if (len) {
+			//delete all
+			if (len === $tbody.find('tr').length) {
+				$tbody.html(TABNODATATR);
+				$tbody.parent().find('thead input').prop('checked',false);
+				$tbody.parent().find('thead input,thead button').prop('disabled',true);
+				rules[secId] = {};
+				ruleObj = {};
+			} else {
+				$checkTrs.map(function () {
+					$(this).parents('tr').remove();
+				});
+				while (len--) {
+					delete ruleObj[keys[len]];
+				}
 			}
+
 			localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
 			if (!$tbody.find('tr').length) {
 				$tbody.html(TABNODATATR);
