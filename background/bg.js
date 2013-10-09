@@ -41,10 +41,7 @@
 		try{
 			while (i--) {
 				tmp = arr[i].split('=');
-				if (tmp.length < 2) {
-					throw new Error('Somme data not key-value paired is found the query string.')
-				}
-				formated[decodeURIComponent(tmp[0])] = decodeURIComponent(tmp[1]);
+				formated[decodeURIComponent(tmp[0])] = tmp[1] === undefined ? '' : decodeURIComponent(tmp[1]);
 			}
 			obj.formatedData = formated;
 		} catch(e) {
@@ -116,29 +113,29 @@
 		referrule.urls = JSON.parse(localStorage.refer || '[]');
 		logrule.urls = JSON.parse(localStorage.log || '[]');
 
-		if (onoff.blockrule && blockrule.urls.length) {
+		if (onoff.block && blockrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
 		} else {
-			onoff.blockrule = false;
+			onoff.block = false;
 		}
 
-		if (onoff.hstsrule && hstsrule.urls.length) {
+		if (onoff.hsts && hstsrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
 		} else {
-			onoff.hstsrule = false;
+			onoff.hsts = false;
 		}
 
-		if (onoff.referrule && referrule.urls.length) {
+		if (onoff.refer && referrule.urls.length) {
 			reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
 		} else {
-			onoff.referrule = false;
+			onoff.refer = false;
 		}
 
-		if (onoff.logrule && logrule.urls.length) {
+		if (onoff.log && logrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
 			reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
 		} else {
-			onoff.logrule = false;
+			onoff.log = false;
 		}
 
 		localStorage.onoff = JSON.stringify(onoff);
@@ -154,7 +151,7 @@
 		switch(type) {
 			case 'block':
 				blockrule.urls = newData;
-				if (onoff.blockrule) {
+				if (onoff.block) {
 					reqApi.onBeforeRequest.removeListener(blockReq);
 					setTimeout(function (fn,filter) {
 						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
@@ -163,7 +160,7 @@
 				break;
 			case 'hsts':
 				hstsrule.urls = newData;
-				if (onoff.hstsrule) {
+				if (onoff.hsts) {
 					reqApi.onBeforeRequest.removeListener(hstsReq);
 					setTimeout(function (fn,filter) {
 						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
@@ -172,7 +169,7 @@
 				break;
 			case 'refer':
 				referrule.urls = newData;
-				if (onoff.referrule) {
+				if (onoff.refer) {
 					reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
 					setTimeout(function (fn,filter) {
 						reqApi.onBeforeSendHeaders.addListener(fn,filter,['requestHeaders','blocking']);
@@ -181,7 +178,7 @@
 				break;
 			case 'log':
 				logrule.urls = newData;
-				if (onoff.logrule) {
+				if (onoff.log) {
 					reqApi.onBeforeRequest.removeListener(logBody);
 					reqApi.onSendHeaders.removeListener(logRequest);
 					setTimeout(function (fn,filter) {
@@ -191,8 +188,8 @@
 				}
 				break;
 			case 'onoff':
-				if (newData.blockrule !== oldData.blockrule) {
-					if (newData.blockrule) {
+				if (newData.block !== oldData.block) {
+					if (newData.block) {
 						reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
 						console.log('off event block on');
 					} else {
@@ -200,15 +197,15 @@
 						console.log('off event block off');
 					}
 				}
-				if (newData.hstsrule !== oldData.hstsrule) {
-					if (newData.hstsrule) {
+				if (newData.hsts !== oldData.hsts) {
+					if (newData.hsts) {
 						reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
 					} else {
 						reqApi.onBeforeRequest.removeListener(hstsReq);
 					}
 				}
-				if (newData.referrule !== oldData.referrule) {
-					if (newData.referrule) {
+				if (newData.refer !== oldData.refer) {
+					if (newData.refer) {
 						console.log(' event rerfer on');
 						reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
 					} else {
@@ -216,8 +213,8 @@
 						reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
 					}
 				}
-				if (newData.logrule !== oldData.logrule) {
-					if (newData.logrule) {
+				if (newData.log !== oldData.log) {
+					if (newData.log) {
 						console.log(' event log on')
 						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
 						reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);

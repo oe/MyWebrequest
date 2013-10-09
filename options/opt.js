@@ -1,3 +1,8 @@
+//TODO: 1. add rule: error tips style
+//		2. log request function maybe misslead: when no rule it log every request
+//			to fixed this: diable enable checkbox when there is no rule
+//		3. QRCode is to be continued
+
 $(function ($) {
 	var hash = window.location.hash || '#block',
 		currentRule = '',
@@ -5,6 +10,24 @@ $(function ($) {
 		dialogOKCB = null,
 		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>';
 
+	//init rules
+	(function init (rules) {
+		var arr,key,i,j;
+		rules.block= {};
+		rules.refer = {};
+		rules.log = {};
+		rules.hsts = {};
+		for (key in rules) {
+			arr = JSON.parse(localStorage[key] || '[]');
+			j = arr.length;
+			i = 0;
+			while (j--) {
+				++i;
+				rules[key][i] = arr[j];
+			}
+			rules[key].max = i;
+		}
+	})(rules);
 
 	if (!$('section' + hash).length) {
 		hash = '#block';
@@ -19,58 +42,19 @@ $(function ($) {
 			$navLink.parent().addClass('current');
 			window.location.hash = targetId;
 			currentRule = targetId.replace('#','');
-			initTable(currentRule);
+			initSection(currentRule);
 		}
 	});
 	//hash init
 	$('#nav a[href=' + hash + ']').click();
-	//init rules
-	(function init (rules) {
-		var arr,key,i,j;
-		rules.block= {};
-		rules.refer = {};
-		rules.log = {};
-		rules.hsts = {};
-		for (key in rules) {
-			arr = localStorage[key] || '[]';
-			arr = JSON.parse(arr);
-			j = arr.length;
-			i = 0;
-			while (j--) {
-				++i;
-				rules[key][i] = arr[i];
-			}
-		}
-	})(rules);
 
-	//check all
-	$('.rules thead input[type="checkbox"]').on('click',function (e) {
-		var $this = $(this),
-			checked = $this.prop('checked'),
-			parent = $this.parents('.rules');
-		parent.find('tbody input[type="checkbox"]').prop('checked',checked);
-		if (checked) {
-			parent.find('tbody tr').addClass('checked');
-		} else {
-			parent.find('tbody tr').removeClass('checked');
-		}
-	});
-
-	//tr checkbox
-	$('.rules tbody').on('click','input[type="checkbox"]',function (e) {
-		var $this = $(this),
-			$tr = $this.parents('tr'),
-			$tbody = $this.parents('tbody'),
-			$checkAll = $this.parents('.rules').find('thead input[type="checkbox"]');
-		if ($this.prop('checked')) {
-			$tr.addClass('checked');
-			if ($tbody.find('tr').length === $tbody.find('input:checked').length) {
-				$checkAll.prop('checked',true);
-			}
-		} else {
-			$tr.removeClass('checked');
-			$checkAll.prop('checked',false);
-		}
+	// enable or disable a function
+	$('section .switch-input').on('change',function (e) {
+		var secId = $(this).parents('section').attr('id'),
+			enabled = $(this).prop('checked'),
+			onoff = JSON.parse(localStorage.onoff || '') || {};
+		onoff[secId] = enabled;
+		localStorage.onoff = JSON.stringify(onoff);
 	});
 
 	//input box [host] enter key
@@ -137,10 +121,14 @@ $(function ($) {
 			return;
 		}
 		rule = data.protocol + '://' + data.host + '/' + data.path;
-		//TODO:check whether the rule is duplicated
-		
+		if (isValueInObj(ruleObj,rule)) {
+			alert('Rule is exist');
+			return;
+		}
+		++ruleObj.max;
+		ruleObj[ruleObj.max] = rule;
 		str = '<tr>';
-		str +=		'<td><input type="checkbox" value="' + 12 + '"> </td>';
+		str +=		'<td><input type="checkbox" value="' + (++ruleObj.max) + '"> </td>';
 		str +=		'<td title="' + rule + '">';
 		str +=			rule;
 		str +=		'<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
@@ -151,8 +139,9 @@ $(function ($) {
 		} else {
 			$tbody.prepend(str);
 		}
-		//TODO ADD rule to localStorage
+		localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
 
+		$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
 		$host.val('');
 		$path.val('');
 		$host.focus();
@@ -198,6 +187,7 @@ $(function ($) {
 				trCunt;
 			$tr.remove();
 			trCunt = $tbody.find('tr').length;
+			$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
 			if (!trCunt) {
 				$tbody.html(TABNODATATR);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
@@ -207,10 +197,40 @@ $(function ($) {
 		}, 220);
 	});
 
+	//check all
+	$('.rules thead input[type="checkbox"]').on('click',function (e) {
+		var $this = $(this),
+			checked = $this.prop('checked'),
+			parent = $this.parents('.rules');
+		parent.find('tbody input[type="checkbox"]').prop('checked',checked);
+		if (checked) {
+			parent.find('tbody tr').addClass('checked');
+		} else {
+			parent.find('tbody tr').removeClass('checked');
+		}
+	});
+
+	//tr checkbox
+	$('.rules tbody').on('click','input[type="checkbox"]',function (e) {
+		var $this = $(this),
+			$tr = $this.parents('tr'),
+			$tbody = $this.parents('tbody'),
+			$checkAll = $this.parents('.rules').find('thead input[type="checkbox"]');
+		if ($this.prop('checked')) {
+			$tr.addClass('checked');
+			if ($tbody.find('tr').length === $tbody.find('input:checked').length) {
+				$checkAll.prop('checked',true);
+			}
+		} else {
+			$tr.removeClass('checked');
+			$checkAll.prop('checked',false);
+		}
+	});
+
+	//dialog escape key
 	$(document).on('keydown',function (e) {
 		if (e.keyCode === 27 && !$('#overlay-wrapper').prop('hidden')) {
 			$('.dialog .cancel').click();
-			console.log('hahah');
 		}
 	});
 
@@ -223,28 +243,31 @@ $(function ($) {
 		}
 	});
 
-	function initTable(secId) {
+	function initSection(secId) {
 		var ruleObj,
 			str = '',
 			$tbody = $('#' + secId + ' tbody'),
 			delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>',
 			key,
+			onoff = JSON.parse(localStorage.onoff || '') || {},
 			cunt = 0;
 
 		if(!$tbody.length) return;
 		ruleObj = rules[secId] || {};
 		for (key in ruleObj) {
-			++cunt;
-			if (ruleObj.hasOwnProperty(key)) {
-					str += '<tr>';
-					str +=		'<td><input type="checkbox" value="' + key + '"> </td>';
-					str +=		'<td title="' + ruleObj[key] + '">';
-					str +=			ruleObj[key];
-					str +=		delStr;
-					str += '</tr>';
+			//only key is a number
+			if (!isNaN(key) && ruleObj.hasOwnProperty(key)) {
+				++cunt;
+				str += '<tr>';
+				str +=		'<td><input type="checkbox" value="' + key + '"> </td>';
+				str +=		'<td title="' + ruleObj[key] + '">';
+				str +=			ruleObj[key];
+				str +=		delStr;
+				str += '</tr>';
 			}
 		}
 		$('#' + secId + ' .rule-cunt-num').text(cunt);
+		$('#' + secId + ' .switch-input').prop('checked',!!onoff[secId]);
 		if (!str) {
 			$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			str = TABNODATATR;
@@ -278,6 +301,8 @@ $(function ($) {
 			}
 
 			localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
+
+			$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
 			if (!$tbody.find('tr').length) {
 				$tbody.html(TABNODATATR);
 			}
@@ -287,11 +312,22 @@ $(function ($) {
 	function getObjValues (obj) {
 		var arr = [],key;
 		for (key in obj) {
-			if (obj.hasOwnProperty(key)) {
+			//only key is number
+			if (!isNaN(key) && obj.hasOwnProperty(key)) {
 				arr.push(obj[key]);
 			}
 		}
 		return arr;
+	}
+
+	function isValueInObj (obj,value) {
+		var prop;
+		for (prop in obj) {
+			if (obj.hasOwnProperty(prop)) {
+				if (obj[prop] === value) return true;
+			}
+		}
+		return false;
 	}
 
 	function hideDialog () {
