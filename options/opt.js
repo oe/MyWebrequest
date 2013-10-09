@@ -1,5 +1,5 @@
 //TODO: 1. add rule: error tips style
-//		2. log request function maybe misslead: when no rule it log every request
+//		2. all request function maybe misslead: when no rule it will match all request urls
 //			to fixed this: diable enable checkbox when there is no rule
 //		3. QRCode is to be continued
 
@@ -184,6 +184,7 @@ $(function ($) {
 		}
 		setTimeout(function () {
 			var $tbody = $tr.parent(),
+				secId = $tbody.parents('section').attr('id'),
 				trCunt;
 			$tr.remove();
 			trCunt = $tbody.find('tr').length;
