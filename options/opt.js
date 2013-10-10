@@ -1,11 +1,8 @@
 //TODO: 1. add rule: error tips style
-//		2. all request function maybe misslead: when no rule it will match all request urls
-//			to fixed this: diable enable checkbox when there is no rule
-//		3. QRCode is to be continued
+//		2. QRCode is to be continued
 
 $(function ($) {
 	var hash = window.location.hash || '#block',
-		currentRule = '',
 		rules = {},
 		dialogOKCB = null,
 		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>';
@@ -41,21 +38,22 @@ $(function ($) {
 			$('#nav li').removeClass('current');
 			$navLink.parent().addClass('current');
 			window.location.hash = targetId;
-			currentRule = targetId.replace('#','');
-			initSection(currentRule);
+			initSection(targetId.replace('#',''));
 		}
 	});
-	//hash init
-	$('#nav a[href=' + hash + ']').click();
 
 	// enable or disable a function
 	$('section .switch-input').on('change',function (e) {
 		var secId = $(this).parents('section').attr('id'),
 			enabled = $(this).prop('checked'),
 			onoff = JSON.parse(localStorage.onoff || '') || {};
+		console.log('change');
 		onoff[secId] = enabled;
 		localStorage.onoff = JSON.stringify(onoff);
 	});
+
+	//hash init
+	$('#nav a[href=' + hash + ']').click();
 
 	//input box [host] enter key
 	$('.rule-field').on('keyup','input[name="host"]',function (e) {
@@ -135,7 +133,9 @@ $(function ($) {
 		str += '</tr>';
 		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
 			$tbody.html(str);
+			$('#' + secId + ' .switch-input').prop('disabled',false);
 			$tbody.parent().find('thead input,thead button').prop('disabled',false);
+			$('#' + secId + ' .enable-tip').prop('hidden',true);
 		} else {
 			$tbody.prepend(str);
 		}
@@ -171,26 +171,29 @@ $(function ($) {
 		showDialog(config);
 	});
 
-
 	//delete one rule
 	$('.rules tbody').on('click','.delete',function (e) {
 		var $tr = $(this).parent(),
+			secId = $(this).parents('section').attr('id'),
 			key = $tr.find('input').attr('value'),
 			ruleArr;
 		$tr.addClass('fadeOutDown');
-		if (rules[currentRule][key]) {
-			delete rules[currentRule][key];
-			localStorage[currentRule] = JSON.stringify(getObjValues(rules[currentRule]));
+		if (rules[secId][key]) {
+			delete rules[secId][key];
+			localStorage[secId] = JSON.stringify(getObjValues(rules[secId]));
 		}
 		setTimeout(function () {
 			var $tbody = $tr.parent(),
-				secId = $tbody.parents('section').attr('id'),
+				$enable = $('#' + secId + ' .switch-input'),
 				trCunt;
 			$tr.remove();
 			trCunt = $tbody.find('tr').length;
 			$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
 			if (!trCunt) {
 				$tbody.html(TABNODATATR);
+				$enable.prop('checked',false).trigger('change');
+				$enable.prop('disabled',true);
+				$('#' + secId + ' .enable-tip').prop('hidden',false);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			} else if (trCunt === $tbody.find('input:checked').length) {
 				$tbody.parent().find('thead input[type="checkbox"]').prop('checked',true);
@@ -248,6 +251,7 @@ $(function ($) {
 		var ruleObj,
 			str = '',
 			$tbody = $('#' + secId + ' tbody'),
+			$enable = $('#' + secId + ' .switch-input'),
 			delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>',
 			key,
 			onoff = JSON.parse(localStorage.onoff || '') || {},
@@ -268,10 +272,14 @@ $(function ($) {
 			}
 		}
 		$('#' + secId + ' .rule-cunt-num').text(cunt);
-		$('#' + secId + ' .switch-input').prop('checked',!!onoff[secId]);
 		if (!str) {
+			$enable.prop('checked',false).trigger('change');
+			$enable.prop('disabled',true);
+			$('#' + secId + ' .enable-tip').prop('hidden',false);
 			$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			str = TABNODATATR;
+		} else {
+			$enable.prop('checked',!!onoff[secId]);
 		}
 		$tbody.html(str);
 	}
@@ -279,6 +287,7 @@ $(function ($) {
 	function deleteRules (secId) {
 		var $tbody = $('#' + secId + ' tbody'),
 			$checkTrs = $tbody.find('tr input:checked'),
+			$enable = $('#' + secId + ' .switch-input'),
 			keys = $checkTrs.map(function () {
 					return this.value;
 				}).get(),
@@ -290,6 +299,9 @@ $(function ($) {
 				$tbody.html(TABNODATATR);
 				$tbody.parent().find('thead input').prop('checked',false);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
+				$enable.prop('checked',false).trigger('change');
+				$enable.prop('disabled',true);
+				$('#' + secId + ' .enable-tip').prop('hidden',false);
 				rules[secId] = {};
 				ruleObj = {};
 			} else {

@@ -29,6 +29,12 @@
   "pop_more_link": {
   	"message": "more..."
   },
+  "opt_ena_lbl": {
+    "message": "Enable"
+  },
+  "opt_ena_lbltip": {
+    "message": "add a rule to enable"
+  },
   "opt_delete_text": {
     "message": "delete"
   },

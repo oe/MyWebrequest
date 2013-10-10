@@ -78,6 +78,7 @@ a {
 	text-align: left;
 	border-radius: 3px;
 	border-color: #bbb;
+	word-break: break-all;
 }
 #text:focus {
 	outline: none;

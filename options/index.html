@@ -22,12 +22,15 @@
 	</aside>
 	<section id="block">
 		<div class="setting-title">
-			Block <i>Block website that U don't like</i>
+			Block <span>Block website that U don't like</span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
 				<input type="checkbox" class="switch-input" id="switch-block">
-				<label for="switch-block">Enable Block</label>
+				<label for="switch-block">
+					<span i18n-content="opt_ena_lbl">Enable</span>
+					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
+				</label>
 			</div>
 			<div class="item-title">Add rule</div>
 			<div class="rule-field">
@@ -81,7 +84,7 @@
 	</section>
 	<section id="hsts">
 		<div class="setting-title">
-			HSTS <i>Force HTTPS connection to some website.</i>
+			HSTS <span>Force HTTPS connection to some website.</span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
@@ -92,9 +95,9 @@
 			<div class="rule-field">
 				<div class="input-field field-block protocol">
 					<label class="label" for="b-protocol">Protocol</label>
-					<select id="b-protocol" name="protocol" class="input" >
+					<select id="b-protocol" name="protocol" class="input" disabled>
 						<option value="*">*</option>
-						<option value="http">http</option>
+						<option value="http" selected>http</option>
 						<option value="https">https</option>
 					</select>
 				</div>
@@ -140,7 +143,7 @@
 	</section>
 	<section id="refer">
 		<div class="setting-title">
-			Referer <i>Help U view hotlinking images</i>
+			Referer <span>Help U view hotlinking images</span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
@@ -199,7 +202,7 @@
 	</section>
 	<section id="log">
 		<div class="setting-title">
-			Log <i>Help U inspecting the webrequests</i>
+			Log <span>Help U inspecting the webrequests</span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
@@ -258,7 +261,7 @@
 	</section>
 	<section id="qrcode">
 		<div class="setting-title">
-			QRCode <i>Generate QR Code</i>
+			QRCode <span>Generate QR Code</span>
 		</div>
 		<div class="setting-content">
 			hello
@@ -266,7 +269,7 @@
 	</section>
 	<section id="help">
 		<div class="setting-title">
-			Help <i>There must be something U need to know</i>
+			Help <span>There must be something U need to know</span>
 		</div>
 		<div class="setting-content">
 			hello
