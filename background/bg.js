@@ -34,7 +34,7 @@
 			return {error: 'No query data'};
 		}
 		url = url.substr(++i);
-		obj.sourceData = url;
+		obj.rawData = url;
 		arr = url.split('&');
 		i = arr.length;
 		// obj.formatedData = {};

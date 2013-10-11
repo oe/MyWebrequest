@@ -3,7 +3,7 @@
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-
+/*----------- scrollbar -----------------*/
 ::-webkit-scrollbar {
     height:8px;
     width:8px
@@ -52,6 +52,7 @@
     -webkit-box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px -1px 0 rgba(0,0,0,.07);
     background-color:rgba(0,0,0,.05)
 }
+
 html,body{
 	width: 100%;
 	height: 100%;
@@ -160,8 +161,14 @@ section .setting-title{
 	color: grey;
 }
 
-.setting-content{
+.setting-content {
 	margin: 70px 0 20px;
+}
+.setting-content:after {
+	content: " ";
+	display: table;
+	float: none;
+	clear: both;
 }
 .setting-content .rule-switch {
 	margin: 20px 0;
@@ -184,7 +191,7 @@ section .setting-title{
 	color: #999;
 }
 
-/*input field style*/
+/*--------------------- input field style --------------------*/
 .input-field {
 	height: 55px;
 	margin-right: 4px;
@@ -230,11 +237,30 @@ section .setting-title{
 .field-block.path{
 	width: 30%;
 }
+.input-field.field-inline {
+	height: auto;
+	margin-bottom: 8px;
+}
+.field-inline .label,.field-inline .input {
+	display: inline-block;
+}
+.field-inline .label {
+	width: 25%;
+	text-align: right;
+	padding-right: 8px;
+}
+.field-inline.textarea .label {
+	vertical-align: top;
+}
+.field-inline .input {
+	width: 75%;
+	margin-left: -4px;
+}
+.field-inline textarea.input {
+	resize: vertical;
+}
 
-/*.setting-content .tips{
-	height: 30px;
-	width: 100%;
-}*/
+
 
 .arrow_box {
 	position: relative;
@@ -266,6 +292,7 @@ section .setting-title{
 	margin-left: -13px;
 }
 
+/*------------ table(rule list) --------------------*/
 table.rules {
 	width: 100%;
 	table-layout: fixed;
@@ -297,21 +324,13 @@ table.rules tbody tr {
     border-bottom: 1px solid #ccc;
 }
 
-/*table.rules tbody tr:nth-child(odd) {
-	background-color: whitesmoke;
-}*/
 table.rules tbody tr.checked {
 	background-color: whitesmoke;
 }
+
 table.rules tbody tr:hover {
 	background-color: #ddd;
 }
-
-
-
-/*table.rules tbody tr.checked:hover{
-    background-color: #fcd056;
-}*/
 
 table.rules tr td:nth-child(2) {
 	white-space:nowrap;
@@ -337,7 +356,7 @@ table.rules tbody tr td:nth-child(3):hover {
 .align-center {
 	text-align: center;
 }
-
+/*---------------- animation --------------------*/
 @-webkit-keyframes fadeInDown {
 	0% {
 		opacity: 0;
@@ -393,6 +412,7 @@ table.rules tbody tr td:nth-child(3):hover {
 .rules tbody tr.fadeOutDown {
 	-webkit-animation-name: fadeOutDown;
 }
+/*-------- dialog -----------*/
 #overlay-wrapper {
 	position: fixed;
 	top: 0;
@@ -468,3 +488,81 @@ table.rules tbody tr td:nth-child(3):hover {
 	text-align: right;
 	font-size: 0.78em;
 }
+
+/*--------------------- QR Code ------------------*/
+
+/*.setting-content {
+
+}*/
+.qr-left {
+	width: 68%;
+	float: left;
+}
+.qr-right {
+	width: 32%;
+	float: left;
+}
+.qr-left .nav-tabs {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	float: left;
+	width: 15%;
+	border-right: 1px solid #ddd;
+	min-height: 230px;
+}
+.qr-left .nav-tabs>li {
+	border: 1px solid transparent;
+	margin-right: -1px;
+	margin-bottom: 2px;
+	line-height: 15px;
+	padding: 4px;
+	border-radius: 4px 0 0 4px;
+	cursor: default;
+}
+.qr-left .nav-tabs>li:hover {
+	background-color: #eee;
+	border-right-color: #ddd;
+}
+.qr-left .nav-tabs>li.active {
+	background-color: #fff;
+	border-color: #ddd;
+	border-right-color: transparent;
+}
+.qr-left .tab-content {
+	float: right;
+	width: 85%;
+}
+.qr-left .tab-content .tab-pane {
+	display: none;
+	padding: 10px;
+}
+.tab-content .tab-pane.fade {
+	opacity: 0;
+	-webkit-transition: opacity 0.15s linear;
+	transition: opacity 0.15s linear;
+}
+.qr-left .tab-content .tab-pane.active {
+	display: block;
+}
+.tab-content .tab-pane.fade.in {
+	opacity: 1;
+}
+.qr-left .tab-content .tab-pane .s-text{
+	width: 100%;
+	height: 200px;
+	resize: vertical;
+	padding: 4px;
+}
+.qr-left .tab-content .tab-pane .s-msg {
+	height: 150px;
+}
+
+.qr-right .qrcode {
+	/*position: relative;*/
+	width: 200px;
+	height: 200px;
+	margin: 10px auto;
+	border: 1px solid grey;
+}
+
