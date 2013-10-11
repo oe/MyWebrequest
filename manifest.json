@@ -20,7 +20,6 @@
   "background": {
     "page":"background/index.html"
   },
-  "update_url":"http://app.evecalm.com/neuhelper/neuhelper-update.xml",
   "web_accessible_resources": [
     "img/icon16.png",
     "img/icon48.png",
