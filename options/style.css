@@ -201,12 +201,6 @@ section .setting-title{
 .input-field .input, .input-field button {
 	font-family: 'Century Gothic', 'Microsoft YaHei', Verdana;
 }
-.input-field input:focus {
-	border-color: #66afe9;
-	outline: 0;
-	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
-}
 
 .rule-field:after{
 	content: '';
@@ -497,10 +491,12 @@ table.rules tbody tr td:nth-child(3):hover {
 .qr-left {
 	width: 68%;
 	float: left;
+	height: auto;
 }
 .qr-right {
 	width: 32%;
 	float: left;
+	position: relative;
 }
 .qr-left .nav-tabs {
 	list-style: none;
@@ -558,11 +554,13 @@ table.rules tbody tr td:nth-child(3):hover {
 	height: 150px;
 }
 
-.qr-right .qrcode {
-	/*position: relative;*/
+.qr-right .qrcode-area {
+	position: relative;
+	display: block;
 	width: 200px;
 	height: 200px;
 	margin: 10px auto;
-	border: 1px solid grey;
+	background-image: url(../img/qrcode.png);
+	-webkit-background-size: 200px 200px;
+	background-size: 200px 200px;
 }
-

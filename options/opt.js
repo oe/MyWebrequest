@@ -1,11 +1,15 @@
-//TODO: 1. add rule: error tips style
-//		2. QRCode is to be continued
+//TODO: 1. add rule: error tips style, help tip
+//		2. Help is to be continued
 
 $(function ($) {
 	var hash = window.location.hash || '#block',
 		rules = {},
 		dialogOKCB = null,
-		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>';
+		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>',
+		qrcode = new QRCode('qrcode-area', {
+			width : 200,
+			height : 200
+		});
 
 	//init rules
 	(function init (rules) {
@@ -47,7 +51,6 @@ $(function ($) {
 		var secId = $(this).parents('section').attr('id'),
 			enabled = $(this).prop('checked'),
 			onoff = JSON.parse(localStorage.onoff || '') || {};
-		console.log('change');
 		onoff[secId] = enabled;
 		localStorage.onoff = JSON.stringify(onoff);
 	});
@@ -165,7 +168,8 @@ $(function ($) {
 				title: chrome.i18n.getMessage('opt_nochosedlg_title'),
 				content: chrome.i18n.getMessage('opt_nochosedlg_content') || 'Nothing',
 				hideCancel: true,
-				timeout: 1000
+				timeout: 1000,
+				focusOnOK: true
 			};
 		}
 		showDialog(config);
@@ -261,8 +265,42 @@ $(function ($) {
 		$target.addClass('active');
 		setTimeout(function () {
 			$target.addClass('in');
+			$target.find('.input:first').focus();
 		}, 0);
 	});
+
+	//generate QR Code
+	$('.tab-content').on('keyup','.input',function (e) {
+		var $tab = $(this).parents('.tab-pane'),
+			type = $tab.attr('data-type'),
+			str;
+		switch(type) {
+			case 'text':
+				str = $('#s-text').val().trim();
+				break;
+			case 'vcard':
+				str = getVcardString();
+				if (str) {
+					str = 'MECARD:' + str + ';;';
+				}
+				break;
+			case 'msg':
+				if ($('#s-tel').val().trim() || $('#s-msg').val().trim()) {
+					str = 'smsto:' + $('#s-tel').val().trim() + ':' + $('#s-msg').val().trim();
+				}
+				break;
+		}
+		if (str) {
+			try {
+				qrcode.makeCode(str);
+			} catch (e) {
+				alert(e.message);
+			}
+		} else {
+			qrcode._el.querySelector('img').style.display = 'none';
+		}
+	});
+
 
 	function initSection(secId) {
 		var ruleObj,
@@ -271,9 +309,16 @@ $(function ($) {
 			$enable = $('#' + secId + ' .switch-input'),
 			delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>',
 			key,
+			$firstInput,
 			onoff = JSON.parse(localStorage.onoff || '') || {},
 			cunt = 0;
-
+		$firstInput = $('#' + secId + ' .input[name="host"]');
+		if (!$firstInput.length) {
+			$firstInput = $('#' + secId + ' .tab-pane.active .input:first')
+		}
+		setTimeout(function () {
+			$firstInput.focus();
+		}, 0);
 		if(!$tbody.length) return;
 		ruleObj = rules[secId] || {};
 		for (key in ruleObj) {
@@ -350,6 +395,17 @@ $(function ($) {
 		return arr;
 	}
 
+	function getVcardString () {
+		var str = [];
+		$('#tab-vcard').find('input,textarea').map(function (el) {
+			var $this = $(this);
+			if ($this.val() !== '') {
+				str.push($this.attr('name') + ':' + $this.val());
+			}
+		});
+		return str.join(';');
+	}
+
 	function isValueInObj (obj,value) {
 		var prop;
 		for (prop in obj) {
@@ -372,10 +428,10 @@ $(function ($) {
 
 	function showDialog (config) {
 		var $overlayWrapper = $('#overlay-wrapper'),
-			dlgTitle = $('#dialog-title'),
-			dlgContent = $('#dialog-content'),
-			dlgOKBtn = $('#dialog-ok-btn'),
-			dlgCancelBtn = $('#dialog-cancel-btn');
+			$dlgTitle = $('#dialog-title'),
+			$dlgContent = $('#dialog-content'),
+			$dlgOKBtn = $('#dialog-ok-btn'),
+			$dlgCancelBtn = $('#dialog-cancel-btn');
 		config = config || {};
 
 		$overlayWrapper.removeClass('fadeOutUp');
@@ -383,20 +439,25 @@ $(function ($) {
 		$overlayWrapper.prop('hidden',false);
 		$overlayWrapper.addClass('fadeInDown');
 
-		dlgTitle.text(config.title || 'No title');
-		dlgContent.html(config.content || 'No content');
-		dlgOKBtn.prop('hidden',!!config.hideOK);
-		dlgCancelBtn.prop('hidden',!!config.hideCancel);
+		$dlgTitle.text(config.title || 'No title');
+		$dlgContent.html(config.content || 'No content');
+		$dlgOKBtn.prop('hidden',!!config.hideOK);
+		$dlgCancelBtn.prop('hidden',!!config.hideCancel);
 
 		if ($.isFunction(config.callback)) {
 			dialogOKCB = config.callback;
-			dlgOKBtn.removeClass('cancel');
+			$dlgOKBtn.removeClass('cancel');
 		} else {
 			dialogOKCB = null;
-			dlgOKBtn.addClass('cancel');
+			$dlgOKBtn.addClass('cancel');
 		}
 		if ($.isNumeric(config.timeout) && config.timeout > 0) {
 			setTimeout(hideDialog,config.timeout);
+		}
+		if (config.focusOnOK) {
+			$dlgOKBtn.focus();
+		} else {
+			$dlgCancelBtn.focus();
 		}
 	}
 });

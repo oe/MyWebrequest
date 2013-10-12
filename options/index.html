@@ -146,7 +146,7 @@
 	</section>
 	<section id="refer">
 		<div class="setting-title">
-			Referer <span>Help U view hotlinking images</span>
+			Referer <span>Help U browser hotlinking protected images</span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
@@ -280,49 +280,49 @@
 					<li data-target="msg">Message</li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane fade active in" id="tab-text">
-						<textarea class="s-text" id="s-text" placeholder="input some text / url / email address / phone number (Don't type too much, or your scanner will not recognize it. I suggest less than 300 letters.)"></textarea>
+					<div class="tab-pane fade active in" id="tab-text" data-type="text">
+						<textarea class="s-text input" id="s-text" placeholder="text / url / email address / phone number (Don't type too much, or your scanner will not recognize it. I suggest less than 300 letters. Extra spaces will be removed.)"></textarea>
 					</div>
-					<div class="tab-pane fade" id="tab-vcard">
+					<div class="tab-pane fade" id="tab-vcard" data-type="vcard">
 						<div class="input-field field-inline">
 							<label class="label" for="s-name">Name</label>
-							<input id="s-name" name="name" class="input" placeholder="Full name">
+							<input id="s-name" name="N" class="input" placeholder="Full name">
 						</div>
 						<div class="input-field field-inline">
 							<label class="label" for="s-phone">Phone</label>
-							<input id="s-phone" name="name" class="input" placeholder="">
-						</div>
-						<div class="input-field field-inline">
-							<label class="label" for="s-im">IM</label>
-							<input id="s-im" name="name" class="input" placeholder="">
+							<input id="s-phone" name="TEL" class="input" placeholder="">
 						</div>
 						<div class="input-field field-inline">
 							<label class="label" for="s-email">Email</label>
-							<input id="s-email" name="name" class="input" placeholder="">
+							<input id="s-email" name="EMAIL" class="input" placeholder="">
 						</div>
 						<div class="input-field field-inline">
 							<label class="label" for="s-url">Home Page</label>
-							<input id="s-url" name="name" class="input" placeholder="">
+							<input id="s-url" name="URL" class="input" placeholder="">
 						</div>
 						<div class="input-field field-inline">
 							<label class="label" for="s-addr">Address</label>
-							<input id="s-addr" name="name" class="input" placeholder="">
+							<input id="s-addr" name="ADR" class="input" placeholder="">
+						</div>
+						<div class="input-field field-inline">
+							<label class="label" for="s-note">Memo</label>
+							<input id="s-note" name="NOTE" class="input" placeholder="">
 						</div>
 					</div>
-					<div class="tab-pane fade" id="tab-msg">
+					<div class="tab-pane fade" id="tab-msg" data-type="msg">
 						<div class="input-field field-inline">
 							<label class="label" for="s-tel">To</label>
 							<input id="s-tel" name="name" class="input" placeholder="phone number">
 						</div>
 						<div class="input-field field-inline textarea">
 							<label class="label" for="s-msg">Message</label>
-							<textarea id="s-msg" class="input s-msg" placeholder="Don't type too much or your scanner can't recognize it. I suggest 300 letters."></textarea>
+							<textarea id="s-msg" class="input s-msg" placeholder="Don't type too much or your scanner can't recognize it. I suggest 300 letters. Extra spaces will be removed."></textarea>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="qr-right">
-				<div id="qrcode" class="qrcode"></div>
+				<div id="qrcode-area" class="qrcode-area"></div>
 			</div>
 		</div>
 	</section>
@@ -352,7 +352,8 @@
 			</div>
 		</div>
 	</div>
-	<script src="/common/i18n.js"></script>
+	<script src="../common/i18n.js"></script>
+	<script src="../common/qrcode.js"></script>
 	<script src="../common/jquery.min.js"></script>
 	<script type="text/javascript" src="opt.js"></script>
 </body>
