@@ -118,10 +118,10 @@ aside .app-name{
 	display: block;
 	width: 100%;
 }
-.nav>li.current{
+.nav>li.active {
 	border-left-color: #666;
 }
-.nav>li.current a {
+.nav>li.active a {
 	font-weight: 600;
 	color: #444;
 	cursor: default;
@@ -134,14 +134,14 @@ section {
 	left: -1000px;
 	color: #333;
 	top: 0;
-	transition: left 200ms, opacity 100ms;
 	visibility: hidden;
 	padding: 0 20px 0 0;
 	z-index: 90;
 	font-size: 14px;
 }
-section:target{
+section:target,section.active{
 	visibility: visible;
+	transition: left 200ms, opacity 100ms;
 	left: 200px;
 }
 
@@ -156,7 +156,7 @@ section .setting-title{
 	z-index: 55;
 }
 
-.setting-title span{
+.setting-title .fun-desc{
 	font-size: .8em;
 	color: grey;
 }
@@ -488,6 +488,16 @@ table.rules tbody tr td:nth-child(3):hover {
 /*.setting-content {
 
 }*/
+.qr-tips {
+	font-size: 0.9em;
+	color: #777;
+	padding: 4px;
+	border: 1px solid #ddd;
+	line-height: 1.5em;
+	border-radius: 4px;
+	margin-bottom: 10px;
+	cursor: default;
+}
 .qr-left {
 	width: 68%;
 	float: left;

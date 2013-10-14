@@ -20,22 +20,22 @@
 			<li><a href="#help">Help</a></li>
 		</ul>
 	</aside>
-	<section id="block">
+	<section id="request-settings" data-id="block">
 		<div class="setting-title">
-			Block <span>Block website that U don't like</span>
+			<span id="fun-name">Block</span> <span id="fun-desc" i18n-content="opt_block_desc" class="fun-desc"></span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
 				<input type="checkbox" class="switch-input" id="switch-block">
 				<label for="switch-block">
-					<span i18n-content="opt_ena_lbl">Enable</span>
+					<span i18n-content="opt_ena_lbl"></span>
 					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
 				</label>
 			</div>
-			<div class="item-title">Add rule</div>
+			<div class="item-title" i18n-content="opt_addrule_lbl"></div>
 			<div class="rule-field">
 				<div class="input-field field-block protocol">
-					<label class="label" for="b-protocol">Protocol</label>
+					<label class="label" for="b-protocol" i18n-content="opt_protocol_lbl"></label>
 					<select id="b-protocol" name="protocol" class="input" >
 						<option value="*">*</option>
 						<option value="http">http</option>
@@ -47,24 +47,24 @@
 					<div class="input">://</div>
 				</div>
 				<div class="input-field field-block host">
-					<label class="label" for="b-host">Host</label>
-					<input id="b-host" name="host" class="input" placeholder="required">
+					<label class="label" for="b-host" i18n-content="opt_host_lbl"></label>
+					<input id="b-host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
 				</div>
 				<div class="input-field field-block separator">
 					<label class="label">&nbsp;</label>
 					<div class="input">/</div>
 				</div>
 				<div class="input-field field-block path">
-					<label class="label" for="b-path">Path</label>
-					<input id="b-path" name="path" class="input" placeholder="optional">
+					<label class="label" for="b-path" i18n-content="opt_path_lbl"></label>
+					<input id="b-path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
 				</div>
 				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
-					<button class="input add-rule">Add Rule</button>
+					<button class="input add-rule" i18n-content="opt_addrule_btn"></button>
 				</div>
 			</div>
 			<div class="item-title">
-				Manage rules
+				<span i18n-content="opt_mngrule_lbl"></span>
 				<div class="rule-cunt">
 					(<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>)
 				</div>
@@ -73,194 +73,8 @@
 				<thead>
 					<tr>
 						<th width="7%"><input type="checkbox" name="" id=""></th>
-						<th width="78%">Rule</th>
-						<th width="15%"><button class="multi-delete">delete</button></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
-	</section>
-	<section id="hsts">
-		<div class="setting-title">
-			HSTS <span>Force HTTPS connection to some website.</span>
-		</div>
-		<div class="setting-content">
-			<div class="rule-switch">
-				<input type="checkbox" class="switch-input" id="switch-block">
-				<label for="switch-block">
-					<span i18n-content="opt_ena_lbl">Enable</span>
-					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
-				</label>
-			</div>
-			<div class="item-title">Add rule</div>
-			<div class="rule-field">
-				<div class="input-field field-block protocol">
-					<label class="label" for="b-protocol">Protocol</label>
-					<select id="b-protocol" name="protocol" class="input" disabled>
-						<option value="*">*</option>
-						<option value="http" selected>http</option>
-						<option value="https">https</option>
-					</select>
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">://</div>
-				</div>
-				<div class="input-field field-block host">
-					<label class="label" for="b-host">Host</label>
-					<input id="b-host" name="host" class="input" placeholder="required">
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">/</div>
-				</div>
-				<div class="input-field field-block path">
-					<label class="label" for="b-path">Path</label>
-					<input id="b-path" name="path" class="input" placeholder="optional">
-				</div>
-				<div class="input-field field-block">
-					<label class="label">&nbsp;</label>
-					<button class="input add-rule">Add Rule</button>
-				</div>
-			</div>
-			<div class="item-title">
-				Manage rules
-				<div class="rule-cunt">
-					(<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>)
-				</div>
-			</div>
-			<table class="rules">
-				<thead>
-					<tr>
-						<th width="7%"><input type="checkbox" name="" id=""></th>
-						<th width="78%">Rule</th>
-						<th width="15%"><button class="multi-delete">delete</button></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
-	</section>
-	<section id="refer">
-		<div class="setting-title">
-			Referer <span>Help U browser hotlinking protected images</span>
-		</div>
-		<div class="setting-content">
-			<div class="rule-switch">
-				<input type="checkbox" class="switch-input" id="switch-block">
-				<label for="switch-block">
-					<span i18n-content="opt_ena_lbl">Enable</span>
-					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
-				</label>
-			</div>
-			<div class="item-title">Add rule</div>
-			<div class="rule-field">
-				<div class="input-field field-block protocol">
-					<label class="label" for="b-protocol">Protocol</label>
-					<select id="b-protocol" name="protocol" class="input" >
-						<option value="*">*</option>
-						<option value="http">http</option>
-						<option value="https">https</option>
-					</select>
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">://</div>
-				</div>
-				<div class="input-field field-block host">
-					<label class="label" for="b-host">Host</label>
-					<input id="b-host" name="host" class="input" placeholder="required">
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">/</div>
-				</div>
-				<div class="input-field field-block path">
-					<label class="label" for="b-path">Path</label>
-					<input id="b-path" name="path" class="input" placeholder="optional">
-				</div>
-				<div class="input-field field-block">
-					<label class="label">&nbsp;</label>
-					<button class="input add-rule">Add Rule</button>
-				</div>
-			</div>
-			<div class="item-title">
-				Manage rules
-				<div class="rule-cunt">
-					(<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>)
-				</div>
-			</div>
-			<table class="rules">
-				<thead>
-					<tr>
-						<th width="7%"><input type="checkbox" name="" id=""></th>
-						<th width="78%">Rule</th>
-						<th width="15%"><button class="multi-delete">delete</button></th>
-					</tr>
-				</thead>
-				<tbody>
-				</tbody>
-			</table>
-		</div>
-	</section>
-	<section id="log">
-		<div class="setting-title">
-			Log <span>Help U inspecting the webrequests</span>
-		</div>
-		<div class="setting-content">
-			<div class="rule-switch">
-				<input type="checkbox" class="switch-input" id="switch-block">
-				<label for="switch-block">
-					<span i18n-content="opt_ena_lbl">Enable</span>
-					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
-				</label>
-			</div>
-			<div class="item-title">Add rule</div>
-			<div class="rule-field">
-				<div class="input-field field-block protocol">
-					<label class="label" for="b-protocol">Protocol</label>
-					<select id="b-protocol" name="protocol" class="input" >
-						<option value="*">*</option>
-						<option value="http">http</option>
-						<option value="https">https</option>
-					</select>
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">://</div>
-				</div>
-				<div class="input-field field-block host">
-					<label class="label" for="b-host">Host</label>
-					<input id="b-host" name="host" class="input" placeholder="required">
-				</div>
-				<div class="input-field field-block separator">
-					<label class="label">&nbsp;</label>
-					<div class="input">/</div>
-				</div>
-				<div class="input-field field-block path">
-					<label class="label" for="b-path">Path</label>
-					<input id="b-path" name="path" class="input" placeholder="optional">
-				</div>
-				<div class="input-field field-block">
-					<label class="label">&nbsp;</label>
-					<button class="input add-rule">Add Rule</button>
-				</div>
-			</div>
-			<div class="item-title">
-				Manage rules
-				<div class="rule-cunt">
-					(<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>)
-				</div>
-			</div>
-			<table class="rules">
-				<thead>
-					<tr>
-						<th width="7%"><input type="checkbox" name="" id=""></th>
-						<th width="78%">Rule</th>
-						<th width="15%"><button class="multi-delete">delete</button></th>
+						<th width="78%" i18n-content="opt_th_rule"></th>
+						<th width="15%"><button class="multi-delete" i18n-content="opt_delete_text"></button></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -270,53 +84,55 @@
 	</section>
 	<section id="qrcode">
 		<div class="setting-title">
-			QRCode <span>Generate QR Code</span>
+			QRCode <span i18n-content="opt_qrcode_desc" class="fun-desc"></span>
 		</div>
 		<div class="setting-content">
+			<div class="qr-tips" i18n-content="opt_qr_tips">
+			</div>
 			<div class="qr-left">
 				<ul class="nav-tabs">
-					<li data-target="text" class="active">Text</li>
-					<li data-target="vcard">Vcard</li>
-					<li data-target="msg">Message</li>
+					<li data-target="text" class="active" i18n-content="opt_qrtab_text"></li>
+					<li data-target="vcard" i18n-content="opt_qrtab_vcard"></li>
+					<li data-target="msg" i18n-content="opt_qrtab_message"></li>
 				</ul>
 				<div class="tab-content">
 					<div class="tab-pane fade active in" id="tab-text" data-type="text">
-						<textarea class="s-text input" id="s-text" placeholder="text / url / email address / phone number (Don't type too much, or your scanner will not recognize it. I suggest less than 300 letters. Extra spaces will be removed.)"></textarea>
+						<textarea class="s-text input" id="s-text" i18n-value="placeholder:opt_ph_qrtext"></textarea>
 					</div>
 					<div class="tab-pane fade" id="tab-vcard" data-type="vcard">
 						<div class="input-field field-inline">
-							<label class="label" for="s-name">Name</label>
-							<input id="s-name" name="N" class="input" placeholder="Full name">
+							<label class="label" for="s-name" i18n-content="opt_qrct_vname"></label>
+							<input id="s-name" name="N" class="input" i18n-value="placeholder:opt_ph_vname">
 						</div>
 						<div class="input-field field-inline">
-							<label class="label" for="s-phone">Phone</label>
-							<input id="s-phone" name="TEL" class="input" placeholder="">
+							<label class="label" for="s-phone" i18n-content="opt_qrct_vphone"></label>
+							<input id="s-phone" name="TEL" class="input" i18n-value="placeholder:opt_ph_vtel" >
 						</div>
 						<div class="input-field field-inline">
-							<label class="label" for="s-email">Email</label>
-							<input id="s-email" name="EMAIL" class="input" placeholder="">
+							<label class="label" for="s-email" i18n-content="opt_qrct_vmail"></label>
+							<input id="s-email" name="EMAIL" i18n-value="placeholder:opt_ph_vmail" class="input">
 						</div>
 						<div class="input-field field-inline">
-							<label class="label" for="s-url">Home Page</label>
-							<input id="s-url" name="URL" class="input" placeholder="">
+							<label class="label" for="s-url" i18n-content="opt_qrct_vurl"></label>
+							<input id="s-url" name="URL" i18n-value="placeholder:opt_ph_vurl" class="input">
 						</div>
 						<div class="input-field field-inline">
-							<label class="label" for="s-addr">Address</label>
-							<input id="s-addr" name="ADR" class="input" placeholder="">
+							<label class="label" for="s-addr" i18n-content="opt_qrct_vaddr"></label>
+							<input id="s-addr" name="ADR" class="input" i18n-value="placeholder:opt_ph_vaddr">
 						</div>
 						<div class="input-field field-inline">
-							<label class="label" for="s-note">Memo</label>
-							<input id="s-note" name="NOTE" class="input" placeholder="">
+							<label class="label" for="s-note" i18n-content="opt_qrct_vmemo"></label>
+							<input id="s-note" name="NOTE" i18n-value="placeholder:opt_ph_vnote" class="input">
 						</div>
 					</div>
 					<div class="tab-pane fade" id="tab-msg" data-type="msg">
 						<div class="input-field field-inline">
-							<label class="label" for="s-tel">To</label>
-							<input id="s-tel" name="name" class="input" placeholder="phone number">
+							<label class="label" for="s-tel" i18n-content="opt_qrct_mto"></label>
+							<input id="s-tel" name="name" class="input" i18n-value="placeholder:opt_ph_vtel">
 						</div>
 						<div class="input-field field-inline textarea">
-							<label class="label" for="s-msg">Message</label>
-							<textarea id="s-msg" class="input s-msg" placeholder="Don't type too much or your scanner can't recognize it. I suggest 300 letters. Extra spaces will be removed."></textarea>
+							<label class="label" for="s-msg" i18n-content="opt_qrct_mmessage"></label>
+							<textarea id="s-msg" class="input s-msg" i18n-value="placeholder:opt_ph_message"></textarea>
 						</div>
 					</div>
 				</div>
@@ -328,7 +144,7 @@
 	</section>
 	<section id="help">
 		<div class="setting-title">
-			Help <span>There must be something U need to know</span>
+			Help <span class="fun-desc">There must be something U need to know</span>
 		</div>
 		<div class="setting-content">
 			hello

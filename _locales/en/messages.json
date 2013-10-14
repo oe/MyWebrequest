@@ -49,5 +49,107 @@
   },
   "opt_deldlg_content": {
     "message": "You've chosed xx rule(s), are you sure to delete them all?"
+  },
+  "opt_addrule_lbl": {
+    "message": "Add rule"
+  },
+  "opt_mngrule_lbl": {
+    "message": "Manage rules"
+  },
+  "opt_protocol_lbl": {
+    "message": "Protocol"
+  },
+  "opt_host_lbl": {
+    "message": "Host"
+  },
+  "opt_ph_host": {
+    "message": "required"
+  },
+  "opt_path_lbl": {
+    "message": "Path"
+  },
+  "opt_ph_path": {
+    "message": "optional"
+  },
+  "opt_addrule_btn": {
+    "message": "Add rule"
+  },
+  "opt_th_rule": {
+    "message": "Rule"
+  },
+  "opt_block_desc": {
+    "message": "Block website that U don't like"
+  },
+  "opt_hsts_desc": {
+    "message": "Force HTTPS connection to some website."
+  },
+  "opt_refer_desc": {
+    "message": "Help U browser hotlinking protected images."
+  },
+  "opt_log_desc": {
+    "message": "Help U inspecting the webrequests."
+  },
+  "opt_qrcode_desc": {
+    "message": "Generate QR Code."
+  },
+  "opt_qr_tips": {
+    "message": "1. QR Code will generate automatically when you're typing.<br> 2. Don't type too much or your scanner will not recognize it.<br> 3. You can right click the QR Code then save it as a image & share it with your friends."
+  },
+  "opt_qrtab_text": {
+    "message": "Text"
+  },
+  "opt_qrtab_vcard": {
+    "message": "Vcard"
+  },
+  "opt_qrtab_message": {
+    "message": "Message"
+  },
+  "opt_ph_qrtext": {
+    "message": "text / url / email address / phone number (Don't type too much, or your scanner will not recognize it. I suggest less than 300 letters. Extra spaces will be removed.)"
+  },
+  "opt_qrct_vname": {
+    "message": "Name"
+  },
+  "opt_qrct_vphone": {
+    "message": "Phone"
+  },
+  "opt_qrct_vmail": {
+    "message": "Email"
+  },
+  "opt_qrct_vurl": {
+    "message": "Home Page"
+  },
+  "opt_qrct_vaddr": {
+    "message": "Address"
+  },
+  "opt_qrct_vmemo": {
+    "message": "Memo"
+  },
+  "opt_qrct_mto": {
+    "message": "To"
+  },
+  "opt_qrct_mmessage": {
+    "message": "Message"
+  },
+  "opt_ph_message": {
+    "message": "Don't type too much or your scanner can't recognize it. I suggest 300 letters. Extra spaces will be removed."
+  },
+  "opt_ph_vname": {
+    "message": "e.g. John Smith"
+  },
+  "opt_ph_vtel": {
+    "message": "e.g. 18800000000"
+  },
+  "opt_ph_vmail": {
+    "message": "e.g. sir@sample.com"
+  },
+  "opt_ph_vurl": {
+    "message": "e.g. http://www.evecalm.com"
+  },
+  "opt_ph_vaddr": {
+    "message": "e.g. 10 Fifth Avenue, 888th floor. New York"
+  },
+  "opt_ph_vnote": {
+    "message": "e.g. The guy in blue T-shirt"
   }
 }

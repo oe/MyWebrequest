@@ -13,8 +13,7 @@
 		eles = document.querySelectorAll('[i18n-value]');
 		eles = Array.prototype.slice.call(eles);
 		eles.forEach(function (ele) {
-			var attrs;
-			attrs = ele.getAttribute('i18n-value').split(';');
+			var attrs = ele.getAttribute('i18n-value').split(';');
 			attrs.forEach(function (attr) {
 				attr = attr.split(':');
 				if(attr.length < 1) return;

@@ -2,7 +2,7 @@
 //		2. Help is to be continued
 
 $(function ($) {
-	var hash = window.location.hash || '#block',
+	var hash = window.location.hash.replace('#','') || 'block',
 		rules = {},
 		dialogOKCB = null,
 		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>',
@@ -22,33 +22,47 @@ $(function ($) {
 			arr = JSON.parse(localStorage[key] || '[]');
 			j = arr.length;
 			i = 0;
+			rules[key].max = j;
 			while (j--) {
 				++i;
 				rules[key][i] = arr[j];
 			}
-			rules[key].max = i;
 		}
 	})(rules);
 
-	if (!$('section' + hash).length) {
-		hash = '#block';
-	}
 	//nav link click
 	$('a[href^=#]').on('click',function (e) {
 		var $this = $(this),
-			targetId = $this.attr('href'),
-			$navLink = $('#nav a[href=' + targetId + ']');
-		if ($navLink && $('section' + targetId).length) {
-			$('#nav li').removeClass('current');
-			$navLink.parent().addClass('current');
+			targetId = $this.attr('href').replace('#',''),
+			$navLink = $('#nav a[href=#' + targetId + ']'),
+			$requestSec = $('#request-settings');
+		if ($navLink) {
+			if ($navLink.parent().hasClass('active')) return;
+			$('#nav li').removeClass('active');
+			$navLink.parent().addClass('active');
 			window.location.hash = targetId;
-			initSection(targetId.replace('#',''));
+			if (['block','hsts','refer','log'].indexOf(targetId) > -1) {
+				$requestSec.attr('data-id',targetId);
+				$requestSec.removeClass('active');
+				initRequestSection(targetId);
+				$('#fun-name').text($navLink.text());
+				$('#fun-desc').text(chrome.i18n.getMessage('opt_' + targetId + '_desc'));
+				setTimeout(function () {
+					$requestSec.addClass('active');
+				}, 20);
+				return false;
+			} else {
+				$requestSec.removeClass('active');
+				setTimeout(function () {
+					$('#qrcode .tab-pane.active .input:first').focus();
+				},0);
+			}
 		}
 	});
 
 	// enable or disable a function
 	$('section .switch-input').on('change',function (e) {
-		var secId = $(this).parents('section').attr('id'),
+		var secId = $('#request-settings').attr('data-id'),
 			enabled = $(this).prop('checked'),
 			onoff = JSON.parse(localStorage.onoff || '') || {};
 		onoff[secId] = enabled;
@@ -56,7 +70,8 @@ $(function ($) {
 	});
 
 	//hash init
-	$('#nav a[href=' + hash + ']').click();
+	if(['block','hsts','refer','log','qrcode','help'].indexOf(hash) === -1) hash = 'block';
+	$('#nav a[href=#' + hash + ']').click();
 
 	//input box [host] enter key
 	$('.rule-field').on('keyup','input[name="host"]',function (e) {
@@ -80,7 +95,7 @@ $(function ($) {
 
 	//add rule
 	$('.rule-field').on('click','.add-rule',function (e) {
-		var secId = $(this).parents('section').attr('id'),
+		var secId = $('#request-settings').attr('data-id'),
 			$ruleField = $(this).parents('.rule-field'),
 			$protocol = $ruleField.find('select[name="protocol"]'),
 			$host = $ruleField.find('input[name="host"]'),
@@ -90,11 +105,11 @@ $(function ($) {
 				host: $host.val().trim(),
 				path: $path.val().trim()
 			},
-			hostReg = /^(\*((\.[a-z0-9-]+)*\.[a-z]{2,4})?|([a-z0-9-]+\.)+[a-z]{2,4})$/,
+			hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/,
 			pathReg = /^[\*a-z]*$/,
 			dlg = {},
 			ruleObj = rules[secId],
-			$tbody = $('#' + secId + ' tbody'),
+			$tbody = $('#request-settings tbody'),
 			rule,str;
 		if (['*','http','https'].indexOf(data.protocol) < 0 ) {
 			dlg.title = 'Protocol is not valid';
@@ -129,22 +144,22 @@ $(function ($) {
 		++ruleObj.max;
 		ruleObj[ruleObj.max] = rule;
 		str = '<tr>';
-		str +=		'<td><input type="checkbox" value="' + (++ruleObj.max) + '"> </td>';
+		str +=		'<td><input type="checkbox" value="' + ruleObj.max + '"> </td>';
 		str +=		'<td title="' + rule + '">';
 		str +=			rule;
 		str +=		'<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
 		str += '</tr>';
 		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
 			$tbody.html(str);
-			$('#' + secId + ' .switch-input').prop('disabled',false);
+			$('#request-settings .switch-input').prop('disabled',false);
 			$tbody.parent().find('thead input,thead button').prop('disabled',false);
-			$('#' + secId + ' .enable-tip').prop('hidden',true);
+			$('#request-settings .enable-tip').prop('hidden',true);
 		} else {
 			$tbody.prepend(str);
 		}
 		localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
 
-		$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
+		$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
 		$host.val('');
 		$path.val('');
 		$host.focus();
@@ -152,7 +167,7 @@ $(function ($) {
 
 	//delete multi function
 	$('.rules .multi-delete').on('click',function (e) {
-		var secId = $(this).parents('section').attr('id'),
+		var secId = $('#request-settings').attr('data-id'),
 			len = $(this).parents('table').find('tbody input:checked').length,
 			config;
 		if (len) {
@@ -178,7 +193,7 @@ $(function ($) {
 	//delete one rule
 	$('.rules tbody').on('click','.delete',function (e) {
 		var $tr = $(this).parent(),
-			secId = $(this).parents('section').attr('id'),
+			secId = $('#request-settings').attr('data-id'),
 			key = $tr.find('input').attr('value'),
 			ruleArr;
 		$tr.addClass('fadeOutDown');
@@ -188,16 +203,16 @@ $(function ($) {
 		}
 		setTimeout(function () {
 			var $tbody = $tr.parent(),
-				$enable = $('#' + secId + ' .switch-input'),
+				$enable = $('#request .switch-input'),
 				trCunt;
 			$tr.remove();
 			trCunt = $tbody.find('tr').length;
-			$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
+			$('#request .rule-cunt-num').text($tbody.find('tr').length);
 			if (!trCunt) {
 				$tbody.html(TABNODATATR);
 				$enable.prop('checked',false).trigger('change');
 				$enable.prop('disabled',true);
-				$('#' + secId + ' .enable-tip').prop('hidden',false);
+				$('#request .enable-tip').prop('hidden',false);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			} else if (trCunt === $tbody.find('input:checked').length) {
 				$tbody.parent().find('thead input[type="checkbox"]').prop('checked',true);
@@ -251,10 +266,11 @@ $(function ($) {
 		}
 	});
 
+	// change qr code type
 	$('.nav-tabs li').on('click',function (e) {
 		var $this = $(this),
 			target,$tabNav,$tabContent,$target;
-		if ($this.hasClass('active')) return;
+		// if ($this.hasClass('active')) return;
 		target = $this.attr('data-target');
 		$tabNav = $(this).parent();
 		$tabNav.find('li.active').removeClass('active');
@@ -302,24 +318,21 @@ $(function ($) {
 	});
 
 
-	function initSection(secId) {
+	function initRequestSection(secId) {
 		var ruleObj,
 			str = '',
-			$tbody = $('#' + secId + ' tbody'),
-			$enable = $('#' + secId + ' .switch-input'),
+			$tbody = $('#request-settings tbody'),
+			$enable = $('#request-settings .switch-input'),
 			delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>',
+			$protocol = $('#b-protocol'),
 			key,
-			$firstInput,
+			$firstInput = $('#b-host'),
 			onoff = JSON.parse(localStorage.onoff || '') || {},
 			cunt = 0;
-		$firstInput = $('#' + secId + ' .input[name="host"]');
-		if (!$firstInput.length) {
-			$firstInput = $('#' + secId + ' .tab-pane.active .input:first')
-		}
+
 		setTimeout(function () {
 			$firstInput.focus();
-		}, 0);
-		if(!$tbody.length) return;
+		}, 200);
 		ruleObj = rules[secId] || {};
 		for (key in ruleObj) {
 			//only key is a number
@@ -333,23 +346,31 @@ $(function ($) {
 				str += '</tr>';
 			}
 		}
-		$('#' + secId + ' .rule-cunt-num').text(cunt);
+		$('#request-settings .rule-cunt-num').text(cunt);
 		if (!str) {
 			$enable.prop('checked',false).trigger('change');
 			$enable.prop('disabled',true);
-			$('#' + secId + ' .enable-tip').prop('hidden',false);
+			$('#request-settings .enable-tip').prop('hidden',false);
 			$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			str = TABNODATATR;
 		} else {
 			$enable.prop('checked',!!onoff[secId]);
+			$enable.prop('disabled',false);
+			$('#request-settings .enable-tip').prop('hidden',true);
+			$tbody.parent().find('thead input,thead button').prop('disabled',false);
+		}
+		if (secId === 'hsts') {
+			$protocol.val('http').attr('disabled',true);
+		} else {
+			$protocol.val('*').attr('disabled',false);
 		}
 		$tbody.html(str);
 	}
 
 	function deleteRules (secId) {
-		var $tbody = $('#' + secId + ' tbody'),
+		var $tbody = $('#request-settings tbody'),
 			$checkTrs = $tbody.find('tr input:checked'),
-			$enable = $('#' + secId + ' .switch-input'),
+			$enable = $('#request-settings .switch-input'),
 			keys = $checkTrs.map(function () {
 					return this.value;
 				}).get(),
@@ -363,7 +384,7 @@ $(function ($) {
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
 				$enable.prop('checked',false).trigger('change');
 				$enable.prop('disabled',true);
-				$('#' + secId + ' .enable-tip').prop('hidden',false);
+				$('#request-settings .enable-tip').prop('hidden',false);
 				rules[secId] = {};
 				ruleObj = {};
 			} else {
@@ -377,7 +398,7 @@ $(function ($) {
 
 			localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
 
-			$('#' + secId + ' .rule-cunt-num').text($tbody.find('tr').length);
+			$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
 			if (!$tbody.find('tr').length) {
 				$tbody.html(TABNODATATR);
 			}
