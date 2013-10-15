@@ -46,7 +46,7 @@
 			obj.formatedData = formated;
 		} catch(e) {
 			if (e instanceof URIError) {
-				obj.error = 'The query string is not encoded with utf-8, this can\'t be decoded by now.';
+				obj.error = 'The query string is not encoded in utf-8, this can\'t be decoded by now.';
 			} else {
 				obj.error = e.message;
 			}

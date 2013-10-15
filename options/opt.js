@@ -287,9 +287,10 @@ $(function ($) {
 
 	//generate QR Code
 	$('.tab-content').on('keyup','.input',function (e) {
-		var $tab = $(this).parents('.tab-pane'),
+		var $this = $(this),
+			$tab = $this.parents('.tab-pane'),
 			type = $tab.attr('data-type'),
-			str;
+			str = '';
 		switch(type) {
 			case 'text':
 				str = $('#s-text').val().trim();
@@ -306,7 +307,7 @@ $(function ($) {
 				}
 				break;
 		}
-		if (str) {
+		if (str !== '') {
 			try {
 				qrcode.makeCode(str);
 			} catch (e) {
@@ -314,6 +315,12 @@ $(function ($) {
 			}
 		} else {
 			qrcode._el.querySelector('img').style.display = 'none';
+		}
+		if ($this.is('textarea')) {
+			$tab = $this.next('.letter-cunt');
+			if ($tab.length) {
+				$tab.text(str.length + '/300');
+			}
 		}
 	});
 
@@ -359,6 +366,7 @@ $(function ($) {
 			$('#request-settings .enable-tip').prop('hidden',true);
 			$tbody.parent().find('thead input,thead button').prop('disabled',false);
 		}
+		$tbody.parent().find('thead input').prop('checked',false);
 		if (secId === 'hsts') {
 			$protocol.val('http').attr('disabled',true);
 		} else {

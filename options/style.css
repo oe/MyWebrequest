@@ -563,7 +563,6 @@ table.rules tbody tr td:nth-child(3):hover {
 .qr-left .tab-content .tab-pane .s-msg {
 	height: 150px;
 }
-
 .qr-right .qrcode-area {
 	position: relative;
 	display: block;
@@ -573,4 +572,17 @@ table.rules tbody tr td:nth-child(3):hover {
 	background-image: url(../img/qrcode.png);
 	-webkit-background-size: 200px 200px;
 	background-size: 200px 200px;
+}
+.letter-cunt-wrapper {
+	position: relative;
+}
+.letter-cunt-wrapper>.letter-cunt {
+	position: absolute;
+	color: #333;
+	bottom: 4px;
+	right: 10px;
+}
+.tab-pane.letter-cunt-wrapper>.letter-cunt {
+	bottom: 14px;
+	right: 20px;
 }

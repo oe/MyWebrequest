@@ -68,25 +68,46 @@ a {
 	position: relative;
 	text-align: center;
 }
-#text {
+#text-wrapper {
 	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	width: 100%;
 	height: 165px;
-	padding: 3px;
-	resize: none;
-	text-align: left;
+	border: 1px solid #bbb;
 	border-radius: 3px;
-	border-color: #bbb;
-	word-break: break-all;
+	/*border-color: #bbb;*/
+	position: relative;
 }
-#text:focus {
+#text-wrapper.focus {
 	border-color: #66afe9;
 	outline: 0;
 	-webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
 }
+#text {
+	position: absolute;
+	border: none;
+	outline: none;
+	padding: 3px;
+	resize: none;
+	text-align: left;
+	word-break: break-all;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 20px;
+}
+#text:focus {
+	box-shadow: none;
+}
+#letter-cunt {
+	position: absolute;
+	font-size: .9em;
+	bottom: 0;
+	right: 2px;
+}
 #make {
+	margin-top: 4px;
 	font-size: 14px;
 }
 #make:active {
