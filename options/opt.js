@@ -1,6 +1,7 @@
 //TODO: 1. add rule: error tips style, help tip
 //		2. Help is to be continued
 
+// // http://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=
 $(function ($) {
 	var hash = window.location.hash.replace('#','') || 'block',
 		rules = {},
