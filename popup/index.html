@@ -14,14 +14,20 @@
 	<div id="code">
 		<div id="text-wrapper">
 			<textarea id="text"></textarea>
-			<div id="letter-cunt">10/300</div>
+			<div id="fun">
+				<div id="long-error" i18n-content="pop_text_toolong" hidden></div>
+				<div id="letter-cunt">10/300</div>
+			</div>
 		</div>
 		<button id="make" i18n-content="pop_make_btn"></button>
 		<a href="../options/index.html#qrcode" target="_blank" i18n-content="pop_more_link"></a>
-		<div id="qrcode"></div>
+		<div id="qrcode-wrapper">
+			<img src="" id="qrcode">
+			<span id="ntwk-error" i18n-content="pop_google_down" hidden></span>
+		</div>
 	</div>
 	<script src="/common/i18n.js"></script>
-	<script src="/common/qrcode.js"></script>
+	<!-- // <script src="/common/qrcode.js"></script> -->
 	<script src="./popup.js"></script>
 </body>
 </html>

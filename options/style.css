@@ -251,7 +251,7 @@ section .setting-title{
 	margin-left: -4px;
 }
 .field-inline textarea.input {
-	resize: vertical;
+	resize: none;
 }
 
 
@@ -556,12 +556,12 @@ table.rules tbody tr td:nth-child(3):hover {
 }
 .qr-left .tab-content .tab-pane .s-text{
 	width: 100%;
-	height: 200px;
-	resize: vertical;
+	height: 205px;
+	resize: none;
 	padding: 4px;
 }
 .qr-left .tab-content .tab-pane .s-msg {
-	height: 150px;
+	height: 170px;
 }
 .qr-right .qrcode-area {
 	position: relative;
@@ -575,6 +575,7 @@ table.rules tbody tr td:nth-child(3):hover {
 }
 .letter-cunt-wrapper {
 	position: relative;
+	margin-bottom: 8px;
 }
 .letter-cunt-wrapper>.letter-cunt {
 	position: absolute;
@@ -585,4 +586,14 @@ table.rules tbody tr td:nth-child(3):hover {
 .tab-pane.letter-cunt-wrapper>.letter-cunt {
 	bottom: 14px;
 	right: 20px;
+}
+.qr-fun {
+	overflow: hidden;
+}
+.qr-fun .qr-error-tip {
+	float: left;
+	color: #b94a48;
+}
+.qr-fun .make-qrcode {
+	float: right;
 }

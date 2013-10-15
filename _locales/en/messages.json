@@ -29,8 +29,11 @@
   "pop_more_link": {
   	"message": "more..."
   },
-  "qrcode_encode_error": {
-    "message": "Sorry,but I can't handle current characters. You can reload this & try again."
+  "pop_text_toolong": {
+    "message": "Too much words"
+  },
+  "pop_google_down": {
+    "message": "Sorry, but I can't access Google api."
   },
   "opt_ena_lbl": {
     "message": "Enable"
@@ -63,7 +66,7 @@
     "message": "Protocol"
   },
   "opt_host_lbl": {
-    "message": "Host"
+    "message": "Domain"
   },
   "opt_ph_host": {
     "message": "required"
@@ -133,6 +136,12 @@
   },
   "opt_qrct_mmessage": {
     "message": "Message"
+  },
+  "opt_qrtip_ovfl": {
+    "message": "Too many words, shorten them."
+  },
+  "opt_qrtip_notext": {
+    "message": "Do not leave everything empty."
   },
   "opt_ph_message": {
     "message": "Extra spaces will be removed."

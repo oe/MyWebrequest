@@ -6,11 +6,7 @@ $(function ($) {
 	var hash = window.location.hash.replace('#','') || 'block',
 		rules = {},
 		dialogOKCB = null,
-		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>',
-		qrcode = new QRCode('qrcode-area', {
-			width : 200,
-			height : 200
-		});
+		TABNODATATR = '<tr nodata><td colspan="3" class="align-center">' + chrome.i18n.getMessage('opt_no_rules') + '</td></tr>';
 
 	//init rules
 	(function init (rules) {
@@ -74,6 +70,18 @@ $(function ($) {
 	if(['block','hsts','refer','log','qrcode','help'].indexOf(hash) === -1) hash = 'block';
 	$('#nav a[href=#' + hash + ']').click();
 
+	document.getElementById('qrimg').onerror = function (e) {
+		this.setAttribute('hidden');
+		showDialog({
+			title: 'Can\'t access Google Api',
+			content: 'My webrequest is using Google api to generate QR Code.<br>Please check your network',
+			hideCancel: true,
+			focusOnOK: true,
+			timeout: 3000
+		});
+
+	};
+
 	//input box [host] enter key
 	$('.rule-field').on('keyup','input[name="host"]',function (e) {
 		var $path;
@@ -107,7 +115,7 @@ $(function ($) {
 				path: $path.val().trim()
 			},
 			hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/,
-			pathReg = /^[\*a-z]*$/,
+			pathReg = /^\.*$/,
 			dlg = {},
 			ruleObj = rules[secId],
 			$tbody = $('#request-settings tbody'),
@@ -286,10 +294,20 @@ $(function ($) {
 		}, 0);
 	});
 
+	//generate QR Code with short cut
+	$('.tab-content').on('keydown','.input',function (e) {
+		if (e.ctrlKey && e.keyCode === 13) {
+			$(this).parents('.tab-pane').find('.make-qrcode').click();
+			return false;
+		}
+	});
+
 	//generate QR Code
-	$('.tab-content').on('keyup','.input',function (e) {
+	$('.tab-content').on('click','.make-qrcode',function (e) {
 		var $this = $(this),
 			$tab = $this.parents('.tab-pane'),
+			$errorTip = $this.prev(),
+			$qrimg = $('#qrimg'),
 			type = $tab.attr('data-type'),
 			str = '';
 		switch(type) {
@@ -309,13 +327,25 @@ $(function ($) {
 				break;
 		}
 		if (str !== '') {
-			try {
-				qrcode.makeCode(str);
-			} catch (e) {
-				alert(e.message);
+			str = encodeURIComponent(str);
+			if (str.length > 1900) {
+				$errorTip.text(chrome.i18n.getMessage('opt_qrtip_ovfl'));
+				$errorTip.prop('hidden',false);
+				setTimeout(function () {
+					$errorTip.prop('hidden',true);
+				}, 3000);
+				return;
 			}
+			$qrimg.attr('src','http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&choe=UTF-8&chl=' + str);
+			$qrimg.prop('hidden',false);
 		} else {
-			qrcode._el.querySelector('img').style.display = 'none';
+			$errorTip.text(chrome.i18n.getMessage('opt_qrtip_notext'));
+			$errorTip.prop('hidden',false);
+			$tab.find('.input:first').focus();
+			setTimeout(function () {
+				$errorTip.prop('hidden',true);
+			}, 3000);
+			return;
 		}
 		if ($this.is('textarea')) {
 			$tab = $this.next('.letter-cunt');
@@ -325,7 +355,13 @@ $(function ($) {
 		}
 	});
 
+	//qr textarea input length count
+	$('.letter-cunt-wrapper').on('keyup','textarea',function (e) {
+		var $next = $(this).next();
+		$next.text(this.value.length + '/300');
+	});
 
+// (?<path>(?:\/.*)*\/)? (?<filename>.*?\.(?<ext>\w{2,4}))? (?<qrystr>\??(?:\w+\=[^\#]+)(?:\&?\w+\=\w+)*)* (?<bkmrk>\#.*)?
 	function initRequestSection(secId) {
 		var ruleObj,
 			str = '',
@@ -455,7 +491,7 @@ $(function ($) {
 			$(document.body).removeClass('ovHidden');
 		}, 220);
 	}
-
+	//config: {title: 'title',content: '',hideOK: false, hideCancel: true,focusOnOK:false,callback: fun..,timeout: 200}
 	function showDialog (config) {
 		var $overlayWrapper = $('#overlay-wrapper'),
 			$dlgTitle = $('#dialog-title'),

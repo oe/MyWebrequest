@@ -96,9 +96,15 @@
 					<li data-target="msg" i18n-content="opt_qrtab_message"></li>
 				</ul>
 				<div class="tab-content">
-					<div class="tab-pane fade active in letter-cunt-wrapper" id="tab-text" data-type="text">
-						<textarea class="s-text input" id="s-text" i18n-value="placeholder:opt_ph_qrtext"></textarea>
-						<div class="letter-cunt">0/300</div>
+					<div class="tab-pane fade active in" id="tab-text" data-type="text">
+						<div class="letter-cunt-wrapper">
+							<textarea class="s-text input" id="s-text" i18n-value="placeholder:opt_ph_qrtext"></textarea>
+							<div class="letter-cunt">0/300</div>
+						</div>
+						<div class="qr-fun">
+							<div class="qr-error-tip" hidden></div>
+							<button class="make-qrcode" i18n-content="pop_make_btn"></button>
+						</div>
 					</div>
 					<div class="tab-pane fade" id="tab-vcard" data-type="vcard">
 						<div class="input-field field-inline">
@@ -125,6 +131,10 @@
 							<label class="label" for="s-note" i18n-content="opt_qrct_vmemo"></label>
 							<input id="s-note" name="NOTE" i18n-value="placeholder:opt_ph_vnote" class="input">
 						</div>
+						<div class="qr-fun">
+							<div class="qr-error-tip" hidden></div>
+							<button class="make-qrcode" i18n-content="pop_make_btn"></button>
+						</div>
 					</div>
 					<div class="tab-pane fade" id="tab-msg" data-type="msg">
 						<div class="input-field field-inline">
@@ -136,11 +146,17 @@
 							<textarea id="s-msg" class="input s-msg" i18n-value="placeholder:opt_ph_message"></textarea>
 							<div class="letter-cunt">0/300</div>
 						</div>
+						<div class="qr-fun">
+							<div class="qr-error-tip" hidden></div>
+							<button class="make-qrcode" i18n-content="pop_make_btn"></button>
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="qr-right">
-				<div id="qrcode-area" class="qrcode-area"></div>
+				<div id="qrcode-area" class="qrcode-area">
+					<img src="" id="qrimg">
+				</div>
 			</div>
 		</div>
 	</section>

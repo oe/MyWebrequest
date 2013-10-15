@@ -1,41 +1,45 @@
-var qrelm = document.getElementById('qrcode'),
+var qrelm = document.getElementById('qrcode-wrapper'),
+	qrimg = document.getElementById('qrcode'),
 	text = document.getElementById('text'),
 	textWrapper = document.getElementById('text-wrapper'),
 	cunt = document.getElementById('letter-cunt'),
 	makeBtn = document.getElementById('make'),
 	prompt = document.getElementById('prompt'),
 	actionTip = document.getElementById('action-tip'),
-	content = '',
-	qrcode = new QRCode(qrelm, {
-		width : 200,
-		height : 200
-	});
-	//set correct Level to the lowest
+	googleDown = document.getElementById('ntwk-error'),
+	tooLong = document.getElementById('long-error'),
+	content = '';
+
+	qrimg.onerror = function (e) {
+		googleDown.removeAttribute('hidden');
+	};
 chrome.tabs.query({
     active: true,
     lastFocusedWindow: true
 }, function(tabs) {
     var tab = tabs[0];
     content = tab.url;
-    try {
-    	qrcode.makeCode(content);
-    } catch(e) {
-    	qrelm.innerHTML = '<code>' + e.message + '</code>';
-    }
+	qrimg.src = 'http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&choe=UTF-8&chl=' + encodeURIComponent(content);
 });
-
+// http://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L|0&choe=UTF-8&chl=
 function makeQRCode () {
+	var encoded = '';
 	prompt.innerHTML = chrome.i18n.getMessage('pop_get_new');
 	content = text.value;
-	try {
-    	qrcode.makeCode(content);
-    } catch(e) {
-    	// qrelm.innerHTML = '<code>Too many words, can\'t make a QRCode</code>';
-    	qrelm.innerHTML = '<code>' + chrome.i18n.getMessage('qrcode_encode_error') + '</code>';
-    	qrcode.clear();
-    }
+	encoded = encodeURIComponent(content);
+	if (encoded.length > 1900) {
+		textWrapper.classList.add('error');
+		tooLong.removeAttribute('hidden');
+		setTimeout(function () {
+			textWrapper.classList.remove('error');
+			tooLong.setAttribute('hidden');
+		}, 3000);
+		return;
+	}
+	qrimg.src = 'http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&choe=UTF-8&chl=' + encoded;
     textWrapper.classList.remove('focus');
 	qrelm.style.display = 'block';
+	googleDown.setAttribute('hidden');
 	actionTip.innerText = chrome.i18n.getMessage('pop_action_tip');
 	qrelm.focus();
 }
