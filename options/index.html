@@ -165,7 +165,16 @@
 			Help <span class="fun-desc">There must be something U need to know</span>
 		</div>
 		<div class="setting-content">
-			hello
+			<div class="item-title" >About this app</div>
+			<div class="item-content">
+				<p>I'm living in China, as U know the network environment is terrible, U can only visit some website through https or other complex ways. Some websites I like(wordpress.com, wikipedia.org and others) are available through https, and Chrome has a hsts setting that can force https connection to some websites. But these settings are easily lost when you clear your browser data, so I write the app to do this and the settings are not easily lost.</p>
+				<p>As U see, this app do more than this, you can also block website, view hotlinking protected pictures and inspect request. You just need to add a request url pattern(i.e a rule) that can match the target request url(s) and this app will do it automatically. The QR Code is an extra function added for fun.</p>
+			</div>
+			<div class="item-title" >Rule's Format</div>
+			<p>Rule's format is refered to <a href="http://developer.chrome.com/extensions/match_patterns.html" target="_blank">Match Patterns</a>, I've made some changes for this app that rules can only match website urls but not file or other urls. In a rule, star sign <code>*</code> is a special character meaning every possible things. A rule consists of three parts: protocol, domain and path.</p>
+			<p>Protocol: protocol can be <code>http</code>,<code>https</code> or both(<code>*</code>).</p>
+			<p>Domain: this is request, a doamin consists of alphanumeric,hyphen sign(<code>-</code>) and dot sign(<code>.</code>). If U use star sign in domain, it can only be the first(or the only) character. The dot sign split the domain into several section, every part can contains hyphen sign(one or more) except for the last section(this is the top level domain). In these sections, hyphen sign can't be the first or the last character.</p>
+			<p>Path: this is optinal, leaving it empty will be treat as star sign(i.e every possible thing).</p>
 		</div>
 	</section>
 	<div id="overlay-wrapper" class="animated" hidden>
@@ -173,11 +182,8 @@
 			<div id="overlay" class="dialog">
 				<div class="dialog-close cancel"></div>
 				<div class="dialog-title" id="dialog-title">
-					Are sure delete all?
 				</div>
 				<div class="dialog-content" id="dialog-content">
-					You've choosed 15 rules,are sure to deleted them all?<br>
-					The operation will take effect immediately.
 				</div>
 				<div class="dialog-btns">
 					<button id="dialog-ok-btn">OK</button>

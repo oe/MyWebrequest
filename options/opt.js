@@ -1,5 +1,6 @@
 //TODO: 1.error tips need to be beautified
 //		2. Help is to be continued
+//		3. when add rule check whether it will disable the qrcode
 
 $(function ($) {
 	var hash = window.location.hash.replace('#','') || 'block',
