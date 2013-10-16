@@ -1,7 +1,6 @@
-//TODO: 1. add rule: error tips style, help tip
+//TODO: 1.error tips need to be beautified
 //		2. Help is to be continued
 
-// // http://chart.apis.google.com/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=
 $(function ($) {
 	var hash = window.location.hash.replace('#','') || 'block',
 		rules = {},
@@ -28,7 +27,7 @@ $(function ($) {
 	})(rules);
 
 	//nav link click
-	$('a[href^=#]').on('click',function (e) {
+	$(document).on('click','a[href^=#]',function (e) {
 		var $this = $(this),
 			targetId = $this.attr('href').replace('#',''),
 			$navLink = $('#nav a[href=#' + targetId + ']'),
@@ -47,7 +46,6 @@ $(function ($) {
 				setTimeout(function () {
 					$requestSec.addClass('active');
 				}, 20);
-				return false;
 			} else {
 				$requestSec.removeClass('active');
 				setTimeout(function () {
@@ -73,13 +71,11 @@ $(function ($) {
 	document.getElementById('qrimg').onerror = function (e) {
 		this.setAttribute('hidden');
 		showDialog({
-			title: 'Can\'t access Google Api',
-			content: 'My webrequest is using Google api to generate QR Code.<br>Please check your network',
+			title: chrome.i18n.getMessage('opt_errtip_gtitle'),
+			content: chrome.i18n.getMessage('opt_errtip_gcontent'),
 			hideCancel: true,
-			focusOnOK: true,
-			timeout: 3000
+			focusOnOK: true
 		});
-
 	};
 
 	//input box [host] enter key
@@ -91,14 +87,16 @@ $(function ($) {
 				$path.focus();
 			} else {
 				$(this).parents('.rule-field').find('.add-rule').click();
+				return false;
 			}
 		}
 	});
 
-	//input box [path]
+	//input box [path] enter key
 	$('.rule-field').on('keyup','input[name="path"]',function (e) {
 		if (e.keyCode === 13) {
 			$(this).parents('.rule-field').find('.add-rule').click();
+			return false;
 		}
 	});
 
@@ -115,40 +113,31 @@ $(function ($) {
 				path: $path.val().trim()
 			},
 			hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/,
-			pathReg = /^\.*$/,
+			pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/,
 			dlg = {},
 			ruleObj = rules[secId],
 			$tbody = $('#request-settings tbody'),
 			rule,str;
 		if (['*','http','https'].indexOf(data.protocol) < 0 ) {
-			dlg.title = 'Protocol is not valid';
-			dlg.content = 'Have U modified option page? Just reload it again please.';
-			dlg.hideCancel = true;
-			showDialog(dlg);
+			showTip($protocol,chrome.i18n.getMessage('opt_errtip_protocol'));
 			return;
 		}
 		if (!data.host || !hostReg.test(data.host.toLowerCase())) {
-			dlg.title = 'Host is not valid';
-			dlg.content = 'Please see help for more infomation';
-			dlg.hideCancel = true;
-			showDialog(dlg);
-			return;
+			showTip($host,chrome.i18n.getMessage('opt_errtip_host'));
+			return false;
 		}
 		//Path treat empty as star(*)
 		if ('' === data.path) {
 			data.path = '*';
 		}
 		if (!data.path || !pathReg.test(data.path.toLowerCase())) {
-			dlg.title = 'Path is not valid';
-			dlg.content = 'Please see help for more infomation';
-			dlg.hideCancel = true;
-			showDialog(dlg);
-			return;
+			showTip($path,chrome.i18n.getMessage('opt_errtip_path'));
+			return false;
 		}
 		rule = data.protocol + '://' + data.host + '/' + data.path;
 		if (isValueInObj(ruleObj,rule)) {
-			alert('Rule is exist');
-			return;
+			showTip($host,chrome.i18n.getMessage('opt_errtip_duplicate'));
+			return false;
 		}
 		++ruleObj.max;
 		ruleObj[ruleObj.max] = rule;
@@ -187,16 +176,11 @@ $(function ($) {
 					deleteRules(secId);
 				}
 			};
+			showDialog(config);
 		} else {
-			config = {
-				title: chrome.i18n.getMessage('opt_nochosedlg_title'),
-				content: chrome.i18n.getMessage('opt_nochosedlg_content') || 'Nothing',
-				hideCancel: true,
-				timeout: 1000,
-				focusOnOK: true
-			};
+			showTip(this,chrome.i18n.getMessage('opt_errtip_nochose'));
+			return false;
 		}
-		showDialog(config);
 	});
 
 	//delete one rule
@@ -259,10 +243,17 @@ $(function ($) {
 		}
 	});
 
-	//dialog escape key
+	//hide dialog when pressed escape key
 	$(document).on('keydown',function (e) {
 		if (e.keyCode === 27 && !$('#overlay-wrapper').prop('hidden')) {
 			$('.dialog .cancel').click();
+		}
+	});
+	//hide tooltip when keyup or click
+	$(document).on('click keyup',function (e) {
+		var $tooltip = $('#tooltip');
+		if ($tooltip.hasClass('show')) {
+			$tooltip.removeClass('show');
 		}
 	});
 
@@ -272,6 +263,7 @@ $(function ($) {
 		hideDialog();
 		if (dialogOKCB) {
 			dialogOKCB.call();
+			dialogOKCB = null;
 		}
 	});
 
@@ -357,11 +349,9 @@ $(function ($) {
 
 	//qr textarea input length count
 	$('.letter-cunt-wrapper').on('keyup','textarea',function (e) {
-		var $next = $(this).next();
-		$next.text(this.value.length + '/300');
+		$(this).next().text(this.value.trim().length + '/300');
 	});
 
-// (?<path>(?:\/.*)*\/)? (?<filename>.*?\.(?<ext>\w{2,4}))? (?<qrystr>\??(?:\w+\=[^\#]+)(?:\&?\w+\=\w+)*)* (?<bkmrk>\#.*)?
 	function initRequestSection(secId) {
 		var ruleObj,
 			str = '',
@@ -491,6 +481,19 @@ $(function ($) {
 			$(document.body).removeClass('ovHidden');
 		}, 220);
 	}
+	//show error tip
+	function showTip (el,msg) {
+		var $el = $(el),
+			$tooltip = $('#tooltip'),
+			$msg = $('#tooltip-msg'),
+			pos = $el.offset();
+		$msg.html(msg);
+		pos.top += $el.height() + 15;
+		pos.left += $el.width() / 2 - $tooltip.width() / 2;
+		$tooltip.css({top: pos.top + 'px',left: pos.left + 'px'}).addClass('show');
+		$el.focus().select();
+	}
+
 	//config: {title: 'title',content: '',hideOK: false, hideCancel: true,focusOnOK:false,callback: fun..,timeout: 200}
 	function showDialog (config) {
 		var $overlayWrapper = $('#overlay-wrapper'),
@@ -515,7 +518,6 @@ $(function ($) {
 			$dlgOKBtn.removeClass('cancel');
 		} else {
 			dialogOKCB = null;
-			$dlgOKBtn.addClass('cancel');
 		}
 		if ($.isNumeric(config.timeout) && config.timeout > 0) {
 			setTimeout(hideDialog,config.timeout);

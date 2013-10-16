@@ -1,6 +1,6 @@
 {
   "appName":  {
-    "message": "Hello My Webrequest"
+    "message": "My Webrequest"
   },
   "iconTitle": {
   	"message": "Get current page's QRCode"
@@ -23,8 +23,8 @@
   "pop_edit_tip": {
   	"message": "(Don't type too much)"
   },
-  "pop_make_btn": {
-  	"message": "Make QRCode"
+  "qr_make_btn": {
+  	"message": "GO!(Ctrl+Enter)"
   },
   "pop_more_link": {
   	"message": "more..."
@@ -72,7 +72,7 @@
     "message": "required"
   },
   "opt_path_lbl": {
-    "message": "Path"
+    "message": "Path(including query string)"
   },
   "opt_ph_path": {
     "message": "optional"
@@ -87,19 +87,34 @@
     "message": "Block website that U don't like"
   },
   "opt_hsts_desc": {
-    "message": "Force HTTPS connection to some website."
+    "message": "Force HTTPS connection to some website"
   },
   "opt_refer_desc": {
-    "message": "Help U browser hotlinking protected images."
+    "message": "Help U browser hotlinking protected pictures"
   },
   "opt_log_desc": {
-    "message": "Help U inspecting the webrequests."
+    "message": "Help U inspecting the webrequests"
+  },
+  "opt_errtip_protocol": {
+    "message": "Protocol is invalid. Are U trying to do something? Just reload this page."
+  },
+  "opt_errtip_host": {
+    "message": "Domain is invalid. Get more info in <a href=\"#help\">Help</a>"
+  },
+  "opt_errtip_path": {
+    "message": "Path is invalid. Get more info in <a href=\"#help\">Help</a>"
+  },
+  "opt_errtip_duplicate": {
+    "message": "This rule is exist. Try something else."
+  },
+  "opt_errtip_nochose": {
+    "message": "You have not choose anything."
   },
   "opt_qrcode_desc": {
     "message": "Generate QR Code."
   },
   "opt_qr_tips": {
-    "message": "1. QR Code will generate automatically when you're typing.<br> 2. Don't type too much or your scanner will not recognize it.<br> 3. You can right click the QR Code then save it as a image & share it with your friends."
+    "message": "1. Don't type too much or your scanner will not recognize it.<br> 2. You can right click the QR Code then save it as a image & share it with your friends."
   },
   "opt_qrtab_text": {
     "message": "Text"
@@ -111,7 +126,7 @@
     "message": "Message"
   },
   "opt_ph_qrtext": {
-    "message": "text / url / email address / phone number (Extra spaces will be removed.)"
+    "message": "text / url / email address / phone number (Extra spaces will be removed)"
   },
   "opt_qrct_vname": {
     "message": "Name"
@@ -138,10 +153,16 @@
     "message": "Message"
   },
   "opt_qrtip_ovfl": {
-    "message": "Too many words, shorten them."
+    "message": "Too many words, shorten them"
   },
   "opt_qrtip_notext": {
-    "message": "Do not leave everything empty."
+    "message": "Do not leave everything empty"
+  },
+  "opt_errtip_gtitle": {
+    "message": "Can't access Google API"
+  },
+  "opt_errtip_gcontent": {
+    "message": "My webrequest is using Google api to generate QR Code.<br>Please check your network."
   },
   "opt_ph_message": {
     "message": "Extra spaces will be removed."

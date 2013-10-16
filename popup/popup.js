@@ -62,7 +62,7 @@ text.addEventListener('keydown',function (e) {
 },false);
 
 text.addEventListener('keyup',function (e) {
-	cunt.innerText = this.value.length + '/300';
+	cunt.innerText = this.value.trim().length + '/300';
 },false);
 
 makeBtn.addEventListener('click',makeQRCode,false);
