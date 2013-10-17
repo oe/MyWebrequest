@@ -113,6 +113,7 @@ $(function ($) {
 				host: $host.val().trim(),
 				path: $path.val().trim()
 			},
+			ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/,
 			hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/,
 			pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/,
 			dlg = {},
@@ -123,7 +124,8 @@ $(function ($) {
 			showTip($protocol,chrome.i18n.getMessage('opt_errtip_protocol'));
 			return;
 		}
-		if (!data.host || !hostReg.test(data.host.toLowerCase())) {
+		data.host = data.host.toLowerCase();
+		if (!data.host || (!hostReg.test(data.host) && !ipReg.test(data.host))) {
 			showTip($host,chrome.i18n.getMessage('opt_errtip_host'));
 			return false;
 		}
@@ -136,48 +138,58 @@ $(function ($) {
 			return false;
 		}
 		rule = data.protocol + '://' + data.host + '/' + data.path;
+		if (rule.length > 500) {
+			showTip($host,chrome.i18n.getMessage('opt_errtip_rulelong'));
+			return false;
+		}
+		//whether rule is duplicated
 		if (isValueInObj(ruleObj,rule)) {
 			showTip($host,chrome.i18n.getMessage('opt_errtip_duplicate'));
 			return false;
 		}
-		++ruleObj.max;
-		ruleObj[ruleObj.max] = rule;
-		str = '<tr>';
-		str +=		'<td><input type="checkbox" value="' + ruleObj.max + '"> </td>';
-		str +=		'<td title="' + rule + '">';
-		str +=			rule;
-		str +=		'<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
-		str += '</tr>';
-		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
-			$tbody.html(str);
-			$('#request-settings .switch-input').prop('disabled',false);
-			$tbody.parent().find('thead input,thead button').prop('disabled',false);
-			$('#request-settings .enable-tip').prop('hidden',true);
-		} else {
-			$tbody.prepend(str);
+		if (data.host === '*') {
+			if (['block','hsts'].indexOf(secId) > -1) {
+				showDialog({
+					title: chrome.i18n.getMessage('opt_errdlg_title'),
+					content: chrome.i18n.getMessage('opt_errdlg_cstarqr'),
+					callback: addRule,
+					cbargs:[rule,secId,$tbody,$host,$path]
+				});
+				return;
+			} else {
+				showDialog({
+					title: chrome.i18n.getMessage('opt_errdlg_title'),
+					content: chrome.i18n.getMessage('opt_errdlg_cstar'),
+					callback: addRule,
+					cbargs:[rule,secId,$tbody,$host,$path]
+				});
+				return;
+			}
 		}
-		localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
-
-		$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
-		$host.val('');
-		$path.val('');
-		$host.focus();
+		str = data.host.replace(/\./g,'\\.').replace('*','.*');
+		if (['block','hsts'].indexOf(secId) > -1 && (new RegExp('^' + str + '$')).test('chart.apis.google.com')) {
+			showDialog({
+				title: chrome.i18n.getMessage('opt_errdlg_title'),
+				content: chrome.i18n.getMessage('opt_errdlg_cqr'),
+				callback: addRule,
+				cbargs:[rule,secId,$tbody,$host,$path]
+			});
+			return;
+		}
+		addRule(rule,secId,$tbody,$host,$path)
 	});
 
 	//delete multi function
 	$('.rules .multi-delete').on('click',function (e) {
 		var secId = $('#request-settings').attr('data-id'),
-			len = $(this).parents('table').find('tbody input:checked').length,
-			config;
+			len = $(this).parents('table').find('tbody input:checked').length;
 		if (len) {
-			config = {
+			showDialog({
 				title: chrome.i18n.getMessage('opt_deldlg_title'),
 				content: chrome.i18n.getMessage('opt_deldlg_content').replace('xx',len),
-				callback: function () {
-					deleteRules(secId);
-				}
-			};
-			showDialog(config);
+				callback: deleteRules,
+				cbargs:[secId]
+			});
 		} else {
 			showTip(this,chrome.i18n.getMessage('opt_errtip_nochose'));
 			return false;
@@ -263,7 +275,8 @@ $(function ($) {
 	$('#dialog-ok-btn').on('click',function (e) {
 		hideDialog();
 		if (dialogOKCB) {
-			dialogOKCB.call();
+			dialogOKCB.apply(null,dialogOKCB.args);
+			dialogOKCB.args = null;
 			dialogOKCB = null;
 		}
 	});
@@ -403,6 +416,32 @@ $(function ($) {
 		$tbody.html(str);
 	}
 
+	function addRule (rule,type,$tbody,$host,$path) {
+		var ruleObj = rules[type],str = '';
+		++ruleObj.max;
+		ruleObj[ruleObj.max] = rule;
+		str = '<tr>';
+		str +=		'<td><input type="checkbox" value="' + ruleObj.max + '"> </td>';
+		str +=		'<td title="' + rule + '">';
+		str +=			rule;
+		str +=		'<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
+		str += '</tr>';
+		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
+			$tbody.html(str);
+			$('#request-settings .switch-input').prop('disabled',false);
+			$tbody.parent().find('thead input,thead button').prop('disabled',false);
+			$('#request-settings .enable-tip').prop('hidden',true);
+		} else {
+			$tbody.prepend(str);
+		}
+		localStorage[type] = JSON.stringify(getObjValues(ruleObj));
+
+		$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
+		$host.val('');
+		$path.val('');
+		$host.focus();
+	}
+
 	function deleteRules (secId) {
 		var $tbody = $('#request-settings tbody'),
 			$checkTrs = $tbody.find('tr input:checked'),
@@ -495,7 +534,7 @@ $(function ($) {
 		$el.focus().select();
 	}
 
-	//config: {title: 'title',content: '',hideOK: false, hideCancel: true,focusOnOK:false,callback: fun..,timeout: 200}
+	//config: {title: 'title',content: '',hideOK: false, hideCancel: true,focusOnOK:false,callback: fun..,cbargs:[],timeout: 200}
 	function showDialog (config) {
 		var $overlayWrapper = $('#overlay-wrapper'),
 			$dlgTitle = $('#dialog-title'),
@@ -516,6 +555,7 @@ $(function ($) {
 
 		if ($.isFunction(config.callback)) {
 			dialogOKCB = config.callback;
+			dialogOKCB.args = config.cbargs ? config.cbargs : [];
 			$dlgOKBtn.removeClass('cancel');
 		} else {
 			dialogOKCB = null;

@@ -184,5 +184,20 @@
   },
   "opt_ph_vnote": {
     "message": "e.g. The guy in blue T-shirt"
+  },
+  "opt_errtip_rulelong": {
+    "message": "Rule is too long, just make it simple."
+  },
+  "opt_errdlg_title": {
+    "message": "Watch out!"
+  },
+  "opt_errdlg_cstar": {
+    "message": "This rule may match every request & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
+  },
+  "opt_errdlg_cqr": {
+    "message": "This rule may disable QR Code function.<br>Are U sure to add this? Click OK to add it anyway."
+  },
+  "opt_errdlg_cstarqr": {
+    "message": "This rule may match every request, disable QR Code function & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
   }
 }

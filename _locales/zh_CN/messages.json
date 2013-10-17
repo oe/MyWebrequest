@@ -184,5 +184,20 @@
   },
   "opt_ph_vnote": {
     "message": "如 程序猿一只"
+  },
+  "opt_errtip_rulelong": {
+    "message": "规则太长,精简些吧."
+  },
+  "opt_errdlg_title": {
+    "message": "小心啊!"
+  },
+  "opt_errdlg_cstar": {
+    "message": "当前规则可能会匹配任意联网请求并严重影响浏览器的正常使用. <br>你坚持要添加吗? 豁出去的话,点OK就好了."
+  },
+  "opt_errdlg_cqr": {
+    "message": "当前规则可能导致二维码功能无法正常使用.<br>仍然想添加吗?点OK仍旧添加."
+  },
+  "opt_errdlg_cstarqr": {
+    "message": "当前规则可能会匹配任意联网请求,二维码功能将无法正常使用,并会严重影响浏览器的正常使用.<br>你还是想添加吗? 想悲剧就点OK吧."
   }
 }
