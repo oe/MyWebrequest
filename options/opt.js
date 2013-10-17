@@ -197,16 +197,16 @@ $(function ($) {
 		}
 		setTimeout(function () {
 			var $tbody = $tr.parent(),
-				$enable = $('#request .switch-input'),
+				$enable = $('#request-settings .switch-input'),
 				trCunt;
 			$tr.remove();
 			trCunt = $tbody.find('tr').length;
-			$('#request .rule-cunt-num').text($tbody.find('tr').length);
+			$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
 			if (!trCunt) {
 				$tbody.html(TABNODATATR);
 				$enable.prop('checked',false).trigger('change');
 				$enable.prop('disabled',true);
-				$('#request .enable-tip').prop('hidden',false);
+				$('#request-settings .enable-tip').prop('hidden',false);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
 			} else if (trCunt === $tbody.find('input:checked').length) {
 				$tbody.parent().find('thead input[type="checkbox"]').prop('checked',true);
@@ -411,10 +411,11 @@ $(function ($) {
 					return this.value;
 				}).get(),
 			ruleObj = rules[secId],
-			len = keys.length;
+			len = keys.length,
+			trLen = $tbody.find('tr').length;
 		if (len) {
 			//delete all
-			if (len === $tbody.find('tr').length) {
+			if (len === trLen) {
 				$tbody.html(TABNODATATR);
 				$tbody.parent().find('thead input').prop('checked',false);
 				$tbody.parent().find('thead input,thead button').prop('disabled',true);
@@ -431,10 +432,9 @@ $(function ($) {
 					delete ruleObj[keys[len]];
 				}
 			}
-
+			$('#request-settings .rule-cunt-num').text(trLen - len);
 			localStorage[secId] = JSON.stringify(getObjValues(ruleObj));
 
-			$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
 			if (!$tbody.find('tr').length) {
 				$tbody.html(TABNODATATR);
 			}
