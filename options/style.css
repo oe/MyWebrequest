@@ -175,9 +175,13 @@ section .setting-title{
 }
 .tooltip .arrow_box {
 	position: relative;
-	background: #d5c744;
-	border: 2px solid #f5d362;
+	color: #b94a48;
+	background-color: #f2dede;
+	border: 2px solid #ebccd1;
 	padding: 4px;
+}
+.tooltip .arrow_box a {
+	color: #086;
 }
 .tooltip .arrow_box:after, .tooltip .arrow_box:before {
 	bottom: 100%;
@@ -190,14 +194,14 @@ section .setting-title{
 }
 .tooltip .arrow_box:after {
 	border-color: rgba(213, 199, 68, 0);
-	border-bottom-color: #d5c744;
+	border-bottom-color: #f2dede;
 	border-width: 6px;
 	left: 50%;
 	margin-left: -6px;
 }
 .tooltip .arrow_box:before {
 	border-color: rgba(245, 211, 98, 0);
-	border-bottom-color: #f5d362;
+	border-bottom-color: #ebccd1;
 	border-width: 8px;
 	left: 50%;
 	margin-left: -8px;

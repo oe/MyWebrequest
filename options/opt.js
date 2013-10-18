@@ -38,7 +38,7 @@ $(function ($) {
 			$('#nav li').removeClass('active');
 			$navLink.parent().addClass('active');
 			window.location.hash = targetId;
-			if (['block','hsts','refer','log'].indexOf(targetId) > -1) {
+			if (['block','hsts','refer','log'].indexOf(targetId) !== -1) {
 				$requestSec.attr('data-id',targetId);
 				$requestSec.removeClass('active');
 				initRequestSection(targetId);
@@ -120,7 +120,7 @@ $(function ($) {
 			ruleObj = rules[secId],
 			$tbody = $('#request-settings tbody'),
 			rule,str;
-		if (['*','http','https'].indexOf(data.protocol) < 0 ) {
+		if (['*','http','https'].indexOf(data.protocol) === -1 ) {
 			showTip($protocol,chrome.i18n.getMessage('opt_errtip_protocol'));
 			return;
 		}
@@ -148,7 +148,7 @@ $(function ($) {
 			return false;
 		}
 		if (data.host === '*') {
-			if (['block','hsts'].indexOf(secId) > -1) {
+			if (['block','hsts'].indexOf(secId) !== -1) {
 				showDialog({
 					title: chrome.i18n.getMessage('opt_errdlg_title'),
 					content: chrome.i18n.getMessage('opt_errdlg_cstarqr'),
@@ -167,7 +167,7 @@ $(function ($) {
 			}
 		}
 		str = data.host.replace(/\./g,'\\.').replace('*','.*');
-		if (['block','hsts'].indexOf(secId) > -1 && (new RegExp('^' + str + '$')).test('chart.apis.google.com')) {
+		if (['block','hsts'].indexOf(secId) !== -1 && (new RegExp('^' + str + '$')).test('chart.apis.google.com')) {
 			showDialog({
 				title: chrome.i18n.getMessage('opt_errdlg_title'),
 				content: chrome.i18n.getMessage('opt_errdlg_cqr'),
