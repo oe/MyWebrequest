@@ -132,8 +132,14 @@
 		}
 
 		if (onoff.log && logrule.urls.length) {
+			var notification = webkitNotifications.createNotification(
+                        '/img/icon48.png',
+                        chrome.i18n.getMessage('bg_logison'),
+                        chrome.i18n.getMessage('bg_logon_tip')
+                );
 			reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
 			reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
+	        notification.show();
 		} else {
 			onoff.log = false;
 		}

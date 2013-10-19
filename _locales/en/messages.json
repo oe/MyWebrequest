@@ -8,6 +8,12 @@
   "appDesc": {
   	"message": "Control your browser's web request."
   },
+  "bg_logison": {
+    "message": "Log function is enabled"
+  },
+  "bg_logon_tip": {
+    "message": "If U no long need inspecting webrequest, just disable it."
+  },
   "pop_prompt": {
   	"message": "Current page url's QRCode"
   },

@@ -8,6 +8,12 @@
   "appDesc": {
     "message": "管理你浏览器的web请求"
   },
+  "bg_logison": {
+    "message": "Log功能已经开启"
+  },
+  "bg_logon_tip": {
+    "message": "如果你不再需要监控请求,那就把它关掉吧."
+  },
   "pop_prompt": {
     "message": "当前页面地址的二维码"
   },
