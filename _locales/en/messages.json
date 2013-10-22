@@ -96,7 +96,7 @@
     "message": "Force HTTPS connection to some website"
   },
   "opt_refer_desc": {
-    "message": "Help U browser hotlinking protected pictures"
+    "message": "Help U access anti-hotlinking pictures"
   },
   "opt_log_desc": {
     "message": "Help U inspecting the webrequests"

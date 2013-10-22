@@ -80,7 +80,7 @@ $(function ($) {
 	};
 
 	//input box [host] enter key
-	$('.rule-field').on('keyup','input[name="host"]',function (e) {
+	$('#host').on('keyup',function (e) {
 		var $path;
 		if (e.keyCode === 13) {
 			$path = $(this).parents('.rule-field').find('input[name="path"]');
@@ -92,9 +92,29 @@ $(function ($) {
 			}
 		}
 	});
+	//paste to be continue...
+	$('#host').on('paste',function (e) {
+		var str = e.originalEvent.clipboardData.getData('text/plain'),
+			arr,i;
+		str = str.trim();
+		if (str !== '') {
+			// prototol in str
+			if (str.indexOf('://') > 0) {
+				arr = str.split('://');
+				if (arr.length === 2) {
+					expression
+				}
+			} else {
+				if (str.indexOf('/') > 0) {
+					expression
+				}
+			}
+		}
+		return true;
+	});
 
 	//input box [path] enter key
-	$('.rule-field').on('keyup','input[name="path"]',function (e) {
+	$('#path').on('keyup',function (e) {
 		if (e.keyCode === 13) {
 			$(this).parents('.rule-field').find('.add-rule').click();
 			return false;

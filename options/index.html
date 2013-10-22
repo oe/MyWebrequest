@@ -14,7 +14,7 @@
 		<ul class="nav" id="nav">
 			<li ><a href="#block">Block</a></li>
 			<li><a href="#hsts">HTTPS</a></li>
-			<li><a href="#refer">Referer</a></li>
+			<li><a href="#refer">Hotlinking</a></li>
 			<li><a href="#log">Log</a></li>
 			<li><a href="#qrcode">QRCode</a></li>
 			<li><a href="#help">Help</a></li>
@@ -35,8 +35,8 @@
 			<div class="item-title" i18n-content="opt_addrule_lbl"></div>
 			<div class="rule-field">
 				<div class="input-field field-block protocol">
-					<label class="label" for="b-protocol" i18n-content="opt_protocol_lbl"></label>
-					<select id="b-protocol" name="protocol" class="input" >
+					<label class="label" for="protocol" i18n-content="opt_protocol_lbl"></label>
+					<select id="protocol" name="protocol" class="input" >
 						<option value="*">*</option>
 						<option value="http">http</option>
 						<option value="https">https</option>
@@ -47,16 +47,16 @@
 					<div class="input">://</div>
 				</div>
 				<div class="input-field field-block host">
-					<label class="label" for="b-host" i18n-content="opt_host_lbl"></label>
-					<input id="b-host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
+					<label class="label" for="host" i18n-content="opt_host_lbl"></label>
+					<input id="host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
 				</div>
 				<div class="input-field field-block separator">
 					<label class="label">&nbsp;</label>
 					<div class="input">/</div>
 				</div>
 				<div class="input-field field-block path">
-					<label class="label" for="b-path" i18n-content="opt_path_lbl"></label>
-					<input id="b-path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
+					<label class="label" for="path" i18n-content="opt_path_lbl"></label>
+					<input id="path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
 				</div>
 				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
@@ -180,8 +180,8 @@
 			<div class="item-cotent">你可以添加规则来屏蔽某些网站,屏蔽某一类请求,屏蔽某张特定的图片、脚本.当然你也可以用来屏蔽广告,大多广告都是通过脚本文件来加载的,你只需要屏蔽脚本文件的地址或者其所在域就好了,但是不推荐你这么做,本扩展不是主攻屏蔽广告,你可以使用adblock,不过我更推荐用修改hosts文件的方式来屏蔽广告.</div>
 			<div class="item-title">HTTPS</div>
 			<div class="item-cotent">如果某个网站支持HTTPS,你可以将它的域添加到规则中,就可以强制使用HTTPS请求,比如将*.wordpress.com加入到规则中,你就可以在中国浏览wordpress.com上的博客了,包括图片.当然你也可以只为特定的请求添加规则.</div>
-			<div class="item-title">Refer</div>
-			<div class="item-cotent">有时候浏览论坛时会发现贴图上写着”图片来自xxx“(比如来自QQ空间),而看不到原图.这是图片所有者的防盗链措施,一来保护版权,而来减轻服务器负担,这无可厚非的,责任主要在于发帖者,但是这却给浏览者带来不便.</div>
+			<div class="item-title">Hotlinking</div>
+			<div class="item-cotent">有时候浏览论坛时会发现贴图上写着”图片来自xxx“(比如来自QQ空间),而看不到原图.这是站长的防盗链措施,一来保护版权,二来减轻服务器负担,这无可厚非的,责任主要在于发帖者,但这却给浏览者带来不便.当遇到有盗链保护而无法正常浏览的图片时,右击图片选择复制图片地址,这样你就得到了图片的地址了,将图片的域名添加到规则即可,只需要域名哦.</div>
 			<div class="item-title">Log</div>
 			<div class="item-cotent">查看网络请求的请求头(header)以及内容(body).查看方法:1.打开扩展管理器(在地址栏输入chrome://extensions/) 2.启用开发者模式(勾选右上角的付款框) 3.打开本扩展后台页面(找到本扩展,点击background/index.html) 4.切换到Console选项卡(在新打开的窗口中,切换到Console选项卡) Console中打印的有编号的记录就是浏览器发送的请求啦.
 				<img src="../img/log.png" width="730" alt=""></div>
