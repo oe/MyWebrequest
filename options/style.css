@@ -156,6 +156,20 @@ section .setting-title{
 	background-color: rgba(255,255,255,.9);
 	z-index: 55;
 }
+code {
+	padding: 2px 4px;
+	font-size: 90%;
+	color: #c7254e;
+	white-space: nowrap;
+	background-color: #f9f2f4;
+	border-radius: 4px;
+}
+.info-box {
+	padding: 4px;
+	color: #3a87ad;
+	background-color: #d9edf7;
+	border-color: #bce8f1;
+}
 /*------------------ error tip -------------------------*/
 .tooltip {
 	position: absolute;

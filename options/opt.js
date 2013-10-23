@@ -92,22 +92,45 @@ $(function ($) {
 			}
 		}
 	});
-	//paste to be continue...
+	//paste string in host input box
 	$('#host').on('paste',function (e) {
 		var str = e.originalEvent.clipboardData.getData('text/plain'),
-			arr,i;
+			arr,i,tmp;
+		// hash in a url is unnecessary, remove it
+		i = str.indexOf('#');
+		if (~i) {
+			str = str.substring(0,i);
+		}
 		str = str.trim();
 		if (str !== '') {
-			// prototol in str
-			if (str.indexOf('://') > 0) {
+			i = str.indexOf('://');
+			if (~i) {
+				if (!i) return true;
 				arr = str.split('://');
-				if (arr.length === 2) {
-					expression
+				if (arr.length !== 2) return true;
+				tmp = arr[0].trim();
+				if (!~['*','http','https'].indexOf(tmp)) return true;
+				if (!$('#protocol').prop('disabled')) {
+					$('#protocol').val(tmp);
 				}
-			} else {
-				if (str.indexOf('/') > 0) {
-					expression
+				tmp = arr[1].trim();
+				arr = tmp.split('/');
+				$('#host').val(arr[0]);
+				if (arr[1] !== undefined) {
+					arr.shift();
+					$('#path').val(arr.join('/'));
 				}
+				arr = null;
+				return false;
+			} else if(str.indexOf('/') > 0) {
+				arr = str.split('/');
+				$('#host').val(arr[0]);
+				if (arr[1] !== undefined) {
+					arr.shift();
+					$('#path').val(arr.join('/'));
+				}
+				arr = null;
+				return false;
 			}
 		}
 		return true;

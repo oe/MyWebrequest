@@ -41,6 +41,9 @@
   "pop_google_down": {
     "message": "抱歉,貌似你现在访问不了谷歌."
   },
+  "opt_pg_tile": {
+    "message": "选项"
+  },
   "opt_ena_lbl": {
     "message": "启用"
   },

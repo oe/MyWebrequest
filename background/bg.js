@@ -4,7 +4,10 @@
 		referrule = {},
 		logrule = {},
 		logNum = 0,
-		requestCache = {};
+		requestCache = {},
+		goRule = {
+			urls:['*://www.google.com/url*','*://www.google.com.hk/url*']
+		};
 
 	var pattern = /^(\*|https|http):\/\/(\*((\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4})?|([a-zA-Z0-9]+\.)+[a-zA-Z]{2,4})\/$/;
 
@@ -70,15 +73,28 @@
 		return {redirectUrl:details.url.replace('http://','https://')};
 	}
 
+	function cancelGoogleRedirct (details) {
+		var url = details.url,i;
+		i = url.indexOf('url=');
+		if (~i) {
+			url = url.substring(i);
+			i = url.indexOf('&');
+			if (~i) {
+				url = url.substring(0,i);
+			}
+			url = url.split('=');
+			url = decodeURIComponent(url[1]);
+		}
+		return {redirectUrl: url};
+	}
+
 	function modifyReferer (details) {
 		var headers = details.requestHeaders,
-			len = headers.length,
-			type = '',
-			newReferer = '';
+			len = headers.length;
 		while (len--) {
 			if (headers[len].name === 'Referer') {
-				//delete referrer
-				headers.splice(len,1);
+				headers[len].value = details.url;
+				// headers.splice(len,1);
 				break;
 			}
 		}
@@ -112,6 +128,10 @@
 		hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
 		referrule.urls = JSON.parse(localStorage.refer || '[]');
 		logrule.urls = JSON.parse(localStorage.log || '[]');
+
+		if (/*onoff.google*/true) {
+			reqApi.onBeforeRequest.addListener(cancelGoogleRedirct,goRule,['blocking']);
+		}
 
 		if (onoff.block && blockrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
@@ -197,10 +217,8 @@
 				if (newData.block !== oldData.block) {
 					if (newData.block) {
 						reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
-						console.log('off event block on');
 					} else {
 						reqApi.onBeforeRequest.removeListener(blockReq);
-						console.log('off event block off');
 					}
 				}
 				if (newData.hsts !== oldData.hsts) {
@@ -212,20 +230,16 @@
 				}
 				if (newData.refer !== oldData.refer) {
 					if (newData.refer) {
-						console.log(' event rerfer on');
 						reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
 					} else {
-						console.log(' event rerfer off');
 						reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
 					}
 				}
 				if (newData.log !== oldData.log) {
 					if (newData.log) {
-						console.log(' event log on')
 						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
 						reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
 					} else {
-						console.log(' event log off');
 						reqApi.onBeforeRequest.removeListener(logBody);
 						reqApi.onSendHeaders.removeListener(logRequest);
 					}
