@@ -9,8 +9,6 @@
 			urls:['*://www.google.com/url*','*://www.google.com.hk/url*']
 		};
 
-	var pattern = /^(\*|https|http):\/\/(\*((\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,4})?|([a-zA-Z0-9]+\.)+[a-zA-Z]{2,4})\/$/;
-
 	function cloneObj (o) {
 		var obj,i;
 		if (Array.isArray(o)) {
