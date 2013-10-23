@@ -415,9 +415,9 @@ $(function ($) {
 			$tbody = $('#request-settings tbody'),
 			$enable = $('#request-settings .switch-input'),
 			delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>',
-			$protocol = $('#b-protocol'),
+			$protocol = $('#protocol'),
 			key,
-			$firstInput = $('#b-host'),
+			$firstInput = $('#host'),
 			onoff = JSON.parse(localStorage.onoff || '') || {},
 			cunt = 0;
 
