@@ -162,41 +162,40 @@
 	</section>
 	<section id="help">
 		<div class="setting-title">
-			Help <span class="fun-desc">There must be something U need to know</span>
+			Help <span class="fun-desc" i18n-content="opt_help_desc"></span>
 		</div>
 		<div class="setting-content">
-			<div class="item-title" >关于本应用</div>
+			<div class="item-title" i18n-content="opt_hp_abttl"></div>
 			<div class="item-content">
-				<p>本应用主要是使用chrome的webrequest api来实现的,可以用来简单的管理浏览器的请求,功能点包括"屏蔽请求"(Block),"强制使用HTTPS连接"(HTTPS),"浏览防盗链的图片"(Hotlinking),"监控网络请求"(Log).你只要输入一条URL匹配模式(即规则)并启用相关功能就可以使用了.在这些功能之外,我还添加了二维码功能,希望你喜欢.使用中如遇到任何问题,欢迎<a href="mailto:feedback@evecalm.com?subject=My%20Webrequest%20Feedback">发送邮件</a>反馈.</p>
+				<p i18n-content="opt_hp_abtct"></p>
 			</div>
-			<div class="item-title" >规则的格式</div>
+			<div class="item-title" i18n-content="opt_hp_ruletl"></div>
 			<div class="item-content">
-				<p>规则的格式主要参考<a href="http://developer.chrome.com/extensions/match_patterns.html" target="_blank">Chrome Url 匹配模式</a>, 根据本扩展的功能我做了些许变动,主要在于在本扩展中规则只能匹配https和http协议请求,像file,ftp等其他请求就没法匹配了.一条规则分为三部分:协议,域名,路径(包含请求字符串).在规则中,星号(<code>*</code>)是一个特殊符号,代表所有可能的东西.</p>
-				<p>协议: 可以是<code>http</code>或者<code>https</code>,<code>*</code>则表示二者均可</p>
-				<p>域名: 由字母数字连字符还有点号组成,如:www.google.com.域名中也可以用<code>*</code>,但是它只能是域名中的第一个或者唯一一个字符.对了,域名也可以填写IP地址.</p>
-				<p>路径: 有字母数字还有一些特殊符号(<code>-_+=&%@!.,?|~/</code>)组成,你也可以用<code>*</code>.路径如果被留空的话,则会被当做<code>*</code>,即任意路径.</p>
-				<p class="info-box">添加规则时,你可以将一个URL粘贴到<code>域名</code>输入框中,扩展会自动处理,协助你输入.</p>
+				<p i18n-content="opt_hp_rulect1"></p>
+				<p i18n-content="opt_hp_rulect2"></p>
+				<p i18n-content="opt_hp_rulect3"></p>
+				<p i18n-content="opt_hp_rulect4"></p>
+				<p class="info-box" i18n-content="opt_hp_rulect5"></p>
 			</div>
 			<div class="item-title">Block</div>
 			<div class="item-cotent">
-				<p>你可以添加规则来屏蔽某些网站,屏蔽某一类请求,屏蔽某张特定的图片、脚本.当然你也可以用来屏蔽广告,大多广告都是通过脚本文件来加载的,你只需要屏蔽脚本文件的地址或者其所在域就好了,但是不推荐你这么做,本扩展不是主攻屏蔽广告,你可以使用adblock,不过我更推荐用修改hosts文件的方式来屏蔽广告.</p>
+				<p i18n-content="opt_hp_blockct"></p>
 			</div>
 			<div class="item-title">HTTPS</div>
 			<div class="item-cotent">
-				<p>如果某个网站支持HTTPS,你可以将它的域添加到规则中,就可以强制使用HTTPS请求,比如将<code>*.wordpress.com</code>加入到规则中,你就可以在中国浏览wordpress.com上的博客了,包括图片.当然你也可以只为特定的请求添加规则.</p>
+				<p i18n-content="opt_hp_hstsct"></p>
 			</div>
 			<div class="item-title">Hotlinking</div>
 			<div class="item-cotent">
-				<p>有时候浏览论坛时会发现贴图上写着”图片来自xxx“(比如来自QQ空间),而看不到原图.这是站长的防盗链措施,一来保护版权,二来减轻服务器负担,这无可厚非的,责任主要在于发帖者,但这却给浏览者带来不便.当遇到有盗链保护而无法正常浏览的图片时,右击图片选择复制图片地址,这样你就得到了图片的地址了,将图片的域名添加到规则即可,只需要域名哦.</p>
+				<p i18n-content="opt_hp_hotct"></p>
 			</div>
 			<div class="item-title">Log</div>
 			<div class="item-cotent">
-				<p>查看网络请求的请求头(header)以及内容(body).查看方法如下图所示.
-				<img src="../img/log.png" width="730" alt=""></p>
+				<p i18n-content="opt_hp_logct"></p>
 			</div>
 			<div class="item-title">QR Code</div>
 			<div class="item-cotent">
-				<p>浏览网站时,点击地址栏右侧的浅蓝色地球图标就可以获得当前网页地址的二维码.双击二维码图片还可以编辑内容,然后再生成新的二维码.用你的手机上的二维码扫描软件就可以轻松的从电脑同步数据啦,免去了在手机上输入不方便的烦恼.注意在生成二维码时,不要输入太多文字(汉字建议在150字以内,英文则在300字以内),否则生成的二维码纹路复杂,低配置的手机无法识别.二维码是使用Google的API生成的,所以使用二维码功能需要联网,并且得保证能正常访问Google的API服务.</p>
+				<p i18n-content="opt_hp_qrct"></p>
 			</div>
 		</div>
 	</section>

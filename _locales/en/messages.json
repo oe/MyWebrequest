@@ -208,5 +208,47 @@
   },
   "opt_errdlg_cstarqr": {
     "message": "This rule may match every request, disable QR Code function & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
+  },
+    "opt_help_desc": {
+    "message": "There must be something U need to know"
+  },
+  "opt_hp_abttl": {
+    "message": "About this extension"
+  },
+  "opt_hp_abtct": {
+    "message": "This extension is based on chrome webrequest api, can be used to manage browser requests simply. Its main feature contains Blocking Request (Block), forcing to use HTTPS connections (HTTPS), helping you browse anti-hotlinking images (Hotlinking), monitoring network request (Log). You just need to enter a URL pattern (i.e., rules) and enable related function. In additional, I added QR Code function, I hope you like it. If you have any questions, please feel free to contact me at <a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20Feedback\"> evecalm@live.com</a>."
+  },
+  "opt_hp_ruletl": {
+    "message": "Rule's format"
+  },
+  "opt_hp_rulect1": {
+    "message": "The format of the rule mainly refers to <a href=\"http://developer.chrome.com/extensions/match_patterns.html\" target=\"_blank\">Match Patterns</a>. I made a little change to apply it in my extension: a rule can only matches requests over https and http protocol , and requests over file, FTP or other protocols will not be matched. A rule contains three parts: the protocol, domain, path (including query string). In the rule, an asterisk (*) is a special symbol means any possible thing."
+  },
+  "opt_hp_rulect2": {
+    "message": "Protocal: can be<code>http</code>or<code>https</code>,<code>*</code>means both are ok."
+  },
+  "opt_hp_rulect3": {
+    "message": "Host: consist of alphanumeric characters and connected with dots, such as: www.google.com, chrome.google.com . <code>*</code> can also be used in the host, but it can only be the first or the only one character. Yes, you can use IP address too."
+  },
+  "opt_hp_rulect4": {
+    "message": "Path: consist of alphanumeric and some special symbols (<code>-_ + = &% @!.,?|~/</code>), you can also use <code>*</code> . If the path is left blank, then it will be treated as <code>*</code>, that is, any path."
+  },
+  "opt_hp_rulect5": {
+    "message": "When Adding a rule, you can paste a URL into the <code>domain<code> input box, the extension will do the rest for you automatically."
+  },
+  "opt_hp_blockct": {
+    "message": "You can add patterns to block certain websites, specific images or scripts. Of course, it can be used to block ads, but I do not recommend doing this, this extension does not aim at blocking ads, you can install Adblock to do this."
+  },
+  "opt_hp_hstsct": {
+    "message": "If a website supports HTTPS, you can add its host as a rule, then all requests to the site will go through HTTPS. For example, wordpress.com supports HTTPS, then after adding <code>*.wordpress.com</code> as a rule, all blogs including blogs' pictures on wordpress.com will be connected through HTTPS."
+  },
+  "opt_hp_hotct": {
+    "message": "有时候浏览论坛时会发现贴图上写着”图片来自xxx“(比如来自QQ空间),而看不到原图.这是站长的防盗链措施,一来保护版权,二来减轻服务器负担,这无可厚非的,责任主要在于发帖者,但这却给浏览者带来不便.当遇到有盗链保护而无法正常浏览的图片时,右击图片选择复制图片地址,这样你就得到了图片的地址了,将图片的域名添加到规则即可,只需要域名哦."
+  },
+  "opt_hp_logct": {
+    "message": "查看网络请求的请求头(header)以及内容(body).查看方法如下图所示.<img src=\"../img/log.png\" width=\"730\">"
+  },
+  "opt_hp_qrct": {
+    "message": "浏览网站时,点击地址栏右侧的浅蓝色地球图标就可以获得当前网页地址的二维码.双击二维码图片还可以编辑内容,然后再生成新的二维码.用你的手机上的二维码扫描软件就可以轻松的从电脑同步数据啦,免去了在手机上输入不方便的烦恼.注意在生成二维码时,不要输入太多文字(汉字建议在150字以内,英文则在300字以内),否则生成的二维码纹路复杂,低配置的手机无法识别.二维码是使用Google的API生成的,所以使用二维码功能需要联网,并且得保证能正常访问Google的API服务."
   }
 }
