@@ -234,19 +234,19 @@
     "message": "Path: consist of alphanumeric and some special symbols (<code>-_ + = &% @!.,?|~/</code>), you can also use <code>*</code> . If the path is left blank, then it will be treated as <code>*</code>, that is, any path."
   },
   "opt_hp_rulect5": {
-    "message": "When Adding a rule, you can paste a URL into the <code>domain<code> input box, the extension will do the rest for you automatically."
+    "message": "When Adding a rule, you can paste a URL into the <code>domain</code> input box, the extension will do the rest for you automatically."
   },
   "opt_hp_blockct": {
     "message": "You can add patterns to block certain websites, specific images or scripts. Of course, it can be used to block ads, but I do not recommend doing this, this extension does not aim at blocking ads, you can install Adblock to do this."
   },
   "opt_hp_hstsct": {
-    "message": "If a website supports HTTPS, you can add its host as a rule, then all requests to the site will go through HTTPS. For example, wordpress.com supports HTTPS, then after adding <code>*.wordpress.com</code> as a rule, all blogs including blogs' pictures on wordpress.com will be connected through HTTPS."
+    "message": "If a website supports HTTPS, you can add its domain as a rule, then all requests to this site will go through HTTPS. For example, wordpress.com supports HTTPS, then after adding <code>*.wordpress.com</code> as a rule, all blogs including blogs' pictures on wordpress.com will be connected via HTTPS."
   },
   "opt_hp_hotct": {
-    "message": "Sometimes Browse forum will find maps that read \"images from xxx\" (e.g. from QZone), but not the original, which is the webmaster of the anti-hotlinking measures to protect a copyright, and second, to alleviate the burden on the server, this is understandable, primarily the responsibility of the poster, but it gave viewers the inconvenience. When confronted with hotlinking protection cannot view the picture, right-click the image selects copy Image URLs, so you get the picture address, the name of the picture can be added to the rules, only the domain name."
+    "message": "You may have seen many fake pictures because of hotlinking-prevention. For now, just right click the picture and click \"copy image URL\", then paste it into the domain input box (clear the path input box so this rule will apply to all pictures under this domain). After this, you can see the original pictures."
   },
   "opt_hp_logct": {
-    "message": "Inspect network requests details including request header (header) and content (body). See the figure below.<img src=\"../img/log.png\" width=\"730\">"
+    "message": "Inspect network requests' details including request header (header) and content (body). See the figure below.<img src=\"../img/log.png\" width=\"730\">"
   },
   "opt_hp_qrct": {
     "message": "When surfing the internet, you can click the blue earth icon on the right side of the location bar, then a QR code of the web page's URL will be generated. And you can double click the QR code, edit the content and get a new QR code. After this, use your mobile app to scan them! It's an easy way to share messages from PC to phone. This feature is powered by Google API, so make sure you can access Goolg API before using it."

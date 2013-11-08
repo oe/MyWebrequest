@@ -71,7 +71,7 @@
 		return {redirectUrl:details.url.replace('http://','https://')};
 	}
 
-	function cancelGoogleRedirct (details) {
+	function cancelGoogleRedirect (details) {
 		var url = details.url,i;
 		i = url.indexOf('url=');
 		if (~i) {
@@ -91,8 +91,8 @@
 			len = headers.length;
 		while (len--) {
 			if (headers[len].name === 'Referer') {
-				headers[len].value = details.url;
-				// headers.splice(len,1);
+				// headers[len].value = details.url;
+				headers.splice(len,1);
 				break;
 			}
 		}
@@ -127,9 +127,10 @@
 		referrule.urls = JSON.parse(localStorage.refer || '[]');
 		logrule.urls = JSON.parse(localStorage.log || '[]');
 
-		if (/*onoff.google*/true) {
-			reqApi.onBeforeRequest.addListener(cancelGoogleRedirct,goRule,['blocking']);
-		}
+		// onoff.google redir
+		// if (true) {
+		// 	reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
+		// }
 
 		if (onoff.block && blockrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
