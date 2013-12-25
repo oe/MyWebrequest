@@ -10,24 +10,44 @@
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
+    <script>
+      var lang = (undefined ===window.navigator.language) ? window.navigator.browserLanguage : window.navigator.language;
+      lang = lang.toLowerCase() === 'zh-cn' ? 'lang-zh' : 'lang-en';
+      document.documentElement.setAttribute('class',lang);
+    </script>
   </head>
   <body>
-
       <header>
         <h1>My Webrequest</h1>
-        <p>Control your browser's web request.</p>
+        <p class="en">Control your browser's web request.</p>
+        <p class="zh">管理你浏览器的网络请求.</p>
       </header>
 
       <div id="banner">
         <span id="logo"></span>
 
-        <a href="https://github.com/evecalm/MyWebrequest" class="button fork"><strong>View On GitHub</strong></a>
+        <a href="https://github.com/evecalm/MyWebrequest" class="button fork">
+          <strong class="en">View On GitHub</strong>
+          <strong class="zh">到GitHub查看</strong>
+        </a>
         <div class="downloads">
-          <span>Install:</span>
+          <span class="en">Install:</span>
+          <span class="zh">安装:</span>
           <ul>
-            <li id="install-chrome"><a href="https://www.google.com/intl/zh-CN/chrome/browser/index.html?standalone=1#eula" class="button">Install Chrome</a></li>
-            <li><a href="https://chrome.google.com/webstore/detail/my-webrequest/ojodgdaaholkmelbddlhnfdgamohijhk?utm_source=chrome-ntp-icon" class="button">Install from Chrome Web Store</a></li>
+            <li id="install-chrome">
+              <a href="https://www.google.com/intl/zh-CN/chrome/browser/index.html?standalone=1#eula" class="button">
+                <span class="en">Install Chrome</span>
+                <span class="zh">安装谷歌浏览器</span>
+              </a>
+            </li>
+            <li>
+              <a href="https://chrome.google.com/webstore/detail/my-webrequest/ojodgdaaholkmelbddlhnfdgamohijhk" class="en button">
+              Install from Chrome Web Store
+              </a>
+              <a href="https://chrome.google.com/webstore/detail/my-webrequest/ojodgdaaholkmelbddlhnfdgamohijhk" class="zh button">
+                从Chrome应用商店安装扩展
+              </a>
+            </li>
           </ul>
         </div>
       </div><!-- end banner -->
@@ -38,18 +58,24 @@
       </nav>
       <section>
         <h3>
-<a class="anchor"><span class="octicon octicon-link"></span></a>Welcome to My Webrequest/欢迎使用My Webrequest</h3>
+          <a class="anchor"><span class="octicon octicon-link"></span></a>
+          <span class="en">Welcome to My Webrequest</span>
+          <span class="zh">欢迎使用My Webrequest</span>
+        </h3>
 
-<p>This is a Chrome extension based on <a href="https://developer.chrome.com/extensions/webRequest.html">Chrome webrequest API</a>. It can be used to manage Chrome's web request (blocking request, forcing HTTPS connection), browse hotlinking pictures, inspect network requests (recorded as logs), and also with the QR code feature (It's an easy way to share text from PC to phone). Click the button on the top right to install it. Please read the help content in option page before using.</p>
+       <p class="en">This is a Chrome extension based on <a href="https://developer.chrome.com/extensions/webRequest.html">Chrome webrequest API</a>. It can be used to manage Chrome's web request (blocking request, forcing HTTPS connection), browse hotlinking pictures, inspect network requests (recorded as logs), and also with the QR code feature (It's an easy way to share text from PC to phone). Click the button on the top right to install it. Please read the help content in option page before using.</p>
 
-<p>这个一个基于<a href="https://developer.chrome.com/extensions/webRequest.html">Chrome webrequest API</a>的谷歌浏览器扩展。它可以用来屏蔽请求，强制使用加密连接，浏览盗链图，监控网络请求(将请求以日志形式记录下拉)，另外还有二维码功能(可以用来向手机传送简单的文本信息)。点击右上放的按钮来安装本扩展，使用前请阅读选项页的帮助信息。</p>
+        <p class="zh">这个一个基于<a href="https://developer.chrome.com/extensions/webRequest.html">Chrome webrequest API</a>的谷歌浏览器扩展。它可以用来屏蔽请求，强制使用加密连接，浏览盗链图，监控网络请求(将请求以日志形式记录下拉)，另外还有二维码功能(可以用来向手机传送简单的文本信息)。点击右上放的按钮来安装本扩展，使用前请阅读选项页的帮助信息。</p>
 
-<h3>
-<a class="anchor"><span class="octicon octicon-link"></span></a>Feedback/反馈</h3>
+      <h3>
+        <a class="anchor"><span class="octicon octicon-link"></span></a>
+        <span class="en">Feedback</span>
+        <span class="zh">反馈</span>
+      </h3>
 
-<p>This is a software, so it has bugs. If you have any question or concerns, please feel free to contact me at <a href="evecalm@live.com">evecalm@live.com</a>. And if you are using github, it's much more appreciated to <a href="https://github.com/evecalm/MyWebrequest/issues/new">create a new issue</a> on my repository. Thanks a lot:)</p>
-<p>作为一款计算机软件，bug是在所难免的，如果你在使用过程中遇到任何问题或者有任何建议，欢迎发送邮件至<a href="evecalm@live.com">evecalm@live.com</a>反馈。当然，如果你也用Github的话，能在我的repository中<a href="https://github.com/evecalm/MyWebrequest/issues/new">创建一个新问题</a>，那就再好不过了。谢谢^^</p>
-      </section>
+      <p class="en">This is a software, so it has bugs. If you have any question or concerns, please feel free to contact me at <a href="evecalm@live.com">evecalm@live.com</a>. And if you are using github, it's much more appreciated to <a href="https://github.com/evecalm/MyWebrequest/issues/new">create a new issue</a> on my repository. Thanks a lot:)</p>
+     <p class="zh">作为一款计算机软件，bug是在所难免的，如果你在使用过程中遇到任何问题或者有任何建议，欢迎发送邮件至<a href="evecalm@live.com">evecalm@live.com</a>反馈。当然，如果你也用Github的话，能在我的repository中<a href="https://github.com/evecalm/MyWebrequest/issues/new">创建一个新问题</a>，那就再好不过了。谢谢^^</p>
+    </section>
       <footer>
         <p>Project maintained by <a href="https://github.com/evecalm">evecalm</a></p>
         <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>

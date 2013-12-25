@@ -11,6 +11,14 @@ by Matt Graham
 /*
  * Corrects block display not defined in IE6/7/8/9 & FF3
  */
+.lang-en .zh {
+  display: none !important;
+}
+
+.lang-zh .en {
+  display: none !important;
+}
+
 article,
 aside,
 details,
