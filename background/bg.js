@@ -29,20 +29,31 @@
 	}
 
 	function formatQueryBody (url) {
-		var obj = {},i,arr,tmp,formated = {};
+		var obj = {},i,len,arr,tmp,formated = {},name,val;
 		i = url.indexOf('?');
 		if (i === -1) {
-			return {error: 'No query data'};
+			return false;
 		}
 		url = url.substr(++i);
 		obj.rawData = url;
 		arr = url.split('&');
-		i = arr.length;
+		len = arr.length;
 		// obj.formatedData = {};
 		try{
-			while (i--) {
+			for(i = 0; i < len; ++i) {
 				tmp = arr[i].split('=');
-				formated[decodeURIComponent(tmp[0])] = tmp[1] === undefined ? '' : decodeURIComponent(tmp[1]);
+				name = decodeURIComponent(tmp[0]);
+				val = tmp[1] === undefined ? '' : decodeURIComponent(tmp[1]);
+				if ( formated[ name ] !== undefined ) {
+					if (Array.isArray(formated[ name] )) {
+						formated[ name ].push( val );
+					} else {
+						formated[ name ] = [ formated[ name ] ];
+						formated[ name ].push( val );
+					}
+				} else {
+					formated[ name ] = val;
+				}
 			}
 			obj.formatedData = formated;
 		} catch(e) {
@@ -107,14 +118,27 @@
 	}
 
 	function logRequest (details) {
-		var id = details.requestId;
+		var id = details.requestId,
+			queryBody = formatQueryBody(details.url),
+			i = details.url.indexOf('//'),
+			domain;
 		++logNum;
+
+		domain = details.url.indexOf('/', i + 2);
+		// find '/'
+		if (~domain) {
+			domain = details.url.substr(0,domain);
+		} else {
+			domain = details.url;
+		}
 		if (requestCache[id]) {
 			details.requestBody = requestCache[id];
 		}
 		details.requestHeaders = formatHeaders(details.requestHeaders);
-		details.queryBody = formatQueryBody(details.url);
-		console.log('%c%d %o','color: #086', logNum, details);
+		if (queryBody) {
+			details.queryBody = queryBody;
+		}
+		console.log('%c%d %o %cfrom domain: %s','color: #086', logNum, details, 'color: #557c30', domain);
 		delete requestCache[id];
 	}
 
