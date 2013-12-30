@@ -97,7 +97,7 @@ aside .app-name{
 	width: 90%;
 	list-style-type: none;
 	margin: 0;
-	margin-top: 20px; 
+	margin-top: 20px;
 	padding: 0;
 }
 
@@ -352,6 +352,29 @@ table.rules td,table.rules th {
 
 table.rules tbody tr {
     border-bottom: 1px solid #ccc;
+    height: 34px;
+}
+
+table.rules tbody tr.new-item {
+  background: #72c39a;
+  max-height: 0;
+  opacity: 0;
+  -webkit-transform: translateX(-300px);
+  -webkit-animation:
+    openSpace 0.2s ease forwards,
+    moveIn 0.3s 0.2s ease forwards;
+}
+@-webkit-keyframes openSpace {
+  to {
+    max-height: 34px;
+  }
+}
+@-webkit-keyframes moveIn {
+  to {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+    background-color: transparent;
+  }
 }
 
 table.rules tbody tr.checked {
@@ -458,7 +481,7 @@ table.rules tbody tr td:nth-child(3):hover {
 	-webkit-box-align: center;
   -webkit-box-orient: vertical;
   -webkit-box-pack: center;
-  
+
   background-color: rgba(255, 255, 255, 0.45);
   bottom: 0;
   left: 0;

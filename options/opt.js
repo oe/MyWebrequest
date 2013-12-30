@@ -460,29 +460,32 @@ $(function ($) {
 	}
 
 	function addRule (rule,type,$tbody,$host,$path) {
-		var ruleObj = rules[type],str = '';
+		var ruleObj = rules[type],str = '',
+			$tr = $('<tr />');
 		++ruleObj.max;
 		ruleObj[ruleObj.max] = rule;
-		str = '<tr>';
-		str +=		'<td><input type="checkbox" value="' + ruleObj.max + '"> </td>';
-		str +=		'<td title="' + rule + '">';
-		str +=			rule;
-		str +=		'<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
-		str += '</tr>';
+		$tr.addClass('new-item');
+		str += '<td><input type="checkbox" value="' + ruleObj.max + '"> </td>';
+		str += '<td title="' + rule + '">';
+		str += 		rule;
+		str += '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>';
+		$tr.html(str);
 		if (!$tbody.find('tr').length || $tbody.find('tr[nodata]').length) {
-			$tbody.html(str);
+			$tbody.find('tr').remove();
 			$('#request-settings .switch-input').prop('disabled',false);
 			$tbody.parent().find('thead input,thead button').prop('disabled',false);
 			$('#request-settings .enable-tip').prop('hidden',true);
-		} else {
-			$tbody.prepend(str);
 		}
+		$tbody.prepend($tr);
 		localStorage[type] = JSON.stringify(getObjValues(ruleObj));
 
 		$('#request-settings .rule-cunt-num').text($tbody.find('tr').length);
 		$host.val('');
 		$path.val('');
 		$host.focus();
+		setTimeout(function () {
+			$tr.removeClass('new-item');
+		}, 600);
 	}
 
 	function deleteRules (secId) {
