@@ -138,7 +138,7 @@
 		if (queryBody) {
 			details.queryBody = queryBody;
 		}
-		console.log('%c%d %o %cfrom domain: %s','color: #086', logNum, details, 'color: #557c30', domain);
+		console.log('%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain);
 		delete requestCache[id];
 	}
 
