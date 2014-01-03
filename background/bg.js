@@ -145,16 +145,20 @@
 	//execute init when browser opened
 	(function init () {
 		var onoff = JSON.parse(localStorage.onoff || '{}'),
+			nogooredir = JSON.parse(localStorage.nogooredir || '[]'),
 			reqApi = chrome.webRequest;
 		blockrule.urls = JSON.parse(localStorage.block || '[]');
 		hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
 		referrule.urls = JSON.parse(localStorage.refer || '[]');
 		logrule.urls = JSON.parse(localStorage.log || '[]');
 
-		// onoff.google redir
-		// if (true) {
-		// 	reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
-		// }
+		// remove google redir
+		if (onoff.nogooredir) {
+			goRule.urls = goRule.urls.concat(nogooredir);
+			reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
+		} else {
+			onoff.nogooredir = false;
+		}
 
 		if (onoff.block && blockrule.urls.length) {
 			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
@@ -236,7 +240,23 @@
 					}, 0,logRequest,logrule);
 				}
 				break;
+			case 'nogooredir':
+				goRule.urls = goRule.urls.concat(nogooredir);
+				if (onoff.nogooredir) {
+					reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect,goRule,['blocking']);
+					setTimeout(function (fn,filter) {
+						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
+					}, 0, cancelGoogleRedirect,goRule);
+				}
+				break;
 			case 'onoff':
+				if (newData.nogooredir !== oldData.nogooredir) {
+					if (newData) {
+						reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
+					} else {
+						reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect,goRule,['blocking']);
+					}
+				}
 				if (newData.block !== oldData.block) {
 					if (newData.block) {
 						reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
