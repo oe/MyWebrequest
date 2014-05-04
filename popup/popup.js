@@ -39,7 +39,7 @@ function makeQRCode () {
 	qrimg.src = 'http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&choe=UTF-8&chl=' + encoded;
     textWrapper.classList.remove('focus');
 	qrelm.style.display = 'block';
-	googleDown.setAttribute('hidden');
+	googleDown.setAttribute('hidden', true);
 	actionTip.innerText = chrome.i18n.getMessage('pop_action_tip');
 	qrelm.focus();
 }
