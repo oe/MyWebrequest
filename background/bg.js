@@ -1,4 +1,4 @@
-(function  () {
+(function  (undefined) {
 	var blockrule = {},
 		hstsrule = {},
 		referrule = {},
@@ -145,16 +145,16 @@
 	//execute init when browser opened
 	(function init () {
 		var onoff = JSON.parse(localStorage.onoff || '{}'),
-			nogooredir = JSON.parse(localStorage.nogooredir || '[]'),
+			gooredir = JSON.parse(localStorage.gooredir || '[]'),
 			reqApi = chrome.webRequest;
 		blockrule.urls = JSON.parse(localStorage.block || '[]');
 		hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
 		referrule.urls = JSON.parse(localStorage.refer || '[]');
 		logrule.urls = JSON.parse(localStorage.log || '[]');
 
+		goRule.urls = goRule.urls.concat(gooredir);
 		// remove google redir
 		if (onoff.nogooredir) {
-			goRule.urls = goRule.urls.concat(nogooredir);
 			reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
 		} else {
 			onoff.nogooredir = false;
@@ -240,8 +240,8 @@
 					}, 0,logRequest,logrule);
 				}
 				break;
-			case 'nogooredir':
-				goRule.urls = goRule.urls.concat(nogooredir);
+			case 'gooredir':
+				goRule.urls = goRule.urls.concat(newData);
 				if (onoff.nogooredir) {
 					reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect,goRule,['blocking']);
 					setTimeout(function (fn,filter) {

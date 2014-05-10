@@ -55,9 +55,10 @@ $(function ($) {
 			}
 		}
 	});
+	
 
 	// enable or disable a function
-	$('section .switch-input').on('change',function (e) {
+	$('#request-settings .switch-input').on('change',function (e) {
 		var secId = $('#request-settings').attr('data-id'),
 			enabled = $(this).prop('checked'),
 			onoff = JSON.parse(localStorage.onoff || '') || {};
@@ -66,7 +67,7 @@ $(function ($) {
 	});
 
 	//hash init
-	if(['block','hsts','refer','log','qrcode','help'].indexOf(hash) === -1) hash = 'block';
+	if(['block','hsts','refer','log','qrcode','help','utility'].indexOf(hash) === -1) hash = 'block';
 	$('#nav a[href=#' + hash + ']').click();
 
 	document.getElementById('qrimg').onerror = function (e) {
