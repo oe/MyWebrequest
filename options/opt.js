@@ -220,7 +220,7 @@ $(function ($) {
 			});
 			return;
 		}
-		addRule(rule,secId,$tbody,$host,$path)
+		addRule(rule,secId,$tbody,$host,$path);
 	});
 
 	//delete multi function
