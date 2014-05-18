@@ -32,6 +32,9 @@
   "qr_make_btn": {
   	"message": "GO!(Ctrl+Enter)"
   },
+  "qr_make_mac_btn": {
+    "message": "GO!(Command+Enter)"
+  },
   "pop_more_link": {
   	"message": "more..."
   },

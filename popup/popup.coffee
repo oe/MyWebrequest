@@ -47,7 +47,7 @@ qrelm.addEventListener 'dblclick', (e) ->
 ,false
 
 textArea.addEventListener 'keydown', (e) ->
-  if e.ctrlKey and e.keyCode is 13
+  if (e.ctrlKey or e.metaKey) and e.keyCode is 13
     makeQRCode()
 ,false
 

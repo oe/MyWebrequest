@@ -20,6 +20,14 @@
 			</div>
 		</div>
 		<button id="make" i18n-content="qr_make_btn"></button>
+		<script>
+			(function () {
+				var isMac = navigator.userAgent.indexOf('Macintosh') > -1;
+				if (isMac) {
+					document.getElementById('make').setAttribute('i18n-content', 'qr_make_mac_btn');
+				}
+			})();
+		</script>
 		<a href="../options/index.html#qrcode" target="_blank" i18n-content="pop_more_link"></a>
 		<div id="qrcode-wrapper">
 			<img src="" id="qrcode">
