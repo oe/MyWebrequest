@@ -8,12 +8,25 @@ do ->
   content = ''
   qrUrl = 'http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|0&choe=UTF-8&chl='
 
-  qrimg.onerror = (e) -> getEle('ntwk-error').removeAttribute 'hidden'
+  loadImg = (url)->
+    imgElm = document.createElement 'img'
+    classList = qrimg.parentElement.classList
+    classList.remove 'error','loaded'
+    imgElm.onerror = ->
+      classList.add 'error'
+      classList.remove 'loaded'
+    imgElm.onload = ->
+      qrimg.src = url
+      classList.remove 'error'
+      classList.add 'loaded'
+      imgElm = null
+    imgElm.src = url
+    return
 
   chrome.tabs.query {active: true, lastFocusedWindow: true}, (tabs) ->
     content = tabs[0].url
     textArea.value = content
-    qrimg.src = qrUrl + encodeURIComponent content
+    loadImg qrUrl + encodeURIComponent content
 
   makeQRCode = () ->
     encoded = ''
@@ -30,7 +43,7 @@ do ->
       , 3000
       return
 
-    qrimg.src = qrUrl + encoded
+    loadImg qrUrl + encoded
     textWrapper.classList.remove 'focus'
     qrelm.style.display = 'block'
     getEle('ntwk-error').setAttribute 'hidden', true

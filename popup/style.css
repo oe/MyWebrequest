@@ -153,10 +153,28 @@ a {
 	height: 100%;
 	position: absolute;
 	text-align: left;
-	background-color: #fff;
+  background: #fff url(../common/loadinfo.gif) no-repeat center center;
 }
-
-code {
-	color: red;
-	font-style: italic;
+#qrcode-wrapper img {
+  width: 250px;
+  height: 250px;
+  display: none;
+}
+#qrcode-wrapper span {
+  display: none; 
+}
+#qrcode-wrapper.error {
+  background: #fff;
+}
+#qrcode-wrapper.error img {
+  display: none;
+}
+#qrcode-wrapper.error span {
+  display: block;
+}
+#qrcode-wrapper.loaded img {
+  display: block;
+}
+#qrcode-wrapper.loaded span {
+  display: none;
 }
