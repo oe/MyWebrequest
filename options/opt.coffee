@@ -5,18 +5,208 @@ $ ($) ->
   TABNODATATR = "<tr nodata><td colspan='3' class='align-center'>#{chrome.i18n.getMessage 'opt_no_rules' }</td></tr>"
 
   # hash init
-  if ['block','hsts','refer','log','qrcode','help','utility'].indexOf(hash) isnt -1 then hash = 'block';
+  if ['block','hsts','refer','log','qrcode','help','utility'].indexOf(hash) isnt -1 then hash = 'block'
   do (rules = rules) ->
     rules.block = {}
     rules.refer = {}
     rules.log = {}
     rules.hsts = {}
-    for key, val of rules
+    for key of rules
       console.log key
       arr = JSON.parse localStorage[ key ] or '[]'
-      for i,k in arr
-        val[i] = k
+      rules[key].max = arr.length
+      for k,i in arr
+        rules[key][i] = k
     return
+
+  # init setting section
+  initRequestSection = (secId)->
+    ruleObj
+    str = ''
+    $tbody = $ '#request-settings tbody'
+    $enable = $ '#request-settings .switch-input'
+    delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>'
+    $protocol = $ '#protocol'
+    $firstInput = $ '#host'
+    onoff = JSON.parse localStorage.onoff or '{}'
+    cunt = 0
+
+    setTimeout (e)->
+      $firstInput.focus()
+    , 200
+    ruleObj = rules[secId] or {}
+    for key,val of ruleObj
+      # only key is a number
+      if !isNaN(key) and ruleObj.hasOwnProperty key
+        ++cunt
+        str += '<tr>'
+        str +=    "<td><input type='checkbox' value='#{key}'> </td>"
+        str +=    "<td title='#{val}'>#{val}</td>"
+        str +=    delStr
+        str += '</tr>'
+
+    $('#request-settings .rule-cunt-num').text cunt
+    if !str
+      $enable.prop('checked',false).trigger 'change'
+      $enable.prop 'disabled', true
+      $('#request-settings .enable-tip').prop 'hidden', false
+      $tbody.parent().find('thead input,thead button').prop 'disabled', true
+      str = TABNODATATR
+    else
+      $enable.prop 'checked', !!onoff[secId]
+      $enable.prop 'disabled', false
+      $('#request-settings .enable-tip').prop 'hidden', true
+      $tbody.parent().find('thead input,thead button').prop 'disabled', false
+
+    $tbody.parent().find('thead input').prop 'checked', false
+    if secId is 'hsts'
+      $protocol.val('http').attr 'disabled',true
+    else
+      $protocol.val('*').attr 'disabled',false
+    $tbody.html str
+    return
+
+  addRule = (rule,type,$tbody)->
+    ruleObj = rules[type]
+    console.log 'init %o', ruleObj
+    str = ''
+    $tr = $ '<tr />'
+    ++ruleObj.max
+
+    ruleObj[ruleObj.max] = rule
+
+    $tr.addClass 'new-item'
+    str += "<td><input type='checkbox' value='#{ruleObj.max}'> </td>"
+    str += "<td title='#{rule}'>#{rule}</td>"
+    str += "<td class='delete'>#{chrome.i18n.getMessage('opt_delete_text')}</td>"
+    $tr.html str
+    if !$tbody.find('tr').length or $tbody.find('tr[nodata]').length
+      $tbody.find('tr').remove()
+      $('#request-settings .switch-input').prop 'disabled', false
+      $tbody.parent().find('thead input,thead button').prop 'disabled', false
+      $('#request-settings .enable-tip').prop 'hidden', true
+    console.log ruleObj
+    console.log getObjValues ruleObj
+    localStorage[type] = JSON.stringify getObjValues ruleObj
+    $tbody.prepend $tr
+
+    $('#request-settings .rule-cunt-num').text $tbody.find('tr').length
+    $('.rule-field input').val('')
+    $('#host').focus()
+    setTimeout ->
+      $tr.removeClass 'new-item'
+    , 600
+
+  deleteRules = (secId)->
+    $tbody = $ '#request-settings tbody'
+    $checkTrs = $tbody.find 'tr input:checked'
+    $enable = $ '#request-settings .switch-input'
+    keys = $checkTrs.map ()->
+      this.value
+    .get()
+    ruleObj = rules[secId]
+    len = keys.length
+    trLen = $tbody.find('tr').length
+    if len
+      # delete all
+      if len is trLen
+        $tbody.html TABNODATATR
+        $tbody.parent().find('thead input').prop 'checked',false
+        $tbody.parent().find('thead input,thead button').prop 'disabled',true
+        $enable.prop('checked',false).trigger 'change'
+        $enable.prop 'disabled', true
+        $('#request-settings .enable-tip').prop 'hidden', false
+        rules[secId] = {}
+        ruleObj = {}
+      else
+        $checkTrs.map ()->
+          $(this).parents('tr').remove()
+        
+        while len--
+          delete ruleObj[ keys[len] ]
+
+      $('#request-settings .rule-cunt-num').text trLen - len
+      localStorage[secId] = JSON.stringify getObjValues ruleObj
+
+      if !$tbody.find('tr').length
+        $tbody.html TABNODATATR
+
+  getObjValues = (obj)->
+    arr = []
+    for k of obj
+      if !isNaN(k) and obj.hasOwnProperty k
+        arr.push obj[ k ]
+    # make the last be the first
+    arr.reverse()
+
+  getVcardString = ()->
+    str = []
+    $('#tab-vcard').find('input,textarea').map (el)->
+      if el.value isnt ''
+        str.push "#{el.name}:#{el.value}"
+    str.join ';'
+    
+  isValueInObj = (obj,value)->
+    for k, v of obj
+      if obj.hasOwnProperty(k) and v is value
+        return true
+    return false
+      
+  hideDialog = ()->
+    $overlayWrapper = $ '#overlay-wrapper'
+    $overlayWrapper.removeClass 'fadeInDown'
+    $overlayWrapper.addClass 'fadeOutUp'
+    setTimeout ()->
+      $overlayWrapper.prop 'hidden', true
+      $(document.body).removeClass 'ovHidden'
+    , 220
+
+  # //show error tip
+  showTip = (el,msg)->
+    $el = $ el
+    $tooltip = $ '#tooltip'
+    $msg = $ '#tooltip-msg'
+    pos = $el.offset()
+    $msg.html msg
+    pos.top += $el.height() + 15
+    pos.left += $el.width() / 2 - $tooltip.width() / 2
+    $tooltip.css({top: pos.top + 'px',left: pos.left + 'px'}).addClass 'show'
+    $el.focus().select()
+    console.log 'show tip'
+    return
+
+  showDialog = (config)->
+    $overlayWrapper = $ '#overlay-wrapper'
+    $dlgTitle = $ '#dialog-title'
+    $dlgContent = $ '#dialog-content'
+    $dlgOKBtn = $ '#dialog-ok-btn'
+    $dlgCancelBtn = $ '#dialog-cancel-btn'
+    config = config || {}
+
+    $overlayWrapper.removeClass 'fadeOutUp'
+    $(document.body).addClass 'ovHidden'
+    $overlayWrapper.prop 'hidden',false
+    $overlayWrapper.addClass 'fadeInDown'
+
+    $dlgTitle.text config.title or 'No title'
+    $dlgContent.html config.content or 'No content'
+    $dlgOKBtn.prop 'hidden', !!config.hideOK
+    $dlgCancelBtn.prop 'hidden', !!config.hideCancel
+
+    if $.isFunction config.callback
+      dialogOKCB = config.callback
+      dialogOKCB.args = if config.cbargs then config.cbargs else []
+      $dlgOKBtn.removeClass 'cancel'
+    else
+      dialogOKCB = null
+
+    if $.isNumeric(config.timeout) and config.timeout > 0
+      setTimeout hideDialog, config.timeout
+
+    if config.focusOnOK
+      $dlgOKBtn.focus()
+    else
+      $dlgCancelBtn.focus()
 
   $(document).on 'click', 'a[href^=#]', (e) ->
     targetId = $(this).attr('href').replace '#', ''
@@ -63,11 +253,12 @@ $ ($) ->
   # qrcode image on error
   document.getElementById('qrimg').onerror = (e) ->
     @setAttribute 'hidden', true
-    showDialog
+    showDialog {
       title: chrome.i18n.getMessage 'opt_errtip_gtitle'
       content: chrome.i18n.getMessage 'opt_errtip_gcontent'
       hideCancel: true
       focusOnOK: true
+    }
 
   # input box [host] on *enter key*
   $('#host').on 'keyup', (e) ->
@@ -84,9 +275,9 @@ $ ($) ->
     if url isnt ''
       i = url.indexOf '://'
       if ~i
-        if (!i) return true;
-        arr = url.split('://');
-        if arr.length isnt 2 then return true;
+        if not i then return true
+        arr = url.split '://'
+        if arr.length isnt 2 then return true
         tmp = arr[0].trim()
         if ['*','http','https'].indexOf(tmp) is -1 then return true
         if !$('#protocol').prop 'disabled'
@@ -108,7 +299,7 @@ $ ($) ->
           arr.shift()
           $('#path').val arr.join('/').split('#').shift()
         arr = null
-        return false     
+        return false
     return true
 
   # input box [path] on enter key
@@ -123,23 +314,24 @@ $ ($) ->
     $protocol = $ '#protocol'
     $host = $ "#host"
     $path = $ "#path"
-    data = 
-      protocol: $protocol.val().trim(),
-      host: $host.val().trim().toLowerCase(),
+    data = {
+      protocol: $protocol.val().trim()
+      host: $host.val().trim().toLowerCase()
       path: $path.val().trim()
+    }
     ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
     hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
     pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
-    ruleObj = rules[secId],
+    ruleObj = rules[secId]
     $tbody = $('#request-settings tbody')
 
     if ['*','http','https'].indexOf(data.protocol) is -1
       showTip $protocol, chrome.i18n.getMessage 'opt_errtip_protocol'
-      return
+      return false
 
     if !data.host or (!hostReg.test(data.host) && !ipReg.test(data.host))
       showTip $host, chrome.i18n.getMessage 'opt_errtip_host'
-      return
+      return false
 
     # Path treat empty as star(*)
     if data.path is ''
@@ -147,17 +339,17 @@ $ ($) ->
 
     if !data.path or !pathReg.test data.path
       showTip $path, chrome.i18n.getMessage 'opt_errtip_path'
-      return
+      return false
 
     rule = "#{data.protocol}://#{data.host}/#{data.path}"
     if rule.length > 500
       showTip $host, chrome.i18n.getMessage 'opt_errtip_rulelong'
-      return
+      return false
 
     # whether rule is duplicated
     if isValueInObj ruleObj, rule
-      showTip($host,chrome.i18n.getMessage('opt_errtip_duplicate'));
-      return
+      showTip $host,chrome.i18n.getMessage 'opt_errtip_duplicate'
+      return false
 
     if data.host is '*'
       if ['block','hsts'].indexOf(secId) isnt -1
@@ -170,11 +362,12 @@ $ ($) ->
       if ['block','hsts'].indexOf(secId) isnt -1 and (new RegExp('^' + str + '$')).test 'chart.apis.google.com'
         errorContent = 'opt_errdlg_cqr'
     if errorContent
-      showDialog
+      showDialog {
         title: chrome.i18n.getMessage 'opt_errdlg_title'
         content: chrome.i18n.getMessage errorContent
-        callback: addRule,
+        callback: addRule
         cbargs: [rule, secId, $tbody]
+      }
       return
     else
       addRule rule, secId, $tbody
@@ -185,15 +378,16 @@ $ ($) ->
     secId = $('#request-settings').attr 'data-id'
     len = $(this).parents('table').find('tbody input:checked').length
     if len
-      showDialog
+      showDialog {
         title: chrome.i18n.getMessage 'opt_deldlg_title'
         content: chrome.i18n.getMessage('opt_deldlg_content').replace 'xx', len
         callback: deleteRules
         cbargs:[ secId ]
+      }
       return
     else
       showTip this, chrome.i18n.getMessage 'opt_errtip_nochose'
-      return
+      return false
 
   # delete on rule
   $('.rules tbody').on 'click', '.delete', (e) ->
@@ -289,7 +483,7 @@ $ ($) ->
   $('.tab-content').on 'keydown', '.input', (e)->
     if (e.ctrlKey or e.metaKey) and e.keyCode is 13
       $(this).parents('.tab-pane').find('.make-qrcode').click()
-      return false;
+      return false
 
   # generate QR Code
   $('.tab-content').on 'click', '.make-qrcode', (e)->
@@ -308,7 +502,7 @@ $ ($) ->
           str = 'MECARD:' + str + ';;'
       when 'msg'
         if $('#s-tel').val().trim() or $('#s-msg').val().trim()
-          str = 'smsto:' + $('#s-tel').val().trim() + ':' + $('#s-msg').val().trim();
+          str = 'smsto:' + $('#s-tel').val().trim() + ':' + $('#s-msg').val().trim()
 
     if str isnt ''
       str = encodeURIComponent str
@@ -339,189 +533,6 @@ $ ($) ->
   # qr textarea input length count
   $('.letter-cunt-wrapper').on 'keyup', 'textarea', (e)->
     $(this).next().text this.value.trim().length + '/300'
-
-  # init setting section
-  initRequestSection = (secId)->
-    ruleObj
-    str = ''
-    $tbody = $ '#request-settings tbody'
-    $enable = $ '#request-settings .switch-input'
-    delStr = '<td class="delete">' + chrome.i18n.getMessage('opt_delete_text') + '</td>'
-    $protocol = $ '#protocol'
-    $firstInput = $ '#host'
-    onoff = JSON.parse(localStorage.onoff or '{}'
-    cunt = 0
-
-    setTimeout (e)->
-      $firstInput.focus()
-    , 200
-    ruleObj = rules[secId] or {}
-    for key,val of ruleObj
-      # only key is a number
-      if !isNaN(key) or ruleObj.hasOwnProperty key
-        ++cunt
-        str += '<tr>';
-        str +=    "<td><input type='checkbox' value='#{key}'> </td>"
-        str +=    "<td title='#{val}'>#{val}</td>"
-        str +=    delStr
-        str += '</tr>';
-
-    $('#request-settings .rule-cunt-num').text cunt
-    if !str
-      $enable.prop('checked',false).trigger 'change'
-      $enable.prop 'disabled', true
-      $('#request-settings .enable-tip').prop 'hidden', false
-      $tbody.parent().find('thead input,thead button').prop 'disabled', true
-      str = TABNODATATR
-    else
-      $enable.prop 'checked', !!onoff[secId]
-      $enable.prop 'disabled', false
-      $('#request-settings .enable-tip').prop 'hidden', true
-      $tbody.parent().find('thead input,thead button').prop 'disabled', false
-
-    $tbody.parent().find('thead input').prop 'checked', false
-    if secId is 'hsts'
-      $protocol.val('http').attr 'disabled',true
-    else
-      $protocol.val('*').attr 'disabled',false
-    $tbody.html str
-
-  addRule = (rule,type,$tbody)->
-    ruleObj = rules[type]
-    str = ''
-    $tr = $ '<tr />'
-    ++ruleObj.max
-
-    ruleObj[ruleObj.max] = rule
-
-    $tr.addClass 'new-item'
-    str += "<td><input type='checkbox' value='#{ruleObj.max}'> </td>"
-    str += "<td title='#{rule}'>#{rule}</td>"
-    str += "<td class='delete'>#{chrome.i18n.getMessage('opt_delete_text')}</td>"
-    $tr.html str
-    if !$tbody.find('tr').length or $tbody.find('tr[nodata]').length
-      $tbody.find('tr').remove()
-      $('#request-settings .switch-input').prop 'disabled', false
-      $tbody.parent().find('thead input,thead button').prop 'disabled', false
-      $('#request-settings .enable-tip').prop 'hidden', true
-
-    $tbody.prepend $tr
-    localStorage[type] = JSON.stringify getObjValues ruleObj
-
-    $('#request-settings .rule-cunt-num').text $tbody.find('tr').length
-    $('.rule-field input').val('').focus();
-    setTimeout ()->
-      $tr.removeClass 'new-item'
-    , 600
-
-  deleteRules = (secId)->
-    $tbody = $ '#request-settings tbody'
-    $checkTrs = $tbody.find 'tr input:checked'
-    $enable = $ '#request-settings .switch-input'
-    keys = $checkTrs.map(()->
-      this.value
-    }).get()
-    ruleObj = rules[secId]
-    len = keys.length
-    trLen = $tbody.find('tr').length
-    if len
-      # delete all
-      if len is trLen
-        $tbody.html TABNODATATR
-        $tbody.parent().find('thead input').prop 'checked',false
-        $tbody.parent().find('thead input,thead button').prop 'disabled',true
-        $enable.prop('checked',false).trigger 'change'
-        $enable.prop 'disabled', true
-        $('#request-settings .enable-tip').prop 'hidden', false
-        rules[secId] = {}
-        ruleObj = {}
-      else
-        $checkTrs.map ()->
-          $(this).parents('tr').remove()
-        
-        while len--
-          delete ruleObj[ keys[len] ]
-
-      $('#request-settings .rule-cunt-num').text trLen - len
-      localStorage[secId] = JSON.stringify getObjValues ruleObj
-
-      if !$tbody.find('tr').length
-        $tbody.html TABNODATATR
-
-  getObjValues = (obj)->
-    arr = []
-    for k of obj
-      if !isNaN(k) and obj.hasOwnProperty k
-        arr.push obj[ k ]
-    arr
-
-  getVcardString = ()->
-    str = []
-    $('#tab-vcard').find('input,textarea').map (el)->
-      if el.value isnt ''
-        str.push "#{el.name}:#{el.value}"
-    str.join ';'
-    
-  isValueInObj = (obj,value)->
-    for k, v of obj
-      if obj.hasOwnProperty(k) and v is value
-        return true
-    return false
-      
-  hideDialog = ()->
-    $overlayWrapper = $ '#overlay-wrapper'
-    $overlayWrapper.removeClass 'fadeInDown'
-    $overlayWrapper.addClass 'fadeOutUp'
-    setTimeout ()->
-      $overlayWrapper.prop 'hidden', true
-      $(document.body).removeClass 'ovHidden'
-    , 220
-
-  # //show error tip
-  showTip = (el,msg)->
-    $el = $ el
-    $tooltip = $ '#tooltip'
-    $msg = $ '#tooltip-msg'
-    pos = $el.offset()
-    $msg.html msg
-    pos.top += $el.height() + 15
-    pos.left += $el.width() / 2 - $tooltip.width() / 2
-    $tooltip.css({top: pos.top + 'px',left: pos.left + 'px'}).addClass 'show'
-    $el.focus().select()
-
-  showDialog = (config)->
-    $overlayWrapper = $ '#overlay-wrapper'
-    $dlgTitle = $ '#dialog-title'
-    $dlgContent = $ '#dialog-content'
-    $dlgOKBtn = $ '#dialog-ok-btn'
-    $dlgCancelBtn = $ '#dialog-cancel-btn'
-    config = config || {}
-
-    $overlayWrapper.removeClass 'fadeOutUp'
-    $(document.body).addClass 'ovHidden'
-    $overlayWrapper.prop 'hidden',false
-    $overlayWrapper.addClass 'fadeInDown'
-
-    $dlgTitle.text config.title or 'No title'
-    $dlgContent.html config.content or 'No content'
-    $dlgOKBtn.prop 'hidden', !!config.hideOK
-    $dlgCancelBtn.prop 'hidden', !!config.hideCancel
-
-    if $.isFunction config.callback
-      dialogOKCB = config.callback
-      dialogOKCB.args = if config.cbargs then config.cbargs else []
-      $dlgOKBtn.removeClass 'cancel'
-    else
-      dialogOKCB = null
-
-    if $.isNumeric(config.timeout) and config.timeout > 0
-      setTimeout hideDialog, config.timeout
-
-    if config.focusOnOK
-      $dlgOKBtn.focus()
-    else
-      $dlgCancelBtn.focus()
-
 
 
 

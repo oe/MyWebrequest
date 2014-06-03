@@ -382,7 +382,7 @@ table.rules tbody tr.checked {
 }
 
 table.rules tbody tr:hover {
-	background-color: #ddd;
+	background-color: #f5f5f5;
 }
 
 table.rules tr td:nth-child(2) {

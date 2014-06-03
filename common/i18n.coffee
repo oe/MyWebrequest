@@ -1,6 +1,11 @@
 do (window) ->
-  slice = Array.prototype.slice;
-  
+  slice = Array.prototype.slice
+
+  if navigator.userAgent.indexOf('Macintosh') > -1
+    makeBtns = slice.call document.querySelectorAll '.make-qrcode'
+    makeBtns.forEach (btn)->
+      btn.setAttribute 'i18n-content', 'qr_make_mac_btn'
+
   elms = document.querySelectorAll '[i18n-content]'
   elms = slice.call elms
 

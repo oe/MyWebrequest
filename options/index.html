@@ -160,19 +160,6 @@
 				</div>
 			</div>
 		</div>
-		<script>
-			(function () {
-				var isMac = navigator.userAgent.indexOf('Macintosh') > -1,
-					makeBtns;
-				if (isMac) {
-					makeBtns = document.querySelectorAll('.make-qrcode');
-					makeBtns = Array.prototype.slice.call( makeBtns);
-					makeBtns.forEach(function (btn) {
-						btn.setAttribute('i18n-content', 'qr_make_mac_btn');
-					});
-				}
-			})();
-		</script>
 	</section>
 	<section id="utility">
 		<div class="setting-title">
@@ -247,7 +234,6 @@
 		</div>
 	</div>
 	<script src="../common/i18n.js"></script>
-	<script src="../common/qrcode.js"></script>
 	<script src="../common/jquery.min.js"></script>
 	<script type="text/javascript" src="opt.js"></script>
 </body>
