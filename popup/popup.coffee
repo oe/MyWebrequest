@@ -6,7 +6,7 @@ do ->
   cunt = getEle 'letter-cunt'
   textArea = getEle 'text'
   content = ''
-  qrUrl = 'http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|0&choe=UTF-8&chl='
+  qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data='
 
   loadImg = (url)->
     imgElm = document.createElement 'img'

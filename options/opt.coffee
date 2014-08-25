@@ -208,6 +208,12 @@ $ ($) ->
     else
       $dlgCancelBtn.focus()
 
+  # init utility page
+  initUtility = ->
+    onoff = JSON.parse localStorage.onoff or '{}'
+    $('#switch-google').prop 'checked', !!onoff.nogooredir
+    return
+
   $(document).on 'click', 'a[href^=#]', (e) ->
     targetId = $(this).attr('href').replace '#', ''
     $navlink = $("#nav a[href=##{targetId}]").parent()
@@ -219,23 +225,28 @@ $ ($) ->
       $navlink.addClass 'active'
 
       location.hash = targetId
+      switch targetId
+        when 'block','hsts','refer','log'
+          $requestSec.attr 'data-id', targetId
+          $requestSec.removeClass 'active'
+          initRequestSection targetId
+          $('#fun-name').text $navlink.text()
+          $('#fun-desc').text chrome.i18n.getMessage "opt_#{targetId}_desc"
 
-      if ['block','hsts','refer','log'].indexOf(targetId) isnt -1
-        $requestSec.attr 'data-id', targetId
-        $requestSec.removeClass 'active'
-        initRequestSection targetId
-        $('#fun-name').text $navlink.text()
-        $('#fun-desc').text chrome.i18n.getMessage "opt_#{targetId}_desc"
-
-        setTimeout ()->
-          $requestSec.addClass 'active'
-        , 20
-      else
-        $requestSec.removeClass 'active'
-        if targetId is 'qrcode'
+          setTimeout ()->
+            $requestSec.addClass 'active'
+          , 20
+        when 'qrcode'
+          $requestSec.removeClass 'active'
           setTimeout () ->
             $('#qrcode .tab-pane.active .input:first').focus()
           ,0
+        when 'utility'
+          $requestSec.removeClass 'active'
+          do initUtility
+        else
+          $requestSec.removeClass 'active'
+    return
 
   $("#nav a[href=##{hash}]").click()
 
@@ -514,7 +525,7 @@ $ ($) ->
         , 3000
         return
 
-      $qrimg.attr 'src',"http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|0&choe=UTF-8&chl=#{str}"
+      $qrimg.attr 'src',"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
       $qrimg.prop 'hidden', false
     else
       $errorTip.text chrome.i18n.getMessage 'opt_qrtip_notext'
@@ -529,12 +540,25 @@ $ ($) ->
       $tab = $this.next '.letter-cunt'
       if $tab.length
         $tab.text str.length + '/300'
+    return
 
   # qr textarea input length count
   $('.letter-cunt-wrapper').on 'keyup', 'textarea', (e)->
     $(this).next().text this.value.trim().length + '/300'
+    return
 
+  $('#switch-google').on 'change', ->
+    onoff = JSON.parse localStorage.onoff or '{}'
+    if this.checked
+      onoff[ 'nogooredir' ] = true
+    else
+      onoff[ 'nogooredir' ] = false
+    localStorage.onoff = JSON.stringify onoff
+    console.log 'google changed'
+    return
+    
 
+  return
 
 
 

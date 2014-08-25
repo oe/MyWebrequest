@@ -1,293 +1,316 @@
-(function  (undefined) {
-	var blockrule = {},
-		hstsrule = {},
-		referrule = {},
-		logrule = {},
-		logNum = 0,
-		requestCache = {},
-		goRule = {
-			urls:['*://www.google.com/url*','*://www.google.com.hk/url*']
-		};
-
-	function cloneObj (o) {
-		var obj,i;
-		if (Array.isArray(o)) {
-			if (o.length > 1) {
-				obj = [];
-			} else {
-				return o[0];
-			}
-		} else {
-			obj = {};
-		}
-		for (i in o) {
-			if (o.hasOwnProperty(i)) {
-				obj[i] = o[i] instanceof Object ? cloneObj(o[i]) : o[i];
-			}
-		}
-		return obj;
-	}
-
-	function formatQueryBody (url) {
-		var obj = {},i,len,arr,tmp,formated = {},name,val;
-		i = url.indexOf('?');
-		if (i === -1) {
-			return false;
-		}
-		url = url.substr(++i);
-		obj.rawData = url;
-		arr = url.split('&');
-		len = arr.length;
-		// obj.formatedData = {};
-		try{
-			for(i = 0; i < len; ++i) {
-				tmp = arr[i].split('=');
-				name = decodeURIComponent(tmp[0]);
-				val = tmp[1] === undefined ? '' : decodeURIComponent(tmp[1]);
-				if ( formated[ name ] !== undefined ) {
-					if (Array.isArray(formated[ name] )) {
-						formated[ name ].push( val );
-					} else {
-						formated[ name ] = [ formated[ name ] ];
-						formated[ name ].push( val );
-					}
-				} else {
-					formated[ name ] = val;
-				}
-			}
-			obj.formatedData = formated;
-		} catch(e) {
-			if (e instanceof URIError) {
-				obj.error = 'The query string is not encoded in utf-8, this can\'t be decoded by now.';
-			} else {
-				obj.error = e.message;
-			}
-		}
-		return obj;
-	}
-
-	function formatHeaders (headers) {
-		var obj = {},i = headers.length;
-		while (i--) {
-			obj[headers[i].name] = headers[i].value;
-		}
-		return obj;
-	}
-
-	function blockReq (details) {
-		return {cancel: true};
-	}
-
-	function hstsReq (details) {
-		return {redirectUrl:details.url.replace('http://','https://')};
-	}
-
-	function cancelGoogleRedirect (details) {
-		var url = details.url,i;
-		i = url.indexOf('url=');
-		if (~i) {
-			url = url.substring(i);
-			i = url.indexOf('&');
-			if (~i) {
-				url = url.substring(0,i);
-			}
-			url = url.split('=');
-			url = decodeURIComponent(url[1]);
-		}
-		return {redirectUrl: url};
-	}
-
-	function modifyReferer (details) {
-		var headers = details.requestHeaders,
-			len = headers.length;
-		while (len--) {
-			if (headers[len].name === 'Referer') {
-				// headers[len].value = details.url;
-				headers.splice(len,1);
-				break;
-			}
-		}
-		return {requestHeaders: headers};
-	}
-
-	function logBody (details) {
-		//only post data in requestbody,get data is in url
-		if (details.requestBody) {
-			requestCache[details.requestId] = cloneObj(details.requestBody);
-		}
-	}
-
-	function logRequest (details) {
-		var id = details.requestId,
-			queryBody = formatQueryBody(details.url),
-			i = details.url.indexOf('//'),
-			domain;
-		++logNum;
-
-		domain = details.url.indexOf('/', i + 2);
-		// find '/'
-		if (~domain) {
-			domain = details.url.substr(0,domain);
-		} else {
-			domain = details.url;
-		}
-		if (requestCache[id]) {
-			details.requestBody = requestCache[id];
-		}
-		details.requestHeaders = formatHeaders(details.requestHeaders);
-		if (queryBody) {
-			details.queryBody = queryBody;
-		}
-		console.log('%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain);
-		delete requestCache[id];
-	}
-
-	//execute init when browser opened
-	(function init () {
-		var onoff = JSON.parse(localStorage.onoff || '{}'),
-			gooredir = JSON.parse(localStorage.gooredir || '[]'),
-			reqApi = chrome.webRequest;
-		blockrule.urls = JSON.parse(localStorage.block || '[]');
-		hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
-		referrule.urls = JSON.parse(localStorage.refer || '[]');
-		logrule.urls = JSON.parse(localStorage.log || '[]');
-
-		goRule.urls = goRule.urls.concat(gooredir);
-		// remove google redir
-		if (onoff.nogooredir) {
-			reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
-		} else {
-			onoff.nogooredir = false;
-		}
-
-		if (onoff.block && blockrule.urls.length) {
-			reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
-		} else {
-			onoff.block = false;
-		}
-
-		if (onoff.hsts && hstsrule.urls.length) {
-			reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
-		} else {
-			onoff.hsts = false;
-		}
-
-		if (onoff.refer && referrule.urls.length) {
-			reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
-		} else {
-			onoff.refer = false;
-		}
-
-		if (onoff.log && logrule.urls.length) {
-			var notification = webkitNotifications.createNotification(
-                        '/img/icon48.png',
-                        chrome.i18n.getMessage('bg_logison'),
-                        chrome.i18n.getMessage('bg_logon_tip')
-                );
-			reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
-			reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
-	        notification.show();
-		} else {
-			onoff.log = false;
-		}
-
-		localStorage.onoff = JSON.stringify(onoff);
-	})();
-
-	window.addEventListener("storage", function  (event){
-		var type = event.key,
-			reqApi = chrome.webRequest,
-			newData = JSON.parse(event.newValue || '[]'),
-			oldData = JSON.parse(event.oldValue || '[]'),
-			onoff = JSON.parse(localStorage.onoff || '{}');
-
-		switch(type) {
-			case 'block':
-				blockrule.urls = newData;
-				if (onoff.block) {
-					reqApi.onBeforeRequest.removeListener(blockReq);
-					setTimeout(function (fn,filter) {
-						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
-					}, 0,blockReq,blockrule);
-				}
-				break;
-			case 'hsts':
-				hstsrule.urls = newData;
-				if (onoff.hsts) {
-					reqApi.onBeforeRequest.removeListener(hstsReq);
-					setTimeout(function (fn,filter) {
-						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
-					}, 0,hstsReq,hstsrule);
-				}
-				break;
-			case 'refer':
-				referrule.urls = newData;
-				if (onoff.refer) {
-					reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
-					setTimeout(function (fn,filter) {
-						reqApi.onBeforeSendHeaders.addListener(fn,filter,['requestHeaders','blocking']);
-					}, 0,modifyReferer,referrule);
-				}
-				break;
-			case 'log':
-				logrule.urls = newData;
-				if (onoff.log) {
-					reqApi.onBeforeRequest.removeListener(logBody);
-					reqApi.onSendHeaders.removeListener(logRequest);
-					setTimeout(function (fn,filter) {
-						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
-						reqApi.onSendHeaders.addListener(fn,filter,['requestHeaders']);
-					}, 0,logRequest,logrule);
-				}
-				break;
-			case 'gooredir':
-				goRule.urls = goRule.urls.concat(newData);
-				if (onoff.nogooredir) {
-					reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect,goRule,['blocking']);
-					setTimeout(function (fn,filter) {
-						reqApi.onBeforeRequest.addListener(fn,filter,['blocking']);
-					}, 0, cancelGoogleRedirect,goRule);
-				}
-				break;
-			case 'onoff':
-				if (newData.nogooredir !== oldData.nogooredir) {
-					if (newData) {
-						reqApi.onBeforeRequest.addListener(cancelGoogleRedirect,goRule,['blocking']);
-					} else {
-						reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect,goRule,['blocking']);
-					}
-				}
-				if (newData.block !== oldData.block) {
-					if (newData.block) {
-						reqApi.onBeforeRequest.addListener(blockReq,blockrule,['blocking']);
-					} else {
-						reqApi.onBeforeRequest.removeListener(blockReq);
-					}
-				}
-				if (newData.hsts !== oldData.hsts) {
-					if (newData.hsts) {
-						reqApi.onBeforeRequest.addListener(hstsReq,hstsrule,['blocking']);
-					} else {
-						reqApi.onBeforeRequest.removeListener(hstsReq);
-					}
-				}
-				if (newData.refer !== oldData.refer) {
-					if (newData.refer) {
-						reqApi.onBeforeSendHeaders.addListener(modifyReferer,referrule,['requestHeaders','blocking']);
-					} else {
-						reqApi.onBeforeSendHeaders.removeListener(modifyReferer);
-					}
-				}
-				if (newData.log !== oldData.log) {
-					if (newData.log) {
-						reqApi.onBeforeRequest.addListener(logBody,logrule,['requestBody']);
-						reqApi.onSendHeaders.addListener(logRequest,logrule,['requestHeaders']);
-					} else {
-						reqApi.onBeforeRequest.removeListener(logBody);
-						reqApi.onSendHeaders.removeListener(logRequest);
-					}
-				}
-				break;
-		}
-	});
-})()
+// Generated by CoffeeScript 1.7.1
+(function() {
+  var blockReq, blockrule, cancelGoogleRedirect, cloneObj, formatHeaders, formatQstr, getQueryString, goRule, goRuleBasic, hstsReq, hstsrule, logBody, logNum, logRequest, logrule, modifyReferer, pushNotification, referrule, requestCache;
+  blockrule = {};
+  hstsrule = {};
+  logrule = {};
+  referrule = {};
+  logNum = 0;
+  requestCache = {};
+  goRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
+  goRule = {
+    urls: goRuleBasic
+  };
+  cloneObj = function(o) {
+    var i, k, key, obj, val, _i, _len;
+    if (o === null || !(o instanceof Object)) {
+      return o;
+    }
+    if (Array.isArray(o)) {
+      if (o.length > 1) {
+        obj = [];
+        for (k = _i = 0, _len = o.length; _i < _len; k = ++_i) {
+          i = o[k];
+          obj[k] = i instanceof Object ? cloneObj(i) : i;
+        }
+        return obj;
+      } else {
+        return o[0];
+      }
+    } else {
+      obj = {};
+      for (val in o) {
+        key = o[val];
+        obj[val] = key instanceof Object ? cloneObj(key) : key;
+      }
+      return obj;
+    }
+  };
+  getQueryString = function(url) {
+    var anchor, qstr;
+    anchor = document.createElement('a');
+    anchor.href = url;
+    qstr = anchor.search;
+    anchor = null;
+    return qstr;
+  };
+  formatQstr = function(url) {
+    var arr, e, i, key, pair, qstr, result, val, _i, _len;
+    qstr = getQueryString(url);
+    qstr = qstr ? qstr.replace(/^\?/, '') : void 0;
+    if (!qstr) {
+      return false;
+    }
+    arr = qstr.split('&');
+    result = {};
+    try {
+      for (_i = 0, _len = arr.length; _i < _len; _i++) {
+        i = arr[_i];
+        pair = i.split('=');
+        key = decodeURIComponent(pair[0]);
+        val = val === void 0 ? '' : decodeURIComponent(pair[1]);
+        if (result[key] === void 0) {
+          result[key] = val;
+        } else {
+          if (Array.isArray(result[key])) {
+            result[key].push(val);
+          } else {
+            result[key] = [result[key]];
+            result[key].push(val);
+          }
+        }
+      }
+      return {
+        formatedData: result
+      };
+    } catch (_error) {
+      e = _error;
+      if (e instanceof URIError) {
+        result.error = 'The query string is not encoded with utf-8, this can\'t be decoded by now.';
+      } else {
+        result.error = e.message;
+      }
+      return result;
+    }
+  };
+  formatHeaders = function(headers) {
+    var obj, val, _i, _len;
+    obj = {};
+    for (_i = 0, _len = headers.length; _i < _len; _i++) {
+      val = headers[_i];
+      obj[val.name] = val.value;
+    }
+    return obj;
+  };
+  blockReq = function(details) {
+    return {
+      cancel: true
+    };
+  };
+  hstsReq = function(details) {
+    return {
+      redirectUrl: details.url.replace('http://', 'https://')
+    };
+  };
+  cancelGoogleRedirect = function(details) {
+    var url;
+    url = formatQstr(details.url).formatedData;
+    url = url != null ? url.url : void 0;
+    console.log('google urls %s', url);
+    if (!url) {
+      url = details.url;
+    }
+    return {
+      redirectUrl: url
+    };
+  };
+  modifyReferer = function(details) {
+    var headers, i, k, _i, _len;
+    headers = details.requestHeaders;
+    for (k = _i = 0, _len = headers.length; _i < _len; k = ++_i) {
+      i = headers[k];
+      if (i.name === 'Referer') {
+        header.split(k, 1);
+        break;
+      }
+    }
+    return {
+      requestHeaders: headers
+    };
+  };
+  logBody = function(details) {
+    if (details.requestBody) {
+      return requestCache[details.requestId] = cloneObj(details.requestBody);
+    }
+  };
+  logRequest = function(details) {
+    var domain, i, queryBody, rid, url;
+    ++logNum;
+    url = details.url;
+    rid = details.requestId;
+    queryBody = formatQstr(details.url);
+    i = url.indexOf('//');
+    domain = url.indexOf('/', i + 2);
+    if (~domain) {
+      domain = url.substr(0, domain);
+    } else {
+      domain = url;
+    }
+    if (requestCache[rid]) {
+      details.requestBody = requestCache[rid];
+    }
+    details.requestHeaders = formatHeaders(details.requestHeaders);
+    if (queryBody) {
+      details.queryBody = queryBody;
+    }
+    console.log('%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain);
+    return delete requestCache[id];
+  };
+  pushNotification = (function() {
+    if (chrome.notifications) {
+      return function(title, content) {
+        chrome.notifications.create('', {
+          type: 'basic',
+          iconUrl: '/img/icon48.png',
+          title: title,
+          message: content
+        }, function() {});
+      };
+    } else if (window.webkitNotifications) {
+      return function(title, content) {
+        var notifi;
+        notifi = webkitNotifications.createNotification('/img/icon48.png', title, content);
+        notifi.show();
+      };
+    } else {
+      return function() {};
+    }
+  })();
+  (function() {
+    var nogooredir, onoff, reqApi;
+    onoff = JSON.parse(localStorage.onoff || '{}');
+    nogooredir = JSON.parse(localStorage.nogooredir || '[]');
+    blockrule.urls = JSON.parse(localStorage.block || '[]');
+    hstsrule.urls = JSON.parse(localStorage.hsts || '[]');
+    referrule.urls = JSON.parse(localStorage.refer || '[]');
+    logrule.urls = JSON.parse(localStorage.log || '[]');
+    reqApi = chrome.webRequest;
+    if (onoff.nogooredir) {
+      goRule.urls = goRule.urls.concat(nogooredir);
+      reqApi.onBeforeRequest.addListener(cancelGoogleRedirect, goRule, ['blocking']);
+    } else {
+      onoff.nogooredir = false;
+    }
+    if (onoff.block && blockrule.urls.length) {
+      reqApi.onBeforeRequest.addListener(blockReq, blockrule, ['blocking']);
+    } else {
+      onoff.block = false;
+    }
+    if (onoff.hsts && hstsrule.urls.length) {
+      reqApi.onBeforeRequest.addListener(hstsReq, hstsrule, ['blocking']);
+    } else {
+      onoff.hsts = false;
+    }
+    if (onoff.refer && referrule.urls.length) {
+      reqApi.onBeforeRequest.addListener(modifyReferer, referrule, ['requestHeaders', 'blocking']);
+    } else {
+      onoff.refer = false;
+    }
+    if (onoff.log && logrule.urls.length) {
+      pushNotification(chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip'));
+      reqApi.onBeforeRequest.addListener(logBody, logrule, ['requestBody']);
+      reqApi.onSendHeaders.addListener(logRequest, logrule, ['requestHeaders']);
+    } else {
+      onoff.log = false;
+    }
+    return localStorage.onoff = JSON.stringify(onoff);
+  })();
+  window.addEventListener('storage', function(event) {
+    var newData, oldData, onoff, reqApi, type;
+    console.log('event fired %o', event);
+    type = event.key;
+    reqApi = chrome.webRequest;
+    newData = JSON.parse(event.newValue || '[]');
+    oldData = JSON.parse(event.oldValue || '[]');
+    onoff = JSON.parse(localStorage.onoff || '{}');
+    switch (type) {
+      case 'block':
+        blockrule.urls = newData;
+        if (onoff.block) {
+          reqApi.onBeforeRequest.removeListener(blockReq);
+          return setTimeout(function(fn, filter) {
+            return reqApi.onBeforeRequest.addListener(fn, filter, ['blocking']);
+          }, 0, blockReq, blockrule);
+        }
+        break;
+      case 'hsts':
+        hstsrule.urls = newData;
+        if (onoff.hsts) {
+          reqApi.onBeforeRequest.removeListener(hstsReq);
+          return setTimeout(function(fn, filter) {
+            return reqApi.onBeforeRequest.addListener(fn, filter, ['blocking']);
+          }, 0, hstsReq, hstsrule);
+        }
+        break;
+      case 'refer':
+        referrule.urls = newData;
+        if (onoff.refer) {
+          reqApi.onBeforeRequest.removeListener(modifyReferer);
+          return setTimeout(function(fn, filter) {
+            return reqApi.onBeforeRequest.addListener(fn, filter, ['requestHeaders', 'blocking']);
+          }, 0, modifyReferer, referrule);
+        }
+        break;
+      case 'log':
+        logrule.urls = newData;
+        if (onoff.log) {
+          reqApi.onBeforeRequest.removeListener(logBody);
+          reqApi.onSendHeaders.removeListener(logRequest);
+          return setTimeout(function(fnBR, fnSH, filter) {
+            reqApi.onBeforeRequest.addListener(fnBR, filter, ['requestBody']);
+            return reqApi.onSendHeaders.addListener(fnSH, filter, ['requestHeaders']);
+          }, 0, logBody, logRequest, logrule);
+        }
+        break;
+      case 'nogooredir':
+        goRule.urls = goRuleBasic.concat(newData);
+        if (onoff.nogooredir) {
+          reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect);
+          return setTimeout(function(fn, filter) {
+            return reqApi.onBeforeRequest.addListener(fn, filter, ['blocking']);
+          }, 0, cancelGoogleRedirect, goRule);
+        }
+        break;
+      case 'onoff':
+        console.log('onoff change...');
+        if (newData.nogooredir !== oldData.nogooredir) {
+          console.log('google noredirection...');
+          if (newData.nogooredir) {
+            reqApi.onBeforeRequest.addListener(cancelGoogleRedirect, goRule, ['blocking']);
+          } else {
+            reqApi.onBeforeRequest.removeListener(cancelGoogleRedirect);
+          }
+        }
+        if (newData.block !== oldData.block) {
+          if (newData.block) {
+            reqApi.onBeforeRequest.addListener(blockReq, blockrule, ['blocking']);
+          } else {
+            reqApi.onBeforeRequest.removeListener(blockReq);
+          }
+        }
+        if (newData.hsts !== oldData.hsts) {
+          if (newData.hsts) {
+            reqApi.onBeforeRequest.addListener(hstsReq, hstsrule, ['blocking']);
+          } else {
+            reqApi.onBeforeRequest.removeListener(hstsReq);
+          }
+        }
+        if (newData.refer !== oldData.refer) {
+          if (newData.refer) {
+            reqApi.onBeforeRequest.addListener(modifyReferer, referrule, ['requestHeaders', 'blocking']);
+          } else {
+            reqApi.onBeforeRequest.removeListener(modifyReferer);
+          }
+        }
+        if (newData.log !== oldData.log) {
+          if (newData.log) {
+            reqApi.onBeforeRequest.addListener(logBody, logrule, ['requestBody']);
+            return reqApi.onSendHeaders.addListener(logRequest, logrule, ['requestHeaders']);
+          } else {
+            reqApi.onBeforeRequest.removeListener(logBody);
+            return reqApi.onSendHeaders.removeListener(logRequest);
+          }
+        }
+    }
+  });
+})();

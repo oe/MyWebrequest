@@ -78,7 +78,7 @@
     "message": "Protocol"
   },
   "opt_host_lbl": {
-    "message": "Domain"
+    "message": "Domain(or IP Addr)"
   },
   "opt_ph_host": {
     "message": "required"
@@ -253,5 +253,11 @@
   },
   "opt_hp_qrct": {
     "message": "When surfing the internet, you can click the blue earth icon on the right side of the location bar, then a QR code of the web page's URL will be generated. And you can double click the QR code, edit the content and get a new QR code. After this, use your mobile app to scan them! It's an easy way to share messages from PC to phone. This feature is powered by Google API, so make sure you can access Goolg API before using it."
+  },
+  "opt_utility_desc": {
+    "message": "Other useful tools"
+  },
+  "opt_ena_google_lbl": {
+    "message": "Remove Google search results redirection"
   }
 }
