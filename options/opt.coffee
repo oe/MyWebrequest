@@ -5,14 +5,14 @@ $ ($) ->
   TABNODATATR = "<tr nodata><td colspan='3' class='align-center'>#{chrome.i18n.getMessage 'opt_no_rules' }</td></tr>"
 
   # hash init
-  if ['block','hsts','refer','log','qrcode','help','utility'].indexOf(hash) isnt -1 then hash = 'block'
+  if ['block','hsts','hotlink','log','qrcode','help','utility'].indexOf(hash) isnt -1 then hash = 'block'
   do (rules = rules) ->
     rules.block = {}
-    rules.refer = {}
+    rules.hotlink = {}
     rules.log = {}
     rules.hsts = {}
     for key of rules
-      console.log key
+      # console.log key
       arr = JSON.parse localStorage[ key ] or '[]'
       rules[key].max = arr.length
       for k,i in arr
@@ -212,6 +212,7 @@ $ ($) ->
   initUtility = ->
     onoff = JSON.parse localStorage.onoff or '{}'
     $('#switch-google').prop 'checked', !!onoff.nogooredir
+    $('#switch-gstatic').prop 'checked', !!onoff.gstatic
     return
 
   $(document).on 'click', 'a[href^=#]', (e) ->
@@ -226,7 +227,7 @@ $ ($) ->
 
       location.hash = targetId
       switch targetId
-        when 'block','hsts','refer','log'
+        when 'block','hsts','hotlink','log'
           $requestSec.attr 'data-id', targetId
           $requestSec.removeClass 'active'
           initRequestSection targetId
@@ -524,9 +525,18 @@ $ ($) ->
           $errorTip.prop 'hidden', true
         , 3000
         return
-
-      $qrimg.attr 'src',"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
-      $qrimg.prop 'hidden', false
+      imgSrc = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
+      $('<img/>').on 'load', ->
+        $qrimg.removeClass 'show'
+        $qrimg.attr 'src', imgSrc
+        do $(this).remove
+        setTimeout ->
+          $qrimg.addClass 'show'
+          return
+        , 0
+      .attr 'src', imgSrc
+      # $qrimg.attr 'src',"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
+      # $qrimg.prop 'hidden', false
     else
       $errorTip.text chrome.i18n.getMessage 'opt_qrtip_notext'
       $errorTip.prop 'hidden', false
@@ -556,7 +566,16 @@ $ ($) ->
     localStorage.onoff = JSON.stringify onoff
     console.log 'google changed'
     return
-    
+  
+  $('#switch-gstatic').on 'change', ->
+    onoff = JSON.parse localStorage.onoff or '{}'
+    if this.checked
+      onoff[ 'gstatic' ] = true
+    else
+      onoff[ 'gstatic' ] = false
+    localStorage.onoff = JSON.stringify onoff
+    console.log 'google changed'
+    return
 
   return
 

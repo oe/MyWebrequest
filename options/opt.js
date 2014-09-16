@@ -5,17 +5,16 @@ $(function($) {
   rules = {};
   dialogOKCB = null;
   TABNODATATR = "<tr nodata><td colspan='3' class='align-center'>" + (chrome.i18n.getMessage('opt_no_rules')) + "</td></tr>";
-  if (['block', 'hsts', 'refer', 'log', 'qrcode', 'help', 'utility'].indexOf(hash) !== -1) {
+  if (['block', 'hsts', 'hotlink', 'log', 'qrcode', 'help', 'utility'].indexOf(hash) !== -1) {
     hash = 'block';
   }
   (function(rules) {
     var arr, i, k, key, _i, _len;
     rules.block = {};
-    rules.refer = {};
+    rules.hotlink = {};
     rules.log = {};
     rules.hsts = {};
     for (key in rules) {
-      console.log(key);
       arr = JSON.parse(localStorage[key] || '[]');
       rules[key].max = arr.length;
       for (i = _i = 0, _len = arr.length; _i < _len; i = ++_i) {
@@ -229,6 +228,7 @@ $(function($) {
     var onoff;
     onoff = JSON.parse(localStorage.onoff || '{}');
     $('#switch-google').prop('checked', !!onoff.nogooredir);
+    $('#switch-gstatic').prop('checked', !!onoff.gstatic);
   };
   $(document).on('click', 'a[href^=#]', function(e) {
     var $navlink, $requestSec, targetId;
@@ -245,7 +245,7 @@ $(function($) {
       switch (targetId) {
         case 'block':
         case 'hsts':
-        case 'refer':
+        case 'hotlink':
         case 'log':
           $requestSec.attr('data-id', targetId);
           $requestSec.removeClass('active');
@@ -527,7 +527,7 @@ $(function($) {
     }
   });
   $('.tab-content').on('click', '.make-qrcode', function(e) {
-    var $errorTip, $qrimg, $tab, $this, str, type;
+    var $errorTip, $qrimg, $tab, $this, imgSrc, str, type;
     $this = $(this);
     $tab = $this.parents('.tab-pane');
     $errorTip = $this.prev();
@@ -559,8 +559,15 @@ $(function($) {
         }, 3000);
         return;
       }
-      $qrimg.attr('src', "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + str);
-      $qrimg.prop('hidden', false);
+      imgSrc = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + str;
+      $('<img/>').on('load', function() {
+        $qrimg.removeClass('show');
+        $qrimg.attr('src', imgSrc);
+        $(this).remove();
+        return setTimeout(function() {
+          $qrimg.addClass('show');
+        }, 0);
+      }).attr('src', imgSrc);
     } else {
       $errorTip.text(chrome.i18n.getMessage('opt_qrtip_notext'));
       $errorTip.prop('hidden', false);
@@ -587,6 +594,17 @@ $(function($) {
       onoff['nogooredir'] = true;
     } else {
       onoff['nogooredir'] = false;
+    }
+    localStorage.onoff = JSON.stringify(onoff);
+    console.log('google changed');
+  });
+  $('#switch-gstatic').on('change', function() {
+    var onoff;
+    onoff = JSON.parse(localStorage.onoff || '{}');
+    if (this.checked) {
+      onoff['gstatic'] = true;
+    } else {
+      onoff['gstatic'] = false;
     }
     localStorage.onoff = JSON.stringify(onoff);
     console.log('google changed');

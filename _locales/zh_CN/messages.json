@@ -259,5 +259,8 @@
   },
   "opt_ena_google_lbl": {
     "message": "移除谷歌搜索结果重定向, 提升搜索结果打开的速度及成功率"
+  },
+  "opt_ena_gstatic_lbl": {
+    "message": "加快国外网站访问速度(将对Google CDN的请求重定向至360的镜像cdn)"
   }
 }

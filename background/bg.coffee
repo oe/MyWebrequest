@@ -1,13 +1,14 @@
 do ->
-  blockrule = {}
-  hstsrule = {}
-  logrule = {}
-  referrule = {}
+  gsearchRuleBasic = ['*://www.google.com/url*','*://www.google.com.hk/url*']
+  _rules =
+    block: {}
+    hsts: {}
+    log: {}
+    hotlink: {}
+    gsearch: { urls: gsearchRuleBasic }
+    gstatic: { urls:['http://ajax.googleapis.com/*','http://fonts.googleapis.com/*'] }
   logNum = 0
   requestCache = {}
-  goRuleBasic = ['*://www.google.com/url*','*://www.google.com.hk/url*']
-  goRule =
-    urls: goRuleBasic
 
   # 克隆对象
   cloneObj = (o) ->
@@ -72,58 +73,6 @@ do ->
       obj[ val.name ] = val.value
     obj
 
-  # 屏蔽请求
-  blockReq = (details) ->
-    { cancel: true }
-
-  # 强制加密链接
-  hstsReq = (details) ->
-    { redirectUrl: details.url.replace 'http://','https://' }
-
-  # 取消Google搜索结果重定向
-  cancelGoogleRedirect = (details) ->
-    url = formatQstr(details.url).formatedData
-    url = url?.url
-    console.log 'google urls %s', url
-    if !url
-      url = details.url
-    { redirectUrl: url }
-
-  # 修改HTTP header中的referrer
-  modifyReferer = (details) ->
-    headers = details.requestHeaders
-    for i,k in headers
-      if i.name is 'Referer'
-        header.split k,1
-        break
-    { requestHeaders: headers }
-
-  # 记录请求的body, 主要针对post, put请求
-  logBody = (details) ->
-    if details.requestBody
-      requestCache[ details.requestId ] = cloneObj details.requestBody
-
-  # 记录请求
-  logRequest = (details) ->
-    ++logNum
-    url = details.url
-    rid = details.requestId
-    queryBody = formatQstr details.url
-    i = url.indexOf '//'
-    domain = url.indexOf '/', i + 2
-    if ~domain
-      domain = url.substr 0, domain
-    else
-      domain = url
-    if requestCache[ rid ]
-      details.requestBody = requestCache[ rid ]
-    details.requestHeaders = formatHeaders details.requestHeaders
-    if queryBody
-      details.queryBody = queryBody
-    console.log '%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain
-    # 删除已打印的请求的缓存
-    delete requestCache[id]
-
   # 推送消息提醒, Chrome不同版本的API不一致, 故添加此函数
   pushNotification = do->
     if chrome.notifications
@@ -144,48 +93,111 @@ do ->
       ->
     
 
+  # 请求的监听事件
+  onRequests =
+    # 取消Google搜索结果重定向
+    nogooredir:
+      fn:  (details) ->
+        url = formatQstr(details.url).formatedData
+        url = url?.url
+        console.log 'google urls %s', url
+        if !url
+          url = details.url
+        { redirectUrl: url }
+      permit: [ 'blocking' ]
+      on: 'onBeforeRequest'
+    # 屏蔽请求
+    block:
+      fn: (details)->
+        {cancel: true}
+      permit: [ 'blocking' ]
+      on: 'onBeforeRequest'
+    # 强制加密链接
+    hsts:
+      fn: (details)->
+        { redirectUrl: details.url.replace /^http\:\/\//,'https://' }
+      permit: [ 'blocking' ]
+      on: 'onBeforeRequest'
+    # 修改HTTP header中的referrer
+    hotlink:
+      fn: (details) ->
+        headers = details.requestHeaders
+        for i,k in headers
+          if i.name is 'Referer'
+            header.split k,1
+            break
+        { requestHeaders: headers }
+      permit: [ 'requestHeaders', 'blocking' ]
+      on: 'onBeforeRequest'
+    # 记录请求的body, 主要针对post, put请求
+    logBody:
+      fn:  (details) ->
+        if details.requestBody
+          requestCache[ details.requestId ] = cloneObj details.requestBody
+      permit: [ 'requestBody' ]
+      on: 'onBeforeRequest'
+    # 记录请求
+    logRequest:
+      fn: (details) ->
+        ++logNum
+        url = details.url
+        rid = details.requestId
+        queryBody = formatQstr details.url
+        i = url.indexOf '//'
+        domain = url.indexOf '/', i + 2
+        if ~domain
+          domain = url.substr 0, domain
+        else
+          domain = url
+        if requestCache[ rid ]
+          details.requestBody = requestCache[ rid ]
+        details.requestHeaders = formatHeaders details.requestHeaders
+        if queryBody
+          details.queryBody = queryBody
+        console.log '%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain
+        # 删除已打印的请求的缓存
+        delete requestCache[id]
+      permit: [ 'requestHeaders' ]
+      on: 'onSendHeaders'
+    # Google cdn 跳转至360镜像cdn
+    gstatic:
+      fn: (details)->
+        { redirectUrl: details.url.replace 'googleapis.com', 'useso.com' }
+      permit: [ 'blocking' ]
+      on: 'onBeforeRequest'
+
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
   do ->
-    
     onoff = JSON.parse localStorage.onoff or '{}'
-    nogooredir = JSON.parse localStorage.nogooredir or '[]'
-    blockrule.urls = JSON.parse localStorage.block or '[]'
-    hstsrule.urls = JSON.parse localStorage.hsts or '[]'
-    referrule.urls = JSON.parse localStorage.refer or '[]'
-    logrule.urls = JSON.parse localStorage.log or '[]'
+    # 初始化rules
+    rule
+    for own k, v of _rules
+      rule = JSON.parse localStorage[ k ] or '[]'
+      if v.urls
+        v.urls = v.urls.concat rule
+      else
+        v.urls = rule
+
     reqApi = chrome.webRequest
-
-    if onoff.nogooredir
-      goRule.urls = goRule.urls.concat nogooredir
-      reqApi.onBeforeRequest.addListener cancelGoogleRedirect, goRule, [ 'blocking' ]
-    else
-      onoff.nogooredir = false
-
-    if onoff.block and blockrule.urls.length
-      reqApi.onBeforeRequest.addListener blockReq, blockrule, [ 'blocking' ]
-    else
-      onoff.block = false
-
-    if onoff.hsts and hstsrule.urls.length
-      reqApi.onBeforeRequest.addListener hstsReq, hstsrule, [ 'blocking' ]
-    else
-      onoff.hsts = false
-
-    if onoff.refer and referrule.urls.length
-      reqApi.onBeforeRequest.addListener modifyReferer, referrule, [ 'requestHeaders', 'blocking' ]
-    else
-      onoff.refer = false
-
-    if onoff.log and logrule.urls.length
-      # 监控网络请求是比较耗费资源的, 所以如果浏览器开启时检测到监控网络请求功能处于开启状态, 则会弹出通知
-      pushNotification chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip')
-      reqApi.onBeforeRequest.addListener logBody, logrule, [ 'requestBody' ]
-      reqApi.onSendHeaders.addListener logRequest, logrule, [ 'requestHeaders' ]
-    else
-      onoff.log = false
-
+    onRequest = null
+    # 启用各个特性
+    for own k, v of _rules
+      if onoff[ k ]
+        if k is 'log'
+          pushNotification chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip')
+          onRequest = onRequests['logBody']
+          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+          onRequest = onRequests['logRequest']
+          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+        else
+          onRequest = onRequests[ k ]
+          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+      else
+        onoff[ k ] = false
+    # 保存规则
     localStorage.onoff = JSON.stringify onoff
+    return
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
   window.addEventListener 'storage', (event) ->
@@ -196,80 +208,55 @@ do ->
     oldData = JSON.parse event.oldValue or '[]'
     onoff = JSON.parse localStorage.onoff or '{}'
 
-    switch type
-      when 'block'
-        blockrule.urls = newData
-        if onoff.block
-          reqApi.onBeforeRequest.removeListener blockReq
-          setTimeout (fn, filter) ->
-            reqApi.onBeforeRequest.addListener fn, filter, [ 'blocking' ]
-          , 0, blockReq, blockrule
-
-      when 'hsts'
-        hstsrule.urls = newData
-        if onoff.hsts
-          reqApi.onBeforeRequest.removeListener hstsReq
-          setTimeout (fn, filter) ->
-            reqApi.onBeforeRequest.addListener fn, filter, [ 'blocking' ]
-          , 0, hstsReq, hstsrule
-
-      when 'refer'
-        referrule.urls = newData
-        if onoff.refer
-          reqApi.onBeforeRequest.removeListener modifyReferer
-          setTimeout (fn, filter) ->
-            reqApi.onBeforeRequest.addListener fn, filter, [ 'requestHeaders','blocking' ]
-          , 0, modifyReferer, referrule
-
-      when 'log'
-        logrule.urls = newData
-        if onoff.log
-          reqApi.onBeforeRequest.removeListener logBody
-          reqApi.onSendHeaders.removeListener logRequest
-          setTimeout (fnBR, fnSH, filter) ->
-            reqApi.onBeforeRequest.addListener fnBR, filter, [ 'requestBody' ]
-            reqApi.onSendHeaders.addListener fnSH, filter, [ 'requestHeaders' ]
-          , 0, logBody, logRequest, logrule
-
-      when 'nogooredir'
-        goRule.urls = goRuleBasic.concat newData
-        if onoff.nogooredir
-          reqApi.onBeforeRequest.removeListener cancelGoogleRedirect
-          setTimeout (fn, filter) ->
-            reqApi.onBeforeRequest.addListener fn,filter, [ 'blocking' ]
-          , 0, cancelGoogleRedirect, goRule
-
-      when 'onoff'
-        console.log 'onoff change...'
-        if newData.nogooredir isnt oldData.nogooredir
-          console.log 'google noredirection...'
-          if newData.nogooredir
-            reqApi.onBeforeRequest.addListener cancelGoogleRedirect, goRule, [ 'blocking' ]
+    onRequest = null
+    if type is 'onoff'
+      for own k of _rules
+        if newData[ k ] isnt oldData[ k ]
+          if newData[ k ]
+            if k is 'log'
+              onRequest = onRequests['logBody']
+              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+              onRequest = onRequests['logRequest']
+              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+            else
+              onRequest = onRequests[ k ]
+              console.log _rules[ k ], onRequest.on, onRequest.fn, onRequest.permit
+              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
           else
-            reqApi.onBeforeRequest.removeListener cancelGoogleRedirect
-        if newData.block isnt oldData.block
-          if newData.block
-            reqApi.onBeforeRequest.addListener blockReq, blockrule, [ 'blocking' ]
-          else
-            reqApi.onBeforeRequest.removeListener blockReq
-        if newData.hsts isnt oldData.hsts
-          if newData.hsts
-            reqApi.onBeforeRequest.addListener hstsReq, hstsrule, [ 'blocking' ]
-          else
-            reqApi.onBeforeRequest.removeListener hstsReq
-        if newData.refer isnt oldData.refer
-          if newData.refer
-            reqApi.onBeforeRequest.addListener modifyReferer, referrule, [ 'requestHeaders', 'blocking' ]
-          else
-            reqApi.onBeforeRequest.removeListener modifyReferer
-        if newData.log isnt oldData.log
-          if newData.log
-            reqApi.onBeforeRequest.addListener logBody, logrule, [ 'requestBody' ]
-            reqApi.onSendHeaders.addListener logRequest, logrule, [ 'requestHeaders' ]
-          else
-            reqApi.onBeforeRequest.removeListener logBody
-            reqApi.onSendHeaders.removeListener logRequest
+            if k is 'log'
+              onRequest = onRequests['logBody']
+              reqApi[ onRequest.on ].removeListener onRequest.fn
+              onRequest = onRequests['logRequest']
+              reqApi[ onRequest.on ].removeListener onRequest.fn
+              requestCache = {}
+            else
+              onRequest = onRequests[ k ]
+              reqApi[ onRequest.on ].removeListener onRequest.fn
+          
+    else
+      _rules[ type ].urls = newData
+      if type is 'nogooredir'
+        _rules[ type ].urls = _rules[ type ].urls.concat gsearchRuleBasic
+      
+      if onoff[ type ]
+        if type is 'log'
+          reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
+          reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn
+          setTimeout ->
+            onRequest = onRequests['logBody']
+            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
+            onRequest = onRequests['logRequest']
+            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
+            return
+          , 0
+        else
+          onRequest = onRequests[ type ]
+          reqApi[ onRequest.on ].removeListener onRequest.fn
+          setTimeout ->
+            # console.log _rules[ type ], onRequest.on, onRequest.fn, onRequest.permit
+            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
+            return
+          , 0
+    return
 
   return
-
-

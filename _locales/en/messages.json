@@ -259,5 +259,8 @@
   },
   "opt_ena_google_lbl": {
     "message": "Remove Google search results redirection"
+  },
+  "opt_ena_gstatic_lbl": {
+    "message": "Speed up website(by redirecting request Google CDN to 360safe's cdn, for Chinese only)"
   }
 }
