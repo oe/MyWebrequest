@@ -4,8 +4,15 @@ $ ($) ->
   dialogOKCB = null
   TABNODATATR = "<tr nodata><td colspan='3' class='align-center'>#{chrome.i18n.getMessage 'opt_no_rules' }</td></tr>"
 
+  QRAPIHOST = 'api.qrserver.com'
+  QRAPIURL = 'http://api.qrserver.com/v1/create-qr-code/?size=200x200&data=%s'
+
+  ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
+  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
+  pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
+
   # hash init
-  if ['block','hsts','hotlink','log','qrcode','help','utility'].indexOf(hash) isnt -1 then hash = 'block'
+  if ['block','hsts','hotlink','log','qrcode','help','utility'].indexOf(hash) is -1 then hash = 'block'
   do (rules = rules) ->
     rules.block = {}
     rules.hotlink = {}
@@ -21,7 +28,6 @@ $ ($) ->
 
   # init setting section
   initRequestSection = (secId)->
-    ruleObj
     str = ''
     $tbody = $ '#request-settings tbody'
     $enable = $ '#request-settings .switch-input'
@@ -68,7 +74,7 @@ $ ($) ->
 
   addRule = (rule,type,$tbody)->
     ruleObj = rules[type]
-    console.log 'init %o', ruleObj
+    # console.log 'init %o', ruleObj
     str = ''
     $tr = $ '<tr />'
     ++ruleObj.max
@@ -85,8 +91,8 @@ $ ($) ->
       $('#request-settings .switch-input').prop 'disabled', false
       $tbody.parent().find('thead input,thead button').prop 'disabled', false
       $('#request-settings .enable-tip').prop 'hidden', true
-    console.log ruleObj
-    console.log getObjValues ruleObj
+    # console.log ruleObj
+    # console.log getObjValues ruleObj
     localStorage[type] = JSON.stringify getObjValues ruleObj
     $tbody.prepend $tr
 
@@ -141,7 +147,8 @@ $ ($) ->
 
   getVcardString = ()->
     str = []
-    $('#tab-vcard').find('input,textarea').map (el)->
+    $('#tab-vcard').find('input,textarea').map (i,el)->
+      console.log el
       if el.value isnt ''
         str.push "#{el.name}:#{el.value}"
     str.join ';'
@@ -153,10 +160,11 @@ $ ($) ->
     return false
       
   hideDialog = ()->
-    $overlayWrapper = $ '#overlay-wrapper'
+    $overlayWrapper = $ '#confirm-dialog-wrapper'
     $overlayWrapper.removeClass 'fadeInDown'
     $overlayWrapper.addClass 'fadeOutUp'
     setTimeout ()->
+      $overlayWrapper.removeClass 'fadeOutUp'
       $overlayWrapper.prop 'hidden', true
       $(document.body).removeClass 'ovHidden'
     , 220
@@ -170,20 +178,26 @@ $ ($) ->
     $msg.html msg
     pos.top += $el.height() + 15
     pos.left += $el.width() / 2 - $tooltip.width() / 2
-    $tooltip.css({top: pos.top + 'px',left: pos.left + 'px'}).addClass 'show'
+    $tooltip.css {
+      top: pos.top + 'px',
+      left: pos.left + 'px'
+    }
+    setTimeout ->
+      $tooltip.addClass 'show'
+      return
+    , 10
+      
     $el.focus().select()
-    console.log 'show tip'
     return
 
   showDialog = (config)->
-    $overlayWrapper = $ '#overlay-wrapper'
+    $overlayWrapper = $ '#confirm-dialog-wrapper'
     $dlgTitle = $ '#dialog-title'
     $dlgContent = $ '#dialog-content'
     $dlgOKBtn = $ '#dialog-ok-btn'
     $dlgCancelBtn = $ '#dialog-cancel-btn'
     config = config || {}
 
-    $overlayWrapper.removeClass 'fadeOutUp'
     $(document.body).addClass 'ovHidden'
     $overlayWrapper.prop 'hidden',false
     $overlayWrapper.addClass 'fadeInDown'
@@ -208,11 +222,23 @@ $ ($) ->
     else
       $dlgCancelBtn.focus()
 
+  getCustomFavorGsearch = ->
+    host = localStorage.gsearch or ''
+    if host then host = JSON.parse(host)[0]
+    host = host or ''
+    host.slice 4, -5
+
+  updateFavorGsearchOnview = (host)->
+    $('#custom-favor-gsearch').text host
+    $('#custom-favor-gsearch-wrapper').prop 'hidden', !host
+    return
+
   # init utility page
   initUtility = ->
     onoff = JSON.parse localStorage.onoff or '{}'
-    $('#switch-google').prop 'checked', !!onoff.nogooredir
+    $('#switch-google').prop 'checked', !!onoff.gsearch
     $('#switch-gstatic').prop 'checked', !!onoff.gstatic
+    updateFavorGsearchOnview do getCustomFavorGsearch
     return
 
   $(document).on 'click', 'a[href^=#]', (e) ->
@@ -331,9 +357,6 @@ $ ($) ->
       host: $host.val().trim().toLowerCase()
       path: $path.val().trim()
     }
-    ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
-    hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
-    pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
     ruleObj = rules[secId]
     $tbody = $('#request-settings tbody')
 
@@ -371,7 +394,7 @@ $ ($) ->
     else
       # check whether the rule will disable QR feature
       str = data.host.replace(/\./g,'\\.').replace '*', '.*'
-      if ['block','hsts'].indexOf(secId) isnt -1 and (new RegExp('^' + str + '$')).test 'chart.apis.google.com'
+      if ['block'].indexOf(secId) isnt -1 and (new RegExp('^' + str + '$')).test QRAPIHOST
         errorContent = 'opt_errdlg_cqr'
     if errorContent
       showDialog {
@@ -455,8 +478,10 @@ $ ($) ->
       
   # hide dialog when pressed escape key
   $(document).on 'keydown', (e) ->
-    if e.keyCode is 27 and !$('#overlay-wrapper').prop 'hidden'
-      $('.dialog .cancel').click()
+    if e.keyCode is 27
+      $overlay = $ '.overlay-wrapper:visible'
+      if $overlay.length then $overlay.find('.cancel').click()
+    return
 
   # hide tooltip when keyup or click
   $(document).on 'click keyup', (e)->
@@ -525,7 +550,7 @@ $ ($) ->
           $errorTip.prop 'hidden', true
         , 3000
         return
-      imgSrc = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
+      imgSrc = QRAPIURL.replace '%s', str
       $('<img/>').on 'load', ->
         $qrimg.removeClass 'show'
         $qrimg.attr 'src', imgSrc
@@ -535,8 +560,6 @@ $ ($) ->
           return
         , 0
       .attr 'src', imgSrc
-      # $qrimg.attr 'src',"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=#{str}"
-      # $qrimg.prop 'hidden', false
     else
       $errorTip.text chrome.i18n.getMessage 'opt_qrtip_notext'
       $errorTip.prop 'hidden', false
@@ -560,13 +583,72 @@ $ ($) ->
   $('#switch-google').on 'change', ->
     onoff = JSON.parse localStorage.onoff or '{}'
     if this.checked
-      onoff[ 'nogooredir' ] = true
+      onoff[ 'gsearch' ] = true
     else
-      onoff[ 'nogooredir' ] = false
+      onoff[ 'gsearch' ] = false
     localStorage.onoff = JSON.stringify onoff
     console.log 'google changed'
     return
   
+  $('#gsearch-rule-switch').on 'click', '.js-add-favor-gsearch', ->
+    $('#preferred-google').val do getCustomFavorGsearch
+    $wrapper = $ '#input-dialog-wrapper'
+    $(document.body).addClass 'ovHidden'
+    $wrapper.prop 'hidden',false
+    $wrapper.addClass 'fadeInDown'
+    setTimeout ->
+      do $('#preferred-google').focus
+      return
+    , 210
+    return
+
+  $('#preferred-google').on 'keyup', (e)->
+    if e.keyCode is 13
+      do $('#input-dialog-wrapper .js-btn-ok').click
+    return
+  
+  hideInputDialog = ->
+    $overlayWrapper = $ '#input-dialog-wrapper'
+    $overlayWrapper.removeClass 'fadeInDown'
+    $overlayWrapper.addClass 'fadeOutUp'
+    setTimeout ()->
+      $overlayWrapper.removeClass 'fadeOutUp'
+      $overlayWrapper.prop 'hidden', true
+      $(document.body).removeClass 'ovHidden'
+    , 220
+    return
+
+  $('#input-dialog-wrapper .cancel').on 'click', hideInputDialog
+    
+
+  $('#input-dialog-wrapper .js-btn-ok').on 'click', ->
+    host = $.trim do $('#preferred-google').val
+    if host is ''
+      localStorage.gsearch = JSON.stringify []
+      updateFavorGsearchOnview ''
+    else
+      host = do host.toLowerCase
+      i = host.indexOf '\/\/'
+      if i isnt -1 then host = host.substr i + 2
+      i = host.indexOf '\/'
+      if i isnt -1 then host = host.substr 0, i
+      if ipReg.test(host) or hostReg.test host
+        arr = host.split '.'
+        if arr.length is 2 and arr[0] is 'google'
+          host = "www.#{host}"
+
+        updateFavorGsearchOnview host
+        
+        host = "*://#{host}/url*"
+        localStorage.gsearch = JSON.stringify [ host ]
+        # debugger
+      else
+        showTip $('#preferred-google'), chrome.i18n.getMessage 'opt_errtip_host'
+        return
+      
+    do hideInputDialog
+    return
+
   $('#switch-gstatic').on 'change', ->
     onoff = JSON.parse localStorage.onoff or '{}'
     if this.checked

@@ -101,31 +101,38 @@ var __hasProp = {}.hasOwnProperty;
   };
   pushNotification = (function() {
     if (chrome.notifications) {
-      return function(title, content) {
-        chrome.notifications.create('', {
+      return function(title, content, notifiId, cb) {
+        notifiId = notifiId || '';
+        chrome.notifications.create(notifiId, {
           type: 'basic',
           iconUrl: '/img/icon48.png',
           title: title,
           message: content
         }, function() {});
+        if (notifiId && cb instanceof Function) {
+          chrome.notifications.onClicked.addListener(function(nId) {
+            if (nId === notifiId) {
+              cb();
+            }
+          });
+        }
       };
     } else if (window.webkitNotifications) {
       return function(title, content) {
         var notifi;
         notifi = webkitNotifications.createNotification('/img/icon48.png', title, content);
-        notifi.show();
+        return notifi.show();
       };
     } else {
       return function() {};
     }
   })();
   onRequests = {
-    nogooredir: {
+    gsearch: {
       fn: function(details) {
         var url;
         url = formatQstr(details.url).formatedData;
         url = url != null ? url.url : void 0;
-        console.log('google urls %s', url);
         if (!url) {
           url = details.url;
         }
@@ -170,7 +177,7 @@ var __hasProp = {}.hasOwnProperty;
         };
       },
       permit: ['requestHeaders', 'blocking'],
-      on: 'onBeforeRequest'
+      on: 'onBeforeSendHeaders'
     },
     logBody: {
       fn: function(details) {
@@ -239,7 +246,9 @@ var __hasProp = {}.hasOwnProperty;
       v = _rules[k];
       if (onoff[k]) {
         if (k === 'log') {
-          pushNotification(chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip'));
+          pushNotification(chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip'), 'log-enabled-hint', function() {
+            window.open('/options/index.html#log');
+          });
           onRequest = onRequests['logBody'];
           reqApi[onRequest.on].addListener(onRequest.fn, _rules[k], onRequest.permit);
           onRequest = onRequests['logRequest'];
@@ -256,7 +265,6 @@ var __hasProp = {}.hasOwnProperty;
   })();
   window.addEventListener('storage', function(event) {
     var k, newData, oldData, onRequest, onoff, reqApi, type;
-    console.log('event fired %o', event);
     type = event.key;
     reqApi = chrome.webRequest;
     newData = JSON.parse(event.newValue || '[]');
@@ -275,7 +283,6 @@ var __hasProp = {}.hasOwnProperty;
               reqApi[onRequest.on].addListener(onRequest.fn, _rules[k], onRequest.permit);
             } else {
               onRequest = onRequests[k];
-              console.log(_rules[k], onRequest.on, onRequest.fn, onRequest.permit);
               reqApi[onRequest.on].addListener(onRequest.fn, _rules[k], onRequest.permit);
             }
           } else {
@@ -294,7 +301,7 @@ var __hasProp = {}.hasOwnProperty;
       }
     } else {
       _rules[type].urls = newData;
-      if (type === 'nogooredir') {
+      if (type === 'gsearch') {
         _rules[type].urls = _rules[type].urls.concat(gsearchRuleBasic);
       }
       if (onoff[type]) {

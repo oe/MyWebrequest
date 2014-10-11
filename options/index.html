@@ -166,12 +166,14 @@
 			Utility <span i18n-content="opt_utility_desc" class="fun-desc"></span>
 		</div>
 		<div class="setting-content">
-			<div class="rule-switch">
+			<div class="rule-switch" id="gsearch-rule-switch">
 				<input type="checkbox" class="switch-input" id="switch-google">
 				<label for="switch-google">
 					<span i18n-content="opt_ena_google_lbl"></span>
 					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
 				</label>
+				<div class="rule-detail" i18n-content="gsearch_rule_detail">
+				</div>
 			</div>
 			<div class="rule-switch">
 				<input type="checkbox" class="switch-input" id="switch-gstatic">
@@ -179,6 +181,9 @@
 					<span i18n-content="opt_ena_gstatic_lbl"></span>
 					<span class="enable-tip" hidden>(<span i18n-content="opt_ena_lbltip"></span>)</span>
 				</label>
+			</div>
+			<div class="rule-switch" i18n-content="want_new_feature">
+				<strong>Considering another awesome feature could be done with this extension? JUST <a href="mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request">TELL ME NOW!</a></strong>
 			</div>
 		</div>
 	</section>
@@ -221,17 +226,33 @@
 			</div>
 		</div>
 	</section>
-	<div id="overlay-wrapper" class="animated" hidden>
-		<div id="overlay-box">
-			<div id="overlay" class="dialog">
+	<div id="confirm-dialog-wrapper" class="overlay-wrapper animated" hidden>
+		<div class="overlay-box">
+			<div class="overlay dialog">
 				<div class="dialog-close cancel"></div>
 				<div class="dialog-title" id="dialog-title">
 				</div>
 				<div class="dialog-content" id="dialog-content">
 				</div>
 				<div class="dialog-btns">
-					<button id="dialog-ok-btn">OK</button>
-					<button class="cancel" id="dialog-cancel-btn">Cancel</button>
+					<button id="dialog-ok-btn" i18n-content="ok_btn"></button>
+					<button class="cancel" i18n-content="cancel_btn"></button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="input-dialog-wrapper" class="overlay-wrapper animated" hidden>
+		<div class="overlay-box">
+			<div class="overlay dialog">
+				<div class="dialog-close cancel"></div>
+				<div class="dialog-title" i18n-content="input_dlg_title"></div>
+				<div class="input-hint" i18n-content="input_dlg_hint"></div>
+				<div class="dialog-content">
+					<input class="full-width" type="text" i18n-value="placeholder:input_dlg_inputph" id="preferred-google">
+				</div>
+				<div class="dialog-btns">
+					<button class="js-btn-ok" i18n-content="ok_btn"></button>
+					<button class="cancel js-btn-cancel" i18n-content="cancel_btn"></button>
 				</div>
 			</div>
 		</div>

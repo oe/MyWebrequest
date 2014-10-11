@@ -5,6 +5,12 @@
   "iconTitle": {
     "message": "获取当前页面的二维码"
   },
+  "ok_btn": {
+    "message": "确认"
+  },
+  "cancel_btn": {
+    "message": "取消"
+  },
   "appDesc": {
     "message": "管理你浏览器的web请求"
   },
@@ -225,16 +231,16 @@
     "message": "规则的格式"
   },
   "opt_hp_rulect1": {
-    "message": "规则的格式主要参考<a href=\"http://developer.chrome.com/extensions/match_patterns.html\" target=\"_blank\">Chrome Url 匹配模式</a>, 根据本扩展的功能我做了些许变动,主要在于在本扩展中规则只能匹配https和http协议请求,像file,ftp等其他请求就没法匹配了.一条规则分为三部分:协议,域名,路径(包含请求字符串).在规则中,星号(<code>*</code>)是一个特殊符号,代表所有可能的东西."
+    "message": "规则的格式主要参考<a href=\"http://developer.chrome.com/extensions/match_patterns.html\" target=\"_blank\">Chrome Url 匹配模式</a>, 根据本扩展的功能我做了些许变动,主要在于在本扩展中规则只能匹配https和http协议请求,像file,ftp等其他请求就没法匹配了.一条规则分为三部分:<i>协议</i>,<i>域名</i>,<i>路径</i>(包含请求字符串).在规则中,星号(<code>*</code>)是一个特殊符号,代表所有可能的东西."
   },
   "opt_hp_rulect2": {
-    "message": "协议: 可以是<code>http</code>或者<code>https</code>,<code>*</code>则表示二者均可."
+    "message": "<strong>协议</strong>: 可以是<code>http</code>或者<code>https</code>,<code>*</code>则表示二者均可."
   },
   "opt_hp_rulect3": {
-    "message": "域名: 由字母数字连字符还有点号组成,如:www.google.com.域名中也可以用<code>*</code>,但是它只能是域名中的第一个或者唯一一个字符.对了,域名也可以填写IP地址."
+    "message": "<strong>域名</strong>: 由字母数字连字符还有点号组成,如:www.google.com.域名中也可以用<code>*</code>,但是它只能是域名中的第一个或者唯一一个字符.对了,域名也可以填写IP地址."
   },
   "opt_hp_rulect4": {
-    "message": "路径: 由字母数字还有一些特殊符号(<code>-_+=&%@!.,?|~/</code>)组成,你也可以用<code>*</code>.如果路径被留空的话,则会被当做<code>*</code>,即任意路径."
+    "message": "<strong>路径</strong>: 由字母数字还有一些特殊符号(<code>-_+=&%@!.,?|~/</code>)组成,你也可以用<code>*</code>.如果路径被留空的话,则会被当做<code>*</code>,即任意路径."
   },
   "opt_hp_rulect5": {
     "message": "添加规则时,你可以将一个URL粘贴到<code>域名</code>输入框中,扩展会自动处理,协助你输入."
@@ -261,6 +267,21 @@
     "message": "移除谷歌搜索结果重定向, 提升搜索结果打开的速度及成功率"
   },
   "opt_ena_gstatic_lbl": {
-    "message": "加快国外网站访问速度(将对Google CDN的请求重定向至360的镜像cdn)"
+    "message": "加快使用Google CDN网站的访问速度(将对Google CDN的请求重定向至<a href='http://libs.useso.com/' target='_blank'>360的镜像cdn</a>)"
+  },
+  "gsearch_rule_detail": {
+    "message": "默认情况下, <code>google.com</code> and <code>google.com.hk</code>已经被添加到列表里了. <br> 你也可以 <a class=\"js-add-favor-gsearch\">添加/编辑你最喜欢的谷歌搜索域名</a>.<br><span id=\"custom-favor-gsearch-wrapper\">你已将<code id=\"custom-favor-gsearch\"></code> 添加为你最喜欢的谷歌搜索域名.</span>"
+  },
+  "input_dlg_title": {
+    "message": "添加你最喜欢的Google域名"
+  },
+  "input_dlg_hint": {
+    "message": "你也可以填写IP地址. 如果留空, 之前填写的域名会被移除."
+  },
+  "input_dlg_inputph": {
+    "message": "举个栗子 http://www.google.co.uk"
+  },
+  "want_new_feature": {
+    "message": "<strong>如果你想到本扩展还可以做其他事? 那就赶紧<a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request\">联系我吧!</a></strong>"
   }
 }

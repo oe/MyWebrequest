@@ -76,19 +76,23 @@ do ->
   # 推送消息提醒, Chrome不同版本的API不一致, 故添加此函数
   pushNotification = do->
     if chrome.notifications
-      (title, content)->
-        chrome.notifications.create '',
+      (title, content, notifiId, cb)->
+        notifiId = notifiId or ''
+        chrome.notifications.create notifiId,
           type: 'basic'
           iconUrl: '/img/icon48.png'
           title: title
           message: content
         , ->
+        if notifiId and cb instanceof Function
+          chrome.notifications.onClicked.addListener (nId)->
+            if nId is notifiId then do cb
+            return
         return
     else if window.webkitNotifications
       (title,content)->
         notifi = webkitNotifications.createNotification '/img/icon48.png', title, content
         do notifi.show
-        return
     else
       ->
     
@@ -96,11 +100,10 @@ do ->
   # 请求的监听事件
   onRequests =
     # 取消Google搜索结果重定向
-    nogooredir:
+    gsearch:
       fn:  (details) ->
         url = formatQstr(details.url).formatedData
         url = url?.url
-        console.log 'google urls %s', url
         if !url
           url = details.url
         { redirectUrl: url }
@@ -128,7 +131,7 @@ do ->
             break
         { requestHeaders: headers }
       permit: [ 'requestHeaders', 'blocking' ]
-      on: 'onBeforeRequest'
+      on: 'onBeforeSendHeaders'
     # 记录请求的body, 主要针对post, put请求
     logBody:
       fn:  (details) ->
@@ -185,13 +188,16 @@ do ->
     for own k, v of _rules
       if onoff[ k ]
         if k is 'log'
-          pushNotification chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip')
+          pushNotification chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip'), 'log-enabled-hint', ->
+            window.open '/options/index.html#log'
+            return
           onRequest = onRequests['logBody']
           reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
           onRequest = onRequests['logRequest']
           reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
         else
           onRequest = onRequests[ k ]
+          # console.log _rules[ k ], onRequest.on, onRequest.fn, onRequest.permit
           reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
       else
         onoff[ k ] = false
@@ -201,7 +207,7 @@ do ->
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
   window.addEventListener 'storage', (event) ->
-    console.log 'event fired %o', event
+    # console.log 'event fired %o', event
     type = event.key
     reqApi = chrome.webRequest
     newData = JSON.parse event.newValue or '[]'
@@ -220,7 +226,6 @@ do ->
               reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
             else
               onRequest = onRequests[ k ]
-              console.log _rules[ k ], onRequest.on, onRequest.fn, onRequest.permit
               reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
           else
             if k is 'log'
@@ -235,7 +240,7 @@ do ->
           
     else
       _rules[ type ].urls = newData
-      if type is 'nogooredir'
+      if type is 'gsearch'
         _rules[ type ].urls = _rules[ type ].urls.concat gsearchRuleBasic
       
       if onoff[ type ]

@@ -7,7 +7,7 @@
   cunt = getEle('letter-cunt');
   textArea = getEle('text');
   content = '';
-  qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=';
+  qrUrl = 'http://api.qrserver.com/v1/create-qr-code/?size=200x200&data=';
   loadImg = function(url) {
     var classList, imgElm;
     imgElm = document.createElement('img');

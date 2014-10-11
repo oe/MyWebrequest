@@ -3,56 +3,6 @@
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
-/*----------- scrollbar -----------------*/
-::-webkit-scrollbar {
-    height:8px;
-    width:8px
-}
-::-webkit-scrollbar-button {
-    height:0;
-    width:0
-}
-::-webkit-scrollbar-button:start:decrement,::-webkit-scrollbar-button:end:increment {
-    display:block
-}
-::-webkit-scrollbar-button:vertical:start:increment,::-webkit-scrollbar-button:vertical:end:decrement {
-    display:none
-}
-::-webkit-scrollbar-track:vertical,::-webkit-scrollbar-track:horizontal,::-webkit-scrollbar-thumb:vertical,::-webkit-scrollbar-thumb:horizontal,::-webkit-scrollbar-track:vertical,::-webkit-scrollbar-track:horizontal,::-webkit-scrollbar-thumb:vertical,::-webkit-scrollbar-thumb:horizontal {
-    border-style:solid;
-    border-color:transparent
-}
-::-webkit-scrollbar-track:vertical::-webkit-scrollbar-track:horizontal{
-    background-clip:padding-box;
-    background-color:#fff;
-}
-::-webkit-scrollbar-thumb {
-    -webkit-box-shadow:inset 1px 1px 0 rgba(0,0,0,.1),inset 0 -1px 0 rgba(0,0,0,.07);
-    background-clip:padding-box;
-    background-color:rgba(0,0,0,.2);
-    min-height:28px;
-    padding-top:100px;
-}
-::-webkit-scrollbar-thumb:hover {
-    -webkit-box-shadow:inset 1px 1px 1px rgba(0,0,0,.25);
-    background-color:rgba(0,0,0,.4)
-}
-::-webkit-scrollbar-thumb:active {
-    -webkit-box-shadow:inset 1px 1px 3px rgba(0,0,0,.35);
-    background-color:rgba(0,0,0,.5)
-}
-::-webkit-scrollbar-track:vertical,::-webkit-scrollbar-track:horizontal,::-webkit-scrollbar-thumb:vertical,::-webkit-scrollbar-thumb:horizontal {
-    border-width:0;
-}
-::-webkit-scrollbar-track:hover {
-    -webkit-box-shadow:inset 1px 0 0 rgba(0,0,0,.1);
-    background-color:rgba(0,0,0,.05)
-}
-::-webkit-scrollbar-track:active {
-    -webkit-box-shadow:inset 1px 0 0 rgba(0,0,0,.14),inset -1px -1px 0 rgba(0,0,0,.07);
-    background-color:rgba(0,0,0,.05)
-}
-
 /*----------- basicly----------------*/
 html,body{
 	width: 100%;
@@ -65,6 +15,7 @@ body{
 	min-width: 900px;
 	background-color: white;
 	font-family: 'Century Gothic', 'Microsoft YaHei', Verdana;
+	line-height: 1.4;
 	/*overflow: hidden;*/
 }
 
@@ -79,7 +30,11 @@ aside {
 	z-index: 100;
 	background-color: #fff;
 }
-
+a {
+	color: #08c;
+	text-decoration: underline;
+	cursor: pointer;
+}
 aside .app-name{
 	width: 100%;
 	margin: 0;
@@ -87,6 +42,10 @@ aside .app-name{
 	font-size: 17px;
 	color: #08c;
 	cursor: default;
+}
+
+.full-width {
+	width: 100%;
 }
 
 .ovHidden {
@@ -173,7 +132,7 @@ code {
 /*------------------ error tip -------------------------*/
 .tooltip {
 	position: absolute;
-	z-index: 120;
+	z-index: 210;
 	top: 300px;
 	left: 400px;
 	cursor: default;
@@ -238,6 +197,10 @@ code {
 }
 .setting-content .rule-switch {
 	margin: 20px 0;
+}
+
+.setting-content .rule-switch .rule-detail {
+	margin-top: 10px;
 }
 
 .setting-content .enable-tip {
@@ -466,7 +429,7 @@ table.rules tbody tr td:nth-child(3):hover {
 	-webkit-animation-name: fadeOutDown;
 }
 /*-------- dialog -----------*/
-#overlay-wrapper {
+.overlay-wrapper {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -476,7 +439,7 @@ table.rules tbody tr td:nth-child(3):hover {
 	-webkit-transition: 200ms all;
 }
 
-#overlay-box {
+.overlay-box {
   display: -webkit-box;
 	-webkit-box-align: center;
   -webkit-box-orient: vertical;
@@ -492,7 +455,7 @@ table.rules tbody tr td:nth-child(3):hover {
   top: 0;
 }
 
-#overlay {
+.overlay {
 	min-width: 500px;
 	min-height: 100px;
 	-webkit-border-radius: 3px;
@@ -504,6 +467,7 @@ table.rules tbody tr td:nth-child(3):hover {
 	padding: 10px;
 	position: relative;
 	z-index: 200;
+	-webkit-transform: translateY(-50%);
 	-webkit-user-select: none;
 }
 .dialog {
@@ -519,12 +483,16 @@ table.rules tbody tr td:nth-child(3):hover {
 	cursor: default;
 	vertical-align: middle;
 	background: #fff url(/img/close.png) no-repeat center;
+	background-image: -webkit-image-set(url(/img/close.png) 1x, url(/img/close@2x.png) 2x);
 }
 
 .dialog .dialog-close:hover {
 	background: #fff url(/img/close-hover.png) no-repeat center;
+	background-image: -webkit-image-set(url(/img/close-hover.png) 1x, url(/img/close-hover@2x.png) 2x);
 }
-
+.dialog .input-hint {
+	font-size: .7em;
+}
 .dialog .dialog-title {
 	width: 100%;
 	/*margin: 0 0 10px;*/
