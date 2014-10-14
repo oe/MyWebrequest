@@ -282,6 +282,6 @@
     "message": "举个栗子 http://www.google.co.uk"
   },
   "want_new_feature": {
-    "message": "<strong>如果你想到本扩展还可以做其他事? 那就赶紧<a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request\">联系我吧!</a></strong>"
+    "message": "<strong>如果你想到本扩展还可以做其他事, 那就赶紧<a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request\">联系我吧!</a></strong>"
   }
 }
