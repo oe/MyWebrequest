@@ -262,7 +262,8 @@ $ ($) ->
 
           setTimeout ()->
             $requestSec.addClass 'active'
-          , 20
+            return
+          , 100
         when 'qrcode'
           $requestSec.removeClass 'active'
           setTimeout () ->

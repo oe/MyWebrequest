@@ -270,7 +270,7 @@
     "message": "Speed up website using Google CDN(by redirecting request Google CDN to <a href='http://libs.useso.com/' target='_blank'>360safe's cdn</a>, for Chinese only)"
   },
   "gsearch_rule_detail": {
-    "message": "by default, <code>google.com</code> and <code>google.com.hk</code> are add to the list. <br> You can also <a class=\"js-add-favor-gsearch\">add/edit your preferred google domain(or ip)</a>.<br><span id=\"custom-favor-gsearch-wrapper\">You've added <code id=\"custom-favor-gsearch\"></code> as your preferred Google domain.</span>"
+    "message": "by default, <code>google.com</code> and <code>google.com.hk</code> are added to the list. <br> You can also <a class=\"js-add-favor-gsearch\">add/edit your preferred google domain(or ip)</a>.<br><span id=\"custom-favor-gsearch-wrapper\">You've added <code id=\"custom-favor-gsearch\"></code> as your preferred Google domain.</span>"
   },
   "input_dlg_title": {
     "message": "Add your preferred Google domain"

@@ -47,7 +47,7 @@ do ->
       for i in arr
         pair = i.split '='
         key = decodeURIComponent pair[0]
-        val = if val is undefined then '' else decodeURIComponent pair[1]
+        val = if pair[1] is undefined then '' else decodeURIComponent pair[1]
         if result[ key ] is undefined
           result[ key ] = val
         else
@@ -58,6 +58,7 @@ do ->
             result[ key ].push val
       {
         formatedData: result
+        rawData: qstr
       }
     catch e
       if e instanceof URIError
@@ -159,7 +160,8 @@ do ->
           details.queryBody = queryBody
         console.log '%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain
         # 删除已打印的请求的缓存
-        delete requestCache[id]
+        delete requestCache[ rid ]
+        return
       permit: [ 'requestHeaders' ]
       on: 'onSendHeaders'
     # Google cdn 跳转至360镜像cdn
