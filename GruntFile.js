@@ -20,7 +20,7 @@ module.exports = function(grunt) {
               '!./**/*.map',
               '!./**/*.command',
               '!./**/*.jade',
-              '!./**/.svn/**',
+              '!./**/.**',
               '!./node_modules/**',
               '!./**/*.zip',
               '!./GruntFile*',

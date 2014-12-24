@@ -128,7 +128,7 @@ do ->
         headers = details.requestHeaders
         for i,k in headers
           if i.name is 'Referer'
-            header.split k,1
+            headers.splice k,1
             break
         { requestHeaders: headers }
       permit: [ 'requestHeaders', 'blocking' ]

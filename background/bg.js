@@ -169,7 +169,7 @@ var __hasProp = {}.hasOwnProperty;
         for (k = _i = 0, _len = headers.length; _i < _len; k = ++_i) {
           i = headers[k];
           if (i.name === 'Referer') {
-            header.split(k, 1);
+            headers.splice(k, 1);
             break;
           }
         }
