@@ -5,24 +5,22 @@
   "description": "__MSG_appDesc__",
   "default_locale": "en",
   "icons": {
-    "16": "img/icon16.png",
-    "48": "img/icon48.png",
+    "19": "img/icon19.png",
+    "38": "img/icon38.png",
     "128": "img/icon128.png"
   },
   "options_page": "options/index.html",
   "homepage_url": "http://www.evecalm.com",
   "browser_action": {
-    "default_icon": "img/icon48.png",
+    "default_icon": {
+      "19": "img/icon19.png",
+      "38": "img/icon38.png"
+    },
     "default_title": "__MSG_iconTitle__",
     "default_popup": "popup/index.html"
   },
   "permissions": ["*://*/*","webRequest","webRequestBlocking","notifications","tabs"],
   "background": {
     "page":"background/index.html"
-  },
-  "web_accessible_resources": [
-    "img/icon16.png",
-    "img/icon48.png",
-    "img/icon128.png"
-  ]
+  }
 }

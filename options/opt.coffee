@@ -12,7 +12,7 @@ $ ($) ->
   pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
 
   # hash init
-  if ['block','hsts','hotlink','log','qrcode','help','utility'].indexOf(hash) is -1 then hash = 'block'
+  if ['block', 'hsts', 'hotlink', 'log', 'qrcode', 'help', 'utility', 'ext-settings'].indexOf(hash) is -1 then hash = 'block'
   do (rules = rules) ->
     rules.block = {}
     rules.hotlink = {}
@@ -22,7 +22,7 @@ $ ($) ->
       # console.log key
       arr = JSON.parse localStorage[ key ] or '[]'
       rules[key].max = arr.length
-      for k,i in arr
+      for k, i in arr
         rules[key][i] = k
     return
 
@@ -41,7 +41,7 @@ $ ($) ->
       $firstInput.focus()
     , 200
     ruleObj = rules[secId] or {}
-    for key,val of ruleObj
+    for key, val of ruleObj
       # only key is a number
       if !isNaN(key) and ruleObj.hasOwnProperty key
         ++cunt
@@ -53,7 +53,7 @@ $ ($) ->
 
     $('#request-settings .rule-cunt-num').text cunt
     if !str
-      $enable.prop('checked',false).trigger 'change'
+      $enable.prop('checked', false).trigger 'change'
       $enable.prop 'disabled', true
       $('#request-settings .enable-tip').prop 'hidden', false
       $tbody.parent().find('thead input,thead button').prop 'disabled', true
@@ -66,13 +66,13 @@ $ ($) ->
 
     $tbody.parent().find('thead input').prop 'checked', false
     if secId is 'hsts'
-      $protocol.val('http').attr 'disabled',true
+      $protocol.val('http').attr 'disabled', true
     else
-      $protocol.val('*').attr 'disabled',false
+      $protocol.val('*').attr 'disabled', false
     $tbody.html str
     return
 
-  addRule = (rule,type,$tbody)->
+  addRule = (rule, type, $tbody)->
     ruleObj = rules[type]
     # console.log 'init %o', ruleObj
     str = ''
@@ -117,9 +117,9 @@ $ ($) ->
       # delete all
       if len is trLen
         $tbody.html TABNODATATR
-        $tbody.parent().find('thead input').prop 'checked',false
-        $tbody.parent().find('thead input,thead button').prop 'disabled',true
-        $enable.prop('checked',false).trigger 'change'
+        $tbody.parent().find('thead input').prop 'checked', false
+        $tbody.parent().find('thead input,thead button').prop 'disabled', true
+        $enable.prop('checked', false).trigger 'change'
         $enable.prop 'disabled', true
         $('#request-settings .enable-tip').prop 'hidden', false
         rules[secId] = {}
@@ -147,13 +147,13 @@ $ ($) ->
 
   getVcardString = ()->
     str = []
-    $('#tab-vcard').find('input,textarea').map (i,el)->
+    $('#tab-vcard').find('input,textarea').map (i, el)->
       console.log el
       if el.value isnt ''
         str.push "#{el.name}:#{el.value}"
     str.join ';'
     
-  isValueInObj = (obj,value)->
+  isValueInObj = (obj, value)->
     for k, v of obj
       if obj.hasOwnProperty(k) and v is value
         return true
@@ -170,7 +170,7 @@ $ ($) ->
     , 220
 
   # //show error tip
-  showTip = (el,msg)->
+  showTip = (el, msg)->
     $el = $ el
     $tooltip = $ '#tooltip'
     $msg = $ '#tooltip-msg'
@@ -199,7 +199,7 @@ $ ($) ->
     config = config || {}
 
     $(document.body).addClass 'ovHidden'
-    $overlayWrapper.prop 'hidden',false
+    $overlayWrapper.prop 'hidden', false
     $overlayWrapper.addClass 'fadeInDown'
 
     $dlgTitle.text config.title or 'No title'
@@ -241,6 +241,13 @@ $ ($) ->
     updateFavorGsearchOnview do getCustomFavorGsearch
     return
 
+  initSettings = ->
+    extConfig = JSON.parse localStorage.getItem('config') or '{}'
+    iconStyle = 'colored'
+    iconStyle = 'grey' if extConfig.iconStyle is 'grey'
+    $("#ext-iconstyle-switch input[value='#{iconStyle}']").prop 'checked', true
+    return
+
   $(document).on 'click', 'a[href^=#]', (e) ->
     targetId = $(this).attr('href').replace '#', ''
     $navlink = $("#nav a[href=##{targetId}]").parent()
@@ -253,7 +260,7 @@ $ ($) ->
 
       location.hash = targetId
       switch targetId
-        when 'block','hsts','hotlink','log'
+        when 'block', 'hsts', 'hotlink', 'log'
           $requestSec.attr 'data-id', targetId
           $requestSec.removeClass 'active'
           initRequestSection targetId
@@ -268,10 +275,13 @@ $ ($) ->
           $requestSec.removeClass 'active'
           setTimeout () ->
             $('#qrcode .tab-pane.active .input:first').focus()
-          ,0
+          , 0
         when 'utility'
           $requestSec.removeClass 'active'
           do initUtility
+        when 'ext-settings'
+          $requestSec.removeClass 'active'
+          do initSettings
         else
           $requestSec.removeClass 'active'
     return
@@ -287,7 +297,14 @@ $ ($) ->
 
     onoff[ secId ] = enabled
     localStorage.onoff = JSON.stringify onoff
+    return
 
+  # 浏览器ext图标
+  $('#ext-iconstyle-switch input:radio').on 'change', (e)->
+    extConfig = JSON.parse localStorage.getItem('config') or '{}'
+    extConfig.iconStyle = this.value
+    localStorage.setItem 'config', JSON.stringify extConfig
+    return
 
   # qrcode image on error
   document.getElementById('qrimg').onerror = (e) ->
@@ -318,7 +335,7 @@ $ ($) ->
         arr = url.split '://'
         if arr.length isnt 2 then return true
         tmp = arr[0].trim()
-        if ['*','http','https'].indexOf(tmp) is -1 then return true
+        if ['*', 'http', 'https'].indexOf(tmp) is -1 then return true
         if !$('#protocol').prop 'disabled'
           $('#protocol').val tmp
 
@@ -348,7 +365,7 @@ $ ($) ->
       false
 
   #add rule
-  $('.rule-field').on 'click','.add-rule', (e) ->
+  $('.rule-field').on 'click', '.add-rule', (e) ->
     secId = $('#request-settings').attr 'data-id'
     $protocol = $ '#protocol'
     $host = $ "#host"
@@ -361,7 +378,7 @@ $ ($) ->
     ruleObj = rules[secId]
     $tbody = $('#request-settings tbody')
 
-    if ['*','http','https'].indexOf(data.protocol) is -1
+    if ['*', 'http', 'https'].indexOf(data.protocol) is -1
       showTip $protocol, chrome.i18n.getMessage 'opt_errtip_protocol'
       return false
 
@@ -384,17 +401,17 @@ $ ($) ->
 
     # whether rule is duplicated
     if isValueInObj ruleObj, rule
-      showTip $host,chrome.i18n.getMessage 'opt_errtip_duplicate'
+      showTip $host, chrome.i18n.getMessage 'opt_errtip_duplicate'
       return false
 
     if data.host is '*'
-      if ['block','hsts'].indexOf(secId) isnt -1
+      if ['block', 'hsts'].indexOf(secId) isnt -1
         errorContent = 'opt_errdlg_cstarqr'
       else
         errorContent = 'opt_errdlg_cstar'
     else
       # check whether the rule will disable QR feature
-      str = data.host.replace(/\./g,'\\.').replace '*', '.*'
+      str = data.host.replace(/\./g, '\\.').replace '*', '.*'
       if ['block'].indexOf(secId) isnt -1 and (new RegExp('^' + str + '$')).test QRAPIHOST
         errorContent = 'opt_errdlg_cqr'
     if errorContent
@@ -464,7 +481,7 @@ $ ($) ->
       $table.find('tbody tr').removeClass 'checked'
     
   # single rule check
-  $('.rules tbody').on 'click','input[type="checkbox"]', (e)->
+  $('.rules tbody').on 'click', 'input[type="checkbox"]', (e)->
     $this = $ this
     $tr = $this.parents 'tr'
     $tbody = $this.parents 'tbody'
@@ -595,7 +612,7 @@ $ ($) ->
     $('#preferred-google').val do getCustomFavorGsearch
     $wrapper = $ '#input-dialog-wrapper'
     $(document.body).addClass 'ovHidden'
-    $wrapper.prop 'hidden',false
+    $wrapper.prop 'hidden', false
     $wrapper.addClass 'fadeInDown'
     setTimeout ->
       do $('#preferred-google').focus

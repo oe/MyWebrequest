@@ -1,12 +1,12 @@
 do ->
-  gsearchRuleBasic = ['*://www.google.com/url*','*://www.google.com.hk/url*']
+  gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*']
   _rules =
     block: {}
     hsts: {}
     log: {}
     hotlink: {}
     gsearch: { urls: gsearchRuleBasic }
-    gstatic: { urls:['http://ajax.googleapis.com/*','http://fonts.googleapis.com/*'] }
+    gstatic: { urls:['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'] }
   logNum = 0
   requestCache = {}
 
@@ -17,7 +17,7 @@ do ->
     if Array.isArray o
       if o.length > 1
         obj = []
-        for i,k in o
+        for i, k in o
           obj[ k ] = if i instanceof Object then cloneObj(i) else i
         obj
       else
@@ -39,7 +39,7 @@ do ->
   # 格式化query string
   formatQstr = (url) ->
     qstr = getQueryString url
-    qstr = if qstr then qstr.replace /^\?/,''
+    qstr = if qstr then qstr.replace /^\?/, ''
     if !qstr then return false
     arr = qstr.split '&'
     result = {}
@@ -91,7 +91,7 @@ do ->
             return
         return
     else if window.webkitNotifications
-      (title,content)->
+      (title, content)->
         notifi = webkitNotifications.createNotification '/img/icon48.png', title, content
         do notifi.show
     else
@@ -119,16 +119,16 @@ do ->
     # 强制加密链接
     hsts:
       fn: (details)->
-        { redirectUrl: details.url.replace /^http\:\/\//,'https://' }
+        { redirectUrl: details.url.replace /^http\:\/\//, 'https://' }
       permit: [ 'blocking' ]
       on: 'onBeforeRequest'
     # 修改HTTP header中的referrer
     hotlink:
       fn: (details) ->
         headers = details.requestHeaders
-        for i,k in headers
+        for i, k in headers
           if i.name is 'Referer'
-            headers.splice k,1
+            headers.splice k, 1
             break
         { requestHeaders: headers }
       permit: [ 'requestHeaders', 'blocking' ]
@@ -158,7 +158,7 @@ do ->
         details.requestHeaders = formatHeaders details.requestHeaders
         if queryBody
           details.queryBody = queryBody
-        console.log '%c%d %o %csent to domain: %s','color: #086', logNum, details, 'color: #557c30', domain
+        console.log '%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain
         # 删除已打印的请求的缓存
         delete requestCache[ rid ]
         return
@@ -170,7 +170,18 @@ do ->
         { redirectUrl: details.url.replace 'googleapis.com', 'useso.com' }
       permit: [ 'blocking' ]
       on: 'onBeforeRequest'
-
+  
+  # 更新浏览器ICON
+  updateExtIcon = (iconStyle)->
+    iconStyle = '' if iconStyle isnt 'grey'
+    iconStyle += '-' if iconStyle
+    chrome.browserAction.setIcon
+      path:
+        {
+          "19": "/img/#{iconStyle}icon19.png",
+          "38": "/img/#{iconStyle}icon38.png"
+        }
+    return
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
   do ->
@@ -178,7 +189,7 @@ do ->
     # 初始化rules
     rule
     for own k, v of _rules
-      rule = JSON.parse localStorage[ k ] or '[]'
+      rule = JSON.parse localStorage.getItem( k ) or '[]'
       if v.urls
         v.urls = v.urls.concat rule
       else
@@ -203,8 +214,14 @@ do ->
           reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
       else
         onoff[ k ] = false
+
     # 保存规则
     localStorage.onoff = JSON.stringify onoff
+
+    extConfig = JSON.parse localStorage.getItem('config') or '{}'
+    # 修改浏览器默认图标
+    updateExtIcon extConfig.iconStyle
+    
     return
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
@@ -214,10 +231,15 @@ do ->
     reqApi = chrome.webRequest
     newData = JSON.parse event.newValue or '[]'
     oldData = JSON.parse event.oldValue or '[]'
-    onoff = JSON.parse localStorage.onoff or '{}'
+    
 
     onRequest = null
-    if type is 'onoff'
+    if type is 'config'
+      # icon 风格变化
+      if newData.iconStyle isnt oldData.iconStyle
+        updateExtIcon newData.iconStyle
+        
+    else if type is 'onoff'
       for own k of _rules
         if newData[ k ] isnt oldData[ k ]
           if newData[ k ]
@@ -241,6 +263,7 @@ do ->
               reqApi[ onRequest.on ].removeListener onRequest.fn
           
     else
+      onoff = JSON.parse localStorage.onoff or '{}'
       _rules[ type ].urls = newData
       if type is 'gsearch'
         _rules[ type ].urls = _rules[ type ].urls.concat gsearchRuleBasic

@@ -218,7 +218,19 @@
   "opt_errdlg_cstarqr": {
     "message": "This rule may match every request, disable QR Code function & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
   },
-    "opt_help_desc": {
+  "opt_extsettings_desc": {
+    "message": "Extension settings"
+  },
+  "opt_extstg_icon": {
+    "message": "Browser icon style"
+  },
+  "opt_extstg_icon_colored": {
+    "message": "Colored"
+  },
+  "opt_extstg_icon_grey": {
+    "message": "Grey"
+  },  
+  "opt_help_desc": {
     "message": "There must be something U need to know"
   },
   "opt_hp_abttl": {

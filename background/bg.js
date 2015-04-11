@@ -2,7 +2,7 @@
 var __hasProp = {}.hasOwnProperty;
 
 (function() {
-  var cloneObj, formatHeaders, formatQstr, getQueryString, gsearchRuleBasic, logNum, onRequests, pushNotification, requestCache, _rules;
+  var cloneObj, formatHeaders, formatQstr, getQueryString, gsearchRuleBasic, logNum, onRequests, pushNotification, requestCache, updateExtIcon, _rules;
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
   _rules = {
     block: {},
@@ -226,14 +226,28 @@ var __hasProp = {}.hasOwnProperty;
       on: 'onBeforeRequest'
     }
   };
+  updateExtIcon = function(iconStyle) {
+    if (iconStyle !== 'grey') {
+      iconStyle = '';
+    }
+    if (iconStyle) {
+      iconStyle += '-';
+    }
+    chrome.browserAction.setIcon({
+      path: {
+        "19": "/img/" + iconStyle + "icon19.png",
+        "38": "/img/" + iconStyle + "icon38.png"
+      }
+    });
+  };
   (function() {
-    var k, onRequest, onoff, reqApi, rule, v;
+    var extConfig, k, onRequest, onoff, reqApi, rule, v;
     onoff = JSON.parse(localStorage.onoff || '{}');
     rule;
     for (k in _rules) {
       if (!__hasProp.call(_rules, k)) continue;
       v = _rules[k];
-      rule = JSON.parse(localStorage[k] || '[]');
+      rule = JSON.parse(localStorage.getItem(k) || '[]');
       if (v.urls) {
         v.urls = v.urls.concat(rule);
       } else {
@@ -263,6 +277,8 @@ var __hasProp = {}.hasOwnProperty;
       }
     }
     localStorage.onoff = JSON.stringify(onoff);
+    extConfig = JSON.parse(localStorage.getItem('config') || '{}');
+    updateExtIcon(extConfig.iconStyle);
   })();
   window.addEventListener('storage', function(event) {
     var k, newData, oldData, onRequest, onoff, reqApi, type;
@@ -270,9 +286,12 @@ var __hasProp = {}.hasOwnProperty;
     reqApi = chrome.webRequest;
     newData = JSON.parse(event.newValue || '[]');
     oldData = JSON.parse(event.oldValue || '[]');
-    onoff = JSON.parse(localStorage.onoff || '{}');
     onRequest = null;
-    if (type === 'onoff') {
+    if (type === 'config') {
+      if (newData.iconStyle !== oldData.iconStyle) {
+        updateExtIcon(newData.iconStyle);
+      }
+    } else if (type === 'onoff') {
       for (k in _rules) {
         if (!__hasProp.call(_rules, k)) continue;
         if (newData[k] !== oldData[k]) {
@@ -301,6 +320,7 @@ var __hasProp = {}.hasOwnProperty;
         }
       }
     } else {
+      onoff = JSON.parse(localStorage.onoff || '{}');
       _rules[type].urls = newData;
       if (type === 'gsearch') {
         _rules[type].urls = _rules[type].urls.concat(gsearchRuleBasic);

@@ -218,6 +218,18 @@
   "opt_errdlg_cstarqr": {
     "message": "当前规则可能会匹配任意联网请求,二维码功能将无法正常使用,并会严重影响浏览器的正常使用.<br>你还是想添加吗? 想悲剧就点OK吧."
   },
+  "opt_extsettings_desc": {
+    "message": "扩展设置"
+  },
+  "opt_extstg_icon": {
+    "message": "浏览器图标设置"
+  },
+  "opt_extstg_icon_colored": {
+    "message": "彩色"
+  },
+  "opt_extstg_icon_grey": {
+    "message": "灰色"
+  }, 
   "opt_help_desc": {
     "message": "有些事你应当知道"
   },

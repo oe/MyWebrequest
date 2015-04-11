@@ -641,3 +641,31 @@ table.rules tbody tr td:nth-child(3):hover {
 .qr-fun .make-qrcode {
 	float: right;
 }
+.icon-style {
+	display: inline-block;
+	text-align: center;
+	margin-right: 20px
+}
+
+.icon-style > img {
+	width: 150px;
+	height: 100px;
+	display: block;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+}
+.icon-style-radio {
+	position: relative;
+	top: -.5em;
+	padding: .2em .4em;
+	border-radius: 1em;
+	color: #666;
+	background-color: #eee;
+	border: 1px solid #ccc;
+
+}
+
+
+
+
+
