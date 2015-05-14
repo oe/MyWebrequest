@@ -1,4 +1,13 @@
-define (require)->
+((root, factory)->
+  if typeof define is 'function' and (define.amd or define.cmd)
+    define ->
+      factory root
+  else if typeof exports is 'object'
+    module.exports = factory root
+  else
+    root.utils = factory root
+  return
+)(this, (root) ->
 
   # if an object contains a value
   isValueInObj = (obj, val)->
@@ -48,3 +57,4 @@ define (require)->
     setSwitch      : setSwitch
     getCurrentHash : getCurrentHash
   }
+)
