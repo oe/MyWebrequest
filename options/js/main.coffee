@@ -9,12 +9,20 @@ define (require)->
    * @param  {Boolean} isEnable [description]
    * @return {[type]}           [description]
   ###
-  resetSectionCtrlsState = (isEnable)->
+  resetSectionCtrlsState = (cat)->
     $thead = $ '#request-settings thead'
-    $('#request-settings .switch-input').prop 'disabled', !isEnable
-    $('#request-settings .enable-tip').prop 'hidden', isEnable
-    $thead.find('input, button').prop 'disabled', !isEnable
-    $thead.find('input').prop 'checked', false
+    $tbody = $ '#request-settings tbody'
+    ruleNum = $tbody.find('tr:not([nodata])').length
+    $switch = $ '#request-settings .switch-input'
+    switchEnabled = utils.getSwitch cat
+    
+    $switch.prop
+      'checked'  : switchEnabled and !!ruleNum
+      'disabled' : !ruleNum
+    $('#request-settings .enable-tip').prop 'hidden', !!ruleNum
+    $thead.find('input, button').prop 'disabled', !ruleNum
+    $('#request-settings .rule-cunt-num').text ruleNum
+    $thead.find('input').prop 'checked', ruleNum is $tbody.find('tr input:checked').length
     return
   ###*
    * init section of cat( category )
@@ -28,23 +36,18 @@ define (require)->
     # make the last added be the first
     do rules.reverse
     
-    ruleCount = rules.length
-    hasRule = !!ruleCount
+    hasRule = !!rules.length
     isHsts = cat is 'hsts'
     if hasRule
       html = tpl.rulesTpl rules
     else
       html = tpl.nodataTpl
       utils.setSwitch cat, false
-    # set the rule count num
-    $('#request-settings .rule-cunt-num').text ruleCount
-    # set the enable checkbox's state
-    $('#request-settings .switch-input').prop 'checked', utils.getSwitch cat
-    # enable or disable the controls
-    resetSectionCtrlsState hasRule
+    $('#request-settings tbody').html html
+    # reset controls
+    resetSectionCtrlsState cat
     # hsts has special settings
     $('#protocol').val(if isHsts then 'http' else '*').attr 'disabled', isHsts
-    $('#request-settings tbody').html html
 
     return
 
@@ -54,18 +57,17 @@ define (require)->
     $tr = $ utils.rulesTpl [ rule ]
     $tr.addClass 'new-item'
 
-    noRule = !$tbody.children().length or $tbody.find('tr[nodata]').length
-
-    resetSectionCtrlsState true
+    noRule = !$tbody.find('tr:not([nodata])').length
 
     $tbody[ if noRule then 'html' else 'prepend' ] $tr
-    $('#request-settings .rule-cunt-num').text $tbody.find('tr').length
     $('.rule-field input').val ''
     $('#host').focus()
-    collection.saveRule cat
 
+    collection.saveRule cat
+    resetSectionCtrlsState cat
     setTimeout ->
       $tr.removeClass 'new-item'
+      return
     , 600
     return
 
@@ -78,17 +80,17 @@ define (require)->
       this.value
     .get()
 
-    noRule = rules.length is $tbody.find('tr').length
+    isRemoveAll = rules.length is $tbody.find('tr').length
     utils.removeRule cat, rules
 
     $tr.addClass 'fadeOutDown'
 
     setTimeout ->
       do $tr.remove
-      $('#request-settings .rule-cunt-num').text $tbody.find('tr').length
-      if noRule
-        $tbody.html tpl.nodataTpl
-        resetSectionCtrlsState false
+      $tbody.html tpl.nodataTpl if isRemoveAll
+
+      resetSectionCtrlsState cat
+      return
     , 200
 
     return
