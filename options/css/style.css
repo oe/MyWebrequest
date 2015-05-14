@@ -596,7 +596,7 @@ table.rules tbody tr td:nth-child(3):hover {
 	width: 200px;
 	height: 200px;
 	margin: 10px auto;
-	background-image: url(../img/qrcode.png);
+	background-image: url(../../img/qrcode.png);
 	-webkit-background-size: 200px 200px;
 	background-size: 200px 200px;
 }

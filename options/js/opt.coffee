@@ -1,30 +1,30 @@
-$ ($) ->
+define ->
   hash = location.hash.replace('#', '') or 'block'
   rules = {}
   dialogOKCB = null
   TABNODATATR = "<tr nodata><td colspan='3' class='align-center'>#{chrome.i18n.getMessage 'opt_no_rules' }</td></tr>"
-
+  # QR Server by third part
   QRAPIHOST = 'api.qrserver.com'
   QRAPIURL = 'http://api.qrserver.com/v1/create-qr-code/?size=200x200&data=%s'
 
-  ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
-  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
-  pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
+  # ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
+  # hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
+  # pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
 
   # hash init
-  if ['block', 'hsts', 'hotlink', 'log', 'qrcode', 'help', 'utility', 'ext-settings'].indexOf(hash) is -1 then hash = 'block'
-  do (rules = rules) ->
-    rules.block = {}
-    rules.hotlink = {}
-    rules.log = {}
-    rules.hsts = {}
-    for key of rules
-      # console.log key
-      arr = JSON.parse localStorage[ key ] or '[]'
-      rules[key].max = arr.length
-      for k, i in arr
-        rules[key][i] = k
-    return
+  # if ['block', 'hsts', 'hotlink', 'log', 'qrcode', 'help', 'utility', 'ext-settings'].indexOf(hash) is -1 then hash = 'block'
+  # do (rules = rules) ->
+  #   rules.block = {}
+  #   rules.hotlink = {}
+  #   rules.log = {}
+  #   rules.hsts = {}
+  #   for key of rules
+  #     # console.log key
+  #     arr = JSON.parse localStorage[ key ] or '[]'
+  #     rules[key].max = arr.length
+  #     for k, i in arr
+  #       rules[key][i] = k
+  #   return
 
   # init setting section
   initRequestSection = (secId)->
@@ -137,13 +137,13 @@ $ ($) ->
       if !$tbody.find('tr').length
         $tbody.html TABNODATATR
 
-  getObjValues = (obj)->
-    arr = []
-    for k of obj
-      if !isNaN(k) and obj.hasOwnProperty k
-        arr.push obj[ k ]
-    # make the last be the first
-    arr.reverse()
+  # getObjValues = (obj)->
+  #   arr = []
+  #   for k of obj
+  #     if !isNaN(k) and obj.hasOwnProperty k
+  #       arr.push obj[ k ]
+  #   # make the last be the first
+  #   arr.reverse()
 
   getVcardString = ()->
     str = []
@@ -153,11 +153,11 @@ $ ($) ->
         str.push "#{el.name}:#{el.value}"
     str.join ';'
     
-  isValueInObj = (obj, value)->
-    for k, v of obj
-      if obj.hasOwnProperty(k) and v is value
-        return true
-    return false
+  # isValueInObj = (obj, value)->
+  #   for k, v of obj
+  #     if obj.hasOwnProperty(k) and v is value
+  #       return true
+  #   return false
       
   hideDialog = ()->
     $overlayWrapper = $ '#confirm-dialog-wrapper'
