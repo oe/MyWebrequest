@@ -7,17 +7,20 @@ define (require)->
   rulesTpl = do ->
     deleteText = chrome.i18n.getMessage 'opt_delete_text'
     tpl = '''
-    {{ _.each(function(rule){ }}
     <tr>
-       <td><input type="checkbox" value="{{=rule}}"></td>
-       <td title="{{=rule}}">{{=rule}}</td>
+       <td><input type="checkbox" value="{{rule}}"></td>
+       <td title="{{rule}}">{{rule}}</td>
        <td class="delete">#{del}</td>
     </tr>
-    {{ }) }}
     '''
     tpl = tpl.replace '#{del}', deleteText
 
-    _.template tpl
+    (arr)->
+      res = ''
+      arr.forEach (a)->
+        res += tpl.replace /\{\{\w+\}\}/g, a
+        return
+      res
 
   ###*
    * String of no data tr

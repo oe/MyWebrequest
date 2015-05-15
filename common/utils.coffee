@@ -30,12 +30,6 @@
   isValidPath = (path)->
     pathReg.test path
 
-  # get current page's hash
-  getCurrentHash = (defaultHash='')->
-    pageIds = ['block', 'hsts', 'hotlink', 'log', 'qrcode', 'help', 'utility', 'ext-settings']
-    hash = location.href.hash.replace '#', ''
-    hash = defaultHash if -1 is pageIds.indexOf hash
-    hash
 
   # get the switch of cat whether has turned on
   getSwitch = (cat)->
@@ -47,14 +41,24 @@
     onoff[ cat ] = !!isOn
     return
 
+  # get data from localStorage
+  getLocal = (key, expectFormat)->
+    switch expectFormat
+      when 'object', 'o'
+        JSON.parse localStorage.getItem( key ) or '{}'
+      when 'array', 'a'
+        JSON.parse localStorage.getItem( key ) or '[]'
+      else
+        localStorage.getItem key
+
+
   return {
     isValueInObj   : isValueInObj
     isIp           : isValidIp
     isHost         : isValidHost
-    isHost         : isValidHost
     isPath         : isValidPath
+    getLocal       : getLocal
     getSwitch      : getSwitch
     setSwitch      : setSwitch
-    getCurrentHash : getCurrentHash
   }
 )

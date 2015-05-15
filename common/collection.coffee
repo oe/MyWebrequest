@@ -1,8 +1,17 @@
 ###*
  * all rules gather together to be a collection
 ###
-define (require)->
-  utils = require 'js/utils'
+((root, factory)->
+  if typeof define is 'function' and (define.amd or define.cmd)
+    define ->
+      factory root
+  else if typeof exports is 'object'
+    module.exports = factory root
+  else
+    root.collection = factory root
+  return
+)(this, (root) ->
+  # utils = require 'js/utils'
   # rules' collection
   collection = {}
   # categories
@@ -28,12 +37,12 @@ define (require)->
 
   # get the index of a rule
   # -1 means not found
-  indexOfRule: (cat, rule)->
+  indexOfRule = (cat, rule)->
     rules = collection[ cat ]
     return -1 unless rules and rule
 
     rules.indexOf rule
-    
+
   # add a rule
   addRule = (cat, rule)->
     return false if not rule or ~indexOfRule cat, rule
@@ -42,7 +51,7 @@ define (require)->
 
     saveRule cat
     return true
-   
+
   # remove a rule
   # if rule is undefined then empty all the rules
   removeRule = (cat, rules)->
@@ -51,7 +60,7 @@ define (require)->
       collection[ cat ] = []
       # disable feature of cat when empty
       # TODO: should it be done in background js?
-      utils.setSwitch cat, false
+      # utils.setSwitch cat, false
     else
       rules = [ rules ] unless Array.isArray rules
       rules.forEach (rule)->
@@ -60,7 +69,7 @@ define (require)->
         return
     saveRule cat
     return
- 
+
   # save rules into localStorage
   saveRule = (cat)->
     arr = getRules cat
@@ -91,5 +100,4 @@ define (require)->
     saveRule    : saveRule
     eachRule    : eachRule
   }
-    
-    
+)
