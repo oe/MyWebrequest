@@ -16,7 +16,7 @@
 })(this, function(root) {
   var addRule, cats, collection, eachRule, getRules, hasCat, indexOfRule, initCollection, removeRule, saveRule;
   collection = {};
-  cats = ['block', 'hsts', 'hotlink', 'log'];
+  cats = ['block', 'hsts', 'hotlink', 'log', 'custom'];
   hasCat = function(cat) {
     return ~cats.indexOf(cat);
   };
@@ -29,7 +29,6 @@
   };
   initCollection = function() {
     var cat, i, len;
-    cats = ['block', 'hsts', 'hotlink', 'log'];
     for (i = 0, len = cats.length; i < len; i++) {
       cat = cats[i];
       collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
@@ -55,8 +54,8 @@
   };
   removeRule = function(cat, rules) {
     var _rules;
-    _rules = getRules(cat);
-    if (rule === void 0 || (Array.isArray(rules) && _rules.length === rules.length)) {
+    _rules = collection[cat];
+    if (rules === void 0 || (Array.isArray(rules) && _rules.length === rules.length)) {
       collection[cat] = [];
     } else {
       if (!Array.isArray(rules)) {

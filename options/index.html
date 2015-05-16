@@ -12,6 +12,7 @@
 			My Webrequest
 		</div>
 		<ul class="nav" id="nav">
+			<li ><a href="#custom">Custom</a></li>
 			<li ><a href="#block">Block</a></li>
 			<li><a href="#hsts">HTTPS</a></li>
 			<li><a href="#hotlink">Hotlinking</a></li>
@@ -35,7 +36,7 @@
 				</label>
 			</div>
 			<div class="item-title" i18n-content="opt_addrule_lbl"></div>
-			<div class="rule-field">
+			<div class="rule-field js-not-custom">
 				<div class="input-field field-block protocol">
 					<label class="label" for="protocol" i18n-content="opt_protocol_lbl"></label>
 					<select id="protocol" name="protocol" class="input" >
@@ -65,6 +66,56 @@
 					<button class="input add-rule" i18n-content="opt_addrule_btn"></button>
 				</div>
 			</div>
+			<!-- custom URL -->
+			<div class="rule-field js-custom">
+				<div class="input-field field-block protocol">
+				<!-- protocol -->
+					<label class="label" i18n-content="opt_custom_ptn"></label>
+					<select id="protocol-c" name="protocol-c" class="input" >
+						<option value="*">*</option>
+						<option value="http">http</option>
+						<option value="https">https</option>
+					</select>
+				</div>
+				<div class="input-field field-block separator">
+					<label class="label">&nbsp;</label>
+					<div class="input">://</div>
+				</div>
+				<!-- domain and path-->
+				<div class="input-field field-block host-c">
+					<label class="label">&nbsp;</label>
+					<input id="host-c" name="host-c" class="input" i18n-value="placeholder:opt_ph_urlmatch">
+				</div>
+			</div>
+			<!-- new url rule -->
+			<div class="rule-field js-custom">
+				<div class="input-field field-block large-block">
+					<label class="label" for="redirect-url-input" i18n-content="opt_redirect_to"></label>
+					<input type="text" id="redirect-url-input" class="input" i18n-value="placeholder:opt_ph_newurl">
+				</div>
+			</div>
+			<!-- test url input -->
+			<div class="rule-field js-custom">
+				<div class="input-field field-block large-block">
+					<label class="label" for="test-url-input" i18n-content="opt_test_rule"></label>
+					<input type="text" id="test-url-input" class="input" i18n-value="placeholder:opt_ph_testurl">
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input" i18n-content="opt_test_btn" id="test-url-btn"></button>
+				</div>
+			</div>
+			<!-- test result -->
+			<div class="rule-field js-custom">
+				<div class="input-field field-block large-block">
+					<label class="label" for="protocol" i18n-content="opt_test_result" ></label>
+					<div class="input"> no result</div>
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input" id="add-csrule" i18n-content="opt_addcsrule_btn"></button>
+				</div>
+			</div>
 			<div class="item-title">
 				<span i18n-content="opt_mngrule_lbl"></span>
 				<div class="rule-cunt">
@@ -74,7 +125,7 @@
 			<table class="rules">
 				<thead>
 					<tr>
-						<th width="7%"><input type="checkbox" name="" id=""></th>
+						<th width="7%"><input type="checkbox" name="" id="check-all-rules"></th>
 						<th width="78%" i18n-content="opt_th_rule"></th>
 						<th width="15%"><button class="multi-delete" i18n-content="opt_delete_text"></button></th>
 					</tr>

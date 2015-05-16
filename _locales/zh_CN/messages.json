@@ -87,7 +87,7 @@
     "message": "域名(或者IP地址)"
   },
   "opt_ph_host": {
-    "message": "必填"
+    "message": "必填, 可直接粘贴链接至此"
   },
   "opt_path_lbl": {
     "message": "路径(包括请求字符串)"
@@ -100,6 +100,39 @@
   },
   "opt_th_rule": {
     "message": "规则"
+  },
+  "opt_test_btn": {
+    "message": "测试链接"
+  },
+  "opt_test_result": {
+    "message": "测试结果"
+  },
+  "opt_test_rule": {
+    "message": "测试规则, 检验所写规则是否如期工作"
+  },
+  "opt_redirect_to": {
+    "message": "将匹配的链接跳转至"
+  },
+  "opt_custom_ptn": {
+    "message": "匹配下面的URL"
+  },
+  "opt_addcsrule_btn": {
+    "message": "好了, 添加"
+  },
+  "opt_ph_testurl": {
+    "message": "在此处粘贴真实链接地址来测试上述规则"
+  },
+  "opt_ph_newurl": {
+    "message": "用于生成新链接地址的规则"
+  },
+  "opt_ph_urlmatch": {
+    "message": "用于匹配链接地址的规则"
+  },
+  "opt_custom_desc": {
+    "message": "自定义你的链接跳往何处"
+  },
+  "opt_hotlink_desc": {
+    "message": "帮你轻松的访问盗链图"
   },
   "opt_block_desc": {
     "message": "屏蔽你讨厌的网站"

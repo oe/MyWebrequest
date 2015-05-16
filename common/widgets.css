@@ -217,6 +217,7 @@ input:disabled:-webkit-any([type='password'],
 
 :enabled:focus:-webkit-any(
     select,
+    textarea,
     input[type='checkbox'],
     input[type='number'],
     input[type='password'],

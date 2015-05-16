@@ -236,7 +236,10 @@ code {
 	display: block;
 	float: none;
 	clear: both;
-	margin-bottom: 20px;
+	margin-bottom: 10px;
+}
+.rule-field + .item-title {
+	margin-top: 10px;
 }
 .rule-field .field-block{
 	float: left;
@@ -254,11 +257,21 @@ code {
 .field-block.protocol{
 	width: 10%;
 }
+.field-block.protocol > label {
+	white-space: nowrap;
+	visibility: visible;
+}
 .field-block.host{
-	width: 25%;
+	width: 35%;
+}
+.field-block.host-c {
+	width: 72%;
 }
 .field-block.path{
-	width: 30%;
+	width: 35%;
+}
+.field-block.large-block{
+	width: 85%;
 }
 .input-field.field-inline {
 	height: auto;

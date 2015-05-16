@@ -1,12 +1,17 @@
 do ->
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*']
-  _rules =
-    block: {}
-    hsts: {}
-    log: {}
-    hotlink: {}
-    gsearch: { urls: gsearchRuleBasic }
-    gstatic: { urls:['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'] }
+  gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*']
+
+  RULES_TYPE = [ 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic']
+
+  rules =
+      block: { urls: [] }
+      hsts: { urls: [] }
+      log: { urls: [] }
+      hotlink: { urls: [] }
+      gsearch: { urls: gsearchRuleBasic }
+      gstatic: { urls: gstaticBasic }
+
   logNum = 0
   requestCache = {}
 
@@ -147,12 +152,8 @@ do ->
         url = details.url
         rid = details.requestId
         queryBody = formatQstr details.url
-        i = url.indexOf '//'
-        domain = url.indexOf '/', i + 2
-        if ~domain
-          domain = url.substr 0, domain
-        else
-          domain = url
+        domain = /^(?:[\w-]+):\/\/([^/]+)\//.exec(url)
+        domain = if domain then domain[1] else url
         if requestCache[ rid ]
           details.requestBody = requestCache[ rid ]
         details.requestHeaders = formatHeaders details.requestHeaders
@@ -185,43 +186,40 @@ do ->
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
   do ->
-    onoff = JSON.parse localStorage.onoff or '{}'
-    # 初始化rules
-    rule
-    for own k, v of _rules
-      rule = JSON.parse localStorage.getItem( k ) or '[]'
-      if v.urls
-        v.urls = v.urls.concat rule
-      else
-        v.urls = rule
-
+    onoff = utils.getLocal 'onoff', 'o'
+    
     reqApi = chrome.webRequest
     onRequest = null
     # 启用各个特性
-    for own k, v of _rules
+    for k in RULES_TYPE
       if onoff[ k ]
+        _rule = utils.getLocal k, 'a'
+        rule = rules[ k ]
+        unless rule.urls.length or _rule.length
+          onoff[ k ] = false
+          continue
+        rule.urls = rule.urls.concat _rule
+
         if k is 'log'
-          pushNotification chrome.i18n.getMessage('bg_logison'), chrome.i18n.getMessage('bg_logon_tip'), 'log-enabled-hint', ->
+          pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->
             window.open '/options/index.html#log'
             return
           onRequest = onRequests['logBody']
-          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
           onRequest = onRequests['logRequest']
-          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
         else
           onRequest = onRequests[ k ]
-          # console.log _rules[ k ], onRequest.on, onRequest.fn, onRequest.permit
-          reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
+          # console.log rule, onRequest.on, onRequest.fn, onRequest.permit
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
       else
         onoff[ k ] = false
 
     # 保存规则
-    localStorage.onoff = JSON.stringify onoff
+    utils.setLocal 'onoff', onoff
 
-    extConfig = JSON.parse localStorage.getItem('config') or '{}'
     # 修改浏览器默认图标
-    updateExtIcon extConfig.iconStyle
-    
+    updateExtIcon utils.getConfig 'iconStyle'
     return
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
@@ -238,55 +236,49 @@ do ->
       # icon 风格变化
       if newData.iconStyle isnt oldData.iconStyle
         updateExtIcon newData.iconStyle
-        
-    else if type is 'onoff'
-      for own k of _rules
+      return
+    
+    if type is 'onoff'
+      for k in RULES_TYPE
         if newData[ k ] isnt oldData[ k ]
-          if newData[ k ]
-            if k is 'log'
-              onRequest = onRequests['logBody']
-              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
-              onRequest = onRequests['logRequest']
-              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
-            else
-              onRequest = onRequests[ k ]
-              reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ k ], onRequest.permit
-          else
-            if k is 'log'
-              onRequest = onRequests['logBody']
-              reqApi[ onRequest.on ].removeListener onRequest.fn
-              onRequest = onRequests['logRequest']
-              reqApi[ onRequest.on ].removeListener onRequest.fn
-              requestCache = {}
-            else
-              onRequest = onRequests[ k ]
-              reqApi[ onRequest.on ].removeListener onRequest.fn
-          
-    else
-      onoff = JSON.parse localStorage.onoff or '{}'
-      _rules[ type ].urls = newData
-      if type is 'gsearch'
-        _rules[ type ].urls = _rules[ type ].urls.concat gsearchRuleBasic
-      
-      if onoff[ type ]
-        if type is 'log'
-          reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
-          reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn
-          setTimeout ->
+          method = if newData[ k ] then 'addListener' else 'removeListener'
+          rule = rules[ k ]
+          rule.urls = rules[ k ].urls.concat utils.getLocal k, 'a'
+          if k is 'log'
             onRequest = onRequests['logBody']
-            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
+            reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
             onRequest = onRequests['logRequest']
-            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
-            return
-          , 0
-        else
-          onRequest = onRequests[ type ]
-          reqApi[ onRequest.on ].removeListener onRequest.fn
-          setTimeout ->
-            # console.log _rules[ type ], onRequest.on, onRequest.fn, onRequest.permit
-            reqApi[ onRequest.on ].addListener onRequest.fn, _rules[ type ], onRequest.permit
-            return
-          , 0
+            reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
+          else
+            onRequest = onRequests[ k ]
+            reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
+      return
+
+    isOn = utils.getSwitch type
+    rule = rules[ type ]
+    rule.urls = newData
+    if type is 'gsearch'
+      rule.urls = rule.urls.concat gsearchRuleBasic
+    
+    if isOn
+      if type is 'log'
+        reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
+        reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn
+      else
+        onRequest = onRequests[ type ]
+        reqApi[ onRequest.on ].removeListener onRequest.fn
+
+      if rule.urls.length
+        setTimeout ->
+          onRequest = onRequests['logBody']
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+          onRequest = onRequests['logRequest']
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+          return
+        , 0
+      else
+        utils.setSwitch type, false
+        
     return
 
   return

@@ -15,7 +15,7 @@
   # rules' collection
   collection = {}
   # categories
-  cats= ['block', 'hsts', 'hotlink', 'log']
+  cats = ['block', 'hsts', 'hotlink', 'log', 'custom']
 
   hasCat = (cat)->
     ~cats.indexOf cat
@@ -28,7 +28,6 @@
 
   # init rules into collection from localStorage
   initCollection = ->
-    cats= ['block', 'hsts', 'hotlink', 'log']
 
     for cat in cats
       collection[cat] = JSON.parse localStorage.getItem( cat ) or '[]'
@@ -52,11 +51,11 @@
     saveRule cat
     return true
 
-  # remove a rule
+  # remove rules
   # if rule is undefined then empty all the rules
   removeRule = (cat, rules)->
-    _rules = getRules cat
-    if rule is undefined or (Array.isArray(rules) and _rules.length is rules.length)
+    _rules = collection[ cat ]
+    if rules is undefined or (Array.isArray(rules) and _rules.length is rules.length)
       collection[ cat ] = []
       # disable feature of cat when empty
       # TODO: should it be done in background js?

@@ -87,7 +87,7 @@
     "message": "Domain(or IP Addr)"
   },
   "opt_ph_host": {
-    "message": "required"
+    "message": "required, just paste a url here"
   },
   "opt_path_lbl": {
     "message": "Path(including query string)"
@@ -100,6 +100,39 @@
   },
   "opt_th_rule": {
     "message": "Rule"
+  },
+  "opt_test_btn": {
+    "message": "Test URL"
+  },
+  "opt_test_result": {
+    "message": "Test result"
+  },
+  "opt_test_rule": {
+    "message": "Test your rule"
+  },
+  "opt_redirect_to": {
+    "message": "Redirect this url to"
+  },
+  "opt_custom_ptn": {
+    "message": "Match this url"
+  },
+  "opt_addcsrule_btn": {
+    "message": "OK, Add It"
+  },
+  "opt_ph_testurl": {
+    "message": "paste a real url to test your rule"
+  },
+  "opt_ph_newurl": {
+    "message": "a url pattern to generate the new url"
+  },
+  "opt_ph_urlmatch": {
+    "message": "a url pattern to match a url"
+  },
+  "opt_custom_desc": {
+    "message": "Custom where are your url going to"
+  },
+  "opt_hotlink_desc": {
+    "message": "Enable the accessibility of those hotlinking images"
   },
   "opt_block_desc": {
     "message": "Block website that U don't like"
