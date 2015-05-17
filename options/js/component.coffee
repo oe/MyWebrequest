@@ -52,6 +52,19 @@ define ->
 
   # dialog cancel btn click
   $('.dialog').on 'click', '.cancel', hideDlg
+
+  # hide dialog when pressed escape key
+  $(document).on 'keydown', (e) ->
+    if e.keyCode is 27
+      $overlay = $ '.overlay-wrapper:visible'
+      if $overlay.length then $overlay.find('.cancel').click()
+    return
+
+  # hide tooltip when keyup or click
+  $(document).on 'click keyup', (e)->
+    $tooltip = $ '#tooltip'
+    if $tooltip.hasClass 'show'
+      $tooltip.removeClass 'show'
   # //show error tip
   showTip = (el, msg)->
     $el = $ el

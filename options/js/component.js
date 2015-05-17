@@ -53,6 +53,22 @@ define(function() {
     }, 220);
   };
   $('.dialog').on('click', '.cancel', hideDlg);
+  $(document).on('keydown', function(e) {
+    var $overlay;
+    if (e.keyCode === 27) {
+      $overlay = $('.overlay-wrapper:visible');
+      if ($overlay.length) {
+        $overlay.find('.cancel').click();
+      }
+    }
+  });
+  $(document).on('click keyup', function(e) {
+    var $tooltip;
+    $tooltip = $('#tooltip');
+    if ($tooltip.hasClass('show')) {
+      return $tooltip.removeClass('show');
+    }
+  });
   showTip = function(el, msg) {
     var $el, $msg, $tooltip, pos;
     $el = $(el);

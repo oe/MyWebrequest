@@ -36,7 +36,7 @@ define(function(require) {
       pageCtrls.union.init(cat);
       setTimeout(function() {
         $unionCat.addClass('active');
-      }, 50);
+      }, 100);
     } else {
       if ((ref = pageCtrls[cat]) != null) {
         ref.init(cat);

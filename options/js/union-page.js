@@ -90,8 +90,6 @@ define(function(require) {
     $('#request-settings .js-not-custom').prop('hidden', isCustom);
     rules.reverse();
     $('#fun-name').text($("#nav a[href^=#" + cat + "]").text());
-    console.log(cat);
-    console.log(utils.i18n("opt_" + cat + "_desc"));
     $('#fun-desc').text(utils.i18n("opt_" + cat + "_desc"));
     hasRule = !!rules.length;
     isHsts = cat === 'hsts';
@@ -306,18 +304,47 @@ define(function(require) {
       return false;
     }
   });
-  testUrl = function() {};
-  $('#test-url-btn').on('click', function(e) {
-    var data;
+
+  /**
+   * Test the custom rule with a real url
+   * if pass return the rule object or nothing
+   */
+  testUrl = function() {
+    var $host, $protocol, $realUrl, $redirectUrl, data;
+    $protocol = $('#protocol-c');
+    $host = $('#host-c');
+    $redirectUrl = $('#redirect-url-input');
+    $realUrl = $('#test-url-input');
     data = {
-      protocol: $('#protocol-c').val(),
-      host: $('#host-c').val(),
-      redirectUrl: $('#redirect-url-input').val(),
-      realUrl: $('#test-url-input').val()
+      protocol: $protocol.val(),
+      host: $host.val(),
+      redirectUrl: $redirectUrl.val(),
+      realUrl: $realUrl.val()
     };
-    if (!data.host) {
-      return modal.showTip($('#pro'));
+    if (!utils.isProtocol(data.protocol)) {
+      modal.showTip($protocol, utils.i18n('opt_errtip_protocol'));
+      return;
     }
+    if (!testCustom(data.host)) {
+      modal.showTip($host, utils.i18n('opt_errtip_protocol'));
+      return;
+    }
+    if (!testCustom(data.redirectUrl)) {
+      modal.showTip($redirectUrl, utils.i18n('opt_errtip_protocol'));
+      return;
+    }
+    if (!testCustom(data.realUrl)) {
+      modal.showTip($realUrl, utils.i18n('opt_errtip_protocol'));
+      return;
+    }
+    return {
+      url: '',
+      matchUrl: '',
+      redirectUrl: ''
+    };
+  };
+  $('#test-url-btn').on('click', function(e) {
+    return testUrl();
   });
   return {
     init: initSection,

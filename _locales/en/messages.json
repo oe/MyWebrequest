@@ -123,7 +123,7 @@
     "message": "paste a real url to test your rule"
   },
   "opt_ph_newurl": {
-    "message": "a url pattern to generate the new url"
+    "message": "a url template to generate the new url"
   },
   "opt_ph_urlmatch": {
     "message": "a url pattern to match a url"

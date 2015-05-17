@@ -123,7 +123,7 @@
     "message": "在此处粘贴真实链接地址来测试上述规则"
   },
   "opt_ph_newurl": {
-    "message": "用于生成新链接地址的规则"
+    "message": "用于生成新链接地址的模板"
   },
   "opt_ph_urlmatch": {
     "message": "用于匹配链接地址的规则"

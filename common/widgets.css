@@ -93,7 +93,7 @@ textarea {
   margin: 0;
   /* Use min-height to accommodate addditional padding for touch as needed. */
   min-height: 2em;
-  padding: 3px;
+  padding: 3px 6px;
   outline: none;
 /* For better alignment between adjacent buttons and inputs. */
   padding-bottom: 4px;
@@ -231,10 +231,12 @@ input:disabled:-webkit-any([type='password'],
          input[type='button'],
          input[type='submit']):not(.custom-appearance):not(.link-button)) {
   /* OVERRIDE */
-  -webkit-transition: border-color 200ms;
+  -webkit-transition: all 200ms;
+  transition: all 200ms;
   /* We use border color because it follows the border radius (unlike outline).
    * This is particularly noticeable on mac. */
-  border-color: rgb(77, 144, 254);
+  border-color: #66afe9;
+  background-color: #fefdd2;
   outline: none;
 }
 

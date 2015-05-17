@@ -97,8 +97,6 @@ define (require)->
     do rules.reverse
     # init section name & description
     $('#fun-name').text $("#nav a[href^=##{cat}]").text()
-    console.log cat
-    console.log utils.i18n "opt_#{cat}_desc"
     $('#fun-desc').text utils.i18n "opt_#{cat}_desc"
 
     hasRule = !!rules.length
@@ -303,18 +301,50 @@ define (require)->
       $('#test-url-btn').click()
       return false
   
+  ###*
+   * Test the custom rule with a real url
+   * if pass return the rule object or nothing
+  ###
   testUrl = ->
-    
+    $protocol = $ '#protocol-c'
+    $host = $ '#host-c'
+    $redirectUrl = $ '#redirect-url-input'
+    $realUrl = $ '#test-url-input'
+    data =
+      protocol: $protocol.val()
+      host: $host.val()
+      redirectUrl: $redirectUrl.val()
+      realUrl: $realUrl.val()
+
+    unless utils.isProtocol data.protocol
+      modal.showTip $protocol, utils.i18n 'opt_errtip_protocol'
+      return
+
+    unless testCustom data.host
+      modal.showTip $host, utils.i18n 'opt_errtip_protocol'
+      return
+
+    unless testCustom data.redirectUrl
+      modal.showTip $redirectUrl, utils.i18n 'opt_errtip_protocol'
+      return
+
+    unless testCustom data.realUrl
+      modal.showTip $realUrl, utils.i18n 'opt_errtip_protocol'
+      return
+  
+    return {
+      # url for chrome webrequest api to match
+      url: ''
+      # url with placeholder to extract the params
+      matchUrl: ''
+      # url template to get the new url
+      redirectUrl: ''
+    }
+
+
   # test url
   $('#test-url-btn').on 'click', (e)->
-    data =
-      protocol: $('#protocol-c').val()
-      host: $('#host-c').val()
-      redirectUrl: $('#redirect-url-input').val()
-      realUrl: $('#test-url-input').val()
-
-    unless data.host
-      modal.showTip $('#pro')
+    do testUrl
 
 
   return {

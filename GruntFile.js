@@ -47,7 +47,8 @@ module.exports = function(grunt) {
         // 设置不压缩的关键字
         mangle: {
           except: ['require']
-        }
+        },
+        preserveComments: false
       },
       min: {
         files: [{

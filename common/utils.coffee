@@ -72,7 +72,7 @@
 
     for v, k in r.params
       res[ v ] = matchs[ k + 1 ] or ''
-    matchs = /^(\w+):\/\/([^/]+)\/?/.exec url
+    matchs = /^(\w+):\/\/([^\/]+)\/?/.exec url
     # keep protocol
     res.p = matchs[1]
     # keep host
@@ -88,10 +88,12 @@
     catch e
       return e.message
 
-  # get a list from redirect to url, eg. http://{sub}.github.com/{name}/{protol}
+  # get a list from redirect to url, eg. http://{sub}.github.com/{%name}/{=protol}
+  # %name mean encodeURIComponent name
+  # =name mean decodeURIComponent name
   getRedirectParamList = (url)->
-    url.match(/\{(\w+)\}/g).map (p)->
-      p.slice 1, -1
+    url.match(/\{([%=\w]+)\}/g).map (p)->
+      p.trim().slice 1, -1
 
   ###*
    * return undefined if no undefined word, or a list contains undefined words
@@ -101,22 +103,43 @@
   ###
   hasUndefinedWord = (refer, url)->
     res = []
+    sample = getRedirectParamList url
     for v in sample
+      unless -1 is ['%', '='].indexOf v.charAt 0
+        v = v.slice 1
       res.push v if -1 is refer.indexOf v
     if res.length
       res
     else
 
   # have reserved word in url pattern
+  # return a reserved words list that has been miss used.
   hasReservedWord = (params)->
     reserved = ['p', 'h', 'm']
+    res = []
     for v in reserved
-      return true unless -1 is params.indexOf v
-    return false
+      unless -1 is params.indexOf(v) and -1 is params.indexOf("%#{v}") and -1 is params.indexOf("=#{v}")
+        res.push v
+    res = res.filter (v, k)->
+      k is res.indexOf v
+    reteurn res if res.length
 
+  # fill a pattern with data
   fillPattern = (pattern, data)->
-    pattern.replace /\{(\w+)\}/g, ($0, $1)->
-      data[ $1 ] or ''
+    pattern.replace /\{([%=\w]+)\}/g, ($0, $1)->
+      # no prefix
+      if -1 is ['%', '='].indexOf $1.charAt 0
+        data[ $1 ] ? ''
+      else
+        prefix = $1.charAt 0
+        v = data[ $1.slice(1) ] ? ''
+        try
+          if prefix is '%'
+            v = encodeURIComponent v
+          else
+            v = decodeURIComponent v
+        catch e
+        v
 
   ###*
    * get target url

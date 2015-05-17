@@ -45,7 +45,7 @@ define (require)->
       setTimeout ->
         $unionCat.addClass 'active'
         return
-      , 50
+      , 100
     else
       pageCtrls[ cat ]?.init cat
     return

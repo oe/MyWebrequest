@@ -97,8 +97,8 @@
     }
   };
   getRedirectParamList = function(url) {
-    return url.match(/\{(\w+)\}/g).map(function(p) {
-      return p.slice(1, -1);
+    return url.match(/\{([%=\w]+)\}/g).map(function(p) {
+      return p.trim().slice(1, -1);
     });
   };
 
@@ -109,10 +109,14 @@
    * @return {Array|undefined}
    */
   hasUndefinedWord = function(refer, url) {
-    var i, len, res, v;
+    var i, len, res, sample, v;
     res = [];
+    sample = getRedirectParamList(url);
     for (i = 0, len = sample.length; i < len; i++) {
       v = sample[i];
+      if (-1 !== ['%', '='].indexOf(v.charAt(0))) {
+        v = v.slice(1);
+      }
       if (-1 === refer.indexOf(v)) {
         res.push(v);
       }
@@ -124,19 +128,41 @@
     }
   };
   hasReservedWord = function(params) {
-    var i, len, reserved, v;
+    var i, len, res, reserved, v;
     reserved = ['p', 'h', 'm'];
+    res = [];
     for (i = 0, len = reserved.length; i < len; i++) {
       v = reserved[i];
-      if (-1 !== params.indexOf(v)) {
-        return true;
+      if (!(-1 === params.indexOf(v) && -1 === params.indexOf("%" + v) && -1 === params.indexOf("=" + v))) {
+        res.push(v);
       }
     }
-    return false;
+    res = res.filter(function(v, k) {
+      return k === res.indexOf(v);
+    });
+    if (res.length) {
+      return reteurn(res);
+    }
   };
   fillPattern = function(pattern, data) {
-    return pattern.replace(/\{(\w+)\}/g, function($0, $1) {
-      return data[$1] || '';
+    return pattern.replace(/\{([%=\w]+)\}/g, function($0, $1) {
+      var e, prefix, ref, ref1, v;
+      if (-1 === ['%', '='].indexOf($1.charAt(0))) {
+        return (ref = data[$1]) != null ? ref : '';
+      } else {
+        prefix = $1.charAt(0);
+        v = (ref1 = data[$1.slice(1)]) != null ? ref1 : '';
+        try {
+          if (prefix === '%') {
+            v = encodeURIComponent(v);
+          } else {
+            v = decodeURIComponent(v);
+          }
+        } catch (_error) {
+          e = _error;
+        }
+        return v;
+      }
     });
   };
 
