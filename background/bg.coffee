@@ -86,7 +86,7 @@ do ->
         notifiId = notifiId or ''
         chrome.notifications.create notifiId,
           type: 'basic'
-          iconUrl: '/img/icon48.png'
+          iconUrl: '/img/icon38.png'
           title: title
           message: content
         , ->
@@ -199,7 +199,6 @@ do ->
           onoff[ k ] = false
           continue
         rule.urls = rule.urls.concat _rule
-
         if k is 'log'
           pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->
             window.open '/options/index.html#log'
@@ -254,31 +253,33 @@ do ->
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
       return
 
-    isOn = utils.getSwitch type
-    rule = rules[ type ]
-    rule.urls = newData
-    if type is 'gsearch'
-      rule.urls = rule.urls.concat gsearchRuleBasic
+    # 如果当前功能未开启
+    return unless utils.getSwitch type
     
-    if isOn
-      if type is 'log'
-        reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
-        reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn
-      else
-        onRequest = onRequests[ type ]
-        reqApi[ onRequest.on ].removeListener onRequest.fn
+    rule = rules[ type ]
+    rule.urls = rule.urls.concat newData if Array.isArray newData
+    if type is 'log'
+      reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
+      reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn
+    else
+      onRequest = onRequests[ type ]
+      reqApi[ onRequest.on ].removeListener onRequest.fn
 
-      if rule.urls.length
-        setTimeout ->
+    if rule.urls.length
+      setTimeout ->
+        if type is 'log'
           onRequest = onRequests['logBody']
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
           onRequest = onRequests['logRequest']
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
-          return
-        , 0
-      else
-        utils.setSwitch type, false
-        
+        else
+          onRequest = onRequests[ type ]
+          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+        return
+      , 0
+    else
+      utils.setSwitch type, false
+
     return
 
   return

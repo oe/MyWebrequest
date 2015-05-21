@@ -114,7 +114,7 @@
         notifiId = notifiId || '';
         chrome.notifications.create(notifiId, {
           type: 'basic',
-          iconUrl: '/img/icon48.png',
+          iconUrl: '/img/icon38.png',
           title: title,
           message: content
         }, function() {});
@@ -278,7 +278,7 @@
     updateExtIcon(utils.getConfig('iconStyle'));
   })();
   window.addEventListener('storage', function(event) {
-    var isOn, j, k, len, method, newData, oldData, onRequest, reqApi, rule, type;
+    var j, k, len, method, newData, oldData, onRequest, reqApi, rule, type;
     type = event.key;
     reqApi = chrome.webRequest;
     newData = JSON.parse(event.newValue || '[]');
@@ -310,30 +310,34 @@
       }
       return;
     }
-    isOn = utils.getSwitch(type);
-    rule = rules[type];
-    rule.urls = newData;
-    if (type === 'gsearch') {
-      rule.urls = rule.urls.concat(gsearchRuleBasic);
+    if (!utils.getSwitch(type)) {
+      return;
     }
-    if (isOn) {
-      if (type === 'log') {
-        reqApi[onRequests['logBody'].on].removeListener(onRequests['logBody'].fn);
-        reqApi[onRequests['logRequest'].on].removeListener(onRequests['logRequest'].fn);
-      } else {
-        onRequest = onRequests[type];
-        reqApi[onRequest.on].removeListener(onRequest.fn);
-      }
-      if (rule.urls.length) {
-        setTimeout(function() {
+    rule = rules[type];
+    if (Array.isArray(newData)) {
+      rule.urls = rule.urls.concat(newData);
+    }
+    if (type === 'log') {
+      reqApi[onRequests['logBody'].on].removeListener(onRequests['logBody'].fn);
+      reqApi[onRequests['logRequest'].on].removeListener(onRequests['logRequest'].fn);
+    } else {
+      onRequest = onRequests[type];
+      reqApi[onRequest.on].removeListener(onRequest.fn);
+    }
+    if (rule.urls.length) {
+      setTimeout(function() {
+        if (type === 'log') {
           onRequest = onRequests['logBody'];
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
           onRequest = onRequests['logRequest'];
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
-        }, 0);
-      } else {
-        utils.setSwitch(type, false);
-      }
+        } else {
+          onRequest = onRequests[type];
+          reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
+        }
+      }, 0);
+    } else {
+      utils.setSwitch(type, false);
     }
   });
 })();
