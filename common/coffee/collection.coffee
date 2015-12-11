@@ -86,6 +86,50 @@
       return
     return
 
+  # get the switch of cat whether has turned on
+  getSwitch = (cat)->
+    onoff = JSON.parse localStorage.getItem('onoff') or '{}'
+    !!onoff[ cat ]
+
+  # set switch of cat to isOn
+  setSwitch = (cat, isOn)->
+    onoff = JSON.parse localStorage.getItem('onoff') or '{}'
+    onoff[ cat ] = !!isOn
+    localStorage.setItem 'onoff', JSON.stringify onoff
+    return
+
+  # get the config of {key}
+  getConfig = (key)->
+    config = JSON.parse localStorage.getItem('config') or '{}'
+    config[ key ]
+
+  # set the config of {key}
+  setConfig = (key, val)->
+    config = JSON.parse localStorage.getItem('config') or '{}'
+    config[ key ] = val
+    localStorage.setItem 'config', JSON.stringify config
+    return
+
+  # get data from localStorage
+  getLocal = (key, expectFormat)->
+    switch expectFormat
+      when 'object', 'o'
+        JSON.parse localStorage.getItem( key ) or '{}'
+      when 'array', 'a'
+        JSON.parse localStorage.getItem( key ) or '[]'
+      else
+        localStorage.getItem key
+
+  # set a data
+  setLocal = (key)->
+    localStorage.setItem key, JSON.stringify val
+    return
+
+  # remove a data
+  removeLocal = (key)->
+    localStorage.removeItem key
+    return
+
   # init collection
   do initCollection
 
@@ -98,5 +142,11 @@
     removeRule  : removeRule
     saveRule    : saveRule
     eachRule    : eachRule
+    getLocal    : getLocal
+    setLocal    : setLocal
+    getSwitch   : getSwitch
+    setSwitch   : setSwitch
+    getConfig   : getConfig
+    setConfig   : setConfig
   }
 )

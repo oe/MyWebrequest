@@ -5,11 +5,14 @@ define (require)->
   tpl = require 'js/tpl'
   vars = require 'js/vars'
 
+  UNION_PAGES = ['block', 'hotlink', 'hsts', 'log', 'custom']
+
   # check a union cat
   # union cat: block, hotlink, hsts, etc these use a common section
   isUnionCat = (cat)->
-    ~['block', 'hotlink', 'hsts', 'log', 'custom'].indexOf (cat or '').replace '#', ''
+    (cat or '').replace('#', '') in UNION_PAGES
 
+  # check whether the host won't disable qr feature
   isSafe4Qr = (cat, host)->
     return true if cat isnt 'block'
     str = host.replace(/\./g, '\\.').replace '*', '.*'
@@ -24,7 +27,7 @@ define (require)->
     $tbody = $ '#request-settings tbody'
     ruleNum = $tbody.find('tr:not([nodata])').length
     $switch = $ '#request-settings .switch-input'
-    switchEnabled = utils.getSwitch cat
+    switchEnabled = collection.getSwitch cat
     
     $switch.prop
       'checked'  : switchEnabled and !!ruleNum
@@ -83,8 +86,7 @@ define (require)->
   
   ###*
    * init section of cat( category )
-   * @param  {[type]} cat [description]
-   * @return {[type]}     [description]
+   * @param  {String} cat
   ###
   initSection = (cat)->
     rules = collection.getRules cat
@@ -105,7 +107,7 @@ define (require)->
       html = tpl.rulesTpl rules
     else
       html = tpl.nodataTpl
-      utils.setSwitch cat, false
+      collection.setSwitch cat, false
     $('#request-settings tbody').html html
     # reset controls
     resetSectionCtrlsState cat
@@ -121,10 +123,11 @@ define (require)->
 
     return
 
-    # union cat switch input
+
+  # union cat switch input
   $('#request-settings .switch-input').on 'change', (e) ->
     cat = $('#request-settings').attr 'data-id'
-    utils.setSwitch cat, @checked
+    collection.setSwitch cat, @checked
     return
 
   # input box [host] on *enter key*
@@ -144,17 +147,16 @@ define (require)->
 
     i = url.indexOf '://'
     url = '*://' + url if i is -1
-    url += '/' unless /\w+\//.test url
 
-    return true unless url.match /^([a-z]+|\*):\/\/([^\/]+)\/(.*)$/g
+    return true unless url.match /^([a-z]+|\*):\/\/([^\/]+)\/(\/.*)?$/g
     # extract regexp results right now or things changed
     protocol = RegExp.$1.toLowerCase()
     host = RegExp.$2
-    path = RegExp.$3
+    path = RegExp.$3 or ''
     return true unless ~['*', 'http', 'https'].indexOf protocol
     $('#protocol').val protocol if not $('#protocol').prop 'disabled'
     $('#host').val host
-    $('#path').val path
+    $('#path').val path.replace /^\//, ''
     return false
 
   # input box [path] on enter key

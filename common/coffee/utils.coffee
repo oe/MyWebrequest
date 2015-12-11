@@ -28,6 +28,7 @@
   isProtocol = (protocol)->
     -1 isnt protocols.indexOf protocol
 
+
   # // http://www.baidu.com/:g-:d/abc
   optionalParam = /\((.*?)\)/g
   namedParam    = /(\(\?)?:\w+/g
@@ -55,6 +56,8 @@
       params: params
     }
 
+  # reg to match protocol, host, path, query
+  urlComponentReg = /^(w+):\/\/([^/]+)\/?([^?]+)?\??(.*)?$/
   ###*
    * get a key-value object from the url which match the pattern
    * @param  {Object} r   {reg: ..., params: ''} from route2reg
@@ -72,13 +75,17 @@
 
     for v, k in r.params
       res[ v ] = matchs[ k + 1 ] or ''
-    matchs = /^(\w+):\/\/([^\/]+)\/?/.exec url
+    matchs = urlComponentReg.exec url
     # keep protocol
     res.p = matchs[1]
     # keep host
     res.h = matchs[2]
     # main domain
     res.m = res.h.split('.').slice(-2).join '.'
+    # path
+    res.r = matchs[3] or ''
+    # query string
+    res.q = matchs[4] or ''
     res
 
   # return undefined if valid or a error message
@@ -112,12 +119,13 @@
       res
     else
 
+  # pre-defined placeholders
+  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q']
   # have reserved word in url pattern
   # return a reserved words list that has been miss used.
   hasReservedWord = (params)->
-    reserved = ['p', 'h', 'm']
     res = []
-    for v in reserved
+    for v in RESERVED_HOLDERS
       unless -1 is params.indexOf(v) and -1 is params.indexOf("%#{v}") and -1 is params.indexOf("=#{v}")
         res.push v
     res = res.filter (v, k)->
@@ -154,56 +162,12 @@
     return '' unless params
     fillPattern pattern, params
 
-  # get the switch of cat whether has turned on
-  getSwitch = (cat)->
-    onoff = JSON.parse localStorage.getItem('onoff') or '{}'
-    !!onoff[ cat ]
-
-  # set switch of cat to isOn
-  setSwitch = (cat, isOn)->
-    onoff = JSON.parse localStorage.getItem('onoff') or '{}'
-    onoff[ cat ] = !!isOn
-    localStorage.setItem 'onoff', JSON.stringify onoff
-    return
-
-  getConfig = (key)->
-    config = JSON.parse localStorage.getItem('config') or '{}'
-    config[ key ]
-
-  setConfig = (key, val)->
-    config = JSON.parse localStorage.getItem('config') or '{}'
-    config[ key ] = val
-    localStorage.setItem 'config', JSON.stringify config
-    return
-
-  # get data from localStorage
-  getLocal = (key, expectFormat)->
-    switch expectFormat
-      when 'object', 'o'
-        JSON.parse localStorage.getItem( key ) or '{}'
-      when 'array', 'a'
-        JSON.parse localStorage.getItem( key ) or '[]'
-      else
-        localStorage.getItem key
-
-  setLocal = (key, val)->
-    if val?
-      localStorage.setItem key, JSON.stringify val
-    else
-      localStorage.removeItem key
-    return
 
   # i18n
   i18n = (msgid)->
     chrome.i18n.getMessage msgid
 
   return {
-    getLocal         : getLocal
-    setLocal         : setLocal
-    getSwitch        : getSwitch
-    setSwitch        : setSwitch
-    getConfig        : getConfig
-    setConfig        : setConfig
     isIp             : isIp
     isHost           : isHost
     isPath           : isPath

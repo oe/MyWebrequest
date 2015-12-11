@@ -19,11 +19,13 @@ define (require)->
   .get()
 
 
-  # check a setting section cat
+  ###*
+   * check a setting section cat
+   * @param  {String}  cat cat name
+   * @return {Boolean}
+  ###
   isPageCat = (cat)->
-    ~pageIds.indexOf (cat or '').replace '#', ''
-
-  
+    (cat or '').replace('#', '') in pageIds
 
 
   
