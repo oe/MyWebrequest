@@ -35,11 +35,8 @@ do ->
 
   # 获取URL的queryString
   getQueryString = (url) ->
-    anchor = document.createElement 'a'
-    anchor.href = url
-    qstr = anchor.search
-    anchor = null
-    qstr
+    /(\?.+)$/.exec url
+    RegExp.$1 or ''
 
   # 格式化query string
   formatQstr = (url) ->
@@ -186,14 +183,14 @@ do ->
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
   do ->
-    onoff = utils.getLocal 'onoff', 'o'
+    onoff = collection.getLocal 'onoff', 'o'
     
     reqApi = chrome.webRequest
     onRequest = null
     # 启用各个特性
     for k in RULES_TYPE
       if onoff[ k ]
-        _rule = utils.getLocal k, 'a'
+        _rule = collection.getLocal k, 'a'
         rule = rules[ k ]
         unless rule.urls.length or _rule.length
           onoff[ k ] = false
@@ -215,10 +212,10 @@ do ->
         onoff[ k ] = false
 
     # 保存规则
-    utils.setLocal 'onoff', onoff
+    collection.setLocal 'onoff', onoff
 
     # 修改浏览器默认图标
-    updateExtIcon utils.getConfig 'iconStyle'
+    updateExtIcon collection.getConfig 'iconStyle'
     return
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
@@ -242,7 +239,7 @@ do ->
         if newData[ k ] isnt oldData[ k ]
           method = if newData[ k ] then 'addListener' else 'removeListener'
           rule = rules[ k ]
-          rule.urls = rules[ k ].urls.concat utils.getLocal k, 'a'
+          rule.urls = rules[ k ].urls.concat collection.getLocal k, 'a'
           if k is 'log'
             onRequest = onRequests['logBody']
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
@@ -254,7 +251,7 @@ do ->
       return
 
     # 如果当前功能未开启
-    return unless utils.getSwitch type
+    return unless collection.getSwitch type
     
     rule = rules[ type ]
     rule.urls = rule.urls.concat newData if Array.isArray newData
@@ -278,7 +275,7 @@ do ->
         return
       , 0
     else
-      utils.setSwitch type, false
+      collection.setSwitch type, false
 
     return
 

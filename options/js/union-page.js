@@ -2,9 +2,9 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var UNION_PAGES, addRule, collection, initSection, isSafe4Qr, isUnionCat, modal, removeRule, resetSectionCtrlsState, testUrl, tpl, utils, vars;
-  utils = require('common/utils');
-  collection = require('common/collection');
+  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isSafe4Qr, isUnionCat, modal, removeRule, resetSectionCtrlsState, tpl, utils, vars;
+  utils = require('common/js/utils');
+  collection = require('common/js/collection');
   modal = require('js/component');
   tpl = require('js/tpl');
   vars = require('js/vars');
@@ -127,29 +127,16 @@ define(function(require) {
     }
   });
   $('#host').on('paste', function(e) {
-    var host, i, path, protocol, url;
-    url = e.originalEvent.clipboardData.getData('text/plain');
-    if (!url) {
-      return true;
-    }
-    i = url.indexOf('://');
-    if (i === -1) {
-      url = '*://' + url;
-    }
-    if (!url.match(/^([a-z]+|\*):\/\/([^\/]+)\/(\/.*)?$/g)) {
-      return true;
-    }
-    protocol = RegExp.$1.toLowerCase();
-    host = RegExp.$2;
-    path = RegExp.$3 || '';
-    if (!~['*', 'http', 'https'].indexOf(protocol)) {
+    var url;
+    url = utils.getUrlFromClipboard(e);
+    if (!(url.protocol && utils.isProtocol(url.protocol))) {
       return true;
     }
     if (!$('#protocol').prop('disabled')) {
-      $('#protocol').val(protocol);
+      $('#protocol').val(url.protocol);
     }
-    $('#host').val(host);
-    $('#path').val(path.replace(/^\//, ''));
+    $('#host').val(url.host);
+    $('#path').val(url.path.replace(/^\//, ''));
     return false;
   });
   $('#path').on('keyup', function(e) {
@@ -263,27 +250,15 @@ define(function(require) {
     }
   });
   $('#host-c').on('paste', function(e) {
-    var host, i, protocol, url;
-    url = e.originalEvent.clipboardData.getData('text/plain');
-    if (!url) {
-      return true;
-    }
-    i = url.indexOf('://');
-    if (i === -1) {
-      url = '*://' + url;
-    }
-    if (!url.match(/^([a-z]+|\*):\/\/(.*)$/g)) {
-      return true;
-    }
-    protocol = RegExp.$1.toLowerCase();
-    host = RegExp.$2;
-    if (!~['*', 'http', 'https'].indexOf(protocol)) {
+    var url;
+    url = utils.getUrlFromClipboard(e);
+    if (!(url.protocol && utils.isProtocol(url.protocol))) {
       return true;
     }
     if (!$('#protocol').prop('disabled')) {
-      $('#protocol-c').val(protocol);
+      $('#protocol-c').val(url.protocol);
     }
-    $('#host-c').val(host);
+    $('#host-c').val("" + url.host + url.path);
     return false;
   });
   $('#host-c').on('keyup', function(e) {
@@ -309,7 +284,7 @@ define(function(require) {
    * Test the custom rule with a real url
    * if pass return the rule object or nothing
    */
-  testUrl = function() {
+  checkCustomRule = function() {
     var $host, $protocol, $realUrl, $redirectUrl, data;
     $protocol = $('#protocol-c');
     $host = $('#host-c');
@@ -344,7 +319,7 @@ define(function(require) {
     };
   };
   $('#test-url-btn').on('click', function(e) {
-    return testUrl();
+    return checkCustomRule();
   });
   return {
     init: initSection,

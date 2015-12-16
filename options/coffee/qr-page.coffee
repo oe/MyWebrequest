@@ -1,7 +1,8 @@
 define (require)->
   modal = require 'js/component'
-  utils = require 'common/utils'
-  QRAPIURL = 'http://api.qrserver.com/v1/create-qr-code/?size=200x200&data=%s'
+  utils = require 'common/js/utils'
+  vars = require 'js/vars'
+  QRAPIURL = vars.QR_API_URL
 
   init = (cat)->
     setTimeout ->

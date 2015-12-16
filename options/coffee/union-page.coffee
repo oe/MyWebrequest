@@ -1,6 +1,6 @@
 define (require)->
-  utils = require 'common/utils'
-  collection = require 'common/collection'
+  utils = require 'common/js/utils'
+  collection = require 'common/js/collection'
   modal = require 'js/component'
   tpl = require 'js/tpl'
   vars = require 'js/vars'
@@ -142,21 +142,11 @@ define (require)->
 
   # paste string to [host] input box
   $('#host').on 'paste', (e) ->
-    url = e.originalEvent.clipboardData.getData 'text/plain'
-    return true unless url
-
-    i = url.indexOf '://'
-    url = '*://' + url if i is -1
-
-    return true unless url.match /^([a-z]+|\*):\/\/([^\/]+)\/(\/.*)?$/g
-    # extract regexp results right now or things changed
-    protocol = RegExp.$1.toLowerCase()
-    host = RegExp.$2
-    path = RegExp.$3 or ''
-    return true unless ~['*', 'http', 'https'].indexOf protocol
-    $('#protocol').val protocol if not $('#protocol').prop 'disabled'
-    $('#host').val host
-    $('#path').val path.replace /^\//, ''
+    url = utils.getUrlFromClipboard e
+    return true unless url.protocol and utils.isProtocol url.protocol
+    $('#protocol').val url.protocol if not $('#protocol').prop 'disabled'
+    $('#host').val url.host
+    $('#path').val url.path.replace /^\//, ''
     return false
 
   # input box [path] on enter key
@@ -273,19 +263,10 @@ define (require)->
 
   # paste string to [custom host] input box
   $('#host-c').on 'paste', (e) ->
-    url = e.originalEvent.clipboardData.getData 'text/plain'
-    return true unless url
-
-    i = url.indexOf '://'
-    url = '*://' + url if i is -1
-
-    return true unless url.match /^([a-z]+|\*):\/\/(.*)$/g
-    # extract regexp results right now or things changed
-    protocol = RegExp.$1.toLowerCase()
-    host = RegExp.$2
-    return true unless ~['*', 'http', 'https'].indexOf protocol
-    $('#protocol-c').val protocol if not $('#protocol').prop 'disabled'
-    $('#host-c').val host
+    url = utils.getUrlFromClipboard e
+    return true unless url.protocol and utils.isProtocol url.protocol
+    $('#protocol-c').val url.protocol if not $('#protocol').prop 'disabled'
+    $('#host-c').val "#{url.host}#{url.path}"
     return false
 
   $('#host-c').on 'keyup', (e)->
@@ -307,7 +288,7 @@ define (require)->
    * Test the custom rule with a real url
    * if pass return the rule object or nothing
   ###
-  testUrl = ->
+  checkCustomRule = ->
     $protocol = $ '#protocol-c'
     $host = $ '#host-c'
     $redirectUrl = $ '#redirect-url-input'
@@ -346,7 +327,7 @@ define (require)->
 
   # test url
   $('#test-url-btn').on 'click', (e)->
-    do testUrl
+    do checkCustomRule
 
 
   return {

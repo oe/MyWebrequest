@@ -262,7 +262,16 @@
   },
   "opt_extstg_icon_grey": {
     "message": "灰色"
-  }, 
+  },
+  "opt_extstg_data": {
+    "message": "扩展数据的备份及恢复"
+  },
+  "opt_extstg_bkp": {
+    "message": "备份"
+  },
+  "opt_extstg_rstr": {
+    "message": "恢复"
+  },
   "opt_help_desc": {
     "message": "有些事你应当知道"
   },

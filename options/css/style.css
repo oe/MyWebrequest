@@ -214,6 +214,10 @@ code {
 	font-size: 18px;
 }
 
+.setting-content .item-content + .item-title {
+	margin-top: 10px;
+}
+
 .setting-content .item-title .rule-cunt {
 	display: inline;
 	font-size: 0.8em;

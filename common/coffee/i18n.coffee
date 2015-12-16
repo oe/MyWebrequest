@@ -1,3 +1,6 @@
+###*
+ * auto i18n the web page
+###
 do (window) ->
   slice = Array.prototype.slice
 
@@ -11,7 +14,8 @@ do (window) ->
   elms = slice.call elms
 
   elms.forEach (elm) ->
-    elm.innerHTML = chrome.i18n.getMessage( elm.getAttribute 'i18n-content') or 'Error:No Message'
+    if msgId = elm.getAttribute 'i18n-content'
+      elm.innerHTML = chrome.i18n.getMessage( msgId ) or 'Error:No Message'
     return
   
   elms = document.querySelectorAll '[i18n-value]'

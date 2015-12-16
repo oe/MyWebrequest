@@ -262,7 +262,16 @@
   },
   "opt_extstg_icon_grey": {
     "message": "Grey"
-  },  
+  },
+  "opt_extstg_data": {
+    "message": "Data Backup / Restore"
+  },
+  "opt_extstg_bkp": {
+    "message": "Backup"
+  },
+  "opt_extstg_rstr": {
+    "message": "Restore"
+  },
   "opt_help_desc": {
     "message": "There must be something U need to know"
   },

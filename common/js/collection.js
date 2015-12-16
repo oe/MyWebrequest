@@ -122,7 +122,7 @@
         return localStorage.getItem(key);
     }
   };
-  setLocal = function(key) {
+  setLocal = function(key, val) {
     localStorage.setItem(key, JSON.stringify(val));
   };
   removeLocal = function(key) {

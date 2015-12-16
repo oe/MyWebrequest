@@ -1,11 +1,12 @@
 define (require)->
 
-  utils = require 'common/utils'
+  utils = require 'common/js/utils'
+  collection = require 'common/js/collection'
   modal = require 'js/component'
   
   # init utility page
   init = (cat)->
-    onoff = utils.getLocal 'onoff', 'o'
+    onoff = collection.getLocal 'onoff', 'o'
     $('#switch-google').prop 'checked', !!onoff.gsearch
     $('#switch-gstatic').prop 'checked', !!onoff.gstatic
     updateGhostText do getCustomFavorGsearch
@@ -16,15 +17,15 @@ define (require)->
     return
 
   getCustomFavorGsearch = ->
-    host = utils.getLocal 'gsearch', 'a'
+    host = collection.getLocal 'gsearch', 'a'
     host = if host then host[0] or '' else ''
     host.slice 4, -5
 
   $('#switch-google').on 'change', ->
-    utils.setSwitch 'gsearch', !!this.checked
+    collection.setSwitch 'gsearch', !!this.checked
     return
   $('#switch-gstatic').on 'change', ->
-    utils.setSwitch 'gstatic', !!this.checked
+    collection.setSwitch 'gstatic', !!this.checked
     return
 
   # press ok on the google domain edit dialog
@@ -49,7 +50,7 @@ define (require)->
   $('#input-dialog-wrapper .js-btn-ok').on 'click', ->
     host = $.trim do $('#preferred-google').val
     if host is ''
-      utils.setLocal 'gsearch'
+      collection.setLocal 'gsearch', []
       updateGhostText ''
       modal.hideDlg '#input-dialog-wrapper'
       return
@@ -64,8 +65,8 @@ define (require)->
         host = "www.#{host}"
 
       updateGhostText host
-        
-      utils.setLocal 'gsearch', [ "*://#{host}/url*" ]
+
+      collection.setLocal 'gsearch', [ "*://#{host}/url*" ]
       modal.hideDlg '#input-dialog-wrapper'
     else
       modal.showTip $('#preferred-google'), utils.i18n 'opt_errtip_host'
