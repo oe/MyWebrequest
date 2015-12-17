@@ -28,53 +28,148 @@
   isProtocol = (protocol)->
     protocol in protocols
 
+  ###*
+   * get i18n text
+   * @param  {String} msgid text label id
+   * @return {String}
+  ###
+  i18n = (msgid)->
+    chrome.i18n.getMessage msgid
 
-  # // http://www.baidu.com/:g-:d/abc
-  optionalParam = /\((.*?)\)/g
-  namedParam    = /(\(\?)?:\w+/g
-  splatParam    = /\*\w+/g
+  ###*
+   * get object's values into an array
+   * @param  {Object} o
+   * @return {Array}
+  ###
+  getObjVals = (o)->
+    res = []
+    for own k, v of o
+      res.push v
+    res
+  
+  ###*
+   * GET url info url the clipboard, returns {protocol, host, path}
+   * @param  {Event} e  paste event
+   * @return {Object}
+  ###
+  getUrlFromClipboard = (e)->
+    result = {}
+    url = e.originalEvent.clipboardData.getData 'text/plain'
+    return result unless url
+
+    i = url.indexOf '://'
+    url = '*://' + url if i is -1
+
+    return result unless url.match /^([a-z]+|\*):\/\/([^\/]+)(\/.*)?$/i
+    # extract regexp results right now or things changed
+    result.protocol = RegExp.$1.toLowerCase()
+    result.host = RegExp.$2
+    result.path = RegExp.$3
+    result
+
+  ###*
+   * parse a query string into a key-value object
+   * @param  {String} qs
+   * @return {Object}
+  ###
+  parseQs = (url)->
+    params = {}
+    url
+    .replace /^[^?]+\?/, ''
+    .replace /#[^#]*/, ''
+    .split '&'
+    .forEach (el)->
+      parts = el.split '='
+      parts[1] = parts[1] ? ''
+      try
+        params[ decodeURIComponent(parts[0]) ] = decodeURIComponent( parts[1] )
+      catch e
+        params[ parts[0] ] = parts[1]
+    params
+  
+  # get keywords list(array) in route object
+  getKwdsInRoute = (router)->
+    [].concat router.params, getObjVals route.qsParams
+
+
+  # // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
+  # // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
+  # optionalParam = /\((.*?)\)/g
+  namedParam    = /\{(\(\?)?(\w+)\}/g
+  splatParam    = /\{(\*\w+)\}/g
   escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
-
+  queryStrReg   = /([\w%\[\]]+)=\{([\w]+)\}/g
   ###*
    * convert a url pattern to a regexp
    * @param  {String} route url pattern
    * @return {Object}
    *                 {
    *                    reg: regexp string can match an url
-   *                    params: var name of each named param
+   *                    hasQs: has named params in query string
+   *                    params: two array of var name of each named param in path an querystring
    *                 }
   ###
   route2reg = (route)->
+    result = {}
+    parts = route.split '?'
+    # route contains more than one ?
+    if parts.length > 2 then return result
+    result.hasQs = parts.length is 2
     params = []
-    route = route.replace escapeRegExp, '\\$&'
-    .replace optionalParam, '(?:$1)?'
-    .replace namedParam, (match, optional)->
-      params.push match.replace /^[^:]*?:/, ''
-      if optional then match else '([^/?]+)'
-    .replace splatParam, (match)->
-      params.push match.replace /^[^*]*?\*/, ''
+    
+    # hand named params in path
+    part = parts[0].replace escapeRegExp, '\\$&'
+    # .replace optionalParam, '(?:$1)?'
+    .replace namedParam, (match, $1, $2)->
+      params.push $2
+      if $1 then match else '([^/?]+)'
+    .replace splatParam, (match, $1)->
+      params.push $1
       '([^?]*?)'
-    reg = '^' + route + '(?:\\?([\\s\\S]*))?$'
-    {
-      reg: reg
-      params: params
-    }
+    reg = '^' + part + '(?:\\?([\\s\\S]*))?$'
+    result.reg = reg
+    result.params = params
+
+    # hand named params in query string
+    params = {}
+    if result.hasQs
+      parts[1].replace queryStrReg, ($0, $1, $2)->
+        try
+          $1 = decodeURIComponent $1
+        catch e
+        params[ $1 ] = $2
+    result.qsParams = params
+    result.hasQs = !!Object.keys(params).length
+    result
+
+  # pre-defined placeholders
+  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q']
+  # have reserved word in url pattern
+  # return a reserved words list that has been miss used.
+  hasReservedWord = (router)->
+    params = getKwdsInRoute router
+    res = []
+    for v in RESERVED_HOLDERS
+      if v in params or "%#{v}" in params or "=#{v}" in params
+        res.push v
+    # remove duplicated names
+    res = res.filter (v, k)->
+      k isnt res.indexOf v
+    return res if res.length
 
   ###*
-   * check the route
+   * check the whether router's keywords are unique
    * return undefined if valid
-   * return false params is empty
    * return an array of duplicated names if found in params
    * @param  {Object}  res result returned by route2reg
    * @return {Boolean|Array|undefined}
   ###
-  isRouteValid = (res)->
-    params = res.params
-    return false unless params.length
+  isKwdsUniq = (router)->
+    params = getKwdsInRoute router
+    res = []
     res = params.filter (v, k)-> k isnt params.indexOf v
     if res.length
       res
-    
 
 
   # reg to match protocol, host, path, query
@@ -85,17 +180,23 @@
    * @param  {String} url a real url that match that pattern
    * @return {Object}
   ###
-  getUrlParam = (r, url)->
+  getUrlValues = (r, url)->
     res = {}
     try
       matchs = (new RegExp(r.reg)).exec url
     catch e
       matchs = ''
-
     return null unless matchs
-
+    # get path values
     for v, k in r.params
       res[ v ] = matchs[ k + 1 ] or ''
+
+    # get query string values
+    if r.hasQs
+      qsParams = parseQs url
+      for v, k in r.qsParams
+        res[ v ] = qsParams[ k ] or ''
+
     matchs = urlComponentReg.exec url
     # keep protocol
     res.p = RegExp.$1
@@ -121,53 +222,40 @@
   # %name mean encodeURIComponent name
   # =name mean decodeURIComponent name
   getRedirectParamList = (url)->
-    url.match(/\{([%=]?[\w]+)\}/g).map (v)-> v.slice 1, -1
+    url.match(/\{([\w]+)\}/g).map (v)-> v.slice 1, -1
 
   ###*
    * return undefined if no undefined word, or a list contains undefined words
-   * @param  {Object}  refer a defined word list
+   * @param  {Object}  router a defined word list
    * @param  {String}  url   a url pattern that use words in refer
    * @return {Array|undefined}
   ###
-  hasUndefinedWord = (refer, url)->
+  hasUndefinedWord = (router, url)->
+    params = getKwdsInRoute router
     res = []
     sample = getRedirectParamList url
     for v in sample
-      if v.charAt(0) in ['%', '=']
-        v = v.slice 1
-      res.push v if v not in refer
+      res.push v if v not in params
     if res.length
       res
 
-  # pre-defined placeholders
-  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q']
-  # have reserved word in url pattern
-  # return a reserved words list that has been miss used.
-  hasReservedWord = (params)->
-    res = []
-    for v in RESERVED_HOLDERS
-      if v in params or "%#{v}" in params or "=#{v}" in params
-        res.push v
-    # remove duplicated names
-    res = res.filter (v, k)->
-      k isnt res.indexOf v
-    return res if res.length
 
   # fill a pattern with data
   fillPattern = (pattern, data)->
-    pattern.replace /\{([%=]?)([\w]+)\}/g, ($0, $1, $2)->
-      # no prefix
-      unless $1
-        data[ $2 ] ? ''
-      else
-        v = data[ $2 ] ? ''
-        try
-          if $1 is '%'
-            v = encodeURIComponent v
-          else
-            v = decodeURIComponent v
-        catch e
-        v
+    i = pattern.indexOf '?'
+    path = pattern
+    qs = ''
+    if i isnt -1
+      path = pattern.substr 0, i
+      qs = pattern.substr i
+    
+    path.replace /\{(\w+)\}/g, ($0, $1)->
+      val = data[ $2 ] ? ''
+      encodeURIComponent val
+    qs = qs and qs.replace /\{(\w+)\}/g, ($0, $1)->
+      val = data[ $2 ] ? ''
+      encodeURIComponent(val).replace '%20', '+'
+    path + qs
 
   ###*
    * get target url
@@ -178,38 +266,11 @@
   ###
   getTargetUrl = (route, pattern, url)->
     r = route2reg route
-    params = getUrlParam r, url
+    params = getUrlValues r, url
     return '' unless params
     fillPattern pattern, params
 
 
-  ###*
-   * get i18n text
-   * @param  {String} msgid text label id
-   * @return {String}
-  ###
-  i18n = (msgid)->
-    chrome.i18n.getMessage msgid
-
-  ###*
-   * GET url info url the clipboard, returns {protocol, host, path}
-   * @param  {Event} e  paste event
-   * @return {Object}
-  ###
-  getUrlFromClipboard = (e)->
-    result = {}
-    url = e.originalEvent.clipboardData.getData 'text/plain'
-    return result unless url
-
-    i = url.indexOf '://'
-    url = '*://' + url if i is -1
-
-    return result unless url.match /^([a-z]+|\*):\/\/([^\/]+)(\/.*)?$/i
-    # extract regexp results right now or things changed
-    result.protocol = RegExp.$1.toLowerCase()
-    result.host = RegExp.$2
-    result.path = RegExp.$3
-    result
 
   return {
     isIp                : isIp
@@ -218,7 +279,7 @@
     isProtocol          : isProtocol
     i18n                : i18n
     route2reg           : route2reg
-    getUrlParam         : getUrlParam
+    getUrlValues         : getUrlValues
     isRegValid          : isRegValid
     hasUndefinedWord    : hasUndefinedWord
     hasReservedWord     : hasReservedWord
