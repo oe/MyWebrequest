@@ -30,44 +30,28 @@ do ->
     else
       obj = {}
       for val, key of o
-        obj[ val ] = if key instanceof Object then cloneObj key else key
+        obj[ val ] = if key instanceof Object then cloneObj(key) else key
       obj
 
-  # 获取URL的queryString
-  getQueryString = (url) ->
-    /(\?.+)$/.exec url
-    RegExp.$1 or ''
 
-  # 格式化query string
+  # format query string
   formatQstr = (url) ->
-    qstr = getQueryString url
-    qstr = if qstr then qstr.replace /^\?/, ''
-    if !qstr then return false
-    arr = qstr.split '&'
+    qs = utils.getQs url
+    params = utils.parseQs url
+    return false unless qs
+
     result = {}
-    try
-      for i in arr
-        pair = i.split '='
-        key = decodeURIComponent pair[0]
-        val = if pair[1] is undefined then '' else decodeURIComponent pair[1]
-        if result[ key ] is undefined
-          result[ key ] = val
-        else
-          if Array.isArray result[ key ]
-            result[ key ].push val
-          else
-            result[ key ] = [ result[ key ] ]
-            result[ key ].push val
-      {
-        formatedData: result
-        rawData: qstr
-      }
-    catch e
-      if e instanceof URIError
-        result.error = 'The query string is not encoded with utf-8, this can\'t be decoded by now.'
-      else
-        result.error = e.message
-      result
+    for own k, v of params
+      if Array.isArray v
+        # remove the [] suffix in array key name for readability
+        k = k.replace /[]$/, ''
+      result[ k ] = v
+
+    {
+      formatedData: result
+      rawData: qstr
+    }
+
 
   # 格式化http headers
   formatHeaders = (headers) ->

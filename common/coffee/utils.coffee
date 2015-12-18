@@ -67,29 +67,106 @@
     result.path = RegExp.$3
     result
 
+  # 获取URL的queryString
+  getQs = (url) ->
+    "#{url}"
+    .replace /^[^?]+\?/, ''
+    .replace /#[^#]*/, ''
+
+
   ###*
    * parse a query string into a key-value object
    * @param  {String} qs
    * @return {Object}
   ###
-  parseQs = (url)->
+  parseQs = (qs)->
     params = {}
-    url
-    .replace /^[^?]+\?/, ''
-    .replace /#[^#]*/, ''
+    canDecode = true
+    qs
     .split '&'
     .forEach (el)->
       parts = el.split '='
-      parts[1] = parts[1] ? ''
-      try
-        params[ decodeURIComponent(parts[0]) ] = decodeURIComponent( parts[1] )
-      catch e
-        params[ parts[0] ] = parts[1]
+      k = parts[0]
+      v = parts[1] ? ''
+      if canDecode
+        try
+          k = decodeURIComponent k
+          v = decodeURIComponent v
+        catch e
+          canDecode = false
+      # combine array query param into an real array
+      if params[ k ]?
+        if not Array.isArray params[ k ]
+          params[ k ] = [ params[ k ] ]
+        params[ k ].push v
+
+      else
+        params[ k ] = v
+    
     params
+
+  ###*
+   * convert key-val into an querysting: encode(key)=encode(val)
+   * if val is an array, there will be an auto conversion
+   * @param  {String} key
+   * @param  {String|Array} val
+   * @return {String}
+  ###
+  toQueryString = (key, val)->
+    if Array.isArray val
+      try
+        key = decodeURIComponent key
+        key = key.replace(/[]$/, '') + '[]'
+        key = encodeURIComponent(key).replace '%20', '+'
+      catch e
+      "#{key}" + val.map (el)->
+        encodeURIComponent(el).replace '%20', '+'
+      .join "&#{key}="
+    else
+      val = encodeURIComponent(val).replace '%20', '+'
+      "#{key}=#{val}"
+    
+    
   
   # get keywords list(array) in route object
   getKwdsInRoute = (router)->
     [].concat router.params, getObjVals route.qsParams
+
+  ###*
+   * is route string valid
+   * return false if invalid
+   * validate string like {abc}.user.com/{hous}/d.html?hah
+   * @param  {String}  route
+   * @return {Boolean}
+  ###
+  isRouterStrValid = (route)->
+    i = route.indexOf '?'
+    path = route
+    qs = ''
+    if i isnt -1
+      path = route.substr 0, i
+      qs = route.substr i
+    # path basic format
+    return false unless /^(\{\w+\})*\(.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
+    # {*named} should only used in the end of the path
+    return false if /(\{\*\w+\}).+$/.test path
+    if qs
+      # query string basic format
+      return false unless /^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test qs
+      # /\{\*\w+\}/  for {*named}, not allowed
+      # /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
+      # /\{\w+\}(?!&|$)/ for letter followed not & or eof
+      return false if /\{\*\w+\}/.test(qs) or /[?&]\{\w+\}/.test(qs) or /\{\w+\}(?!&|$)/.test qs
+    
+    n = route.replace /\{\*?\w+\}/g, 'xxx'
+    host = n
+    path = ''
+    i = n.indexOf '/'
+    if i isnt -1
+      host = n.substr 0, i
+      path = n.substr i
+    return false unless isHost(host) or isIp(host)
+    return false unless not path or isPath(path)
 
 
   # // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
@@ -98,7 +175,7 @@
   namedParam    = /\{(\(\?)?(\w+)\}/g
   splatParam    = /\{(\*\w+)\}/g
   escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
-  queryStrReg   = /([\w%\[\]]+)=\{([\w]+)\}/g
+  queryStrReg   = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g
   ###*
    * convert a url pattern to a regexp
    * @param  {String} route url pattern
@@ -116,7 +193,7 @@
     if parts.length > 2 then return result
     result.hasQs = parts.length is 2
     params = []
-    
+
     # hand named params in path
     part = parts[0].replace escapeRegExp, '\\$&'
     # .replace optionalParam, '(?:$1)?'
@@ -250,11 +327,12 @@
       qs = pattern.substr i
     
     path.replace /\{(\w+)\}/g, ($0, $1)->
+      val = data[ $1 ] ? ''
+      # / in val, like abc/bdc, won't be encoded
+      if ~val.indexOf('/') then val else encodeURIComponent val
+    qs = qs and qs.replace /([\w\%+]+)=\{(\w+)\}/g, ($0, $1, $2)->
       val = data[ $2 ] ? ''
-      encodeURIComponent val
-    qs = qs and qs.replace /\{(\w+)\}/g, ($0, $1)->
-      val = data[ $2 ] ? ''
-      encodeURIComponent(val).replace '%20', '+'
+      toQueryString $1, val
     path + qs
 
   ###*
@@ -278,8 +356,10 @@
     isPath              : isPath
     isProtocol          : isProtocol
     i18n                : i18n
+    getQs               : getQs
+    parseQs             : parseQs
     route2reg           : route2reg
-    getUrlValues         : getUrlValues
+    getUrlValues        : getUrlValues
     isRegValid          : isRegValid
     hasUndefinedWord    : hasUndefinedWord
     hasReservedWord     : hasReservedWord

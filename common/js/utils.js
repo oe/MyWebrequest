@@ -13,7 +13,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.utils = factory(root);
   }
 })(this, function(root) {
-  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getRedirectParamList, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRegValid, namedParam, parseQs, pathReg, protocols, queryStrReg, route2reg, splatParam, urlComponentReg;
+  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRegValid, isRouterStrValid, namedParam, parseQs, pathReg, protocols, queryStrReg, route2reg, splatParam, toQueryString, urlComponentReg;
   ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
   isIp = function(ip) {
     return ipReg.test(ip);
@@ -80,35 +80,123 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result.path = RegExp.$3;
     return result;
   };
+  getQs = function(url) {
+    return ("" + url).replace(/^[^?]+\?/, '').replace(/#[^#]*/, '');
+  };
 
   /**
    * parse a query string into a key-value object
    * @param  {String} qs
    * @return {Object}
    */
-  parseQs = function(url) {
-    var params;
+  parseQs = function(qs) {
+    var canDecode, params;
     params = {};
-    url.replace(/^[^?]+\?/, '').replace(/#[^#]*/, '').split('&').forEach(function(el) {
-      var e, error, parts, ref;
+    canDecode = true;
+    qs.split('&').forEach(function(el) {
+      var e, error, k, parts, ref, v;
       parts = el.split('=');
-      parts[1] = (ref = parts[1]) != null ? ref : '';
-      try {
-        return params[decodeURIComponent(parts[0])] = decodeURIComponent(parts[1]);
-      } catch (error) {
-        e = error;
-        return params[parts[0]] = parts[1];
+      k = parts[0];
+      v = (ref = parts[1]) != null ? ref : '';
+      if (canDecode) {
+        try {
+          k = decodeURIComponent(k);
+          v = decodeURIComponent(v);
+        } catch (error) {
+          e = error;
+          canDecode = false;
+        }
+      }
+      if (params[k] != null) {
+        if (!Array.isArray(params[k])) {
+          params[k] = [params[k]];
+        }
+        return params[k].push(v);
+      } else {
+        return params[k] = v;
       }
     });
     return params;
   };
+
+  /**
+   * convert key-val into an querysting: encode(key)=encode(val)
+   * if val is an array, there will be an auto conversion
+   * @param  {String} key
+   * @param  {String|Array} val
+   * @return {String}
+   */
+  toQueryString = function(key, val) {
+    var e, error;
+    if (Array.isArray(val)) {
+      try {
+        key = decodeURIComponent(key);
+        key = key.replace(/[]$/, '') + '[]';
+        key = encodeURIComponent(key).replace('%20', '+');
+      } catch (error) {
+        e = error;
+      }
+      return ("" + key) + val.map(function(el) {
+        return encodeURIComponent(el).replace('%20', '+');
+      }).join("&" + key + "=");
+    } else {
+      val = encodeURIComponent(val).replace('%20', '+');
+      return key + "=" + val;
+    }
+  };
   getKwdsInRoute = function(router) {
     return [].concat(router.params, getObjVals(route.qsParams));
+  };
+
+  /**
+   * is route string valid
+   * return false if invalid
+   * validate string like {abc}.user.com/{hous}/d.html?hah
+   * @param  {String}  route
+   * @return {Boolean}
+   */
+  isRouterStrValid = function(route) {
+    var host, i, n, path, qs;
+    i = route.indexOf('?');
+    path = route;
+    qs = '';
+    if (i !== -1) {
+      path = route.substr(0, i);
+      qs = route.substr(i);
+    }
+    if (!/^(\{\w+\})*\(.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
+      return false;
+    }
+    if (/(\{\*\w+\}).+$/.test(path)) {
+      return false;
+    }
+    if (qs) {
+      if (!/^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test(qs)) {
+        return false;
+      }
+      if (/\{\*\w+\}/.test(qs) || /[?&]\{\w+\}/.test(qs) || /\{\w+\}(?!&|$)/.test(qs)) {
+        return false;
+      }
+    }
+    n = route.replace(/\{\*?\w+\}/g, 'xxx');
+    host = n;
+    path = '';
+    i = n.indexOf('/');
+    if (i !== -1) {
+      host = n.substr(0, i);
+      path = n.substr(i);
+    }
+    if (!(isHost(host) || isIp(host))) {
+      return false;
+    }
+    if (!(!path || isPath(path))) {
+      return false;
+    }
   };
   namedParam = /\{(\(\?)?(\w+)\}/g;
   splatParam = /\{(\*\w+)\}/g;
   escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
-  queryStrReg = /([\w%\[\]]+)=\{([\w]+)\}/g;
+  queryStrReg = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g;
 
   /**
    * convert a url pattern to a regexp
@@ -284,13 +372,17 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     }
     path.replace(/\{(\w+)\}/g, function($0, $1) {
       var ref, val;
-      val = (ref = data[$2]) != null ? ref : '';
-      return encodeURIComponent(val);
+      val = (ref = data[$1]) != null ? ref : '';
+      if (~val.indexOf('/')) {
+        return val;
+      } else {
+        return encodeURIComponent(val);
+      }
     });
-    qs = qs && qs.replace(/\{(\w+)\}/g, function($0, $1) {
+    qs = qs && qs.replace(/([\w\%+]+)=\{(\w+)\}/g, function($0, $1, $2) {
       var ref, val;
       val = (ref = data[$2]) != null ? ref : '';
-      return encodeURIComponent(val).replace('%20', '+');
+      return toQueryString($1, val);
     });
     return path + qs;
   };
@@ -317,6 +409,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     isPath: isPath,
     isProtocol: isProtocol,
     i18n: i18n,
+    getQs: getQs,
+    parseQs: parseQs,
     route2reg: route2reg,
     getUrlValues: getUrlValues,
     isRegValid: isRegValid,

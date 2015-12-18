@@ -19474,6 +19474,19 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
+	"\/options\/coffee\/data-maintain.coffee": {
+		"createSourceMap": 1,
+		"fileType": 32,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/coffee\/data-maintain.coffee",
+		"minifyOutput": 0,
+		"outputAbbreviatedPath": "\/options\/js\/data-maintain.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 1,
+		"syntaxCheckerStyle": 1
+		},
 	"\/options\/coffee\/ext-settings-page.coffee": {
 		"createSourceMap": 1,
 		"fileType": 32,
@@ -19613,6 +19626,17 @@
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/options\/js\/component.js",
 		"outputAbbreviatedPath": "\/options\/js\/min\/component-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 1
+		},
+	"\/options\/js\/data-maintain.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/js\/data-maintain.js",
+		"outputAbbreviatedPath": "\/options\/js\/min\/data-maintain-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 0,

@@ -267,7 +267,11 @@
 
 			<div class="item-title" i18n-content="opt_extstg_data"></div>
 			<div class="item-content">
-				<a i18n-content="opt_extstg_bkp" id="backup-ext-data"></a> / <a i18n-content="opt_extstg_rstr" id="restore-ext-data"></a>
+				<a i18n-content="opt_extstg_bkp" id="backup-ext-data"></a> /
+				<a>
+					<input type="file" hidden accept=".json" id="restore-ext-data">
+					<label for="restore-ext-data" i18n-content="opt_extstg_rstr"></label>
+				</a>
 			</div>
 			</div>
 		</div>
