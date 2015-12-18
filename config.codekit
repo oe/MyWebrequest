@@ -169,15 +169,17 @@
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
 		},
-	"\/GruntFile.js": {
-		"fileType": 64,
+	"\/GruntFile.coffee": {
+		"createSourceMap": 0,
+		"fileType": 32,
 		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/GruntFile.js",
-		"outputAbbreviatedPath": "\/min\/GruntFile-min.js",
+		"ignoreWasSetByUser": 1,
+		"inputAbbreviatedPath": "\/GruntFile.coffee",
+		"minifyOutput": 0,
+		"outputAbbreviatedPath": "\/js\/GruntFile.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
+		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
 	"\/img\/close-hover.png": {
