@@ -157,7 +157,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    */
   isRouterStrValid = function(route) {
     var host, i, n, path, qs;
-    route = route.replace(/^([\w\*])+\:\/\//, '');
+    route = route.replace(/^([\w\*]+)\:\/\//, '');
     i = route.indexOf('?');
     path = route;
     qs = '';
@@ -216,8 +216,11 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    *                 }
    */
   getRouter = function(route) {
-    var params, part, parts, reg, result;
-    route = route.replace(/^([\w\*])+\:\/\//, '');
+    var params, part, parts, protocol, reg, result;
+    protocol = route.match(/^([\w\*]+)\:\/\//);
+    protocol = protocol ? protocol[1] : '*';
+    protocol = protocol.replace(escapeRegExp, '(?:\\$&)');
+    route = route.replace(/^([\w\*]+)\:\/\//, '');
     result = {};
     parts = route.split('?');
     if (parts.length > 2) {
@@ -236,7 +239,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       params.push($1);
       return '([^?]*?)';
     });
-    reg = '^' + part + '(?:\\?([\\s\\S]*))?$';
+    reg = "^" + protocol + ":\/\/" + part + "(?:\\?([\\s\\S]*))?$";
     result.reg = reg;
     result.params = params;
     params = {};
@@ -301,7 +304,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    * @return {Object}
    */
   getUrlValues = function(r, url) {
-    var e, error, j, k, l, len, len1, matchs, qsParams, ref, ref1, res, v;
+    var e, error, j, k, len, matchs, qsParams, ref, ref1, res, v;
     res = {};
     try {
       matchs = (new RegExp(r.reg)).exec(url);
@@ -318,13 +321,15 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       res[v] = matchs[k + 1] || '';
     }
     if (r.hasQs) {
-      qsParams = parseQs(url);
+      qsParams = parseQs(getQs(url));
       ref1 = r.qsParams;
-      for (k = l = 0, len1 = ref1.length; l < len1; k = ++l) {
+      for (k in ref1) {
+        if (!hasProp.call(ref1, k)) continue;
         v = ref1[k];
         res[v] = qsParams[k] || '';
       }
     }
+    console.log('url values: %o', res);
     matchs = urlComponentReg.exec(url);
     res.p = RegExp.$1;
     res.h = RegExp.$2;
@@ -383,7 +388,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       path = pattern.substr(0, i);
       qs = pattern.substr(i);
     }
-    path.replace(/\{(\w+)\}/g, function($0, $1) {
+    path = path.replace(/\{(\w+)\}/g, function($0, $1) {
       var ref, val;
       val = (ref = data[$1]) != null ? ref : '';
       if (~val.indexOf('/')) {

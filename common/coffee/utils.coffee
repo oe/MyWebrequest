@@ -140,7 +140,7 @@
    * @return {Boolean}
   ###
   isRouterStrValid = (route)->
-    route = route.replace /^([\w\*])+\:\/\//, ''
+    route = route.replace /^([\w\*]+)\:\/\//, ''
     i = route.indexOf '?'
     path = route
     qs = ''
@@ -195,7 +195,12 @@
    *                 }
   ###
   getRouter = (route)->
-    route = route.replace /^([\w\*])+\:\/\//, ''
+    protocol = route.match /^([\w\*]+)\:\/\//
+
+    protocol = if protocol then protocol[1] else '*'
+    protocol = protocol.replace escapeRegExp, '(?:\\$&)'
+
+    route = route.replace /^([\w\*]+)\:\/\//, ''
     result = {}
     parts = route.split '?'
     # route contains more than one ?
@@ -212,7 +217,7 @@
     .replace splatParam, (match, $1)->
       params.push $1
       '([^?]*?)'
-    reg = '^' + part + '(?:\\?([\\s\\S]*))?$'
+    reg = "^#{protocol}:\/\/#{part}(?:\\?([\\s\\S]*))?$"
     result.reg = reg
     result.params = params
 
@@ -279,9 +284,12 @@
 
     # get query string values
     if r.hasQs
-      qsParams = parseQs url
-      for v, k in r.qsParams
+      qsParams = parseQs getQs url
+
+      for own k, v of r.qsParams
         res[ v ] = qsParams[ k ] or ''
+
+    console.log 'url values: %o', res
 
     matchs = urlComponentReg.exec url
     # keep protocol
@@ -339,7 +347,7 @@
       path = pattern.substr 0, i
       qs = pattern.substr i
     
-    path.replace /\{(\w+)\}/g, ($0, $1)->
+    path = path.replace /\{(\w+)\}/g, ($0, $1)->
       val = data[ $1 ] ? ''
       # / in val, like abc/bdc, won't be encoded
       if ~val.indexOf('/') then val else encodeURIComponent val
