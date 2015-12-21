@@ -292,28 +292,39 @@ define (require)->
     $protocol = $ '#protocol-c'
     $host = $ '#host-c'
     $redirectUrl = $ '#redirect-url-input'
-    $realUrl = $ '#test-url-input'
-    data =
-      protocol: $protocol.val()
-      host: $host.val()
-      redirectUrl: $redirectUrl.val()
-      realUrl: $realUrl.val()
+    $testUrl = $ '#test-url-input'
 
-    unless utils.isProtocol data.protocol
+    protocol = $protocol.val()
+    host = $host.val()
+    redirectUrl = $redirectUrl.val()
+    testUrl = $testUrl.val()
+    
+    matchUrl = protocol + '://' + host
+
+    unless utils.isProtocol protocol
       modal.showTip $protocol, utils.i18n 'opt_errtip_protocol'
       return
 
-    unless testCustom data.host
-      modal.showTip $host, utils.i18n 'opt_errtip_protocol'
+    if false is utils.isRouterStrValid matchUrl
+      alert 'match rule not valid'
+      # modal.showTip $host, utils.i18n 'opt_errtip_protocol'
       return
 
-    unless testCustom data.redirectUrl
-      modal.showTip $redirectUrl, utils.i18n 'opt_errtip_protocol'
+    router = utils.getRouter matchUrl
+    if ret = utils.hasReservedWord router
+      alert 'reserved keywords found in the router: ' + ret.join ','
+      # modal.showTip $redirectUrl, utils.i18n 'opt_errtip_protocol'
+      return
+    console.log 'router: %o', router
+    if ret = utils.hasUndefinedWord router, redirectUrl
+      alert 'undefined keywords found in the redirect url: ' + ret.join ','
       return
 
-    unless testCustom data.realUrl
-      modal.showTip $realUrl, utils.i18n 'opt_errtip_protocol'
+    unless testUrl# and utils.is testUrl
+      alert 'test url need be filled'
       return
+    
+    $('#custom-test-result').text utils.getTargetUrl matchUrl, redirectUrl, testUrl
   
     return {
       # url for chrome webrequest api to match

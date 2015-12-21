@@ -42,7 +42,8 @@ define(function(require) {
   return {
     readFile: readFile,
     getExtData: getExtData,
-    restoreExtData: restoreExtData
+    restoreExtData: restoreExtData,
+    save2File: save2File
   };
 });
 

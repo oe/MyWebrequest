@@ -13,15 +13,18 @@ define (require)->
     collection.setConfig 'iconStyle', this.value
     return
 
+  # get current date string
+  getNowDate = ->
+    now = new Date
+    now.getFullYear() + '-' + ( now.getMonth() + 1 ) + '-' + now.getDate()
+
 
   # back data
   $('#backup-ext-data').on 'click', ->
-    text = encodeURIComponent JSON.stringify do dataMaintain.getExtData
-    dom = document.createElement 'a'
-    dom.setAttribute 'href', 'data:text/plain;charset=utf-8,' + text
-    dom.setAttribute 'download', 'demo.json'
-    dom.click()
+    extData = dataMaintain.getExtData()
+    dataMaintain.save2File extData, "my-webrequest-#{getNowDate()}.json"
 
+  # choose a file to read
   $('#restore-ext-data').on 'change', (e)->
     files = e.target.files
     console.log files

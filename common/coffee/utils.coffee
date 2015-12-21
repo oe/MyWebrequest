@@ -130,7 +130,7 @@
   
   # get keywords list(array) in route object
   getKwdsInRoute = (router)->
-    [].concat router.params, getObjVals route.qsParams
+    [].concat router.params, RESERVED_HOLDERS, getObjVals router.qsParams
 
   ###*
    * is route string valid
@@ -140,6 +140,7 @@
    * @return {Boolean}
   ###
   isRouterStrValid = (route)->
+    route = route.replace /^([\w\*])+\:\/\//, ''
     i = route.indexOf '?'
     path = route
     qs = ''
@@ -147,17 +148,21 @@
       path = route.substr 0, i
       qs = route.substr i
     # path basic format
-    return false unless /^(\{\w+\})*\(.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
+    console.log 'test path format:' +  path
+    return false unless /^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
     # {*named} should only used in the end of the path
+    console.log 'test splat kwd  in the middle of the string'
     return false if /(\{\*\w+\}).+$/.test path
     if qs
       # query string basic format
+      console.log 'test qs format'
       return false unless /^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test qs
       # /\{\*\w+\}/  for {*named}, not allowed
       # /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
       # /\{\w+\}(?!&|$)/ for letter followed not & or eof
+      console.log 'test qs {named} format'
       return false if /\{\*\w+\}/.test(qs) or /[?&]\{\w+\}/.test(qs) or /\{\w+\}(?!&|$)/.test qs
-    
+
     n = route.replace /\{\*?\w+\}/g, 'xxx'
     host = n
     path = ''
@@ -165,7 +170,9 @@
     if i isnt -1
       host = n.substr 0, i
       path = n.substr i
+    console.log 'test host format'
     return false unless isHost(host) or isIp(host)
+    console.log 'test real path format:' + path
     return false unless not path or isPath(path)
 
 
@@ -174,7 +181,8 @@
   # optionalParam = /\((.*?)\)/g
   namedParam    = /\{(\(\?)?(\w+)\}/g
   splatParam    = /\{(\*\w+)\}/g
-  escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
+  # escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
+  escapeRegExp  = /[\-\[\]+?.,\\\^$|#\s]/g
   queryStrReg   = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g
   ###*
    * convert a url pattern to a regexp
@@ -186,7 +194,8 @@
    *                    params: two array of var name of each named param in path an querystring
    *                 }
   ###
-  route2reg = (route)->
+  getRouter = (route)->
+    route = route.replace /^([\w\*])+\:\/\//, ''
     result = {}
     parts = route.split '?'
     # route contains more than one ?
@@ -238,7 +247,7 @@
    * check the whether router's keywords are unique
    * return undefined if valid
    * return an array of duplicated names if found in params
-   * @param  {Object}  res result returned by route2reg
+   * @param  {Object}  res result returned by getRouter
    * @return {Boolean|Array|undefined}
   ###
   isKwdsUniq = (router)->
@@ -253,7 +262,7 @@
   urlComponentReg = /^(\w+):\/\/([^/]+)\/([^?]+)?(\?(.*))?$/
   ###*
    * get a key-value object from the url which match the pattern
-   * @param  {Object} r   {reg: ..., params: ''} from route2reg
+   * @param  {Object} r   {reg: ..., params: ''} from getRouter
    * @param  {String} url a real url that match that pattern
    * @return {Object}
   ###
@@ -299,7 +308,8 @@
   # %name mean encodeURIComponent name
   # =name mean decodeURIComponent name
   getRedirectParamList = (url)->
-    url.match(/\{([\w]+)\}/g).map (v)-> v.slice 1, -1
+    matches = url.match(/\{([\w]+)\}/g) or []
+    matches.map (v)-> v.slice 1, -1
 
   ###*
    * return undefined if no undefined word, or a list contains undefined words
@@ -309,10 +319,13 @@
   ###
   hasUndefinedWord = (router, url)->
     params = getKwdsInRoute router
+    console.log 'router keywords: ' + params.join ','
     res = []
     sample = getRedirectParamList url
+    console.log 'redirected kwds: ' + sample.join ','
     for v in sample
       res.push v if v not in params
+    console.log 'result: ' + res.join ','
     if res.length
       res
 
@@ -330,7 +343,7 @@
       val = data[ $1 ] ? ''
       # / in val, like abc/bdc, won't be encoded
       if ~val.indexOf('/') then val else encodeURIComponent val
-    qs = qs and qs.replace /([\w\%+]+)=\{(\w+)\}/g, ($0, $1, $2)->
+    qs = qs and qs.replace /([\w\%+\[\]]+)=\{(\w+)\}/g, ($0, $1, $2)->
       val = data[ $2 ] ? ''
       toQueryString $1, val
     path + qs
@@ -343,7 +356,7 @@
    * @return {String}         converted url
   ###
   getTargetUrl = (route, pattern, url)->
-    r = route2reg route
+    r = getRouter route
     params = getUrlValues r, url
     return '' unless params
     fillPattern pattern, params
@@ -358,7 +371,8 @@
     i18n                : i18n
     getQs               : getQs
     parseQs             : parseQs
-    route2reg           : route2reg
+    isRouterStrValid    : isRouterStrValid
+    getRouter           : getRouter
     getUrlValues        : getUrlValues
     isRegValid          : isRegValid
     hasUndefinedWord    : hasUndefinedWord

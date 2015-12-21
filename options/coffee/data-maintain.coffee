@@ -44,4 +44,5 @@ define (require)->
     readFile       : readFile
     getExtData     : getExtData
     restoreExtData : restoreExtData
+    save2File      : save2File
   }

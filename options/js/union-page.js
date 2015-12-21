@@ -285,33 +285,39 @@ define(function(require) {
    * if pass return the rule object or nothing
    */
   checkCustomRule = function() {
-    var $host, $protocol, $realUrl, $redirectUrl, data;
+    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, protocol, redirectUrl, ret, router, testUrl;
     $protocol = $('#protocol-c');
     $host = $('#host-c');
     $redirectUrl = $('#redirect-url-input');
-    $realUrl = $('#test-url-input');
-    data = {
-      protocol: $protocol.val(),
-      host: $host.val(),
-      redirectUrl: $redirectUrl.val(),
-      realUrl: $realUrl.val()
-    };
-    if (!utils.isProtocol(data.protocol)) {
+    $testUrl = $('#test-url-input');
+    protocol = $protocol.val();
+    host = $host.val();
+    redirectUrl = $redirectUrl.val();
+    testUrl = $testUrl.val();
+    matchUrl = protocol + '://' + host;
+    if (!utils.isProtocol(protocol)) {
       modal.showTip($protocol, utils.i18n('opt_errtip_protocol'));
       return;
     }
-    if (!testCustom(data.host)) {
-      modal.showTip($host, utils.i18n('opt_errtip_protocol'));
+    if (false === utils.isRouterStrValid(matchUrl)) {
+      alert('match rule not valid');
       return;
     }
-    if (!testCustom(data.redirectUrl)) {
-      modal.showTip($redirectUrl, utils.i18n('opt_errtip_protocol'));
+    router = utils.getRouter(matchUrl);
+    if (ret = utils.hasReservedWord(router)) {
+      alert('reserved keywords found in the router: ' + ret.join(','));
       return;
     }
-    if (!testCustom(data.realUrl)) {
-      modal.showTip($realUrl, utils.i18n('opt_errtip_protocol'));
+    console.log('router: %o', router);
+    if (ret = utils.hasUndefinedWord(router, redirectUrl)) {
+      alert('undefined keywords found in the redirect url: ' + ret.join(','));
       return;
     }
+    if (!testUrl) {
+      alert('test url need be filled');
+      return;
+    }
+    $('#custom-test-result').text(utils.getTargetUrl(matchUrl, redirectUrl, testUrl));
     return {
       url: '',
       matchUrl: '',

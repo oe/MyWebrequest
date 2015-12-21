@@ -13,7 +13,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.utils = factory(root);
   }
 })(this, function(root) {
-  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRegValid, isRouterStrValid, namedParam, parseQs, pathReg, protocols, queryStrReg, route2reg, splatParam, toQueryString, urlComponentReg;
+  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getRouter, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRegValid, isRouterStrValid, namedParam, parseQs, pathReg, protocols, queryStrReg, splatParam, toQueryString, urlComponentReg;
   ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
   isIp = function(ip) {
     return ipReg.test(ip);
@@ -145,7 +145,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     }
   };
   getKwdsInRoute = function(router) {
-    return [].concat(router.params, getObjVals(route.qsParams));
+    return [].concat(router.params, RESERVED_HOLDERS, getObjVals(router.qsParams));
   };
 
   /**
@@ -157,6 +157,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    */
   isRouterStrValid = function(route) {
     var host, i, n, path, qs;
+    route = route.replace(/^([\w\*])+\:\/\//, '');
     i = route.indexOf('?');
     path = route;
     qs = '';
@@ -164,16 +165,20 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       path = route.substr(0, i);
       qs = route.substr(i);
     }
-    if (!/^(\{\w+\})*\(.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
+    console.log('test path format:' + path);
+    if (!/^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
       return false;
     }
+    console.log('test splat kwd  in the middle of the string');
     if (/(\{\*\w+\}).+$/.test(path)) {
       return false;
     }
     if (qs) {
+      console.log('test qs format');
       if (!/^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test(qs)) {
         return false;
       }
+      console.log('test qs {named} format');
       if (/\{\*\w+\}/.test(qs) || /[?&]\{\w+\}/.test(qs) || /\{\w+\}(?!&|$)/.test(qs)) {
         return false;
       }
@@ -186,16 +191,18 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       host = n.substr(0, i);
       path = n.substr(i);
     }
+    console.log('test host format');
     if (!(isHost(host) || isIp(host))) {
       return false;
     }
+    console.log('test real path format:' + path);
     if (!(!path || isPath(path))) {
       return false;
     }
   };
   namedParam = /\{(\(\?)?(\w+)\}/g;
   splatParam = /\{(\*\w+)\}/g;
-  escapeRegExp = /[\-{}\[\]+?.,\\\^$|#\s]/g;
+  escapeRegExp = /[\-\[\]+?.,\\\^$|#\s]/g;
   queryStrReg = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g;
 
   /**
@@ -208,8 +215,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    *                    params: two array of var name of each named param in path an querystring
    *                 }
    */
-  route2reg = function(route) {
+  getRouter = function(route) {
     var params, part, parts, reg, result;
+    route = route.replace(/^([\w\*])+\:\/\//, '');
     result = {};
     parts = route.split('?');
     if (parts.length > 2) {
@@ -270,7 +278,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    * check the whether router's keywords are unique
    * return undefined if valid
    * return an array of duplicated names if found in params
-   * @param  {Object}  res result returned by route2reg
+   * @param  {Object}  res result returned by getRouter
    * @return {Boolean|Array|undefined}
    */
   isKwdsUniq = function(router) {
@@ -288,7 +296,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
 
   /**
    * get a key-value object from the url which match the pattern
-   * @param  {Object} r   {reg: ..., params: ''} from route2reg
+   * @param  {Object} r   {reg: ..., params: ''} from getRouter
    * @param  {String} url a real url that match that pattern
    * @return {Object}
    */
@@ -335,7 +343,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     }
   };
   getRedirectParamList = function(url) {
-    return url.match(/\{([\w]+)\}/g).map(function(v) {
+    var matches;
+    matches = url.match(/\{([\w]+)\}/g) || [];
+    return matches.map(function(v) {
       return v.slice(1, -1);
     });
   };
@@ -349,14 +359,17 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   hasUndefinedWord = function(router, url) {
     var j, len, params, res, sample, v;
     params = getKwdsInRoute(router);
+    console.log('router keywords: ' + params.join(','));
     res = [];
     sample = getRedirectParamList(url);
+    console.log('redirected kwds: ' + sample.join(','));
     for (j = 0, len = sample.length; j < len; j++) {
       v = sample[j];
       if (indexOf.call(params, v) < 0) {
         res.push(v);
       }
     }
+    console.log('result: ' + res.join(','));
     if (res.length) {
       return res;
     }
@@ -379,7 +392,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
         return encodeURIComponent(val);
       }
     });
-    qs = qs && qs.replace(/([\w\%+]+)=\{(\w+)\}/g, function($0, $1, $2) {
+    qs = qs && qs.replace(/([\w\%+\[\]]+)=\{(\w+)\}/g, function($0, $1, $2) {
       var ref, val;
       val = (ref = data[$2]) != null ? ref : '';
       return toQueryString($1, val);
@@ -396,7 +409,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    */
   getTargetUrl = function(route, pattern, url) {
     var params, r;
-    r = route2reg(route);
+    r = getRouter(route);
     params = getUrlValues(r, url);
     if (!params) {
       return '';
@@ -411,7 +424,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     i18n: i18n,
     getQs: getQs,
     parseQs: parseQs,
-    route2reg: route2reg,
+    isRouterStrValid: isRouterStrValid,
+    getRouter: getRouter,
     getUrlValues: getUrlValues,
     isRegValid: isRegValid,
     hasUndefinedWord: hasUndefinedWord,
