@@ -685,10 +685,10 @@ define("dialog-config", {
     //zIndex: 1024,
 
     // 设置遮罩背景颜色
-    backdropBackground: '#000',
+    backdropBackground: 'rgba(255, 255, 255, 0.45)',
 
     // 设置遮罩透明度
-    backdropOpacity: 0.7,
+    backdropOpacity: 1,
 
     // 消息内容
     content: '<span class="ui-dialog-loading">Loading..</span>',
@@ -744,7 +744,7 @@ define("dialog-config", {
         +       '<table class="ui-dialog-grid">'
         +           '<tr>'
         +               '<td i="header" class="ui-dialog-header">'
-        +                   '<button i="close" class="ui-dialog-close">&#215;</button>'
+        +                   '<div i="close" class="ui-dialog-close"></div>'
         +                   '<div i="title" class="ui-dialog-title"></div>'
         +               '</td>'
         +           '</tr>'

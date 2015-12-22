@@ -12,8 +12,8 @@
     _float: left;
     position: relative;
     background-color: #FFF;
-    border: 1px solid #999;
-    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1), 0 0 256px rgba(255, 255, 255, .3);
+    border-radius: 3px;
     outline: 0;
     background-clip: padding-box;
     font-family: Helvetica, arial, sans-serif;
@@ -32,13 +32,14 @@
     transform: scale(1);
 }
 .ui-popup-focus .ui-dialog {
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.15);
 }
 .ui-popup-modal .ui-dialog {
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1), 0 0 256px rgba(255, 255, 255, .3);
+    box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.15);
 }
 .ui-dialog-grid {
     width: auto;
+    min-width: 300px;
     margin: 0;
     border: 0 none;
     border-collapse:collapse;
@@ -55,43 +56,33 @@
 }
 .ui-dialog-header {
     white-space: nowrap;
-    border-bottom: 1px solid #E5E5E5;
+    /*border-bottom: 1px solid #E5E5E5;*/
 }
 .ui-dialog-close {
-    position: relative;
-    _position: absolute;
-    float: right;
-    top: 13px;
-    right: 13px;
-    _height: 26px;
-    padding: 0 4px;
-    font-size: 21px;
-    font-weight: bold;
-    line-height: 1;
-    color: #000;
-    text-shadow: 0 1px 0 #FFF;
-    opacity: .2;
-    filter: alpha(opacity=20);
-    cursor: pointer;
-    background: transparent;
-    _background: #FFF;
-    border: 0;
-    -webkit-appearance: none;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 14px;
+    height: 14px;
+    cursor: default;
+    vertical-align: middle;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: url(img/close.png);
+    background-image: -webkit-image-set(url(img/close.png) 1x, url(img/close@2x.png) 2x);
 }
 .ui-dialog-close:hover,
 .ui-dialog-close:focus {
-    color: #000000;
-    text-decoration: none;
-    cursor: pointer;
-    outline: 0;
-    opacity: 0.5;
-    filter: alpha(opacity=50);
+    background-image: url(img/close-hover.png);
+    background-image: -webkit-image-set(url(img/close-hover.png) 1x, url(img/close-hover@2x.png) 2x);
 }
 .ui-dialog-title {
     margin: 0;
-    line-height: 1.428571429;
+    font-size: 1.1em;
+    line-height: 1.4;
     min-height: 16.428571429px;
-    padding: 15px;
+    padding: 10px 20px 8px 10px;
     overflow:hidden; 
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -99,9 +90,11 @@
     cursor: default;
 }
 .ui-dialog-body {
-    padding: 20px;
-    text-align: center;
+    padding: 12px;
+    padding-top: 0;
+    /*text-align: center;*/
 }
+
 .ui-dialog-content {
     display: inline-block;
     position: relative;
@@ -109,6 +102,26 @@
     *zoom: 1;
     *display: inline;
     text-align: left;
+}
+.ui-dialog-content input {
+    border: 1px solid #bfbfbf;
+    border-radius: 2px;
+    box-sizing: border-box;
+    -webkit-transition: all 200ms;
+    transition: all 200ms;
+    color: #444;
+    font: inherit;
+    margin: 0;
+    min-height: 2em;
+    padding: 3px 6px;
+    outline: none;
+    padding-bottom: 4px;
+}
+.ui-dialog-content input:focus {
+    border-color: #66afe9;
+    background-color: #fefdd2;
+    outline: none;
+
 }
 .ui-dialog-footer {
     padding: 0 20px 20px 20px;
