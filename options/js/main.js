@@ -2,7 +2,7 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var isPageCat, pageCtrls, pageIds;
+  var dialog, isPageCat, pageCtrls, pageIds;
   pageCtrls = {
     union: require('js/union-page'),
     qrcode: require('js/qr-page'),
@@ -16,6 +16,8 @@ define(function(require) {
       return href.replace('#', '');
     }
   }).get();
+  require('lib/artdialog/css/ui-dialog.css');
+  dialog = require('lib/artdialog/js/dialog');
 
   /**
    * check a setting section cat

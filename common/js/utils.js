@@ -13,7 +13,11 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.utils = factory(root);
   }
 })(this, function(root) {
-  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getRouter, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRegValid, isRouterStrValid, namedParam, parseQs, pathReg, protocols, queryStrReg, splatParam, toQueryString, urlComponentReg;
+  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getRouter, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRedirectRuleValid, isRegValid, isRouterStrValid, isUrl, namedParam, parseQs, pathReg, protocols, queryStrReg, splatParam, toQueryString, urlComponentReg;
+  protocols = ['*', 'https', 'http'];
+  isProtocol = function(protocol) {
+    return indexOf.call(protocols, protocol) >= 0;
+  };
   ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/;
   isIp = function(ip) {
     return ipReg.test(ip);
@@ -26,9 +30,24 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   isPath = function(path) {
     return pathReg.test(path);
   };
-  protocols = ['*', 'https', 'http'];
-  isProtocol = function(protocol) {
-    return indexOf.call(protocols, protocol) >= 0;
+  urlComponentReg = /^(\*|\w+):\/\/([^\/]+)\/([^?]+)?(\?(.*))?$/;
+  isUrl = function(url) {
+    var matches, path;
+    matches = urlComponentReg.exec(url);
+    if (!matches) {
+      return false;
+    }
+    if (!isProtocol(matches[1])) {
+      return false;
+    }
+    if (!(isHost(matches[2]) || isIp(matches[2]))) {
+      return false;
+    }
+    path = matches[3] + matches[4];
+    if (!isPath(path)) {
+      return false;
+    }
+    return true;
   };
 
   /**
@@ -54,6 +73,15 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       res.push(v);
     }
     return res;
+  };
+  isRegValid = function(reg) {
+    var e, error;
+    try {
+      new RegExp(reg);
+    } catch (error) {
+      e = error;
+      return e.message;
+    }
   };
 
   /**
@@ -156,15 +184,11 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    * @return {Boolean}
    */
   isRouterStrValid = function(route) {
-    var host, i, n, path, qs;
-    route = route.replace(/^([\w\*]+)\:\/\//, '');
-    i = route.indexOf('?');
-    path = route;
-    qs = '';
-    if (i !== -1) {
-      path = route.substr(0, i);
-      qs = route.substr(i);
-    }
+    var mathes, n, path, protocol, qs;
+    mathes = urlComponentReg.exec(route);
+    protocol = matches[1];
+    path = mathes[2] + matches[3];
+    qs = matches[5];
     console.log('test path format:' + path);
     if (!/^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
       return false;
@@ -184,21 +208,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       }
     }
     n = route.replace(/\{\*?\w+\}/g, 'xxx');
-    host = n;
-    path = '';
-    i = n.indexOf('/');
-    if (i !== -1) {
-      host = n.substr(0, i);
-      path = n.substr(i);
-    }
-    console.log('test host format');
-    if (!(isHost(host) || isIp(host))) {
-      return false;
-    }
-    console.log('test real path format:' + path);
-    if (!(!path || isPath(path))) {
-      return false;
-    }
+    return isUrl(n);
   };
   namedParam = /\{(\(\?)?(\w+)\}/g;
   splatParam = /\{(\*\w+)\}/g;
@@ -210,18 +220,22 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    * @param  {String} route url pattern
    * @return {Object}
    *                 {
+   *                    url: match url, which url will be captured
    *                    reg: regexp string can match an url
    *                    hasQs: has named params in query string
    *                    params: two array of var name of each named param in path an querystring
    *                 }
    */
   getRouter = function(route) {
-    var params, part, parts, protocol, reg, result;
+    var params, part, parts, protocol, reg, result, url;
+    result = {};
     protocol = route.match(/^([\w\*]+)\:\/\//);
     protocol = protocol ? protocol[1] : '*';
+    url = protocol + '://';
     protocol = protocol.replace(escapeRegExp, '(?:\\$&)');
     route = route.replace(/^([\w\*]+)\:\/\//, '');
-    result = {};
+    url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*').replace(/\?.*$/, '*').replace(/\{\w+\}.*$/, '*');
+    result.url = url;
     parts = route.split('?');
     if (parts.length > 2) {
       return result;
@@ -295,64 +309,27 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       return res;
     }
   };
-  urlComponentReg = /^(\w+):\/\/([^\/]+)\/([^?]+)?(\?(.*))?$/;
-
-  /**
-   * get a key-value object from the url which match the pattern
-   * @param  {Object} r   {reg: ..., params: ''} from getRouter
-   * @param  {String} url a real url that match that pattern
-   * @return {Object}
-   */
-  getUrlValues = function(r, url) {
-    var e, error, j, k, len, matchs, qsParams, ref, ref1, res, v;
-    res = {};
-    try {
-      matchs = (new RegExp(r.reg)).exec(url);
-    } catch (error) {
-      e = error;
-      matchs = '';
-    }
-    if (!matchs) {
-      return null;
-    }
-    ref = r.params;
-    for (k = j = 0, len = ref.length; j < len; k = ++j) {
-      v = ref[k];
-      res[v] = matchs[k + 1] || '';
-    }
-    if (r.hasQs) {
-      qsParams = parseQs(getQs(url));
-      ref1 = r.qsParams;
-      for (k in ref1) {
-        if (!hasProp.call(ref1, k)) continue;
-        v = ref1[k];
-        res[v] = qsParams[k] || '';
-      }
-    }
-    console.log('url values: %o', res);
-    matchs = urlComponentReg.exec(url);
-    res.p = RegExp.$1;
-    res.h = RegExp.$2;
-    res.m = res.h.split('.').slice(-2).join('.');
-    res.r = RegExp.$3;
-    res.q = RegExp.$5;
-    return res;
-  };
-  isRegValid = function(reg) {
-    var e, error;
-    try {
-      new RegExp(reg);
-    } catch (error) {
-      e = error;
-      return e.message;
-    }
-  };
   getRedirectParamList = function(url) {
     var matches;
-    matches = url.match(/\{([\w]+)\}/g) || [];
+    matches = url.match(/\{(\w+)\}/g) || [];
     return matches.map(function(v) {
       return v.slice(1, -1);
     });
+  };
+
+  /**
+   * redirect rule valid
+   * @param  {String}  redirectUrl
+   * @return {Boolean}
+   */
+  isRedirectRuleValid = function(redirectUrl) {
+    if (!redirectUrl) {
+      return false;
+    }
+    if (!getRedirectParamList(redirectUrl).length) {
+      return false;
+    }
+    return isUrl(redirectUrl.replace(/^\{\w+\}/, '*').replace(/^\{\w+\}/g, 'xxx'));
   };
 
   /**
@@ -378,6 +355,48 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     if (res.length) {
       return res;
     }
+  };
+
+  /**
+   * get a key-value object from the url which match the pattern
+   * @param  {Object} r   {reg: ..., params: ''} from getRouter
+   * @param  {String} url a real url that match that pattern
+   * @return {Object}
+   */
+  getUrlValues = function(r, url) {
+    var e, error, j, k, len, matches, qsParams, ref, ref1, res, v;
+    res = {};
+    try {
+      matches = (new RegExp(r.reg)).exec(url);
+    } catch (error) {
+      e = error;
+      matches = '';
+    }
+    if (!matches) {
+      return null;
+    }
+    ref = r.params;
+    for (k = j = 0, len = ref.length; j < len; k = ++j) {
+      v = ref[k];
+      res[v] = matches[k + 1] || '';
+    }
+    if (r.hasQs) {
+      qsParams = parseQs(getQs(url));
+      ref1 = r.qsParams;
+      for (k in ref1) {
+        if (!hasProp.call(ref1, k)) continue;
+        v = ref1[k];
+        res[v] = qsParams[k] || '';
+      }
+    }
+    console.log('url values: %o', res);
+    urlComponentReg.exec(url);
+    res.p = RegExp.$1;
+    res.h = RegExp.$2;
+    res.m = res.h.split('.').slice(-2).join('.');
+    res.r = RegExp.$3;
+    res.q = RegExp.$5;
+    return res;
   };
   fillPattern = function(pattern, data) {
     var i, path, qs;
@@ -407,25 +426,25 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
 
   /**
    * get target url
-   * @param  {String} route   url pattern to match a url
+   * @param  {Object} router   url pattern to match a url
    * @param  {String} pattern url pattern that to get a new url
    * @param  {String} url     a real url that match route
    * @return {String}         converted url
    */
-  getTargetUrl = function(route, pattern, url) {
-    var params, r;
-    r = getRouter(route);
-    params = getUrlValues(r, url);
+  getTargetUrl = function(router, pattern, url) {
+    var params;
+    params = getUrlValues(router, url);
     if (!params) {
       return '';
     }
     return fillPattern(pattern, params);
   };
   return {
+    isProtocol: isProtocol,
     isIp: isIp,
     isHost: isHost,
     isPath: isPath,
-    isProtocol: isProtocol,
+    isUrl: isUrl,
     i18n: i18n,
     getQs: getQs,
     parseQs: parseQs,

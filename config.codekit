@@ -19732,6 +19732,59 @@
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
 		},
+	"\/options\/lib\/artdialog\/css\/ui-dialog.css": {
+		"fileType": 16,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/ui-dialog.css",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
+		},
+	"\/options\/lib\/artdialog\/js\/dialog-min.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-min.js",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-min-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 1
+		},
+	"\/options\/lib\/artdialog\/js\/dialog-plus-min.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-plus-min.js",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-plus-min-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 1
+		},
+	"\/options\/lib\/artdialog\/js\/dialog-plus.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-plus.js",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-plus-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 1
+		},
+	"\/options\/lib\/artdialog\/js\/dialog.js": {
+		"fileType": 64,
+		"ignore": 1,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog.js",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-min.js",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"syntaxCheckerStyle": 1
+		},
 	"\/package.json": {
 		"fileType": 524288,
 		"ignore": 1,

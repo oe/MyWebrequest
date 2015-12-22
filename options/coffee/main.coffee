@@ -18,6 +18,8 @@ define (require)->
       href.replace '#', ''
   .get()
 
+  require 'lib/artdialog/css/ui-dialog.css'
+  dialog = require 'lib/artdialog/js/dialog'
 
   ###*
    * check a setting section cat

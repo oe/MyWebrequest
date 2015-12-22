@@ -9,6 +9,10 @@
   return
 )(this, (root) ->
 
+  protocols = [ '*', 'https', 'http']
+  isProtocol = (protocol)->
+    protocol in protocols
+
   # check an ip addr. eg. 102.33.22.1
   ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
   isIp = (ip)->
@@ -24,9 +28,16 @@
   isPath = (path)->
     pathReg.test path
 
-  protocols = [ '*', 'https', 'http']
-  isProtocol = (protocol)->
-    protocol in protocols
+  # reg to match protocol, host, path, query
+  urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]+)?(\?(.*))?$/
+  isUrl = (url)->
+    matches = urlComponentReg.exec url
+    return false unless matches
+    return false unless isProtocol matches[1]
+    return false unless isHost( matches[2] ) or isIp( matches[2] )
+    path = matches[3] + matches[4]
+    return false unless isPath path
+    return true
 
   ###*
    * get i18n text
@@ -46,6 +57,14 @@
     for own k, v of o
       res.push v
     res
+
+  # return undefined if valid or a error message
+  isRegValid = (reg)->
+    try
+      new RegExp reg
+      return
+    catch e
+      return e.message
   
   ###*
    * GET url info url the clipboard, returns {protocol, host, path}
@@ -140,13 +159,14 @@
    * @return {Boolean}
   ###
   isRouterStrValid = (route)->
-    route = route.replace /^([\w\*]+)\:\/\//, ''
-    i = route.indexOf '?'
-    path = route
-    qs = ''
-    if i isnt -1
-      path = route.substr 0, i
-      qs = route.substr i
+    mathes = urlComponentReg.exec route
+
+    protocol = matches[1]
+    # path is host + real path
+    path = mathes[2] + matches[3]
+    # query string without prefix ?
+    qs = matches[5]
+
     # path basic format
     console.log 'test path format:' +  path
     return false unless /^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
@@ -164,16 +184,7 @@
       return false if /\{\*\w+\}/.test(qs) or /[?&]\{\w+\}/.test(qs) or /\{\w+\}(?!&|$)/.test qs
 
     n = route.replace /\{\*?\w+\}/g, 'xxx'
-    host = n
-    path = ''
-    i = n.indexOf '/'
-    if i isnt -1
-      host = n.substr 0, i
-      path = n.substr i
-    console.log 'test host format'
-    return false unless isHost(host) or isIp(host)
-    console.log 'test real path format:' + path
-    return false unless not path or isPath(path)
+    isUrl n
 
 
   # // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
@@ -189,19 +200,33 @@
    * @param  {String} route url pattern
    * @return {Object}
    *                 {
+   *                    url: match url, which url will be captured
    *                    reg: regexp string can match an url
    *                    hasQs: has named params in query string
    *                    params: two array of var name of each named param in path an querystring
    *                 }
   ###
   getRouter = (route)->
+    result = {}
+
     protocol = route.match /^([\w\*]+)\:\/\//
 
     protocol = if protocol then protocol[1] else '*'
-    protocol = protocol.replace escapeRegExp, '(?:\\$&)'
+    url = protocol + '://'
 
+    protocol = protocol.replace escapeRegExp, '(?:\\$&)'
+    # remove protocol
     route = route.replace /^([\w\*]+)\:\/\//, ''
-    result = {}
+    
+    # replace named holder with * in host
+    url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
+    # replace query string with *
+    .replace /\?.*$/, '*'
+    # replace named holder with * in path
+    .replace /\{\w+\}.*$/, '*'
+    result.url = url
+
+    
     parts = route.split '?'
     # route contains more than one ?
     if parts.length > 2 then return result
@@ -262,62 +287,25 @@
     if res.length
       res
 
-
-  # reg to match protocol, host, path, query
-  urlComponentReg = /^(\w+):\/\/([^/]+)\/([^?]+)?(\?(.*))?$/
-  ###*
-   * get a key-value object from the url which match the pattern
-   * @param  {Object} r   {reg: ..., params: ''} from getRouter
-   * @param  {String} url a real url that match that pattern
-   * @return {Object}
-  ###
-  getUrlValues = (r, url)->
-    res = {}
-    try
-      matchs = (new RegExp(r.reg)).exec url
-    catch e
-      matchs = ''
-    return null unless matchs
-    # get path values
-    for v, k in r.params
-      res[ v ] = matchs[ k + 1 ] or ''
-
-    # get query string values
-    if r.hasQs
-      qsParams = parseQs getQs url
-
-      for own k, v of r.qsParams
-        res[ v ] = qsParams[ k ] or ''
-
-    console.log 'url values: %o', res
-
-    matchs = urlComponentReg.exec url
-    # keep protocol
-    res.p = RegExp.$1
-    # keep host
-    res.h = RegExp.$2
-    # main domain
-    res.m = res.h.split('.').slice(-2).join '.'
-    # path
-    res.r = RegExp.$3
-    # query string without question mark
-    res.q = RegExp.$5
-    res
-
-  # return undefined if valid or a error message
-  isRegValid = (reg)->
-    try
-      new RegExp reg
-      return
-    catch e
-      return e.message
-
-  # get a list from redirect to url, eg. http://{sub}.github.com/{%name}/{=protol}
+  # get a list from redirect to url, eg. http://{sub}.github.com/{name}/{protol}
   # %name mean encodeURIComponent name
   # =name mean decodeURIComponent name
   getRedirectParamList = (url)->
-    matches = url.match(/\{([\w]+)\}/g) or []
+    matches = url.match(/\{(\w+)\}/g) or []
     matches.map (v)-> v.slice 1, -1
+
+  ###*
+   * redirect rule valid
+   * @param  {String}  redirectUrl
+   * @return {Boolean}
+  ###
+  isRedirectRuleValid = (redirectUrl)->
+    # redirectUrl is empty
+    return false unless redirectUrl
+    # no params found in redirect url
+    return false unless getRedirectParamList(redirectUrl).length
+    # remove param placeholder and check the url
+    isUrl redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
 
   ###*
    * return undefined if no undefined word, or a list contains undefined words
@@ -337,6 +325,44 @@
     if res.length
       res
 
+  ###*
+   * get a key-value object from the url which match the pattern
+   * @param  {Object} r   {reg: ..., params: ''} from getRouter
+   * @param  {String} url a real url that match that pattern
+   * @return {Object}
+  ###
+  getUrlValues = (r, url)->
+    res = {}
+    try
+      matches = (new RegExp(r.reg)).exec url
+    catch e
+      matches = ''
+    return null unless matches
+    # get path values
+    for v, k in r.params
+      res[ v ] = matches[ k + 1 ] or ''
+
+    # get query string values
+    if r.hasQs
+      qsParams = parseQs getQs url
+
+      for own k, v of r.qsParams
+        res[ v ] = qsParams[ k ] or ''
+
+    console.log 'url values: %o', res
+
+    urlComponentReg.exec url
+    # keep protocol
+    res.p = RegExp.$1
+    # keep host
+    res.h = RegExp.$2
+    # main domain
+    res.m = res.h.split('.').slice(-2).join '.'
+    # path
+    res.r = RegExp.$3
+    # query string without question mark
+    res.q = RegExp.$5
+    res
 
   # fill a pattern with data
   fillPattern = (pattern, data)->
@@ -358,24 +384,24 @@
 
   ###*
    * get target url
-   * @param  {String} route   url pattern to match a url
+   * @param  {Object} router   url pattern to match a url
    * @param  {String} pattern url pattern that to get a new url
    * @param  {String} url     a real url that match route
    * @return {String}         converted url
   ###
-  getTargetUrl = (route, pattern, url)->
-    r = getRouter route
-    params = getUrlValues r, url
+  getTargetUrl = (router, pattern, url)->
+    params = getUrlValues router, url
     return '' unless params
     fillPattern pattern, params
 
 
 
   return {
+    isProtocol          : isProtocol
     isIp                : isIp
     isHost              : isHost
     isPath              : isPath
-    isProtocol          : isProtocol
+    isUrl               : isUrl
     i18n                : i18n
     getQs               : getQs
     parseQs             : parseQs
