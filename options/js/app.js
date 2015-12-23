@@ -11,6 +11,9 @@ seajs.config({
   base: baseUrl,
   paths: {
     'common': baseUrl.replace(/options\/$/, 'common')
+  },
+  alias: {
+    'dialog': baseUrl + 'lib/artdialog/js/dialog-plus'
   }
 });
 

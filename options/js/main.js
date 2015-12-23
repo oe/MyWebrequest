@@ -17,7 +17,7 @@ define(function(require) {
     }
   }).get();
   require('lib/artdialog/css/ui-dialog.css');
-  dialog = require('lib/artdialog/js/dialog');
+  dialog = require('dialog');
 
   /**
    * check a setting section cat

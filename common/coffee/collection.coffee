@@ -130,6 +130,8 @@
     localStorage.removeItem key
     return
 
+  saveCustomRule = (router)->
+
   # init collection
   do initCollection
 

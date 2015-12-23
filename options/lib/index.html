@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Art Dialog</title>
+  <link rel="stylesheet" href="../../common/css/widgets.css">
   <link rel="stylesheet" href="artdialog/css/ui-dialog.css">
   <script src="../../common/js/jquery.min.js"></script>
   <script src="artdialog/js/dialog-plus.js"></script>
@@ -13,8 +14,10 @@ sdfsdfsfsdfsfsdsdfs
   var d = dialog({
     title: '提醒',
     content: 'this is a tipppppp<input>',
-    okVal: '确定',
-    cancelVal: '取消'
+    ok: $.noop,
+    okValue: '确定d',
+    cancelValue: 'd取消',
+    cancel: $.noop
   }).showModal();
   </script>
 </body>

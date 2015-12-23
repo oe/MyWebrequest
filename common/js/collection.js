@@ -14,7 +14,7 @@
     root.collection = factory(root);
   }
 })(this, function(root) {
-  var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, indexOfRule, initCollection, removeLocal, removeRule, saveRule, setConfig, setLocal, setSwitch;
+  var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, indexOfRule, initCollection, removeLocal, removeRule, saveCustomRule, saveRule, setConfig, setLocal, setSwitch;
   collection = {};
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom'];
   hasCat = function(cat) {
@@ -128,6 +128,7 @@
   removeLocal = function(key) {
     localStorage.removeItem(key);
   };
+  saveCustomRule = function(router) {};
   initCollection();
   return {
     _collection: collection,

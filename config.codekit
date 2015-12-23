@@ -182,50 +182,6 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/img\/close-hover.png": {
-		"fileType": 32768,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 214,
-		"inputAbbreviatedPath": "\/img\/close-hover.png",
-		"outputAbbreviatedPath": "\/img\/close-hover.png",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
-	"\/img\/close-hover@2x.png": {
-		"fileType": 32768,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 384,
-		"inputAbbreviatedPath": "\/img\/close-hover@2x.png",
-		"outputAbbreviatedPath": "\/img\/close-hover@2x.png",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
-	"\/img\/close.png": {
-		"fileType": 32768,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 139,
-		"inputAbbreviatedPath": "\/img\/close.png",
-		"outputAbbreviatedPath": "\/img\/close.png",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
-	"\/img\/close@2x.png": {
-		"fileType": 32768,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"initialSize": 170,
-		"inputAbbreviatedPath": "\/img\/close@2x.png",
-		"outputAbbreviatedPath": "\/img\/close@2x.png",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"processed": 0
-		},
 	"\/img\/colored-icon-samp.png": {
 		"fileType": 32768,
 		"ignore": 0,
@@ -19732,14 +19688,78 @@
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
 		},
+	"\/options\/lib\/artdialog\/css\/img\/close-hover.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 214,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close-hover.png",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close-hover.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/options\/lib\/artdialog\/css\/img\/close-hover@2x.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 384,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close-hover@2x.png",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close-hover@2x.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/options\/lib\/artdialog\/css\/img\/close.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 139,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close.png",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
+	"\/options\/lib\/artdialog\/css\/img\/close@2x.png": {
+		"fileType": 32768,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"initialSize": 170,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close@2x.png",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/img\/close@2x.png",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"processed": 0
+		},
 	"\/options\/lib\/artdialog\/css\/ui-dialog.css": {
 		"fileType": 16,
-		"ignore": 0,
+		"ignore": 1,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/ui-dialog.css",
 		"outputAbbreviatedPath": "No Output Path",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0
+		},
+	"\/options\/lib\/artdialog\/css\/ui-dialog.less": {
+		"allowInsecureImports": 0,
+		"createSourceMap": 0,
+		"disableJavascript": 0,
+		"fileType": 1,
+		"ieCompatibility": 1,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/ui-dialog.less",
+		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/css\/ui-dialog.css",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0,
+		"outputStyle": 0,
+		"relativeURLS": 0,
+		"shouldRunAutoprefixer": 1,
+		"shouldRunBless": 0,
+		"strictImports": 0,
+		"strictMath": 0,
+		"strictUnits": 0
 		},
 	"\/options\/lib\/artdialog\/js\/dialog-min.js": {
 		"fileType": 64,
@@ -19784,6 +19804,15 @@
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
+		},
+	"\/options\/lib\/index.html": {
+		"fileType": 8192,
+		"ignore": 0,
+		"ignoreWasSetByUser": 0,
+		"inputAbbreviatedPath": "\/options\/lib\/index.html",
+		"outputAbbreviatedPath": "No Output Path",
+		"outputPathIsOutsideProject": 0,
+		"outputPathIsSetByUser": 0
 		},
 	"\/package.json": {
 		"fileType": 524288,

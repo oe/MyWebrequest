@@ -1,4 +1,5 @@
 /*! artDialog v6.0.4 | https://github.com/aui/artDialog */
+
 !(function () {
 
 var __modules__ = {};
@@ -171,7 +172,6 @@ $.extend(Popup.prototype, {
      * @param   {HTMLElement, Event}  指定位置（可选）
      */
     show: function (anchor) {
-
         if (this.destroyed) {
             return this;
         }
@@ -223,21 +223,22 @@ $.extend(Popup.prototype, {
                     });
                 }
 
+                if (!this.follow) {
+                    backdrop
+                    .css(backdropCss)
+                    .attr({tabindex: '0'})
+                    .on('focus', $.proxy(this.focus, this));
 
-                backdrop
-                .css(backdropCss)
-                .attr({tabindex: '0'})
-                .on('focus', $.proxy(this.focus, this));
+                    // 锁定 tab 的焦点操作
+                    this.__mask = backdrop
+                    .clone(true)
+                    .attr('style', '')
+                    .insertAfter(popup);
 
-                // 锁定 tab 的焦点操作
-                this.__mask = backdrop
-                .clone(true)
-                .attr('style', '')
-                .insertAfter(popup);
-
-                backdrop
-                .addClass(this.className + '-backdrop')
-                .insertBefore(popup);
+                    backdrop
+                    .addClass(this.className + '-backdrop')
+                    .insertBefore(popup);
+                }
 
                 this.__ready = true;
             }
@@ -872,7 +873,7 @@ var artDialog = function (options, ok, cancel) {
             id: 'ok',
             value: options.okValue,
             callback: options.ok,
-            autofocus: true
+            autofocus: typeof options.autofocus === 'boolean' ? options.autofocus : true
         });
     }
     
@@ -1632,6 +1633,23 @@ dialog.get = function (id) {
 
 };
 
+
+// hide followed dialog when click & keyup
+function hideFollowDlg () {
+    var list = dialog.list, k, v;
+    if(!list) return true;
+
+    for (k in list) {
+        if (list.hasOwnProperty(k)) {
+            v = list[ k ];
+            if (v.follow) v.close().remove();
+        }
+    }
+    return true;
+}
+// use capture
+document.addEventListener('click', hideFollowDlg, true);
+document.addEventListener('keyup', hideFollowDlg, true);
 
 
 return dialog;

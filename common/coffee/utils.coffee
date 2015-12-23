@@ -200,14 +200,15 @@
    * @param  {String} route url pattern
    * @return {Object}
    *                 {
-   *                    url: match url, which url will be captured
-   *                    reg: regexp string can match an url
+   *                    url: match url, which url will be captured used by chrome
+   *                    reg: regexp string can match an url & extract params
+   *                    matchUrl: source rule, aka the in-param route
    *                    hasQs: has named params in query string
    *                    params: two array of var name of each named param in path an querystring
    *                 }
   ###
   getRouter = (route)->
-    result = {}
+    result = matchUrl: route
 
     protocol = route.match /^([\w\*]+)\:\/\//
 
