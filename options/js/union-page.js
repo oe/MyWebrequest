@@ -2,7 +2,7 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isSafe4Qr, isUnionCat, modal, removeRule, resetSectionCtrlsState, tpl, utils, vars;
+  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleHasExist, isSafe4Qr, isUnionCat, modal, removeRule, resetSectionCtrlsState, tpl, utils, vars;
   utils = require('common/js/utils');
   collection = require('common/js/collection');
   modal = require('js/component');
@@ -13,13 +13,31 @@ define(function(require) {
     var ref;
     return ref = (cat || '').replace('#', ''), indexOf.call(UNION_PAGES, ref) >= 0;
   };
-  isSafe4Qr = function(cat, host) {
-    var str;
+  isSafe4Qr = function(cat, rule) {
     if (cat !== 'block') {
       return true;
     }
-    str = host.replace(/\./g, '\\.').replace('*', '.*');
-    return !(new RegExp('^' + str + '$')).test(vars.QR_API_HOST);
+    return !utils.isSubRule(rule, vars.QR_API_HOST);
+  };
+
+  /**
+   * check whether a rule is covered by a wide range rule
+   * when add a block or custome rule
+   * @param  {String}  rule like *://abc.com/*
+   * @return {String|undefined} if no block, return undefined, or the exist rule
+   */
+  isRuleHasExist = function(rule, cat) {
+    var i, len1, r, rules;
+    if (cat == null) {
+      cat = 'block';
+    }
+    rules = collection.getRules(cat);
+    for (i = 0, len1 = rules.length; i < len1; i++) {
+      r = rules[i];
+      if (utils.isSubRule(r, rule)) {
+        return r;
+      }
+    }
   };
 
   /**
@@ -146,7 +164,7 @@ define(function(require) {
     }
   });
   $('.rule-field').on('click', '.add-rule', function(e) {
-    var $host, $path, $protocol, cat, data, eMsg, rule;
+    var $host, $path, $protocol, cat, data, eMsg, megaRule, rule;
     cat = $('#request-settings').attr('data-id');
     $protocol = $('#protocol');
     $host = $("#host");
@@ -154,7 +172,7 @@ define(function(require) {
     data = {
       protocol: $protocol.val().trim(),
       host: $host.val().trim().toLowerCase(),
-      path: $path.val().trim()
+      path: $path.val().replace(/\?.*$/, '').trim()
     };
     if (!utils.isProtocol(data.protocol)) {
       modal.showTip($protocol, utils.i18n('opt_errtip_protocol'));
@@ -187,17 +205,26 @@ define(function(require) {
         eMsg = 'opt_errdlg_cstar';
       }
     } else {
-      if (!isSafe4Qr(cat, data.host)) {
+      if (!isSafe4Qr(cat, rule)) {
         eMsg = 'opt_errdlg_cqr';
+      }
+      megaRule = isRuleHasExist(rule, cat);
+      if (megaRule != null) {
+        eMsg = 'opt_errdlg_dupl';
       }
     }
     if (eMsg) {
-      modal.showDlg({
+      dialog({
         title: utils.i18n('opt_errdlg_title'),
         content: utils.i18n(eMsg),
-        callback: addRule,
-        cbargs: [cat, rule]
-      });
+        cancelValue: utils.i18n('cancel_btn'),
+        cancel: function() {},
+        autofocus: false,
+        okValue: utils.i18n('ok_btn'),
+        ok: function() {
+          addRule(cat, rule);
+        }
+      }).showModal();
       return;
     } else {
       addRule(cat, rule);
@@ -285,7 +312,7 @@ define(function(require) {
    * if pass return the rule object or nothing
    */
   checkCustomRule = function() {
-    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, protocol, redirectUrl, ret, router, testUrl;
+    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, megaRule, protocol, redirectUrl, ret, router, testUrl;
     $protocol = $('#protocol-c');
     $host = $('#host-c');
     $redirectUrl = $('#redirect-url-input');
@@ -316,6 +343,17 @@ define(function(require) {
     if (!testUrl) {
       alert('test url need be filled');
       return;
+    }
+    if (!utils.isUrl(testUrl)) {
+      alert('test url is invalid');
+    }
+    megaRule = isRuleHasExist(rule, 'custom');
+    if (megaRule != null) {
+      console.log('todo');
+    }
+    megaRule = isRuleHasExist(rule, 'block');
+    if (megaRule != null) {
+      alert('this rule is conflict with block rule: ' + megaRule);
     }
     $('#custom-test-result').text(utils.getTargetUrl(matchUrl, redirectUrl, testUrl));
     return {

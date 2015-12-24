@@ -123,11 +123,13 @@
   # set a data
   setLocal = (key, val)->
     localStorage.setItem key, JSON.stringify val
+    do initCollection
     return
 
   # remove a data
   removeLocal = (key)->
     localStorage.removeItem key
+    do initCollection
     return
 
   saveCustomRule = (router)->

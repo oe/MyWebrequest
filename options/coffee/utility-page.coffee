@@ -50,7 +50,7 @@ define (require)->
         $input = this._$('content').find 'input'
         onSaveFavorGsearch $input
       cancelValue: utils.i18n 'cancel_btn'
-      cancel: $.noop
+      cancel: ->
     .showModal()
 
     $ipt = dlg._$('content').find('input')
@@ -61,16 +61,6 @@ define (require)->
       $ipt.val('')
       $ipt.val(val)
     , 250
-
-    # $('#preferred-google').val do getCustomFavorGsearch
-    # $wrapper = $ '#input-dialog-wrapper'
-    # $(document.body).addClass 'ovHidden'
-    # $wrapper.prop 'hidden', false
-    # $wrapper.addClass 'fadeInDown'
-    # setTimeout ->
-    #   do $('#preferred-google').focus
-    #   return
-    # , 210
     return
 
   onSaveFavorGsearch = ($input)->
@@ -94,37 +84,11 @@ define (require)->
     else
       dialog
         content: utils.i18n 'opt_errtip_host'
-        # quickClose: true
       .show $input[0]
       $input.focus()
       return false
     return
 
-  # add favor google domain
-  # $('#input-dialog-wrapper .js-btn-ok').on 'click', ->
-  #   host = $.trim do $('#preferred-google').val
-  #   if host is ''
-  #     collection.setLocal 'gsearch', []
-  #     updateGhostText ''
-  #     modal.hideDlg '#input-dialog-wrapper'
-  #     return
-  #   host = do host.toLowerCase
-  #   i = host.indexOf '\/\/'
-  #   if i isnt -1 then host = host.substr i + 2
-  #   i = host.indexOf '\/'
-  #   if i isnt -1 then host = host.substr 0, i
-  #   if utils.isIp( host ) or utils.isHost host
-  #     arr = host.split '.'
-  #     if arr.length is 2 and arr[0] is 'google'
-  #       host = "www.#{host}"
-
-  #     updateGhostText host
-
-  #     collection.setLocal 'gsearch', [ "*://#{host}/url*" ]
-  #     modal.hideDlg '#input-dialog-wrapper'
-  #   else
-  #     modal.showTip $('#preferred-google'), utils.i18n 'opt_errtip_host'
-  #   return
 
   return {
     init: init

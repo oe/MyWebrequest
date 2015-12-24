@@ -124,9 +124,11 @@
   };
   setLocal = function(key, val) {
     localStorage.setItem(key, JSON.stringify(val));
+    initCollection();
   };
   removeLocal = function(key) {
     localStorage.removeItem(key);
+    initCollection();
   };
   saveCustomRule = function(router) {};
   initCollection();

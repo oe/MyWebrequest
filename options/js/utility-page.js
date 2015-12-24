@@ -48,7 +48,7 @@ define(function(require) {
         return onSaveFavorGsearch($input);
       },
       cancelValue: utils.i18n('cancel_btn'),
-      cancel: $.noop
+      cancel: function() {}
     }).showModal();
     $ipt = dlg._$('content').find('input');
     setTimeout(function() {

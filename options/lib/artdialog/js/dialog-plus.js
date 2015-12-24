@@ -283,7 +283,7 @@ $.extend(Popup.prototype, {
             this.__popup.hide().removeClass(this.className + '-show');
             this.__backdrop.hide();
             this.open = false;
-            this.blur();// 恢复焦点，照顾键盘操作的用户
+            this.follow || this.blur();// 恢复焦点，照顾键盘操作的用户
             this.__dispatchEvent('close');
         }
     
@@ -867,7 +867,7 @@ var artDialog = function (options, ok, cancel) {
     if (ok !== undefined) {
         options.ok = ok;
     }
-    
+
     if (options.ok) {
         options.button.push({
             id: 'ok',
@@ -886,6 +886,7 @@ popup.prototype = Popup.prototype;
 var prototype = artDialog.prototype = new popup();
 
 artDialog.create = function (options) {
+    console.log('dialog: %o', options);
     var that = this;
 
     $.extend(this, new Popup());

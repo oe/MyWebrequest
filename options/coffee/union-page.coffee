@@ -13,10 +13,21 @@ define (require)->
     (cat or '').replace('#', '') in UNION_PAGES
 
   # check whether the host won't disable qr feature
-  isSafe4Qr = (cat, host)->
+  isSafe4Qr = (cat, rule)->
     return true if cat isnt 'block'
-    str = host.replace(/\./g, '\\.').replace '*', '.*'
-    not (new RegExp('^' + str + '$')).test vars.QR_API_HOST
+    not utils.isSubRule rule, vars.QR_API_HOST
+
+  ###*
+   * check whether a rule is covered by a wide range rule
+   * when add a block or custome rule
+   * @param  {String}  rule like *://abc.com/*
+   * @return {String|undefined} if no block, return undefined, or the exist rule
+  ###
+  isRuleHasExist = (rule, cat='block')->
+    rules = collection.getRules cat
+    for r in rules
+      if utils.isSubRule r, rule
+        return r
 
   ###*
    * toggle enable state of section of cat( category )
@@ -165,7 +176,8 @@ define (require)->
     data =
       protocol: $protocol.val().trim()
       host: $host.val().trim().toLowerCase()
-      path: $path.val().trim()
+      # remove querystring in the path
+      path: $path.val().replace(/\?.*$/, '').trim()
 
 
     unless utils.isProtocol data.protocol
@@ -200,13 +212,27 @@ define (require)->
         eMsg = 'opt_errdlg_cstar'
     else
       # check whether the rule will disable QR feature
-      eMsg = 'opt_errdlg_cqr' unless isSafe4Qr cat, data.host
+      eMsg = 'opt_errdlg_cqr' unless isSafe4Qr cat, rule
+      # check whether a rule is duplicated
+      megaRule = isRuleHasExist rule, cat
+      eMsg = 'opt_errdlg_dupl' if megaRule?
     if eMsg
-      modal.showDlg
+      dialog
         title: utils.i18n 'opt_errdlg_title'
         content: utils.i18n eMsg
-        callback: addRule
-        cbargs: [cat, rule]
+        cancelValue: utils.i18n 'cancel_btn'
+        cancel: ->
+        autofocus: false
+        okValue: utils.i18n 'ok_btn'
+        ok: ->
+          addRule cat, rule
+          return
+      .showModal()
+      # modal.showDlg
+      #   title: utils.i18n 'opt_errdlg_title'
+      #   content: utils.i18n eMsg
+      #   callback: addRule
+      #   cbargs: [cat, rule]
       return
     else
       addRule cat, rule
@@ -283,7 +309,8 @@ define (require)->
     if e.keyCode is 13
       $('#test-url-btn').click()
       return false
-  
+
+    
   ###*
    * Test the custom rule with a real url
    * if pass return the rule object or nothing
@@ -323,9 +350,21 @@ define (require)->
     unless testUrl# and utils.is testUrl
       alert 'test url need be filled'
       return
+    unless utils.isUrl testUrl
+      alert 'test url is invalid'
+
+    megaRule = isRuleHasExist rule, 'custom'
+    # custom rules has xcross area???
+    if megaRule?
+      console.log 'todo'
     
+    megaRule = isRuleHasExist rule, 'block'
+    if megaRule?
+      alert 'this rule is conflict with block rule: ' + megaRule
+    
+
     $('#custom-test-result').text utils.getTargetUrl matchUrl, redirectUrl, testUrl
-  
+
     return {
       # url for chrome webrequest api to match
       url: ''

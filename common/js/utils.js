@@ -13,7 +13,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.utils = factory(root);
   }
 })(this, function(root) {
-  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getRouter, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRedirectRuleValid, isRegValid, isRouterStrValid, isUrl, namedParam, parseQs, pathReg, protocols, queryStrReg, splatParam, toQueryString, urlComponentReg;
+  var RESERVED_HOLDERS, escapeRegExp, fillPattern, getKwdsInRoute, getObjVals, getQs, getRedirectParamList, getRouter, getTargetUrl, getUrlFromClipboard, getUrlValues, hasReservedWord, hasUndefinedWord, hostReg, i18n, ipReg, isHost, isIp, isKwdsUniq, isPath, isProtocol, isRedirectRuleValid, isRegValid, isRouterStrValid, isSubRule, isUrl, namedParam, parseQs, pathReg, protocols, queryStrReg, splatParam, toQueryString, urlComponentReg;
   protocols = ['*', 'https', 'http'];
   isProtocol = function(protocol) {
     return indexOf.call(protocols, protocol) >= 0;
@@ -107,6 +107,27 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result.host = RegExp.$2;
     result.path = RegExp.$3;
     return result;
+  };
+
+  /**
+   * is rule coverring subRule
+   * like: *://*.g.com covers http://ad.g.com or http://*.g.com
+   * exmaple: to detect if a custom rule is conflicted with a block rule
+   */
+  isSubRule = function(rule, subRule) {
+    var matches, prtl1, prtl2, url1, url2;
+    matches = urlComponentReg.exec(rule);
+    prtl1 = matches[1];
+    url1 = matches[2] + matches[3];
+    matches = urlComponentReg.exec(subRule);
+    prtl2 = matches[1];
+    url2 = matches[2] + matches[3];
+    if (prtl1 !== '*' && prtl1 !== prtl2) {
+      return false;
+    }
+    url1 = url1.replace(escapeRegExp, '(?:\\$&)').replace(/\*/g, '.*');
+    url1 = '^' + url1 + '$';
+    return (new RegExp(url1)).test(url2);
   };
   getQs = function(url) {
     return ("" + url).replace(/^[^?]+\?/, '').replace(/#[^#]*/, '');
@@ -449,6 +470,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     isPath: isPath,
     isUrl: isUrl,
     i18n: i18n,
+    isSubRule: isSubRule,
     getQs: getQs,
     parseQs: parseQs,
     isRouterStrValid: isRouterStrValid,

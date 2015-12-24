@@ -86,6 +86,26 @@
     result.path = RegExp.$3
     result
 
+  ###*
+   * is rule coverring subRule
+   * like: *://*.g.com covers http://ad.g.com or http://*.g.com
+   * exmaple: to detect if a custom rule is conflicted with a block rule
+  ###
+  isSubRule = (rule, subRule)->
+    matches = urlComponentReg.exec rule
+    prtl1 = matches[1]
+    url1 = matches[2] + matches[3]
+
+    matches = urlComponentReg.exec subRule
+    prtl2 = matches[1]
+    url2 = matches[2] + matches[3]
+    return false if prtl1 isnt '*' and prtl1 isnt prtl2
+
+    url1 = url1.replace escapeRegExp, '(?:\\$&)'
+    .replace /\*/g, '.*'
+    url1 = '^' + url1 + '$'
+    (new RegExp(url1)).test url2
+
   # 获取URL的queryString
   getQs = (url) ->
     "#{url}"
@@ -326,6 +346,7 @@
     if res.length
       res
 
+
   ###*
    * get a key-value object from the url which match the pattern
    * @param  {Object} r   {reg: ..., params: ''} from getRouter
@@ -404,6 +425,7 @@
     isPath              : isPath
     isUrl               : isUrl
     i18n                : i18n
+    isSubRule           : isSubRule
     getQs               : getQs
     parseQs             : parseQs
     isRouterStrValid    : isRouterStrValid
