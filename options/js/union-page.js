@@ -2,10 +2,9 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleHasExist, isSafe4Qr, isUnionCat, modal, removeRule, resetSectionCtrlsState, tpl, utils, vars;
+  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleExists, isSafe4Qr, isUnionCat, removeRule, resetSectionCtrlsState, tpl, utils, vars;
   utils = require('common/js/utils');
   collection = require('common/js/collection');
-  modal = require('js/component');
   tpl = require('js/tpl');
   vars = require('js/vars');
   UNION_PAGES = ['block', 'hotlink', 'hsts', 'log', 'custom'];
@@ -26,7 +25,7 @@ define(function(require) {
    * @param  {String}  rule like *://abc.com/*
    * @return {String|undefined} if no block, return undefined, or the exist rule
    */
-  isRuleHasExist = function(rule, cat) {
+  isRuleExists = function(rule, cat) {
     var i, len1, r, rules;
     if (cat == null) {
       cat = 'block';
@@ -175,27 +174,38 @@ define(function(require) {
       path: $path.val().replace(/\?.*$/, '').trim()
     };
     if (!utils.isProtocol(data.protocol)) {
-      modal.showTip($protocol, utils.i18n('opt_errtip_protocol'));
+      dialog({
+        content: utils.i18n('opt_errtip_protocol')
+      }).show($protocol[0]);
       return false;
     }
     if (!(data.host && (utils.isIp(data.host) || utils.isHost(data.host)))) {
-      modal.showTip($host, utils.i18n('opt_errtip_host'));
+      dialog({
+        content: utils.i18n('opt_errtip_host')
+      }).show($host[0]);
       return false;
     }
     if (data.path === '') {
       data.path = '*';
     }
     if (!(data.path && utils.isPath(data.path))) {
-      modal.showTip($path, utils.i18n('opt_errtip_path'));
+      dialog({
+        content: utils.i18n('opt_errtip_path')
+      }).show($path[0]);
       return false;
     }
     rule = data.protocol + "://" + data.host + "/" + data.path;
     if (rule.length > 500) {
-      modal.showTip($host, utils.i18n('opt_errtip_rulelong'));
+      dialog({
+        content: utils.i18n('opt_errtip_rulelong')
+      }).show($host[0]);
       return false;
     }
-    if (~collection.indexOfRule(cat, rule)) {
-      modal.showTip($host, utils.i18n('opt_errtip_duplicate'));
+    megaRule = isRuleExists(rule, cat);
+    if (megaRule != null) {
+      dialog({
+        content: utils.i18n('opt_errtip_duplicate') + megaRule
+      }).show($host[0]);
       return false;
     }
     if (data.host === '*') {
@@ -207,10 +217,6 @@ define(function(require) {
     } else {
       if (!isSafe4Qr(cat, rule)) {
         eMsg = 'opt_errdlg_cqr';
-      }
-      megaRule = isRuleHasExist(rule, cat);
-      if (megaRule != null) {
-        eMsg = 'opt_errdlg_dupl';
       }
     }
     if (eMsg) {
@@ -235,14 +241,21 @@ define(function(require) {
     cat = $('#request-settings').attr('data-id');
     len = $(this).parents('table').find('tbody input:checked').length;
     if (len) {
-      modal.showDlg({
+      dialog({
         title: utils.i18n('opt_deldlg_title'),
         content: utils.i18n('opt_deldlg_content').replace('xx', len),
-        callback: removeRule,
-        cbargs: [cat]
-      });
+        cancelValue: utils.i18n('cancel_btn'),
+        cancel: function() {},
+        autofocus: false,
+        okValue: utils.i18n('ok_btn'),
+        ok: function() {
+          removeRule(cat);
+        }
+      }).showModal();
     } else {
-      modal.showTip(this, utils.i18n('opt_errtip_nochose'));
+      dialog({
+        content: utils.i18n('opt_errtip_nochose')
+      }).show(this);
       return false;
     }
   });
@@ -310,6 +323,15 @@ define(function(require) {
   /**
    * Test the custom rule with a real url
    * if pass return the rule object or nothing
+   * @return {Object}
+   *                 {
+   *                    url: match url, which url will be captured used by chrome
+   *                    reg: regexp string can match an url & extract params
+   *                    matchUrl: match rule with placeholder, used by extension
+   *                    redirectUrl: redirect rule with placeholder
+   *                    hasQs: has named params in query string
+   *                    params: two array of var name of each named param in path an querystring
+   *                 }
    */
   checkCustomRule = function() {
     var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, megaRule, protocol, redirectUrl, ret, router, testUrl;
@@ -323,47 +345,68 @@ define(function(require) {
     testUrl = $testUrl.val();
     matchUrl = protocol + '://' + host;
     if (!utils.isProtocol(protocol)) {
-      modal.showTip($protocol, utils.i18n('opt_errtip_protocol'));
+      dialog({
+        content: utils.i18n('opt_errtip_protocol')
+      }).show($protocol[0]);
       return;
     }
     if (false === utils.isRouterStrValid(matchUrl)) {
-      alert('match rule not valid');
+      dialog({
+        content: 'match rule not valid'
+      }).show($host[0]);
       return;
     }
     router = utils.getRouter(matchUrl);
     if (ret = utils.hasReservedWord(router)) {
-      alert('reserved keywords found in the router: ' + ret.join(','));
+      dialog({
+        content: 'reserved keywords found in the router: ' + ret.join(',')
+      }).show($host[0]);
       return;
+    }
+    megaRule = isRuleExists(router.rule, 'custom');
+    if (megaRule != null) {
+      dialog({
+        content: utils.i18n('opt_errtip_duplicate') + megaRule
+      }).show($host[0]);
     }
     console.log('router: %o', router);
     if (ret = utils.hasUndefinedWord(router, redirectUrl)) {
-      alert('undefined keywords found in the redirect url: ' + ret.join(','));
+      dialog({
+        content: 'undefined keywords found in the redirect url: ' + ret.join(',')
+      }).show($redirectUrl[0]);
       return;
     }
     if (!testUrl) {
-      alert('test url need be filled');
+      dialog({
+        content: 'test url need be filled'
+      }).show($testUrl[0]);
       return;
     }
     if (!utils.isUrl(testUrl)) {
-      alert('test url is invalid');
+      dialog({
+        content: 'test url is invalid'
+      }).show($testUrl[0]);
+      return;
     }
-    megaRule = isRuleHasExist(rule, 'custom');
-    if (megaRule != null) {
-      console.log('todo');
-    }
-    megaRule = isRuleHasExist(rule, 'block');
+    megaRule = isRuleExists(rule, 'block');
     if (megaRule != null) {
       alert('this rule is conflict with block rule: ' + megaRule);
+      return;
     }
-    $('#custom-test-result').text(utils.getTargetUrl(matchUrl, redirectUrl, testUrl));
-    return {
-      url: '',
-      matchUrl: '',
-      redirectUrl: ''
-    };
+    router.redirectUrl = redirectUrl;
+    $('#custom-test-result').text(utils.getTargetUrl(router, testUrl));
+    return router;
   };
   $('#test-url-btn').on('click', function(e) {
     return checkCustomRule();
+  });
+  $('#add-csrule').on('click', function() {
+    var router;
+    router = checkCustomRule();
+    if (!router) {
+      return;
+    }
+    return collection.saveCustomRule(router);
   });
   return {
     init: initSection,

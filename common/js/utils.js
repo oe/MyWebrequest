@@ -30,7 +30,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   isPath = function(path) {
     return pathReg.test(path);
   };
-  urlComponentReg = /^(\*|\w+):\/\/([^\/]+)\/([^?]+)?(\?(.*))?$/;
+  urlComponentReg = /^(\*|\w+):\/\/([^\/]+)(\/[^?]*)(\?(.*))?$/;
   isUrl = function(url) {
     var matches, path;
     matches = urlComponentReg.exec(url);
@@ -205,10 +205,10 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    * @return {Boolean}
    */
   isRouterStrValid = function(route) {
-    var mathes, n, path, protocol, qs;
-    mathes = urlComponentReg.exec(route);
+    var matches, n, path, protocol, qs;
+    matches = urlComponentReg.exec(route);
     protocol = matches[1];
-    path = mathes[2] + matches[3];
+    path = matches[2] + matches[3];
     qs = matches[5];
     console.log('test path format:' + path);
     if (!/^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
@@ -451,17 +451,16 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   /**
    * get target url
    * @param  {Object} router   url pattern to match a url
-   * @param  {String} pattern url pattern that to get a new url
    * @param  {String} url     a real url that match route
    * @return {String}         converted url
    */
-  getTargetUrl = function(router, pattern, url) {
+  getTargetUrl = function(router, url) {
     var params;
     params = getUrlValues(router, url);
     if (!params) {
       return '';
     }
-    return fillPattern(pattern, params);
+    return fillPattern(router.redirectUrl, params);
   };
   return {
     isProtocol: isProtocol,

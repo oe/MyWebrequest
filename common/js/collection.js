@@ -3,6 +3,8 @@
 /**
  * all rules gather together to be a collection
  */
+var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
 (function(root, factory) {
   if (typeof define === 'function' && (define.amd || define.cmd)) {
     define(function() {
@@ -14,7 +16,7 @@
     root.collection = factory(root);
   }
 })(this, function(root) {
-  var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, indexOfRule, initCollection, removeLocal, removeRule, saveCustomRule, saveRule, setConfig, setLocal, setSwitch;
+  var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, hasRule, initCollection, removeLocal, removeRule, saveRule, setConfig, setLocal, setSwitch;
   collection = {};
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom'];
   hasCat = function(cat) {
@@ -23,58 +25,77 @@
   getRules = function(cat) {
     var rules;
     rules = collection[cat];
-    return rules.filter(function(rule) {
-      return rule !== void 0;
-    });
+    if (cat === 'custom') {
+      return Object.keys(rules);
+    } else {
+      return rules;
+    }
   };
   initCollection = function() {
     var cat, i, len;
     for (i = 0, len = cats.length; i < len; i++) {
       cat = cats[i];
-      collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
+      if (cat === 'custom') {
+        collection[cat] = JSON.parse(localStorage.getItem(cat) || '{}');
+      } else {
+        collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
+      }
     }
   };
-  indexOfRule = function(cat, rule) {
+  hasRule = function(cat, rule) {
     var rules;
     rules = collection[cat];
-    if (!(rules && rule)) {
-      return -1;
-    }
-    return rules.indexOf(rule);
-  };
-  addRule = function(cat, rule) {
-    var rules;
-    if (!rule || ~indexOfRule(cat, rule)) {
+    if (!rules) {
       return false;
     }
-    rules = collection[cat];
-    rules[rules.length++] = rule;
+    if (cat === 'custom') {
+      return !!rules[rule];
+    } else {
+      return indexOf.call(rules, rule) >= 0;
+    }
+  };
+  addRule = function(cat, rule) {
+    if (!rule || hasRule(cat, rule)) {
+      return false;
+    }
+    if (cat === 'custom') {
+      rules[rule.url] = rule;
+    } else {
+      rules.push(rule);
+    }
     saveRule(cat);
     return true;
   };
   removeRule = function(cat, rules) {
     var _rules;
-    _rules = collection[cat];
+    _rules = getRules(cat);
     if (rules === void 0 || (Array.isArray(rules) && _rules.length === rules.length)) {
-      collection[cat] = [];
+      collection[cat] = null;
     } else {
       if (!Array.isArray(rules)) {
         rules = [rules];
       }
       rules.forEach(function(rule) {
         var index;
-        index = indexOfRule(cat, rule);
-        if (~index) {
-          _rules[index] = void 0;
+        if (cat === 'custom') {
+          delete collection[cat][rule];
+        } else {
+          index = _rules.indexOf(rule);
+          delete _rules[index];
         }
       });
     }
     saveRule(cat);
   };
   saveRule = function(cat) {
-    var arr;
-    arr = getRules(cat);
-    localStorage.setItem(cat, JSON.stringify(arr));
+    var rules;
+    rules = collection[cat];
+    if (rules) {
+      localStorage.removeItem(cat);
+    } else {
+      localStorage.setItem(cat, JSON.stringify(rules));
+    }
+    initCollection();
   };
   eachRule = function(cat, fn, context) {
     var rules;
@@ -130,11 +151,9 @@
     localStorage.removeItem(key);
     initCollection();
   };
-  saveCustomRule = function(router) {};
   initCollection();
   return {
     _collection: collection,
-    indexOfRule: indexOfRule,
     hasCat: hasCat,
     addRule: addRule,
     getRules: getRules,

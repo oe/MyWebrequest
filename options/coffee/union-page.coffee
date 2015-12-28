@@ -1,7 +1,6 @@
 define (require)->
   utils = require 'common/js/utils'
   collection = require 'common/js/collection'
-  modal = require 'js/component'
   tpl = require 'js/tpl'
   vars = require 'js/vars'
 
@@ -23,7 +22,7 @@ define (require)->
    * @param  {String}  rule like *://abc.com/*
    * @return {String|undefined} if no block, return undefined, or the exist rule
   ###
-  isRuleHasExist = (rule, cat='block')->
+  isRuleExists = (rule, cat='block')->
     rules = collection.getRules cat
     for r in rules
       if utils.isSubRule r, rule
@@ -181,28 +180,39 @@ define (require)->
 
 
     unless utils.isProtocol data.protocol
-      modal.showTip $protocol, utils.i18n 'opt_errtip_protocol'
+      dialog
+        content: utils.i18n 'opt_errtip_protocol'
+      .show $protocol[0]
       return false
 
     unless data.host and ( utils.isIp(data.host) or utils.isHost(data.host) )
-      modal.showTip $host, utils.i18n 'opt_errtip_host'
+      dialog
+        content: utils.i18n 'opt_errtip_host'
+      .show $host[0]
       return false
 
     # Path treat empty as star(*)
     data.path = '*' if data.path is ''
 
     unless data.path and utils.isPath data.path
-      modal.showTip $path, utils.i18n 'opt_errtip_path'
+      dialog
+        content: utils.i18n 'opt_errtip_path'
+      .show $path[0]
       return false
 
     rule = "#{data.protocol}://#{data.host}/#{data.path}"
     if rule.length > 500
-      modal.showTip $host, utils.i18n 'opt_errtip_rulelong'
+      dialog
+        content: utils.i18n 'opt_errtip_rulelong'
+      .show $host[0]
       return false
 
     # whether rule is duplicated
-    if ~collection.indexOfRule cat, rule
-      modal.showTip $host, utils.i18n 'opt_errtip_duplicate'
+    megaRule = isRuleExists rule, cat
+    if megaRule?
+      dialog
+        content: utils.i18n('opt_errtip_duplicate') + megaRule
+      .show $host[0]
       return false
 
     if data.host is '*'
@@ -213,9 +223,7 @@ define (require)->
     else
       # check whether the rule will disable QR feature
       eMsg = 'opt_errdlg_cqr' unless isSafe4Qr cat, rule
-      # check whether a rule is duplicated
-      megaRule = isRuleHasExist rule, cat
-      eMsg = 'opt_errdlg_dupl' if megaRule?
+
     if eMsg
       dialog
         title: utils.i18n 'opt_errdlg_title'
@@ -228,11 +236,6 @@ define (require)->
           addRule cat, rule
           return
       .showModal()
-      # modal.showDlg
-      #   title: utils.i18n 'opt_errdlg_title'
-      #   content: utils.i18n eMsg
-      #   callback: addRule
-      #   cbargs: [cat, rule]
       return
     else
       addRule cat, rule
@@ -243,15 +246,23 @@ define (require)->
     cat = $('#request-settings').attr 'data-id'
     len = $(this).parents('table').find('tbody input:checked').length
     if len
-      modal.showDlg
+      dialog
         title: utils.i18n 'opt_deldlg_title'
         content: utils.i18n('opt_deldlg_content').replace 'xx', len
-        callback: removeRule
-        cbargs:[ cat ]
+        cancelValue: utils.i18n 'cancel_btn'
+        cancel: ->
+        autofocus: false
+        okValue: utils.i18n 'ok_btn'
+        ok: ->
+          removeRule cat
+          return
+      .showModal()
 
       return
     else
-      modal.showTip this, utils.i18n 'opt_errtip_nochose'
+      dialog
+        content: utils.i18n 'opt_errtip_nochose'
+      .show this
       return false
 
   # delete on rule
@@ -314,6 +325,15 @@ define (require)->
   ###*
    * Test the custom rule with a real url
    * if pass return the rule object or nothing
+   * @return {Object}
+   *                 {
+   *                    url: match url, which url will be captured used by chrome
+   *                    reg: regexp string can match an url & extract params
+   *                    matchUrl: match rule with placeholder, used by extension
+   *                    redirectUrl: redirect rule with placeholder
+   *                    hasQs: has named params in query string
+   *                    params: two array of var name of each named param in path an querystring
+   *                 }
   ###
   checkCustomRule = ->
     $protocol = $ '#protocol-c'
@@ -329,55 +349,79 @@ define (require)->
     matchUrl = protocol + '://' + host
 
     unless utils.isProtocol protocol
-      modal.showTip $protocol, utils.i18n 'opt_errtip_protocol'
+      dialog
+        content: utils.i18n 'opt_errtip_protocol'
+      .show $protocol[0]
       return
 
     if false is utils.isRouterStrValid matchUrl
-      alert 'match rule not valid'
-      # modal.showTip $host, utils.i18n 'opt_errtip_protocol'
+      dialog
+        # content: utils.i18n 'opt_errtip_protocol'
+        content: 'match rule not valid'
+      .show $host[0]
       return
 
     router = utils.getRouter matchUrl
     if ret = utils.hasReservedWord router
-      alert 'reserved keywords found in the router: ' + ret.join ','
-      # modal.showTip $redirectUrl, utils.i18n 'opt_errtip_protocol'
-      return
-    console.log 'router: %o', router
-    if ret = utils.hasUndefinedWord router, redirectUrl
-      alert 'undefined keywords found in the redirect url: ' + ret.join ','
+      dialog
+        # content: utils.i18n 'opt_errtip_protocol'
+        content: 'reserved keywords found in the router: ' + ret.join ','
+      .show $host[0]
       return
 
-    unless testUrl# and utils.is testUrl
-      alert 'test url need be filled'
-      return
-    unless utils.isUrl testUrl
-      alert 'test url is invalid'
-
-    megaRule = isRuleHasExist rule, 'custom'
+    megaRule = isRuleExists router.rule, 'custom'
     # custom rules has xcross area???
     if megaRule?
-      console.log 'todo'
+      dialog
+        content: utils.i18n('opt_errtip_duplicate') + megaRule
+      .show $host[0]
+
+    console.log 'router: %o', router
+    if ret = utils.hasUndefinedWord router, redirectUrl
+      dialog
+        # content: utils.i18n 'opt_errtip_protocol'
+        content: 'undefined keywords found in the redirect url: ' + ret.join ','
+      .show $redirectUrl[0]
+      return
+
+
+    unless testUrl# and utils.is testUrl
+      dialog
+        # content: utils.i18n 'opt_errtip_protocol'
+        content: 'test url need be filled'
+      .show $testUrl[0]
+      return
+    unless utils.isUrl testUrl
+      dialog
+        # content: utils.i18n 'opt_errtip_protocol'
+        content: 'test url is invalid'
+      .show $testUrl[0]
+      return
     
-    megaRule = isRuleHasExist rule, 'block'
+    megaRule = isRuleExists rule, 'block'
     if megaRule?
       alert 'this rule is conflict with block rule: ' + megaRule
+      return
     
+    router.redirectUrl = redirectUrl
 
-    $('#custom-test-result').text utils.getTargetUrl matchUrl, redirectUrl, testUrl
+    $('#custom-test-result').text utils.getTargetUrl router, testUrl
 
-    return {
-      # url for chrome webrequest api to match
-      url: ''
-      # url with placeholder to extract the params
-      matchUrl: ''
-      # url template to get the new url
-      redirectUrl: ''
-    }
+    router
 
 
-  # test url
+  # test custom url
   $('#test-url-btn').on 'click', (e)->
     do checkCustomRule
+
+  # add an custom rule
+  $('#add-csrule').on 'click', ->
+    router =  do checkCustomRule
+    return unless router
+    collection.saveCustomRule router
+    # do resetCustomeForm
+    # addRule
+
 
 
   return {

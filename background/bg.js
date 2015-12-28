@@ -5,7 +5,7 @@ var hasProp = {}.hasOwnProperty;
   var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, logNum, onRequests, pushNotification, requestCache, rules, updateExtIcon;
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'];
-  RULES_TYPE = ['block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic'];
+  RULES_TYPE = ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic'];
   rules = {
     block: {
       urls: []
@@ -71,7 +71,7 @@ var hasProp = {}.hasOwnProperty;
     }
     return {
       formatedData: result,
-      rawData: qstr
+      rawData: qs
     };
   };
   formatHeaders = function(headers) {
@@ -123,6 +123,24 @@ var hasProp = {}.hasOwnProperty;
         return {
           redirectUrl: url
         };
+      },
+      permit: ['blocking'],
+      on: 'onBeforeRequest'
+    },
+    custom: {
+      fn: function(details) {
+        var k, rule, url;
+        rules = collection.getLocal('custom', 'o');
+        for (k in rules) {
+          if (!hasProp.call(rules, k)) continue;
+          rule = rules[k];
+          url = utils.getTargetUrl(rule, details.url);
+          if (url) {
+            return {
+              redirectUrl: url
+            };
+          }
+        }
       },
       permit: ['blocking'],
       on: 'onBeforeRequest'
@@ -226,13 +244,15 @@ var hasProp = {}.hasOwnProperty;
     for (j = 0, len = RULES_TYPE.length; j < len; j++) {
       k = RULES_TYPE[j];
       if (onoff[k]) {
-        _rule = collection.getLocal(k, 'a');
+        _rule = collection.getRules(k);
         rule = rules[k];
         if (!(rule.urls.length || _rule.length)) {
           onoff[k] = false;
           continue;
         }
-        rule.urls = rule.urls.concat(_rule);
+        if (_rule) {
+          rule.urls = rule.urls.concat(_rule);
+        }
         if (k === 'log') {
           pushNotification(utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', function() {
             window.open('/options/index.html#log');
@@ -243,6 +263,7 @@ var hasProp = {}.hasOwnProperty;
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
         } else {
           onRequest = onRequests[k];
+          console.log(rule, onRequest.on, onRequest.fn, onRequest.permit);
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
         }
       } else {
@@ -258,6 +279,7 @@ var hasProp = {}.hasOwnProperty;
     reqApi = chrome.webRequest;
     newData = JSON.parse(event.newValue || '[]');
     oldData = JSON.parse(event.oldValue || '[]');
+    collection.initCollection();
     onRequest = null;
     if (type === 'config') {
       if (newData.iconStyle !== oldData.iconStyle) {

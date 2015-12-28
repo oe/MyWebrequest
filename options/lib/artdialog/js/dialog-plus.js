@@ -886,7 +886,6 @@ popup.prototype = Popup.prototype;
 var prototype = artDialog.prototype = new popup();
 
 artDialog.create = function (options) {
-    console.log('dialog: %o', options);
     var that = this;
 
     $.extend(this, new Popup());

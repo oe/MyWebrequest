@@ -23,30 +23,39 @@
   # remove undefined rule
   getRules = (cat)->
     rules = collection[ cat ]
-    rules.filter (rule)->
-      rule isnt undefined
+    if cat is 'custom'
+      Object.keys rules
+    else
+      rules
+    
 
   # init rules into collection from localStorage
   initCollection = ->
 
     for cat in cats
-      collection[cat] = JSON.parse localStorage.getItem( cat ) or '[]'
-
+      if cat is 'custom'
+        collection[cat] = JSON.parse localStorage.getItem( cat ) or '{}'
+      else
+        collection[cat] = JSON.parse localStorage.getItem( cat ) or '[]'
     return
 
   # get the index of a rule
   # -1 means not found
-  indexOfRule = (cat, rule)->
+  hasRule = (cat, rule)->
     rules = collection[ cat ]
-    return -1 unless rules and rule
-
-    rules.indexOf rule
-
+    return false unless rules
+    if cat is 'custom'
+      !!rules[ rule ]
+    else
+      rule in rules
+    
   # add a rule
   addRule = (cat, rule)->
-    return false if not rule or ~indexOfRule cat, rule
-    rules = collection[cat]
-    rules[ rules.length++ ] = rule
+    return false if not rule or hasRule cat, rule
+    if cat is 'custom'
+      rules[ rule.url ] = rule
+    else
+      rules.push rule
 
     saveRule cat
     return true
@@ -54,25 +63,33 @@
   # remove rules
   # if rule is undefined then empty all the rules
   removeRule = (cat, rules)->
-    _rules = collection[ cat ]
+    _rules = getRules cat
     if rules is undefined or (Array.isArray(rules) and _rules.length is rules.length)
-      collection[ cat ] = []
+      collection[ cat ] = null
       # disable feature of cat when empty
       # TODO: should it be done in background js?
       # utils.setSwitch cat, false
     else
       rules = [ rules ] unless Array.isArray rules
       rules.forEach (rule)->
-        index = indexOfRule cat, rule
-        _rules[ index ] = undefined if ~index
+        if cat is 'custom'
+          delete collection[ cat ][ rule ]
+        else
+          index = _rules.indexOf rule
+          delete _rules[ index ]
         return
     saveRule cat
     return
 
   # save rules into localStorage
   saveRule = (cat)->
-    arr = getRules cat
-    localStorage.setItem cat, JSON.stringify arr
+    rules = collection[ cat ]
+    if rules
+      localStorage.removeItem cat
+    else
+      localStorage.setItem cat, JSON.stringify rules
+    
+    do initCollection
     return
 
 
@@ -132,14 +149,11 @@
     do initCollection
     return
 
-  saveCustomRule = (router)->
-
   # init collection
   do initCollection
 
   return {
     _collection : collection
-    indexOfRule : indexOfRule
     hasCat      : hasCat
     addRule     : addRule
     getRules    : getRules

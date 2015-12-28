@@ -2,8 +2,6 @@ define (require)->
 
   utils = require 'common/js/utils'
   collection = require 'common/js/collection'
-  modal = require 'js/component'
-  # dialog = require 'dialog'
   
   # init utility page
   init = (cat)->

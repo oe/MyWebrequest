@@ -2,7 +2,7 @@ do ->
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*']
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*']
 
-  RULES_TYPE = [ 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic']
+  RULES_TYPE = [ 'custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic']
 
   rules =
       block: { urls: [] }
@@ -49,7 +49,7 @@ do ->
 
     {
       formatedData: result
-      rawData: qstr
+      rawData: qs
     }
 
 
@@ -94,6 +94,17 @@ do ->
         if !url
           url = details.url
         { redirectUrl: url }
+      permit: [ 'blocking' ]
+      on: 'onBeforeRequest'
+    # 自定义请求跳转
+    custom:
+      fn: (details)->
+        rules = collection.getLocal 'custom', 'o'
+        for own k, rule of rules
+          url = utils.getTargetUrl rule, details.url
+          if url
+            return { redirectUrl: url }
+
       permit: [ 'blocking' ]
       on: 'onBeforeRequest'
     # 屏蔽请求
@@ -174,12 +185,12 @@ do ->
     # 启用各个特性
     for k in RULES_TYPE
       if onoff[ k ]
-        _rule = collection.getLocal k, 'a'
+        _rule = collection.getRules k
         rule = rules[ k ]
         unless rule.urls.length or _rule.length
           onoff[ k ] = false
           continue
-        rule.urls = rule.urls.concat _rule
+        rule.urls = rule.urls.concat _rule if _rule
         if k is 'log'
           pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->
             window.open '/options/index.html#log'
@@ -190,7 +201,7 @@ do ->
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
         else
           onRequest = onRequests[ k ]
-          # console.log rule, onRequest.on, onRequest.fn, onRequest.permit
+          console.log rule, onRequest.on, onRequest.fn, onRequest.permit
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
       else
         onoff[ k ] = false
@@ -209,7 +220,8 @@ do ->
     reqApi = chrome.webRequest
     newData = JSON.parse event.newValue or '[]'
     oldData = JSON.parse event.oldValue or '[]'
-    
+
+    do collection.initCollection
 
     onRequest = null
     if type is 'config'

@@ -1,5 +1,4 @@
 define (require)->
-  modal = require 'js/component'
   utils = require 'common/js/utils'
   vars = require 'js/vars'
   QRAPIURL = vars.QR_API_URL
@@ -34,11 +33,11 @@ define (require)->
   # qrcode image on error
   document.getElementById('qrimg').onerror = (e) ->
     @setAttribute 'hidden', true
-    modal.showDlg
+    dialog
       title: utils.i18n 'opt_errtip_gtitle'
       content: utils.i18n 'opt_errtip_gcontent'
-      hideCancel: true
-      focusOnOK: true
+      okValue: utils.i18n 'ok_btn'
+      ok: ->
     return
 
   # get vard info

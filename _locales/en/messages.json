@@ -147,16 +147,16 @@
     "message": "Help U inspecting the webrequests"
   },
   "opt_errtip_protocol": {
-    "message": "Protocol is invalid. Are U trying to do something? Just reload this page."
+    "message": "The protocol is invalid. Are U trying to do something? Just reload this page."
   },
   "opt_errtip_host": {
-    "message": "Domain is invalid. Get more info in <a href=\"#help\">Help</a>"
+    "message": "The domain is invalid. Get more info in <a href=\"#help\">Help</a>"
   },
   "opt_errtip_path": {
-    "message": "Path is invalid. Get more info in <a href=\"#help\">Help</a>"
+    "message": "The path is invalid. Get more info in <a href=\"#help\">Help</a>"
   },
   "opt_errtip_duplicate": {
-    "message": "This rule is exist. Try something else."
+    "message": "This rule is duplicated with the rule below. Try something else. <br>"
   },
   "opt_errtip_nochose": {
     "message": "You have not choose anything."

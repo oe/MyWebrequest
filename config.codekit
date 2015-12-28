@@ -19419,19 +19419,6 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/options\/coffee\/component.coffee": {
-		"createSourceMap": 1,
-		"fileType": 32,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/coffee\/component.coffee",
-		"minifyOutput": 0,
-		"outputAbbreviatedPath": "\/options\/js\/component.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 1,
-		"syntaxCheckerStyle": 1
-		},
 	"\/options\/coffee\/data-maintain.coffee": {
 		"createSourceMap": 1,
 		"fileType": 32,
@@ -19573,17 +19560,6 @@
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/options\/js\/app.js",
 		"outputAbbreviatedPath": "\/options\/js\/min\/app-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
-		"syntaxCheckerStyle": 1
-		},
-	"\/options\/js\/component.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/js\/component.js",
-		"outputAbbreviatedPath": "\/options\/js\/min\/component-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 0,
@@ -19761,45 +19737,12 @@
 		"strictMath": 0,
 		"strictUnits": 0
 		},
-	"\/options\/lib\/artdialog\/js\/dialog-min.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-min.js",
-		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-min-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
-		"syntaxCheckerStyle": 1
-		},
-	"\/options\/lib\/artdialog\/js\/dialog-plus-min.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-plus-min.js",
-		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-plus-min-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
-		"syntaxCheckerStyle": 1
-		},
 	"\/options\/lib\/artdialog\/js\/dialog-plus.js": {
 		"fileType": 64,
 		"ignore": 1,
 		"ignoreWasSetByUser": 0,
 		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog-plus.js",
 		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-plus-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
-		"syntaxCheckerStyle": 1
-		},
-	"\/options\/lib\/artdialog\/js\/dialog.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/dialog.js",
-		"outputAbbreviatedPath": "\/options\/lib\/artdialog\/js\/min\/dialog-min.js",
 		"outputPathIsOutsideProject": 0,
 		"outputPathIsSetByUser": 0,
 		"outputStyle": 0,

@@ -29,7 +29,7 @@
     pathReg.test path
 
   # reg to match protocol, host, path, query
-  urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]+)?(\?(.*))?$/
+  urlComponentReg = /^(\*|\w+):\/\/([^/]+)(\/[^?]*)(\?(.*))?$/
   isUrl = (url)->
     matches = urlComponentReg.exec url
     return false unless matches
@@ -179,11 +179,11 @@
    * @return {Boolean}
   ###
   isRouterStrValid = (route)->
-    mathes = urlComponentReg.exec route
+    matches = urlComponentReg.exec route
 
     protocol = matches[1]
     # path is host + real path
-    path = mathes[2] + matches[3]
+    path = matches[2] + matches[3]
     # query string without prefix ?
     qs = matches[5]
 
@@ -407,14 +407,13 @@
   ###*
    * get target url
    * @param  {Object} router   url pattern to match a url
-   * @param  {String} pattern url pattern that to get a new url
    * @param  {String} url     a real url that match route
    * @return {String}         converted url
   ###
-  getTargetUrl = (router, pattern, url)->
+  getTargetUrl = (router, url)->
     params = getUrlValues router, url
     return '' unless params
-    fillPattern pattern, params
+    fillPattern router.redirectUrl, params
 
 
 
