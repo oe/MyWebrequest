@@ -18,7 +18,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
 })(this, function(root) {
   var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, hasRule, initCollection, removeLocal, removeRule, saveRule, setConfig, setLocal, setSwitch;
   collection = {};
-  cats = ['block', 'hsts', 'hotlink', 'log', 'custom'];
+  cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch'];
   hasCat = function(cat) {
     return ~cats.indexOf(cat);
   };

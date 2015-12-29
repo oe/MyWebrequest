@@ -15,7 +15,7 @@
   # rules' collection
   collection = {}
   # categories
-  cats = ['block', 'hsts', 'hotlink', 'log', 'custom']
+  cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch']
 
   hasCat = (cat)->
     ~cats.indexOf cat
