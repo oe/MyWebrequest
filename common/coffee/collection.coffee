@@ -45,13 +45,14 @@
     rules = collection[ cat ]
     return false unless rules
     if cat is 'custom'
-      !!rules[ rule ]
+      !!rules[ rule.url ]
     else
       rule in rules
     
   # add a rule
   addRule = (cat, rule)->
     return false if not rule or hasRule cat, rule
+    rules = collection[ cat ]
     if cat is 'custom'
       rules[ rule.url ] = rule
     else
@@ -85,9 +86,9 @@
   saveRule = (cat)->
     rules = collection[ cat ]
     if rules
-      localStorage.removeItem cat
-    else
       localStorage.setItem cat, JSON.stringify rules
+    else
+      localStorage.removeItem cat
     
     do initCollection
     return
@@ -153,18 +154,19 @@
   do initCollection
 
   return {
-    _collection : collection
-    hasCat      : hasCat
-    addRule     : addRule
-    getRules    : getRules
-    removeRule  : removeRule
-    saveRule    : saveRule
-    eachRule    : eachRule
-    getLocal    : getLocal
-    setLocal    : setLocal
-    getSwitch   : getSwitch
-    setSwitch   : setSwitch
-    getConfig   : getConfig
-    setConfig   : setConfig
+    _collection    : collection
+    initCollection : initCollection
+    hasCat         : hasCat
+    addRule        : addRule
+    getRules       : getRules
+    removeRule     : removeRule
+    saveRule       : saveRule
+    eachRule       : eachRule
+    getLocal       : getLocal
+    setLocal       : setLocal
+    getSwitch      : getSwitch
+    setSwitch      : setSwitch
+    getConfig      : getConfig
+    setConfig      : setConfig
   }
 )

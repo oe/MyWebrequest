@@ -334,15 +334,15 @@ define(function(require) {
    *                 }
    */
   checkCustomRule = function() {
-    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, megaRule, protocol, redirectUrl, ret, router, testUrl;
+    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, megaRule, protocol, redirectUrl, ret, router, targetUrl, testUrl;
     $protocol = $('#protocol-c');
     $host = $('#host-c');
     $redirectUrl = $('#redirect-url-input');
     $testUrl = $('#test-url-input');
     protocol = $protocol.val();
-    host = $host.val();
-    redirectUrl = $redirectUrl.val();
-    testUrl = $testUrl.val();
+    host = $host.val().trim();
+    redirectUrl = $redirectUrl.val().trim();
+    testUrl = $testUrl.val().trim();
     matchUrl = protocol + '://' + host;
     if (!utils.isProtocol(protocol)) {
       dialog({
@@ -363,7 +363,7 @@ define(function(require) {
       }).show($host[0]);
       return;
     }
-    megaRule = isRuleExists(router.rule, 'custom');
+    megaRule = isRuleExists(router.url, 'custom');
     if (megaRule != null) {
       dialog({
         content: utils.i18n('opt_errtip_duplicate') + megaRule
@@ -388,13 +388,14 @@ define(function(require) {
       }).show($testUrl[0]);
       return;
     }
-    megaRule = isRuleExists(rule, 'block');
+    megaRule = isRuleExists(router.url, 'block');
     if (megaRule != null) {
       alert('this rule is conflict with block rule: ' + megaRule);
       return;
     }
     router.redirectUrl = redirectUrl;
-    $('#custom-test-result').text(utils.getTargetUrl(router, testUrl));
+    targetUrl = utils.getTargetUrl(router, testUrl);
+    $('#custom-test-result').html("<a target='_blank' href='" + targetUrl + "'>" + targetUrl + "</a>");
     return router;
   };
   $('#test-url-btn').on('click', function(e) {
@@ -406,7 +407,7 @@ define(function(require) {
     if (!router) {
       return;
     }
-    return collection.saveCustomRule(router);
+    return collection.addRule('custom', router);
   });
   return {
     init: initSection,

@@ -65,7 +65,7 @@
       return
     catch e
       return e.message
-  
+
   ###*
    * GET url info url the clipboard, returns {protocol, host, path}
    * @param  {Event} e  paste event
@@ -141,7 +141,7 @@
 
       else
         params[ k ] = v
-    
+
     params
 
   ###*
@@ -164,9 +164,9 @@
     else
       val = encodeURIComponent(val).replace '%20', '+'
       "#{key}=#{val}"
-    
-    
-  
+
+
+
   # get keywords list(array) in route object
   getKwdsInRoute = (router)->
     [].concat router.params, RESERVED_HOLDERS, getObjVals router.qsParams
@@ -180,6 +180,7 @@
   ###
   isRouterStrValid = (route)->
     matches = urlComponentReg.exec route
+    return false unless matches
 
     protocol = matches[1]
     # path is host + real path
@@ -189,7 +190,7 @@
 
     # path basic format
     console.log 'test path format:' +  path
-    return false unless /^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
+    return false unless /^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
     # {*named} should only used in the end of the path
     console.log 'test splat kwd  in the middle of the string'
     return false if /(\{\*\w+\}).+$/.test path
@@ -235,10 +236,10 @@
     protocol = if protocol then protocol[1] else '*'
     url = protocol + '://'
 
-    protocol = protocol.replace escapeRegExp, '(?:\\$&)'
+    protocol = '\\w+' if protocol is '*'
     # remove protocol
     route = route.replace /^([\w\*]+)\:\/\//, ''
-    
+
     # replace named holder with * in host
     url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
     # replace query string with *
@@ -247,7 +248,7 @@
     .replace /\{\w+\}.*$/, '*'
     result.url = url
 
-    
+
     parts = route.split '?'
     # route contains more than one ?
     if parts.length > 2 then return result
@@ -371,7 +372,6 @@
       for own k, v of r.qsParams
         res[ v ] = qsParams[ k ] or ''
 
-    console.log 'url values: %o', res
 
     urlComponentReg.exec url
     # keep protocol
@@ -394,7 +394,7 @@
     if i isnt -1
       path = pattern.substr 0, i
       qs = pattern.substr i
-    
+
     path = path.replace /\{(\w+)\}/g, ($0, $1)->
       val = data[ $1 ] ? ''
       # / in val, like abc/bdc, won't be encoded

@@ -49,15 +49,17 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       return false;
     }
     if (cat === 'custom') {
-      return !!rules[rule];
+      return !!rules[rule.url];
     } else {
       return indexOf.call(rules, rule) >= 0;
     }
   };
   addRule = function(cat, rule) {
+    var rules;
     if (!rule || hasRule(cat, rule)) {
       return false;
     }
+    rules = collection[cat];
     if (cat === 'custom') {
       rules[rule.url] = rule;
     } else {
@@ -91,9 +93,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     var rules;
     rules = collection[cat];
     if (rules) {
-      localStorage.removeItem(cat);
-    } else {
       localStorage.setItem(cat, JSON.stringify(rules));
+    } else {
+      localStorage.removeItem(cat);
     }
     initCollection();
   };
@@ -154,6 +156,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   initCollection();
   return {
     _collection: collection,
+    initCollection: initCollection,
     hasCat: hasCat,
     addRule: addRule,
     getRules: getRules,

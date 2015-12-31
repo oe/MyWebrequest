@@ -187,9 +187,11 @@ do ->
       if onoff[ k ]
         _rule = collection.getRules k
         rule = rules[ k ]
-        unless rule.urls.length or _rule.length
+        unless (rule and rule.urls and rule.urls.length) or _rule.length
           onoff[ k ] = false
           continue
+        unless rule
+          rule = { urls: [] }
         rule.urls = rule.urls.concat _rule if _rule
         if k is 'log'
           pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->

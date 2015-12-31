@@ -246,9 +246,14 @@ var hasProp = {}.hasOwnProperty;
       if (onoff[k]) {
         _rule = collection.getRules(k);
         rule = rules[k];
-        if (!(rule.urls.length || _rule.length)) {
+        if (!((rule && rule.urls && rule.urls.length) || _rule.length)) {
           onoff[k] = false;
           continue;
+        }
+        if (!rule) {
+          rule = {
+            urls: []
+          };
         }
         if (_rule) {
           rule.urls = rule.urls.concat(_rule);

@@ -207,11 +207,14 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   isRouterStrValid = function(route) {
     var matches, n, path, protocol, qs;
     matches = urlComponentReg.exec(route);
+    if (!matches) {
+      return false;
+    }
     protocol = matches[1];
     path = matches[2] + matches[3];
     qs = matches[5];
     console.log('test path format:' + path);
-    if (!/^(\{\w+\})*(\.\w+){2,}\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
+    if (!/^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
       return false;
     }
     console.log('test splat kwd  in the middle of the string');
@@ -256,7 +259,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     protocol = route.match(/^([\w\*]+)\:\/\//);
     protocol = protocol ? protocol[1] : '*';
     url = protocol + '://';
-    protocol = protocol.replace(escapeRegExp, '(?:\\$&)');
+    if (protocol === '*') {
+      protocol = '\\w+';
+    }
     route = route.replace(/^([\w\*]+)\:\/\//, '');
     url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*').replace(/\?.*$/, '*').replace(/\{\w+\}.*$/, '*');
     result.url = url;
@@ -413,7 +418,6 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
         res[v] = qsParams[k] || '';
       }
     }
-    console.log('url values: %o', res);
     urlComponentReg.exec(url);
     res.p = RegExp.$1;
     res.h = RegExp.$2;

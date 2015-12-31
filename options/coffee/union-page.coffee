@@ -342,9 +342,11 @@ define (require)->
     $testUrl = $ '#test-url-input'
 
     protocol = $protocol.val()
-    host = $host.val()
-    redirectUrl = $redirectUrl.val()
-    testUrl = $testUrl.val()
+    host = $host.val().trim()
+    redirectUrl = $redirectUrl.val().trim()
+    testUrl = $testUrl.val().trim()
+
+    # unless host and redirectUrl
     
     matchUrl = protocol + '://' + host
 
@@ -369,7 +371,7 @@ define (require)->
       .show $host[0]
       return
 
-    megaRule = isRuleExists router.rule, 'custom'
+    megaRule = isRuleExists router.url, 'custom'
     # custom rules has xcross area???
     if megaRule?
       dialog
@@ -398,14 +400,14 @@ define (require)->
       .show $testUrl[0]
       return
     
-    megaRule = isRuleExists rule, 'block'
+    megaRule = isRuleExists router.url, 'block'
     if megaRule?
       alert 'this rule is conflict with block rule: ' + megaRule
       return
     
     router.redirectUrl = redirectUrl
-
-    $('#custom-test-result').text utils.getTargetUrl router, testUrl
+    targetUrl = utils.getTargetUrl router, testUrl
+    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl}'>#{targetUrl}</a>"
 
     router
 
@@ -418,11 +420,9 @@ define (require)->
   $('#add-csrule').on 'click', ->
     router =  do checkCustomRule
     return unless router
-    collection.saveCustomRule router
+    collection.addRule 'custom', router
     # do resetCustomeForm
     # addRule
-
-
 
   return {
     init: initSection
