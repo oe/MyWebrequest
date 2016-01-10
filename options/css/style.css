@@ -35,6 +35,7 @@ a {
 	text-decoration: underline;
 	cursor: pointer;
 }
+a > label { cursor: pointer;}
 aside .app-name{
 	width: 100%;
 	margin: 0;

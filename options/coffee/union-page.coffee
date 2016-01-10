@@ -38,7 +38,7 @@ define (require)->
     ruleNum = $tbody.find('tr:not([nodata])').length
     $switch = $ '#request-settings .switch-input'
     switchEnabled = collection.getSwitch cat
-    
+
     $switch.prop
       'checked'  : switchEnabled and !!ruleNum
       'disabled' : !ruleNum
@@ -76,12 +76,13 @@ define (require)->
   # add a rule
   addRule = (cat, rule)->
     $tbody = $ '#request-settings tbody'
-    $tr = $ tpl.rulesTpl [ rule ]
+    $tr = $ tpl.rulesTpl [ collection.getRule4Show(cat, rule) ]
     $tr.addClass 'new-item'
 
     noRule = !$tbody.find('tr:not([nodata])').length
 
     $tbody[ if noRule then 'html' else 'prepend' ] $tr
+    # clear inputs
     $('.rule-field input').val ''
     $('#host').focus()
 
@@ -99,7 +100,7 @@ define (require)->
    * @param  {String} cat
   ###
   initSection = (cat)->
-    rules = collection.getRules cat
+    rules = collection.getRules4Show cat
 
     isCustom = cat is 'custom'
     $('#request-settings .js-custom').prop 'hidden', !isCustom
@@ -378,7 +379,6 @@ define (require)->
         content: utils.i18n('opt_errtip_duplicate') + megaRule
       .show $host[0]
 
-    console.log 'router: %o', router
     if ret = utils.hasUndefinedWord router, redirectUrl
       dialog
         # content: utils.i18n 'opt_errtip_protocol'
@@ -406,10 +406,10 @@ define (require)->
       return
     
     router.redirectUrl = redirectUrl
-    targetUrl = utils.getTargetUrl router, testUrl
-    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl}'>#{targetUrl}</a>"
-
-    router
+    targetUrl = utils.getTargetUrl(router, testUrl)
+    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl}'>#{targetUrl  or 'not match'}</a>"
+    # return router if test pass
+    if targetUrl then router
 
 
   # test custom url
@@ -420,7 +420,8 @@ define (require)->
   $('#add-csrule').on 'click', ->
     router =  do checkCustomRule
     return unless router
-    collection.addRule 'custom', router
+    addRule 'custom', router
+    # collection.addRule 'custom', router
     # do resetCustomeForm
     # addRule
 

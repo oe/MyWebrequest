@@ -17,18 +17,6 @@
   # categories
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch']
 
-  hasCat = (cat)->
-    ~cats.indexOf cat
-
-  # remove undefined rule
-  getRules = (cat)->
-    rules = collection[ cat ]
-    if cat is 'custom'
-      Object.keys rules
-    else
-      rules
-    
-
   # init rules into collection from localStorage
   initCollection = ->
 
@@ -39,6 +27,43 @@
         collection[cat] = JSON.parse localStorage.getItem( cat ) or '[]'
     return
 
+  hasCat = (cat)->
+    ~cats.indexOf cat
+
+  # get rules
+  getRules = (cat)->
+    rules = collection[ cat ]
+    if cat is 'custom'
+      Object.keys rules
+    else
+      rules
+
+  # get a single rule for show
+  getRule4Show = (cat, rule)->
+    if cat is 'custom'
+      "#{rule.matchUrl}<br>#{rule.redirectUrl}"
+    else
+      rule
+  # get a list for show
+  getRules4Show = (cat)->
+    rules = collection[ cat ]
+    if cat is 'custom'
+      ret = []
+      for k, v of rules
+        ret.push
+          ruleId: v.url
+          rule: "#{v.matchUrl}<br>#{v.redirectUrl}"
+          title: v.matchUrl
+      ret
+    else
+      rules.map (rule)->
+        {
+          ruleId: rule
+          rule: rule
+          title: rule
+        }
+    
+
   # get the index of a rule
   # -1 means not found
   hasRule = (cat, rule)->
@@ -48,7 +73,7 @@
       !!rules[ rule.url ]
     else
       rule in rules
-    
+
   # add a rule
   addRule = (cat, rule)->
     return false if not rule or hasRule cat, rule
@@ -82,6 +107,18 @@
     saveRule cat
     return
 
+  # set restore status
+  # if flag true, then add status flag, or remove it
+  setRestoreStatus = (flag)->
+    if flag
+      localStorage.setItem '_is_restoring_', 'processing'
+    else
+      localStorage.removeItem '_is_restoring_'
+
+  # whether if restoring
+  isRestoring = ->
+    !!localStorage.getItem '_is_restoring_'
+
   # save rules into localStorage
   saveRule = (cat)->
     rules = collection[ cat ]
@@ -89,7 +126,7 @@
       localStorage.setItem cat, JSON.stringify rules
     else
       localStorage.removeItem cat
-    
+
     do initCollection
     return
 
@@ -154,19 +191,23 @@
   do initCollection
 
   return {
-    _collection    : collection
-    initCollection : initCollection
-    hasCat         : hasCat
-    addRule        : addRule
-    getRules       : getRules
-    removeRule     : removeRule
-    saveRule       : saveRule
-    eachRule       : eachRule
-    getLocal       : getLocal
-    setLocal       : setLocal
-    getSwitch      : getSwitch
-    setSwitch      : setSwitch
-    getConfig      : getConfig
-    setConfig      : setConfig
+    _collection      : collection
+    initCollection   : initCollection
+    setRestoreStatus : setRestoreStatus
+    isRestoring      : isRestoring
+    hasCat           : hasCat
+    addRule          : addRule
+    getRules         : getRules
+    getRules4Show    : getRules4Show
+    getRule4Show     : getRule4Show
+    removeRule       : removeRule
+    saveRule         : saveRule
+    eachRule         : eachRule
+    getLocal         : getLocal
+    setLocal         : setLocal
+    getSwitch        : getSwitch
+    setSwitch        : setSwitch
+    getConfig        : getConfig
+    setConfig        : setConfig
   }
 )

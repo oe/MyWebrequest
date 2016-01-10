@@ -235,7 +235,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     return isUrl(n);
   };
   namedParam = /\{(\(\?)?(\w+)\}/g;
-  splatParam = /\{(\*\w+)\}/g;
+  splatParam = /\{\*(\w+)\}/g;
   escapeRegExp = /[\-\[\]+?.,\\\^$|#\s]/g;
   queryStrReg = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g;
 
@@ -461,6 +461,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   getTargetUrl = function(router, url) {
     var params;
     params = getUrlValues(router, url);
+    console.log('url values %o', params);
     if (!params) {
       return '';
     }

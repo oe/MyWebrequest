@@ -1,13 +1,30 @@
 # data backup and restore
 define (require)->
+  collection = require 'common/js/collection'
   # data version
   version = '0.1'
 
+  # get localStorage data into an object
   getExtData = ->
-
-
-  restoreExtData = ->
-
+    ret = {}
+    for own k, v of localStorage
+      ret[ k ] = v
+    ret
+    
+  # restore json string or object to localStorage
+  restoreExtData = (data)->
+    if typeof data isnt 'object'
+      try
+        data = JSON.parse data
+      catch e
+        return false
+    for k, v of data
+      localStorage.setItem k, if typeof v is 'string' then v else String v
+    # reinit collection data in options page
+    collection.initCollection()
+    true
+    
+      
   ###*
    * save text into file
    * @param  {String|Object} text     content of the file
@@ -25,18 +42,20 @@ define (require)->
     dom.click()
 
   # f = e.target.files[0]
-  readFile = (f)->
+  readFile = (f, done, fail)->
     size = f.size
     # file size bigger than 5mb
     if size > 1024 * 1024 * 5
       alert 'Are you kidding me? the config file is bigger than 5m!'
+      fail 'SIZE_OVERFLOW'
       return
     
     reader = new FileReader()
     reader.onload = (e)->
-      content = e.target.result
-      console.log "file: #{content}"
-      console.log JSON.parse content
+      done e.target.result
+    reader.onerror = (e)->
+      fail e.message
+
     reader.readAsText f
 
 

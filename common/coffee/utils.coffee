@@ -212,7 +212,7 @@
   # // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
   # optionalParam = /\((.*?)\)/g
   namedParam    = /\{(\(\?)?(\w+)\}/g
-  splatParam    = /\{(\*\w+)\}/g
+  splatParam    = /\{\*(\w+)\}/g
   # escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
   escapeRegExp  = /[\-\[\]+?.,\\\^$|#\s]/g
   queryStrReg   = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g
@@ -412,6 +412,7 @@
   ###
   getTargetUrl = (router, url)->
     params = getUrlValues router, url
+    console.log 'url values %o', params
     return '' unless params
     fillPattern router.redirectUrl, params
 

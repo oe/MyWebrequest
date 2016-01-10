@@ -27,9 +27,21 @@ define (require)->
   # choose a file to read
   $('#restore-ext-data').on 'change', (e)->
     files = e.target.files
-    console.log files
     if files.length
-      dataMaintain.readFile files[0]
+      # set a flag to tell localStorage the change if from restoration
+      collection.setRestoreStatus true
+      dataMaintain.readFile files[0], (content)->
+        unless dataMaintain.restoreExtData content
+          collection.setRestoreStatus false
+          alert 'format error!'
+          return
+        # reinit this page because it can be affected
+        setTimeout ->
+          init()
+        , 300
+      , (msg)->
+        alert msg
+
     
 
 

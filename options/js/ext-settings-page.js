@@ -28,9 +28,20 @@ define(function(require) {
   $('#restore-ext-data').on('change', function(e) {
     var files;
     files = e.target.files;
-    console.log(files);
     if (files.length) {
-      return dataMaintain.readFile(files[0]);
+      collection.setRestoreStatus(true);
+      return dataMaintain.readFile(files[0], function(content) {
+        if (!dataMaintain.restoreExtData(content)) {
+          collection.setRestoreStatus(false);
+          alert('format error!');
+          return;
+        }
+        return setTimeout(function() {
+          return init();
+        }, 300);
+      }, function(msg) {
+        return alert(msg);
+      });
     }
   });
   return {

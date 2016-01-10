@@ -5,12 +5,13 @@ do ->
   RULES_TYPE = [ 'custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic']
 
   rules =
-      block: { urls: [] }
-      hsts: { urls: [] }
-      log: { urls: [] }
-      hotlink: { urls: [] }
-      gsearch: { urls: gsearchRuleBasic }
-      gstatic: { urls: gstaticBasic }
+    block: { urls: [] }
+    hsts: { urls: [] }
+    log: { urls: [] }
+    hotlink: { urls: [] }
+    custom: { urls: [] }
+    gsearch: { urls: gsearchRuleBasic }
+    gstatic: { urls: gstaticBasic }
 
   logNum = 0
   requestCache = {}
@@ -177,9 +178,10 @@ do ->
     return
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
-  do ->
+  init = ->
+    collection.setRestoreStatus false
+
     onoff = collection.getLocal 'onoff', 'o'
-    
     reqApi = chrome.webRequest
     onRequest = null
     # 启用各个特性
@@ -187,12 +189,13 @@ do ->
       if onoff[ k ]
         _rule = collection.getRules k
         rule = rules[ k ]
-        unless (rule and rule.urls and rule.urls.length) or _rule.length
+        continue unless rule
+        
+        unless rule.urls.length or _rule.length
           onoff[ k ] = false
           continue
-        unless rule
-          rule = { urls: [] }
-        rule.urls = rule.urls.concat _rule if _rule
+
+        rule = urls : rule.urls.concat _rule if _rule
         if k is 'log'
           pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->
             window.open '/options/index.html#log'
@@ -203,7 +206,7 @@ do ->
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
         else
           onRequest = onRequests[ k ]
-          console.log rule, onRequest.on, onRequest.fn, onRequest.permit
+          # console.log rule, onRequest.on, onRequest.fn, onRequest.permit
           reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
       else
         onoff[ k ] = false
@@ -215,13 +218,18 @@ do ->
     updateExtIcon collection.getConfig 'iconStyle'
     return
 
+  do init
+
   # 监听localStroage的storage事件, 即监听配置信息的变化
   window.addEventListener 'storage', (event) ->
     # console.log 'event fired %o', event
     type = event.key
     reqApi = chrome.webRequest
-    newData = JSON.parse event.newValue or '[]'
-    oldData = JSON.parse event.oldValue or '[]'
+    try
+      newData = JSON.parse event.newValue or '[]'
+      oldData = JSON.parse event.oldValue or '[]'
+    catch e
+      console.warn "values(#{newData}/#{oldData}) of #{type} is invalid"
 
     do collection.initCollection
 
@@ -233,11 +241,24 @@ do ->
       return
     
     if type is 'onoff'
+      # if this change came from stroration, then do init after 1s
+      if collection.isRestoring()
+        setTimeout ->
+          # reset the onoff config then init every feature again
+          # to keep the onoff info wont be changed before init
+          collection.setLocal 'onoff', newData
+          init()
+        , 200
+        return
+      
       for k in RULES_TYPE
         if newData[ k ] isnt oldData[ k ]
           method = if newData[ k ] then 'addListener' else 'removeListener'
           rule = rules[ k ]
-          rule.urls = rules[ k ].urls.concat collection.getLocal k, 'a'
+          # return if this onoff is not supported
+          return unless rule
+          rule = urls: rule.urls.concat collection.getRules k
+          
           if k is 'log'
             onRequest = onRequests['logBody']
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
@@ -252,7 +273,10 @@ do ->
     return unless collection.getSwitch type
     
     rule = rules[ type ]
-    rule.urls = rule.urls.concat newData if Array.isArray newData
+    # return if this type is not supported
+    return unless rule
+
+    rule = urls: rule.urls.concat collection.getRules type
     if type is 'log'
       reqApi[ onRequests['logBody'].on ].removeListener onRequests['logBody'].fn
       reqApi[ onRequests['logRequest'].on ].removeListener onRequests['logRequest'].fn

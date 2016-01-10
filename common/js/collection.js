@@ -16,9 +16,20 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.collection = factory(root);
   }
 })(this, function(root) {
-  var addRule, cats, collection, eachRule, getConfig, getLocal, getRules, getSwitch, hasCat, hasRule, initCollection, removeLocal, removeRule, saveRule, setConfig, setLocal, setSwitch;
+  var addRule, cats, collection, eachRule, getConfig, getLocal, getRule4Show, getRules, getRules4Show, getSwitch, hasCat, hasRule, initCollection, isRestoring, removeLocal, removeRule, saveRule, setConfig, setLocal, setRestoreStatus, setSwitch;
   collection = {};
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch'];
+  initCollection = function() {
+    var cat, i, len;
+    for (i = 0, len = cats.length; i < len; i++) {
+      cat = cats[i];
+      if (cat === 'custom') {
+        collection[cat] = JSON.parse(localStorage.getItem(cat) || '{}');
+      } else {
+        collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
+      }
+    }
+  };
   hasCat = function(cat) {
     return ~cats.indexOf(cat);
   };
@@ -31,15 +42,35 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       return rules;
     }
   };
-  initCollection = function() {
-    var cat, i, len;
-    for (i = 0, len = cats.length; i < len; i++) {
-      cat = cats[i];
-      if (cat === 'custom') {
-        collection[cat] = JSON.parse(localStorage.getItem(cat) || '{}');
-      } else {
-        collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
+  getRule4Show = function(cat, rule) {
+    if (cat === 'custom') {
+      return rule.matchUrl + "<br>" + rule.redirectUrl;
+    } else {
+      return rule;
+    }
+  };
+  getRules4Show = function(cat) {
+    var k, ret, rules, v;
+    rules = collection[cat];
+    if (cat === 'custom') {
+      ret = [];
+      for (k in rules) {
+        v = rules[k];
+        ret.push({
+          ruleId: v.url,
+          rule: v.matchUrl + "<br>" + v.redirectUrl,
+          title: v.matchUrl
+        });
       }
+      return ret;
+    } else {
+      return rules.map(function(rule) {
+        return {
+          ruleId: rule,
+          rule: rule,
+          title: rule
+        };
+      });
     }
   };
   hasRule = function(cat, rule) {
@@ -88,6 +119,16 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       });
     }
     saveRule(cat);
+  };
+  setRestoreStatus = function(flag) {
+    if (flag) {
+      return localStorage.setItem('_is_restoring_', 'processing');
+    } else {
+      return localStorage.removeItem('_is_restoring_');
+    }
+  };
+  isRestoring = function() {
+    return !!localStorage.getItem('_is_restoring_');
   };
   saveRule = function(cat) {
     var rules;
@@ -157,9 +198,13 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   return {
     _collection: collection,
     initCollection: initCollection,
+    setRestoreStatus: setRestoreStatus,
+    isRestoring: isRestoring,
     hasCat: hasCat,
     addRule: addRule,
     getRules: getRules,
+    getRules4Show: getRules4Show,
+    getRule4Show: getRule4Show,
     removeRule: removeRule,
     saveRule: saveRule,
     eachRule: eachRule,

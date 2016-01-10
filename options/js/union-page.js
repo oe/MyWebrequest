@@ -85,7 +85,7 @@ define(function(require) {
   addRule = function(cat, rule) {
     var $tbody, $tr, noRule;
     $tbody = $('#request-settings tbody');
-    $tr = $(tpl.rulesTpl([rule]));
+    $tr = $(tpl.rulesTpl([collection.getRule4Show(cat, rule)]));
     $tr.addClass('new-item');
     noRule = !$tbody.find('tr:not([nodata])').length;
     $tbody[noRule ? 'html' : 'prepend']($tr);
@@ -104,7 +104,7 @@ define(function(require) {
    */
   initSection = function(cat) {
     var hasRule, html, isCustom, isHsts, rules;
-    rules = collection.getRules(cat);
+    rules = collection.getRules4Show(cat);
     isCustom = cat === 'custom';
     $('#request-settings .js-custom').prop('hidden', !isCustom);
     $('#request-settings .js-not-custom').prop('hidden', isCustom);
@@ -369,7 +369,6 @@ define(function(require) {
         content: utils.i18n('opt_errtip_duplicate') + megaRule
       }).show($host[0]);
     }
-    console.log('router: %o', router);
     if (ret = utils.hasUndefinedWord(router, redirectUrl)) {
       dialog({
         content: 'undefined keywords found in the redirect url: ' + ret.join(',')
@@ -395,8 +394,10 @@ define(function(require) {
     }
     router.redirectUrl = redirectUrl;
     targetUrl = utils.getTargetUrl(router, testUrl);
-    $('#custom-test-result').html("<a target='_blank' href='" + targetUrl + "'>" + targetUrl + "</a>");
-    return router;
+    $('#custom-test-result').html("<a target='_blank' href='" + targetUrl + "'>" + (targetUrl || 'not match') + "</a>");
+    if (targetUrl) {
+      return router;
+    }
   };
   $('#test-url-btn').on('click', function(e) {
     return checkCustomRule();
@@ -407,7 +408,7 @@ define(function(require) {
     if (!router) {
       return;
     }
-    return collection.addRule('custom', router);
+    return addRule('custom', router);
   });
   return {
     init: initSection,

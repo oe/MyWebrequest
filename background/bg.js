@@ -2,7 +2,7 @@
 var hasProp = {}.hasOwnProperty;
 
 (function() {
-  var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, logNum, onRequests, pushNotification, requestCache, rules, updateExtIcon;
+  var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, init, logNum, onRequests, pushNotification, requestCache, rules, updateExtIcon;
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'];
   RULES_TYPE = ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic'];
@@ -17,6 +17,9 @@ var hasProp = {}.hasOwnProperty;
       urls: []
     },
     hotlink: {
+      urls: []
+    },
+    custom: {
       urls: []
     },
     gsearch: {
@@ -236,8 +239,9 @@ var hasProp = {}.hasOwnProperty;
       }
     });
   };
-  (function() {
+  init = function() {
     var _rule, j, k, len, onRequest, onoff, reqApi, rule;
+    collection.setRestoreStatus(false);
     onoff = collection.getLocal('onoff', 'o');
     reqApi = chrome.webRequest;
     onRequest = null;
@@ -246,17 +250,17 @@ var hasProp = {}.hasOwnProperty;
       if (onoff[k]) {
         _rule = collection.getRules(k);
         rule = rules[k];
-        if (!((rule && rule.urls && rule.urls.length) || _rule.length)) {
+        if (!rule) {
+          continue;
+        }
+        if (!(rule.urls.length || _rule.length)) {
           onoff[k] = false;
           continue;
         }
-        if (!rule) {
-          rule = {
-            urls: []
-          };
-        }
         if (_rule) {
-          rule.urls = rule.urls.concat(_rule);
+          rule = {
+            urls: rule.urls.concat(_rule)
+          };
         }
         if (k === 'log') {
           pushNotification(utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', function() {
@@ -268,7 +272,6 @@ var hasProp = {}.hasOwnProperty;
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
         } else {
           onRequest = onRequests[k];
-          console.log(rule, onRequest.on, onRequest.fn, onRequest.permit);
           reqApi[onRequest.on].addListener(onRequest.fn, rule, onRequest.permit);
         }
       } else {
@@ -277,13 +280,19 @@ var hasProp = {}.hasOwnProperty;
     }
     collection.setLocal('onoff', onoff);
     updateExtIcon(collection.getConfig('iconStyle'));
-  })();
+  };
+  init();
   window.addEventListener('storage', function(event) {
-    var j, k, len, method, newData, oldData, onRequest, reqApi, rule, type;
+    var e, error, j, k, len, method, newData, oldData, onRequest, reqApi, rule, type;
     type = event.key;
     reqApi = chrome.webRequest;
-    newData = JSON.parse(event.newValue || '[]');
-    oldData = JSON.parse(event.oldValue || '[]');
+    try {
+      newData = JSON.parse(event.newValue || '[]');
+      oldData = JSON.parse(event.oldValue || '[]');
+    } catch (error) {
+      e = error;
+      console.warn("values(" + newData + "/" + oldData + ") of " + type + " is invalid");
+    }
     collection.initCollection();
     onRequest = null;
     if (type === 'config') {
@@ -293,12 +302,24 @@ var hasProp = {}.hasOwnProperty;
       return;
     }
     if (type === 'onoff') {
+      if (collection.isRestoring()) {
+        setTimeout(function() {
+          collection.setLocal('onoff', newData);
+          return init();
+        }, 200);
+        return;
+      }
       for (j = 0, len = RULES_TYPE.length; j < len; j++) {
         k = RULES_TYPE[j];
         if (newData[k] !== oldData[k]) {
           method = newData[k] ? 'addListener' : 'removeListener';
           rule = rules[k];
-          rule.urls = rules[k].urls.concat(collection.getLocal(k, 'a'));
+          if (!rule) {
+            return;
+          }
+          rule = {
+            urls: rule.urls.concat(collection.getRules(k))
+          };
           if (k === 'log') {
             onRequest = onRequests['logBody'];
             reqApi[onRequest.on][method](onRequest.fn, rule, onRequest.permit);
@@ -316,9 +337,12 @@ var hasProp = {}.hasOwnProperty;
       return;
     }
     rule = rules[type];
-    if (Array.isArray(newData)) {
-      rule.urls = rule.urls.concat(newData);
+    if (!rule) {
+      return;
     }
+    rule = {
+      urls: rule.urls.concat(collection.getRules(type))
+    };
     if (type === 'log') {
       reqApi[onRequests['logBody'].on].removeListener(onRequests['logBody'].fn);
       reqApi[onRequests['logRequest'].on].removeListener(onRequests['logRequest'].fn);
