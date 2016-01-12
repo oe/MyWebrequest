@@ -37,7 +37,7 @@ define(function(require) {
       content: utils.i18n('opt_errtip_gcontent'),
       okValue: utils.i18n('ok_btn'),
       ok: function() {}
-    });
+    }).showModal();
   };
   getVcardString = function() {
     var str;

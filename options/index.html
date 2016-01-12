@@ -52,7 +52,14 @@
 				<div class="input-field field-block host">
 					<label class="label" for="host" i18n-content="opt_host_lbl"></label>
 					<input id="host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
-					<div class="input-tip">there is some help tip</div>
+					<div class="input-tip">
+						<div>域名应遵守以下规则:</div>
+						<ul>
+							<li>可以指定确切的域名, 如 <code>www.abc.com</code></li>
+							<li>也可以使用IP地址, 如 <code>8.8.8.8</code></li>
+							<li>你可以使用通配符 <code>*</code> 来匹配任意子域名, 但只能在二级及之上的域名中使用. 如 <code>*.abc.com</code> 和 <code>*.api.abc.com</code> 是允许的, 而诸如 <code>*.com</code> 和 <code>*.net</code> 则是非法的.</li>
+						</ul>
+					</div>
 				</div>
 				<div class="input-field field-block separator">
 					<label class="label">&nbsp;</label>
@@ -61,13 +68,38 @@
 				<div class="input-field field-block path">
 					<label class="label" for="path" i18n-content="opt_path_lbl"></label>
 					<input id="path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
-					<div class="input-tip">there is some help tip</div>
+					<div class="input-tip">
+						<div class="error-tip">路径格式错误</div>
+						<div>路径应遵守以下规则(路径开头的 <strong>/</strong> 请省略):</div>
+						<ul>
+							<li>可以指定确切的路径, 如 <code>path</code>, <code>path?num=1</code></li>
+							<li>你可以使用通配符 <code>*</code> 来模糊匹配路径, 如:
+							<ul>
+								<li><code>*</code>(即任意路径)</li>
+								<li><code>path*</code>(所有以 path 开头的路径)</li>
+								<li><code>path*.jsp</code>(以 path 开头并以 .jsp 结尾的路径)</li>
+								<li><code>path?*</code>(所有提交到 path 的query请求)</li>
+								<li> <code>path?num=*</code>(所有提交path的query请求, 且num是第一个请求参数，注意 path?ps=23&num=23 不会被匹配)</li>
+							</ul>
+							</li>
+						</ul>
+					</div>
 				</div>
 				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
 					<button class="input add-rule" i18n-content="opt_addrule_btn"></button>
 				</div>
 			</div>
+			<!-- <div class="rule-field js-not-custom">
+				<div class="input-field field-block large-block">
+					<label class="label" for="test-url-input" i18n-content="opt_test_rule">Test your rule</label>
+					<input type="text" id="test-url-input" class="input" i18n-value="placeholder:opt_ph_testurl" placeholder="paste a real url to test your rule">
+				</div>
+				<div class="input-field field-block">
+					<label class="label">&nbsp;</label>
+					<button class="input" i18n-content="opt_test_btn" id="test-url-btn">Test URL</button>
+				</div>
+			</div> -->
 			<!-- custom URL -->
 			<div class="rule-field js-custom">
 				<div class="input-field field-block protocol">
@@ -101,13 +133,12 @@
 			<!-- test url input -->
 			<div class="rule-field js-custom">
 				<div class="input-field field-block large-block">
-					<label class="label" for="test-url-input" i18n-content="opt_test_rule"></label>
-					<input type="text" id="test-url-input" class="input" i18n-value="placeholder:opt_ph_testurl">
-					<div class="input-tip">there is some help tip</div>
+					<label class="label" for="test-csurl-input" i18n-content="opt_test_rule"></label>
+					<input type="text" id="test-csurl-input" class="input" i18n-value="placeholder:opt_ph_testurl">
 				</div>
 				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
-					<button class="input" i18n-content="opt_test_btn" id="test-url-btn"></button>
+					<button class="input" i18n-content="opt_test_btn" id="test-csurl-btn"></button>
 				</div>
 			</div>
 			<!-- test result -->
@@ -272,6 +303,7 @@
 					<input type="file" hidden accept=".json" id="restore-ext-data">
 					<label for="restore-ext-data" i18n-content="opt_extstg_rstr"></label>
 				</a>
+				<div><small>When restoring, the config file should be in json format and file name with json extension</small></div>
 			</div>
 			</div>
 		</div>

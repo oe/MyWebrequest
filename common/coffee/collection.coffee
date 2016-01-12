@@ -19,12 +19,23 @@
 
   # init rules into collection from localStorage
   initCollection = ->
-
     for cat in cats
+      hasInvalidRule = false
       if cat is 'custom'
-        collection[cat] = JSON.parse localStorage.getItem( cat ) or '{}'
+        rules = JSON.parse localStorage.getItem( cat ) or '{}'
+        # clear invalid rule
+        for k, v of rules
+          unless v
+            hasInvalidRule = true
+            delete rules[ k ]
+        collection[cat] = rules
       else
-        collection[cat] = JSON.parse localStorage.getItem( cat ) or '[]'
+        rules = JSON.parse localStorage.getItem( cat ) or '[]'
+        # clear invalid rule
+        collection[cat] = rules.filter (rule)-> !!rule
+        hasInvalidRule = collection[cat].length isnt rules.length
+      
+      if hasInvalidRule then localStorage.setItem cat, JSON.stringify rules
     return
 
   hasCat = (cat)->
@@ -41,9 +52,17 @@
   # get a single rule for show
   getRule4Show = (cat, rule)->
     if cat is 'custom'
-      "#{rule.matchUrl}<br>#{rule.redirectUrl}"
+      {
+        ruleId: rule.url
+        rule: "<div>#{rule.matchUrl}</div><div>#{rule.redirectUrl}</div>"
+        title: rule.matchUrl
+      }
     else
-      rule
+      {
+        ruleId: rule
+        rule: rule
+        title: rule
+      }
   # get a list for show
   getRules4Show = (cat)->
     rules = collection[ cat ]
@@ -52,7 +71,7 @@
       for k, v of rules
         ret.push
           ruleId: v.url
-          rule: "#{v.matchUrl}<br>#{v.redirectUrl}"
+          rule: "<div>#{v.matchUrl}</div><div>#{v.redirectUrl}</div>"
           title: v.matchUrl
       ret
     else
@@ -102,7 +121,7 @@
           delete collection[ cat ][ rule ]
         else
           index = _rules.indexOf rule
-          delete _rules[ index ]
+          _rules.splice index, 1
         return
     saveRule cat
     return

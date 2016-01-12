@@ -38,6 +38,7 @@ define (require)->
       content: utils.i18n 'opt_errtip_gcontent'
       okValue: utils.i18n 'ok_btn'
       ok: ->
+    .showModal()
     return
 
   # get vard info

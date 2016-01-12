@@ -1,6 +1,7 @@
 define (require)->
   collection = require 'common/js/collection'
   dataMaintain = require 'js/data-maintain'
+  utils = require 'common/js/utils'
   iconStyles = [ 'colored', 'grey' ]
   init = ->
     iconStyle = collection.getConfig 'iconStyle'
@@ -28,19 +29,31 @@ define (require)->
   $('#restore-ext-data').on 'change', (e)->
     files = e.target.files
     if files.length
-      # set a flag to tell localStorage the change if from restoration
-      collection.setRestoreStatus true
-      dataMaintain.readFile files[0], (content)->
-        unless dataMaintain.restoreExtData content
-          collection.setRestoreStatus false
-          alert 'format error!'
-          return
-        # reinit this page because it can be affected
-        setTimeout ->
-          init()
-        , 300
-      , (msg)->
-        alert msg
+      dialog
+        title: utils.i18n 'opt_errtip_gtitle'
+        content: 'This will override all setting you have'
+        okValue: utils.i18n 'ok_btn'
+        cancelValue: utils.i18n 'cancel_btn'
+        cancel: ->
+        ok: ->
+          # set a flag to tell localStorage the change if from restoration
+          collection.setRestoreStatus true
+          dataMaintain.readFile files[0], (content)->
+            unless dataMaintain.restoreExtData content
+              collection.setRestoreStatus false
+              alert 'format error!'
+              return
+            # reinit this page because it can be affected
+            setTimeout ->
+              init()
+            , 300
+          , (msg)->
+            alert msg
+      .showModal()
+
+    # clear selected files
+    # to trigger change event after choose file again
+    this.value = ''
 
     
 

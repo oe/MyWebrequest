@@ -19,7 +19,9 @@
     ipReg.test ip
 
   # check a host. eg. google.com, dev.fb.com, etc.
-  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/
+  # top level domain's length extend to 10
+  # for there are so many new TLDs have long names, like .software
+  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,10})$/
   isHost = (host)->
     hostReg.test host
 
@@ -76,10 +78,13 @@
     url = e.originalEvent.clipboardData.getData 'text/plain'
     return result unless url
 
+    # trim hash(search) in url
+    url = url.replace /#.*$/, ''
+
     i = url.indexOf '://'
     url = '*://' + url if i is -1
 
-    return result unless url.match /^([a-z]+|\*):\/\/([^\/]+)(\/.*)?$/i
+    return result unless url.match urlComponentReg
     # extract regexp results right now or things changed
     result.protocol = RegExp.$1.toLowerCase()
     result.host = RegExp.$2

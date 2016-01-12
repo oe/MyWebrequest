@@ -171,7 +171,7 @@ define(function(require) {
     data = {
       protocol: $protocol.val().trim(),
       host: $host.val().trim().toLowerCase(),
-      path: $path.val().replace(/\?.*$/, '').trim()
+      path: $path.val().replace(/#.*$/, '').trim()
     };
     if (!utils.isProtocol(data.protocol)) {
       dialog({
@@ -338,7 +338,7 @@ define(function(require) {
     $protocol = $('#protocol-c');
     $host = $('#host-c');
     $redirectUrl = $('#redirect-url-input');
-    $testUrl = $('#test-url-input');
+    $testUrl = $('#test-csurl-input');
     protocol = $protocol.val();
     host = $host.val().trim();
     redirectUrl = $redirectUrl.val().trim();
@@ -399,7 +399,7 @@ define(function(require) {
       return router;
     }
   };
-  $('#test-url-btn').on('click', function(e) {
+  $('#test-csurl-btn').on('click', function(e) {
     return checkCustomRule();
   });
   $('#add-csrule').on('click', function() {

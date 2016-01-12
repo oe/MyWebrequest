@@ -176,8 +176,8 @@ define (require)->
     data =
       protocol: $protocol.val().trim()
       host: $host.val().trim().toLowerCase()
-      # remove querystring in the path
-      path: $path.val().replace(/\?.*$/, '').trim()
+      # remove search in the path
+      path: $path.val().replace(/#.*$/, '').trim()
 
 
     unless utils.isProtocol data.protocol
@@ -340,7 +340,7 @@ define (require)->
     $protocol = $ '#protocol-c'
     $host = $ '#host-c'
     $redirectUrl = $ '#redirect-url-input'
-    $testUrl = $ '#test-url-input'
+    $testUrl = $ '#test-csurl-input'
 
     protocol = $protocol.val()
     host = $host.val().trim()
@@ -413,7 +413,7 @@ define (require)->
 
 
   # test custom url
-  $('#test-url-btn').on 'click', (e)->
+  $('#test-csurl-btn').on 'click', (e)->
     do checkCustomRule
 
   # add an custom rule

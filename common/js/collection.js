@@ -20,13 +20,29 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   collection = {};
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch'];
   initCollection = function() {
-    var cat, i, len;
+    var cat, hasInvalidRule, i, k, len, rules, v;
     for (i = 0, len = cats.length; i < len; i++) {
       cat = cats[i];
+      hasInvalidRule = false;
       if (cat === 'custom') {
-        collection[cat] = JSON.parse(localStorage.getItem(cat) || '{}');
+        rules = JSON.parse(localStorage.getItem(cat) || '{}');
+        for (k in rules) {
+          v = rules[k];
+          if (!v) {
+            hasInvalidRule = true;
+            delete rules[k];
+          }
+        }
+        collection[cat] = rules;
       } else {
-        collection[cat] = JSON.parse(localStorage.getItem(cat) || '[]');
+        rules = JSON.parse(localStorage.getItem(cat) || '[]');
+        collection[cat] = rules.filter(function(rule) {
+          return !!rule;
+        });
+        hasInvalidRule = collection[cat].length !== rules.length;
+      }
+      if (hasInvalidRule) {
+        localStorage.setItem(cat, JSON.stringify(rules));
       }
     }
   };
@@ -44,9 +60,17 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   };
   getRule4Show = function(cat, rule) {
     if (cat === 'custom') {
-      return rule.matchUrl + "<br>" + rule.redirectUrl;
+      return {
+        ruleId: rule.url,
+        rule: "<div>" + rule.matchUrl + "</div><div>" + rule.redirectUrl + "</div>",
+        title: rule.matchUrl
+      };
     } else {
-      return rule;
+      return {
+        ruleId: rule,
+        rule: rule,
+        title: rule
+      };
     }
   };
   getRules4Show = function(cat) {
@@ -58,7 +82,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
         v = rules[k];
         ret.push({
           ruleId: v.url,
-          rule: v.matchUrl + "<br>" + v.redirectUrl,
+          rule: "<div>" + v.matchUrl + "</div><div>" + v.redirectUrl + "</div>",
           title: v.matchUrl
         });
       }
@@ -114,7 +138,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
           delete collection[cat][rule];
         } else {
           index = _rules.indexOf(rule);
-          delete _rules[index];
+          _rules.splice(index, 1);
         }
       });
     }

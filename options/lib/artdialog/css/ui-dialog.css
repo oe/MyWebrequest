@@ -40,7 +40,7 @@
 }
 .ui-dialog-grid {
   width: auto;
-  /*min-width: 300px;*/
+  min-width: 300px;
   margin: 0;
   border: 0 none;
   border-collapse: collapse;

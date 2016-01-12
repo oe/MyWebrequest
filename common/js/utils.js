@@ -22,7 +22,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   isIp = function(ip) {
     return ipReg.test(ip);
   };
-  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,4})$/;
+  hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,10})$/;
   isHost = function(host) {
     return hostReg.test(host);
   };
@@ -96,11 +96,12 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     if (!url) {
       return result;
     }
+    url = url.replace(/#.*$/, '');
     i = url.indexOf('://');
     if (i === -1) {
       url = '*://' + url;
     }
-    if (!url.match(/^([a-z]+|\*):\/\/([^\/]+)(\/.*)?$/i)) {
+    if (!url.match(urlComponentReg)) {
       return result;
     }
     result.protocol = RegExp.$1.toLowerCase();
