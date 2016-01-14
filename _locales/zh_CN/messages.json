@@ -90,7 +90,7 @@
     "message": "必填, 可直接粘贴链接至此"
   },
   "opt_path_lbl": {
-    "message": "路径(包括请求字符串)"
+    "message": "路径和query字符串"
   },
   "opt_ph_path": {
     "message": "选填"
@@ -160,6 +160,27 @@
   },
   "opt_errtip_nochose": {
     "message": "你还啥也没选咧,选一个呗!"
+  },
+  "opt_errtip_invalid_matchrule": {
+    "message": "匹配规则格式错误"
+  },
+  "opt_errtip_invalid_resvervedkwd": {
+    "message": "规则中有预定义的名字"
+  },
+  "opt_errtip_invalid_duplicatedkwd": {
+    "message": "规则中有重复生命的名字"
+  },
+  "opt_errtip_invalid_undefinedkwd": {
+    "message": "跳转规则中有未定义的名字"
+  },
+  "opt_errtip_urlneedtest": {
+    "message": "你得输入(粘贴)一个链接来测试规则"
+  },
+  "opt_errtip_urlinvliad": {
+    "message": "链接格式错误"
+  },
+  "opt_errtip_csconflictedblock": {
+    "message": "匹配规则和block规则冲突(也就是说会导致当前规则无法生效)"
   },
   "opt_qrcode_desc": {
     "message": "生成二维码"

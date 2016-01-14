@@ -31,7 +31,7 @@
     pathReg.test path
 
   # reg to match protocol, host, path, query
-  urlComponentReg = /^(\*|\w+):\/\/([^/]+)(\/[^?]*)(\?(.*))?$/
+  urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
   isUrl = (url)->
     matches = urlComponentReg.exec url
     return false unless matches
@@ -184,29 +184,29 @@
    * @return {Boolean}
   ###
   isRouterStrValid = (route)->
+    # if the route doesnt has path and query string
+    # like http://g.cn
+    # then add a / in the end
+    route += '/' unless /\w\//.test route
     matches = urlComponentReg.exec route
     return false unless matches
 
     protocol = matches[1]
     # path is host + real path
-    path = matches[2] + matches[3]
+    path = matches[2] + '/' + matches[3]
     # query string without prefix ?
     qs = matches[5]
 
     # path basic format
-    console.log 'test path format:' +  path
     return false unless /^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test path
     # {*named} should only used in the end of the path
-    console.log 'test splat kwd  in the middle of the string'
     return false if /(\{\*\w+\}).+$/.test path
     if qs
       # query string basic format
-      console.log 'test qs format'
       return false unless /^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test qs
       # /\{\*\w+\}/  for {*named}, not allowed
       # /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
       # /\{\w+\}(?!&|$)/ for letter followed not & or eof
-      console.log 'test qs {named} format'
       return false if /\{\*\w+\}/.test(qs) or /[?&]\{\w+\}/.test(qs) or /\{\w+\}(?!&|$)/.test qs
 
     n = route.replace /\{\*?\w+\}/g, 'xxx'
@@ -236,6 +236,10 @@
   getRouter = (route)->
     result = matchUrl: route
 
+    # if the route doesnt has path and query string
+    # like http://g.cn
+    # then add a / in the end
+    route += '/' unless /\w\//.test route
     protocol = route.match /^([\w\*]+)\:\/\//
 
     protocol = if protocol then protocol[1] else '*'
@@ -269,7 +273,7 @@
     .replace splatParam, (match, $1)->
       params.push $1
       '([^?]*?)'
-    reg = "^#{protocol}:\/\/#{part}(?:\\?([\\s\\S]*))?$"
+    reg = "^#{protocol}:\/\/#{part}(?:\\?([\\s\\S]*))?"
     result.reg = reg
     result.params = params
 
@@ -342,13 +346,10 @@
   ###
   hasUndefinedWord = (router, url)->
     params = getKwdsInRoute router
-    console.log 'router keywords: ' + params.join ','
     res = []
     sample = getRedirectParamList url
-    console.log 'redirected kwds: ' + sample.join ','
     for v in sample
       res.push v if v not in params
-    console.log 'result: ' + res.join ','
     if res.length
       res
 
@@ -393,21 +394,17 @@
 
   # fill a pattern with data
   fillPattern = (pattern, data)->
-    i = pattern.indexOf '?'
-    path = pattern
-    qs = ''
-    if i isnt -1
-      path = pattern.substr 0, i
-      qs = pattern.substr i
-
-    path = path.replace /\{(\w+)\}/g, ($0, $1)->
-      val = data[ $1 ] ? ''
-      # / in val, like abc/bdc, won't be encoded
-      if ~val.indexOf('/') then val else encodeURIComponent val
-    qs = qs and qs.replace /([\w\%+\[\]]+)=\{(\w+)\}/g, ($0, $1, $2)->
+    pattern = pattern.replace /([\w\%+\[\]]+)=\{(\w+)\}/g, ($0, $1, $2)->
       val = data[ $2 ] ? ''
       toQueryString $1, val
-    path + qs
+
+    pattern.replace /\{(\w+)\}/g, ($0, $1)->
+      val = data[ $1 ] ? ''
+      # / in val, like abc/bdc, won't be encoded
+      # q is query string
+      # do not encode query string
+      if ~val.indexOf('/') or $1 is 'q' then val else encodeURIComponent val
+
 
   ###*
    * get target url
@@ -417,7 +414,6 @@
   ###
   getTargetUrl = (router, url)->
     params = getUrlValues router, url
-    console.log 'url values %o', params
     return '' unless params
     fillPattern router.redirectUrl, params
 
@@ -438,6 +434,7 @@
     getUrlValues        : getUrlValues
     isRegValid          : isRegValid
     hasUndefinedWord    : hasUndefinedWord
+    isKwdsUniq          : isKwdsUniq
     hasReservedWord     : hasReservedWord
     getTargetUrl        : getTargetUrl
     getUrlFromClipboard : getUrlFromClipboard

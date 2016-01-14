@@ -30,7 +30,7 @@ define (require)->
   ###
   nodataTpl = do ->
     "<tr nodata>" +
-      "<td colspan='3' class='align-center'>" +
+      "<td colspan='3' class='text-center'>" +
       "#{chrome.i18n.getMessage 'opt_no_rules' }" +
       "</td>" +
     "</tr>"

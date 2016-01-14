@@ -30,7 +30,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   isPath = function(path) {
     return pathReg.test(path);
   };
-  urlComponentReg = /^(\*|\w+):\/\/([^\/]+)(\/[^?]*)(\?(.*))?$/;
+  urlComponentReg = /^(\*|\w+):\/\/([^\/]+)\/([^?]*)(\?(.*))?$/;
   isUrl = function(url) {
     var matches, path;
     matches = urlComponentReg.exec(url);
@@ -207,27 +207,26 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    */
   isRouterStrValid = function(route) {
     var matches, n, path, protocol, qs;
+    if (!/\w\//.test(route)) {
+      route += '/';
+    }
     matches = urlComponentReg.exec(route);
     if (!matches) {
       return false;
     }
     protocol = matches[1];
-    path = matches[2] + matches[3];
+    path = matches[2] + '/' + matches[3];
     qs = matches[5];
-    console.log('test path format:' + path);
     if (!/^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_\+=&%@!\.,\*\?\|~\/])*(\{\*\w+\})?$/.test(path)) {
       return false;
     }
-    console.log('test splat kwd  in the middle of the string');
     if (/(\{\*\w+\}).+$/.test(path)) {
       return false;
     }
     if (qs) {
-      console.log('test qs format');
       if (!/^(([\w_\+%@!\.,\*\?\|~\/]+=\{\w+\})|([\w_\+%@!\.,\*\?\|~\/]+=[\w_\+%@!\.,\*\?\|~\/]+)|&)*$/.test(qs)) {
         return false;
       }
-      console.log('test qs {named} format');
       if (/\{\*\w+\}/.test(qs) || /[?&]\{\w+\}/.test(qs) || /\{\w+\}(?!&|$)/.test(qs)) {
         return false;
       }
@@ -257,6 +256,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result = {
       matchUrl: route
     };
+    if (!/\w\//.test(route)) {
+      route += '/';
+    }
     protocol = route.match(/^([\w\*]+)\:\/\//);
     protocol = protocol ? protocol[1] : '*';
     url = protocol + '://';
@@ -283,7 +285,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       params.push($1);
       return '([^?]*?)';
     });
-    reg = "^" + protocol + ":\/\/" + part + "(?:\\?([\\s\\S]*))?$";
+    reg = "^" + protocol + ":\/\/" + part + "(?:\\?([\\s\\S]*))?";
     result.reg = reg;
     result.params = params;
     params = {};
@@ -371,17 +373,14 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   hasUndefinedWord = function(router, url) {
     var j, len, params, res, sample, v;
     params = getKwdsInRoute(router);
-    console.log('router keywords: ' + params.join(','));
     res = [];
     sample = getRedirectParamList(url);
-    console.log('redirected kwds: ' + sample.join(','));
     for (j = 0, len = sample.length; j < len; j++) {
       v = sample[j];
       if (indexOf.call(params, v) < 0) {
         res.push(v);
       }
     }
-    console.log('result: ' + res.join(','));
     if (res.length) {
       return res;
     }
@@ -428,29 +427,20 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     return res;
   };
   fillPattern = function(pattern, data) {
-    var i, path, qs;
-    i = pattern.indexOf('?');
-    path = pattern;
-    qs = '';
-    if (i !== -1) {
-      path = pattern.substr(0, i);
-      qs = pattern.substr(i);
-    }
-    path = path.replace(/\{(\w+)\}/g, function($0, $1) {
+    pattern = pattern.replace(/([\w\%+\[\]]+)=\{(\w+)\}/g, function($0, $1, $2) {
+      var ref, val;
+      val = (ref = data[$2]) != null ? ref : '';
+      return toQueryString($1, val);
+    });
+    return pattern.replace(/\{(\w+)\}/g, function($0, $1) {
       var ref, val;
       val = (ref = data[$1]) != null ? ref : '';
-      if (~val.indexOf('/')) {
+      if (~val.indexOf('/') || $1 === 'q') {
         return val;
       } else {
         return encodeURIComponent(val);
       }
     });
-    qs = qs && qs.replace(/([\w\%+\[\]]+)=\{(\w+)\}/g, function($0, $1, $2) {
-      var ref, val;
-      val = (ref = data[$2]) != null ? ref : '';
-      return toQueryString($1, val);
-    });
-    return path + qs;
   };
 
   /**
@@ -462,7 +452,6 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   getTargetUrl = function(router, url) {
     var params;
     params = getUrlValues(router, url);
-    console.log('url values %o', params);
     if (!params) {
       return '';
     }
@@ -483,6 +472,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     getUrlValues: getUrlValues,
     isRegValid: isRegValid,
     hasUndefinedWord: hasUndefinedWord,
+    isKwdsUniq: isKwdsUniq,
     hasReservedWord: hasReservedWord,
     getTargetUrl: getTargetUrl,
     getUrlFromClipboard: getUrlFromClipboard

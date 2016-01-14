@@ -2,7 +2,7 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleExists, isSafe4Qr, isUnionCat, removeRule, resetSectionCtrlsState, tpl, utils, vars;
+  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleExists, isSafe4Qr, isUnionCat, removeRule, resetSectionCtrlsState, showInputErrorInfo, tpl, utils, vars;
   utils = require('common/js/utils');
   collection = require('common/js/collection');
   tpl = require('js/tpl');
@@ -97,6 +97,35 @@ define(function(require) {
       $tr.removeClass('new-item');
     }, 600);
   };
+  showInputErrorInfo = function($input, msg) {
+    var $errorTip, $inputTip;
+    $inputTip = $input.nextAll('.input-tip');
+    if (!$inputTip.length) {
+      return;
+    }
+    $errorTip = $inputTip.find('.error-info');
+    clearTimeout($input.data('tid'));
+    $input.data('tid', 0);
+    if (!$errorTip.length) {
+      $errorTip = $('<div/>', {
+        'class': 'error-info'
+      });
+      $inputTip.prepend($errorTip);
+    }
+    $errorTip.html(msg);
+    return $input.focus();
+  };
+  $('.input-tip').prevAll('input').on('keyup', function() {
+    var $errorTip, $this, tid;
+    $this = $(this);
+    $errorTip = $this.nextAll('.input-tip').find('.error-info');
+    if ($errorTip.length && !$this.data('tid')) {
+      tid = setTimeout(function() {
+        return $errorTip.remove();
+      }, 2000);
+      return $this.data('tid', tid);
+    }
+  });
 
   /**
    * init section of cat( category )
@@ -122,9 +151,6 @@ define(function(require) {
     $('#request-settings tbody').html(html);
     resetSectionCtrlsState(cat);
     $('#request-settings').attr('data-id', cat);
-    setTimeout(function() {
-      $('#request-settings').find('input:text:enabled:visible:first').focus();
-    }, 300);
     $('#protocol').val(isHsts ? 'http' : '*').attr('disabled', isHsts);
   };
   $('#request-settings .switch-input').on('change', function(e) {
@@ -174,38 +200,33 @@ define(function(require) {
       path: $path.val().replace(/#.*$/, '').trim()
     };
     if (!utils.isProtocol(data.protocol)) {
-      dialog({
-        content: utils.i18n('opt_errtip_protocol')
-      }).show($protocol[0]);
+      showInputErrorInfo($protocol, utils.i18n('opt_errtip_protocol'));
+      $protocol.focus();
       return false;
     }
     if (!(data.host && (utils.isIp(data.host) || utils.isHost(data.host)))) {
-      dialog({
-        content: utils.i18n('opt_errtip_host')
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_host'));
+      $host.focus();
       return false;
     }
     if (data.path === '') {
       data.path = '*';
     }
     if (!(data.path && utils.isPath(data.path))) {
-      dialog({
-        content: utils.i18n('opt_errtip_path')
-      }).show($path[0]);
+      showInputErrorInfo($path, utils.i18n('opt_errtip_path'));
+      $path.focus();
       return false;
     }
     rule = data.protocol + "://" + data.host + "/" + data.path;
     if (rule.length > 500) {
-      dialog({
-        content: utils.i18n('opt_errtip_rulelong')
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_rulelong'));
+      $host.focus();
       return false;
     }
     megaRule = isRuleExists(rule, cat);
     if (megaRule != null) {
-      dialog({
-        content: utils.i18n('opt_errtip_duplicate') + megaRule
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_duplicate') + megaRule);
+      $host.focus();
       return false;
     }
     if (data.host === '*') {
@@ -351,16 +372,16 @@ define(function(require) {
       return;
     }
     if (false === utils.isRouterStrValid(matchUrl)) {
-      dialog({
-        content: 'match rule not valid'
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_invalid_matchrule'));
       return;
     }
     router = utils.getRouter(matchUrl);
     if (ret = utils.hasReservedWord(router)) {
-      dialog({
-        content: 'reserved keywords found in the router: ' + ret.join(',')
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_invalid_resvervedkwd') + ': ' + ret.join(','));
+      return;
+    }
+    if (ret = utils.isKwdsUniq(router)) {
+      showInputErrorInfo($host, utils.i18n('opt_errtip_invalid_duplicatedkwd') + ': ' + ret.join(','));
       return;
     }
     megaRule = isRuleExists(router.url, 'custom');
@@ -370,31 +391,33 @@ define(function(require) {
       }).show($host[0]);
     }
     if (ret = utils.hasUndefinedWord(router, redirectUrl)) {
-      dialog({
-        content: 'undefined keywords found in the redirect url: ' + ret.join(',')
-      }).show($redirectUrl[0]);
+      showInputErrorInfo($redirectUrl, utils.i18n('opt_errtip_invalid_undefinedkwd') + ': ' + ret.join(','));
       return;
     }
     if (!testUrl) {
       dialog({
-        content: 'test url need be filled'
+        content: utils.i18n('opt_errtip_urlneedtest')
       }).show($testUrl[0]);
       return;
     }
     if (!utils.isUrl(testUrl)) {
       dialog({
-        content: 'test url is invalid'
+        content: utils.i18n('opt_errtip_urlinvliad')
       }).show($testUrl[0]);
       return;
     }
     megaRule = isRuleExists(router.url, 'block');
     if (megaRule != null) {
-      alert('this rule is conflict with block rule: ' + megaRule);
+      dialog({
+        content: utils.i18n('opt_errtip_csconflictedblock') + ': ' + megaRule,
+        okValue: utils.i18n('ok_btn'),
+        ok: function() {}
+      }).showModal();
       return;
     }
     router.redirectUrl = redirectUrl;
     targetUrl = utils.getTargetUrl(router, testUrl);
-    $('#custom-test-result').html("<a target='_blank' href='" + targetUrl + "'>" + (targetUrl || 'not match') + "</a>");
+    $('#custom-test-result').html("<a target='_blank' href='" + (targetUrl || 'javascript:;') + "' class='" + (targetUrl ? '' : 'text-danger') + "'>" + (targetUrl || 'not match') + "</a>");
     if (targetUrl) {
       return router;
     }

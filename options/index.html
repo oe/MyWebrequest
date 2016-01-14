@@ -53,12 +53,13 @@
 					<label class="label" for="host" i18n-content="opt_host_lbl"></label>
 					<input id="host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
 					<div class="input-tip">
-						<div>域名应遵守以下规则:</div>
-						<ul>
-							<li>可以指定确切的域名, 如 <code>www.abc.com</code></li>
-							<li>也可以使用IP地址, 如 <code>8.8.8.8</code></li>
-							<li>你可以使用通配符 <code>*</code> 来匹配任意子域名, 但只能在二级及之上的域名中使用. 如 <code>*.abc.com</code> 和 <code>*.api.abc.com</code> 是允许的, 而诸如 <code>*.com</code> 和 <code>*.net</code> 则是非法的.</li>
-						</ul>
+						<div>域名应遵守以下规则:
+							<ul>
+								<li>可以指定确切的域名, 如 <code>www.abc.com</code></li>
+								<li>也可以使用IP地址, 如 <code>8.8.8.8</code></li>
+								<li>你可以使用通配符 <code>*</code> 来匹配任意子域名, 但只能在二级及之上的域名中使用. 如 <code>*.abc.com</code> 和 <code>*.api.abc.com</code> 是允许的, 而诸如 <code>*.com</code> 和 <code>*.net</code> 则是非法的.</li>
+							</ul>
+						</div>
 					</div>
 				</div>
 				<div class="input-field field-block separator">
@@ -69,18 +70,18 @@
 					<label class="label" for="path" i18n-content="opt_path_lbl"></label>
 					<input id="path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
 					<div class="input-tip">
-						<div class="error-tip">路径格式错误</div>
-						<div>路径应遵守以下规则(路径开头的 <strong>/</strong> 请省略):</div>
-						<ul>
-							<li>可以指定确切的路径, 如 <code>path</code>, <code>path?num=1</code></li>
-							<li>你可以使用通配符 <code>*</code> 来模糊匹配路径, 如:
+						路径应遵守以下规则(请省略路径开头的 <strong>/</strong>):
 							<ul>
-								<li><code>*</code>(即任意路径)</li>
-								<li><code>path*</code>(所有以 path 开头的路径)</li>
-								<li><code>path*.jsp</code>(以 path 开头并以 .jsp 结尾的路径)</li>
-								<li><code>path?*</code>(所有提交到 path 的query请求)</li>
-								<li> <code>path?num=*</code>(所有提交path的query请求, 且num是第一个请求参数，注意 path?ps=23&num=23 不会被匹配)</li>
-							</ul>
+								<li>可以指定确切的路径, 如 <code>path</code>, <code>path?num=1</code></li>
+								<li>你可以使用通配符 <code>*</code> 来模糊匹配路径, 如:
+								<ul>
+									<li><code>*</code>(即任意路径, 包括空)</li>
+									<li><code>path*</code>(所有以 path 开头的路径)</li>
+									<li><code>path*.jsp</code>(以 path 开头并以 .jsp 结尾的路径)</li>
+									<li><code>*kwd*</code>(任何包含 kwd 的路径)</li>
+									<li><code>path?*</code>(所有提交到 path 的query请求)</li>
+									<li> <code>path?num=*</code>(所有提交path的query请求, 且num是第一个请求参数，注意 path?ps=23&num=23 不会被匹配)</li>
+								</ul>
 							</li>
 						</ul>
 					</div>
@@ -90,16 +91,6 @@
 					<button class="input add-rule" i18n-content="opt_addrule_btn"></button>
 				</div>
 			</div>
-			<!-- <div class="rule-field js-not-custom">
-				<div class="input-field field-block large-block">
-					<label class="label" for="test-url-input" i18n-content="opt_test_rule">Test your rule</label>
-					<input type="text" id="test-url-input" class="input" i18n-value="placeholder:opt_ph_testurl" placeholder="paste a real url to test your rule">
-				</div>
-				<div class="input-field field-block">
-					<label class="label">&nbsp;</label>
-					<button class="input" i18n-content="opt_test_btn" id="test-url-btn">Test URL</button>
-				</div>
-			</div> -->
 			<!-- custom URL -->
 			<div class="rule-field js-custom">
 				<div class="input-field field-block protocol">
@@ -119,7 +110,23 @@
 				<div class="input-field field-block host-c">
 					<label class="label">&nbsp;</label>
 					<input id="host-c" name="host-c" class="input" i18n-value="placeholder:opt_ph_urlmatch">
-					<div class="input-tip">there is some help tip</div>
+					<div class="input-tip">
+						匹配URL应遵守以下规则:
+						<ul>
+							<li>可以使用<code>{kwd}</code>的方式来命名你所关注的URL部分, 你可以在跳转规则中使用他们, 如 {name}.abc.com/, uk.abc.com/news/{newsid}-{time}.html</li>
+							<li>URL必须指定一级域名, {fld}.com/ 规则是不允许的 </li>
+							<li>可以使用<code>{*kwd}</code>的方式来匹配路径中末尾的部分, query字符串不会被匹配. 如 uk.abc.com/news/{*newspath} 能匹配 uk.abc.com/news/intl/887.html (此时newspath代表 intl/887.html) </li>
+							<li>你也可以用<code>{kwd}</code>的方式来命名query字符串中你所关注的值. 如 www.google.com.hk/search?q={kwd} 能匹配你在谷歌中搜索的关键字</li>
+							<li>扩展已经预定义了以下的名字, 你自定义的名字不能和下面的重复:</li>
+							<ul>
+								<li><code>p</code> 代表协议如 http, https</li>
+								<li><code>h</code> 代表URL中的域名, 如 g.cn, uk.abc.com </li>
+								<li><code>m</code> 代表URL中的一级域名, 对于 g.cn/search* 则代表 g.cn, 对于 uk.abc.com/news/*则代表 abc.com </li>
+								<li><code>r</code> 代表URL中的路径(不包含开头的<strong>/</strong>), 如 search, news/998.html </li>
+								<li><code>q</code> 代表URL中的query字符串(不包含开头的的<strong>?</strong>), 如 newwindow=1&safe=2 </li>
+							</ul>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<!-- new url rule -->
@@ -127,7 +134,20 @@
 				<div class="input-field field-block large-block">
 					<label class="label" for="redirect-url-input" i18n-content="opt_redirect_to"></label>
 					<input type="text" id="redirect-url-input" class="input" i18n-value="placeholder:opt_ph_newurl">
-					<div class="input-tip">there is some help tip</div>
+					<div class="input-tip">
+						跳转URL应遵守以下规则:
+						<ul>
+							<li>可以使用在匹配URL中定义的名字</li>
+							<li>也可以使用扩展预定义的:</li>
+							<ul>
+								<li><code>p</code> 代表协议如 http, https</li>
+								<li><code>h</code> 代表URL中的主机名(域名), 如 g.cn, uk.abc.com </li>
+								<li><code>m</code> 代表URL中的一级域名, 对于 g.cn/search* 则代表 g.cn, 对于 uk.abc.com/news/*则代表 abc.com </li>
+								<li><code>r</code> 代表URL中的路径(不包含开头的<strong>/</strong>), 如 search, news/998.html </li>
+								<li><code>q</code> 代表URL中的query字符串(不包含开头的的<strong>?</strong>), 如 newwindow=1&safe=2 </li>
+							</ul>
+						</ul>
+					</div>
 				</div>
 			</div>
 			<!-- test url input -->
@@ -347,41 +367,7 @@
 			</div>
 		</div>
 	</section>
-	<div id="confirm-dialog-wrapper" class="overlay-wrapper animated" hidden>
-		<div class="overlay-box">
-			<div class="overlay dialog">
-				<div class="dialog-close cancel"></div>
-				<div class="dialog-title" id="dialog-title">
-				</div>
-				<div class="dialog-content" id="dialog-content">
-				</div>
-				<div class="dialog-btns">
-					<button id="dialog-ok-btn" i18n-content="ok_btn"></button>
-					<button class="cancel" i18n-content="cancel_btn"></button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="input-dialog-wrapper" class="overlay-wrapper animated" hidden>
-		<div class="overlay-box">
-			<div class="overlay dialog">
-				<div class="dialog-close cancel"></div>
-				<div class="dialog-title" i18n-content="input_dlg_title"></div>
-				<div class="input-hint" i18n-content="input_dlg_hint"></div>
-				<div class="dialog-content">
-					<input class="full-width" type="text" i18n-value="placeholder:input_dlg_inputph" id="preferred-google">
-				</div>
-				<div class="dialog-btns">
-					<button class="js-btn-ok" i18n-content="ok_btn"></button>
-					<button class="cancel js-btn-cancel" i18n-content="cancel_btn"></button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div id="tooltip" class="tooltip">
-		<div class="arrow_box" id="tooltip-msg">
-		</div>
-	</div>
+	
 	<script src="../common/js/i18n.js"></script>
 	<script src="../common/js/jquery.min.js"></script>
 	<script src="../common/js/sea.js"></script>

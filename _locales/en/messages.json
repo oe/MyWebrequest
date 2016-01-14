@@ -90,7 +90,7 @@
     "message": "required, just paste a url here"
   },
   "opt_path_lbl": {
-    "message": "Path(including query string)"
+    "message": "Path and Query string"
   },
   "opt_ph_path": {
     "message": "optional"
@@ -160,6 +160,27 @@
   },
   "opt_errtip_nochose": {
     "message": "You have not choose anything."
+  },
+  "opt_errtip_invalid_matchrule": {
+    "message": "Match-rule is invalid"
+  },
+  "opt_errtip_invalid_resvervedkwd": {
+    "message": "Predefined keywords found in the rule"
+  },
+  "opt_errtip_invalid_duplicatedkwd": {
+    "message": "Duplicated keywords found in the rule"
+  },
+  "opt_errtip_invalid_undefinedkwd": {
+    "message": "Undefined keywords found in the redirect-url"
+  },
+  "opt_errtip_urlneedtest": {
+    "message": "You need type(or paste) a url to test your rule"
+  },
+  "opt_errtip_urlinvliad": {
+    "message": "Url is invalid"
+  },
+  "opt_errtip_csconflictedblock": {
+    "message": "Your match rule is in conflict with the block rule(aka your rule won't work)"
   },
   "opt_qrcode_desc": {
     "message": "Generate QR Code."

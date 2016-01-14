@@ -31,7 +31,7 @@ define(function(require) {
    * @return {[type]} [description]
    */
   nodataTpl = (function() {
-    return "<tr nodata>" + "<td colspan='3' class='align-center'>" + ("" + (chrome.i18n.getMessage('opt_no_rules'))) + "</td>" + "</tr>";
+    return "<tr nodata>" + "<td colspan='3' class='text-center'>" + ("" + (chrome.i18n.getMessage('opt_no_rules'))) + "</td>" + "</tr>";
   })();
   return {
     rulesTpl: rulesTpl,

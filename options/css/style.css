@@ -19,11 +19,10 @@ body{
 	/*overflow: hidden;*/
 }
 
-/* utils */
+/*----------- utils -----------*/
 .full-width {
 	width: 100%;
 }
-
 .ovHidden {
 	overflow: hidden;
 }
@@ -34,6 +33,15 @@ code {
 	white-space: nowrap;
 	background-color: #efefef;
 	border-radius: 4px;
+}
+.text-center {
+	text-align: center;
+}
+.text-info {
+	color: #999;
+}
+.text-danger {
+	color: red;
 }
 
 
@@ -134,56 +142,6 @@ section .setting-title{
 	background-color: #d9edf7;
 	border-color: #bce8f1;
 	border-radius: 4px;
-}
-/*------------------ error tip -------------------------*/
-.tooltip {
-	position: absolute;
-	z-index: 210;
-	top: 300px;
-	left: 400px;
-	cursor: default;
-	font-size: 14px;
-	visibility: hidden;
-	opacity: 0;
-	-webkit-transition: all 200ms, opacity 100ms;
-	transition: all 200ms, opacity 100ms;
-}
-.tooltip.show {
-	visibility: visible;
-	opacity: 1;
-}
-.tooltip .arrow_box {
-	position: relative;
-	color: #b94a48;
-	background-color: #f2dede;
-	border: 2px solid #ebccd1;
-	padding: 4px;
-}
-.tooltip .arrow_box a {
-	color: #086;
-}
-.tooltip .arrow_box:after, .tooltip .arrow_box:before {
-	bottom: 100%;
-	border: solid transparent;
-	content: " ";
-	height: 0;
-	width: 0;
-	position: absolute;
-	pointer-events: none;
-}
-.tooltip .arrow_box:after {
-	border-color: rgba(213, 199, 68, 0);
-	border-bottom-color: #f2dede;
-	border-width: 6px;
-	left: 50%;
-	margin-left: -6px;
-}
-.tooltip .arrow_box:before {
-	border-color: rgba(245, 211, 98, 0);
-	border-bottom-color: #ebccd1;
-	border-width: 8px;
-	left: 50%;
-	margin-left: -8px;
 }
 
 /*-----------setting content(right side)---------------*/
@@ -343,7 +301,7 @@ section .setting-title{
 	list-style-type: circle;
 }
 .input-tip ul li {
-	margin-bottom: 4px;
+	margin-bottom: 2px;
 }
 .input-tip:before, .input-tip:after {
 	position: absolute;
@@ -366,6 +324,10 @@ section .setting-title{
 	border-bottom-color: #fff;
 	top: -9px;
 }
+.input-tip .error-info {
+	color: red;
+	margin-bottom: 4px;
+}
 .input:focus + .input-tip {
 	visibility: visible;
 	opacity: 1;
@@ -379,7 +341,6 @@ table.rules {
 	border-radius: 3px;
 	cursor: default;
 }
-
 table.rules thead {
 	border-bottom: 1px solid #ccc;
 	text-align: left;
@@ -455,9 +416,6 @@ table.rules tbody tr td:nth-child(3):hover {
 	color: red;
 }
 
-.align-center {
-	text-align: center;
-}
 /*---------------- animation --------------------*/
 @-webkit-keyframes fadeInDown {
 	0% {
@@ -513,87 +471,6 @@ table.rules tbody tr td:nth-child(3):hover {
 }
 .rules tbody tr.fadeOutDown {
 	-webkit-animation-name: fadeOutDown;
-}
-/*-------- dialog -----------*/
-.overlay-wrapper {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	z-index: 199;
-	-webkit-transition: 200ms all;
-}
-
-.overlay-box {
-  display: -webkit-box;
-	-webkit-box-align: center;
-  -webkit-box-orient: vertical;
-  -webkit-box-pack: center;
-
-  background-color: rgba(255, 255, 255, 0.45);
-  bottom: 0;
-  left: 0;
-  overflow: auto;
-  position: fixed;
-  padding: 20px;
-  right: 0;
-  top: 0;
-}
-
-.overlay {
-	min-width: 500px;
-	min-height: 100px;
-	-webkit-border-radius: 3px;
-	-webkit-box-orient: vertical;
-	-webkit-transition: 200ms -webkit-transform;
-	background: white;
-	box-shadow: 0 4px 23px 5px rgba(0, 0, 0, 0.2), 0 2px 6px rgba(0,0,0,0.15);
-	color: #333;
-	padding: 10px;
-	position: relative;
-	z-index: 200;
-	-webkit-transform: translateY(-50%);
-	-webkit-user-select: none;
-}
-.dialog {
-	cursor: default;
-	font-size: 18px;
-}
-.dialog .dialog-close {
-	position: absolute;
-	top: 6px;
-	right: 6px;
-	width: 14px;
-	height: 14px;
-	cursor: default;
-	vertical-align: middle;
-	background: #fff url(/img/close.png) no-repeat center;
-	background-image: -webkit-image-set(url(/img/close.png) 1x, url(/img/close@2x.png) 2x);
-}
-
-.dialog .dialog-close:hover {
-	background: #fff url(/img/close-hover.png) no-repeat center;
-	background-image: -webkit-image-set(url(/img/close-hover.png) 1x, url(/img/close-hover@2x.png) 2x);
-}
-.dialog .input-hint {
-	font-size: .7em;
-}
-.dialog .dialog-title {
-	width: 100%;
-	/*margin: 0 0 10px;*/
-}
-
-.dialog .dialog-content {
-	font-size: 0.9em;
-	color: #666;
-	margin: 10px 0;
-}
-
-.dialog .dialog-btns{
-	width: 100%;
-	text-align: right;
-	font-size: 0.78em;
 }
 
 /*--------------------- QR Code ------------------*/

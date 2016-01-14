@@ -94,6 +94,32 @@ define (require)->
     , 600
     return
 
+  # show error info in input's input tip
+  showInputErrorInfo = ($input, msg)->
+    $inputTip = $input.nextAll '.input-tip'
+    return unless $inputTip.length
+    $errorTip = $inputTip.find '.error-info'
+    # clear auto hide error info timer
+    clearTimeout $input.data 'tid'
+    $input.data 'tid', 0
+    unless $errorTip.length
+      $errorTip = $ '<div/>', 'class': 'error-info'
+      $inputTip.prepend $errorTip
+    $errorTip.html msg
+    # setTimeout ->
+    $input.focus()
+
+  # auto hide error info after 2s when keystoke
+  $('.input-tip').prevAll('input').on 'keyup', ->
+    $this = $ this
+    $errorTip = $this.nextAll('.input-tip').find '.error-info'
+    # has error tip and no timer
+    if $errorTip.length and not $this.data 'tid'
+      tid = setTimeout ->
+        $errorTip.remove()
+      , 2000
+      $this.data 'tid', tid
+
   
   ###*
    * init section of cat( category )
@@ -125,10 +151,12 @@ define (require)->
 
     $('#request-settings').attr 'data-id', cat
     # focus the first input
-    setTimeout ->
-      $('#request-settings').find('input:text:enabled:visible:first').focus()
-      return
-    , 300
+    # stop focus on the first input
+    # because once focused, an popup tip shows up, that's annoyed
+    # setTimeout ->
+    #   $('#request-settings').find('input:text:enabled:visible:first').focus()
+    #   return
+    # , 300
     # hsts has special settings
     $('#protocol').val(if isHsts then 'http' else '*').attr 'disabled', isHsts
 
@@ -167,7 +195,8 @@ define (require)->
       false
 
 
-  #add a simple rule for block, hotlink, log, hsts
+
+  # add a simple rule for block, hotlink, log, hsts
   $('.rule-field').on 'click', '.add-rule', (e) ->
     cat = $('#request-settings').attr 'data-id'
     $protocol = $ '#protocol'
@@ -181,39 +210,34 @@ define (require)->
 
 
     unless utils.isProtocol data.protocol
-      dialog
-        content: utils.i18n 'opt_errtip_protocol'
-      .show $protocol[0]
+      showInputErrorInfo $protocol, utils.i18n 'opt_errtip_protocol'
+      $protocol.focus()
       return false
 
     unless data.host and ( utils.isIp(data.host) or utils.isHost(data.host) )
-      dialog
-        content: utils.i18n 'opt_errtip_host'
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n 'opt_errtip_host'
+      $host.focus()
       return false
 
     # Path treat empty as star(*)
     data.path = '*' if data.path is ''
 
     unless data.path and utils.isPath data.path
-      dialog
-        content: utils.i18n 'opt_errtip_path'
-      .show $path[0]
+      showInputErrorInfo $path, utils.i18n 'opt_errtip_path'
+      $path.focus()
       return false
 
     rule = "#{data.protocol}://#{data.host}/#{data.path}"
     if rule.length > 500
-      dialog
-        content: utils.i18n 'opt_errtip_rulelong'
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n 'opt_errtip_rulelong'
+      $host.focus()
       return false
 
     # whether rule is duplicated
     megaRule = isRuleExists rule, cat
     if megaRule?
-      dialog
-        content: utils.i18n('opt_errtip_duplicate') + megaRule
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n('opt_errtip_duplicate') + megaRule
+      $host.focus()
       return false
 
     if data.host is '*'
@@ -298,7 +322,7 @@ define (require)->
       $checkAll.prop 'checked', false
     return
 
-
+  # -------------------- for custom rule inputs -------------------------
   # paste string to [custom host] input box
   $('#host-c').on 'paste', (e) ->
     url = utils.getUrlFromClipboard e
@@ -306,17 +330,17 @@ define (require)->
     $('#protocol-c').val url.protocol if not $('#protocol').prop 'disabled'
     $('#host-c').val "#{url.host}#{url.path}"
     return false
-
+  # focus to next
   $('#host-c').on 'keyup', (e)->
     if e.keyCode is 13
       $('#redirect-url-input').focus()
       return false
-
+  # focus to next
   $('#redirect-url-input').on 'keyup', (e)->
     if e.keyCode is 13
       $('#test-url-input').focus()
       return false
-
+  # focus to next
   $('#test-url-input').on 'keyup', (e)->
     if e.keyCode is 13
       $('#test-url-btn').click()
@@ -358,19 +382,18 @@ define (require)->
       return
 
     if false is utils.isRouterStrValid matchUrl
-      dialog
-        # content: utils.i18n 'opt_errtip_protocol'
-        content: 'match rule not valid'
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n 'opt_errtip_invalid_matchrule'
       return
 
     router = utils.getRouter matchUrl
     if ret = utils.hasReservedWord router
-      dialog
-        # content: utils.i18n 'opt_errtip_protocol'
-        content: 'reserved keywords found in the router: ' + ret.join ','
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n('opt_errtip_invalid_resvervedkwd') + ': ' + ret.join ','
       return
+
+    if ret = utils.isKwdsUniq router
+      showInputErrorInfo $host, utils.i18n('opt_errtip_invalid_duplicatedkwd') + ': ' + ret.join ','
+      return
+    
 
     megaRule = isRuleExists router.url, 'custom'
     # custom rules has xcross area???
@@ -380,34 +403,34 @@ define (require)->
       .show $host[0]
 
     if ret = utils.hasUndefinedWord router, redirectUrl
-      dialog
-        # content: utils.i18n 'opt_errtip_protocol'
-        content: 'undefined keywords found in the redirect url: ' + ret.join ','
-      .show $redirectUrl[0]
+      showInputErrorInfo $redirectUrl, utils.i18n('opt_errtip_invalid_undefinedkwd') + ': ' + ret.join ','
       return
 
 
-    unless testUrl# and utils.is testUrl
+    unless testUrl
       dialog
-        # content: utils.i18n 'opt_errtip_protocol'
-        content: 'test url need be filled'
+        content: utils.i18n 'opt_errtip_urlneedtest'
       .show $testUrl[0]
       return
+
     unless utils.isUrl testUrl
       dialog
-        # content: utils.i18n 'opt_errtip_protocol'
-        content: 'test url is invalid'
+        content: utils.i18n 'opt_errtip_urlinvliad'
       .show $testUrl[0]
       return
     
     megaRule = isRuleExists router.url, 'block'
     if megaRule?
-      alert 'this rule is conflict with block rule: ' + megaRule
+      dialog
+        content: utils.i18n('opt_errtip_csconflictedblock') + ': ' + megaRule
+        okValue: utils.i18n 'ok_btn'
+        ok: ->
+      .showModal()
       return
     
     router.redirectUrl = redirectUrl
     targetUrl = utils.getTargetUrl(router, testUrl)
-    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl}'>#{targetUrl  or 'not match'}</a>"
+    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl or 'javascript:;'}' class='#{if targetUrl then '' else 'text-danger' }'>#{targetUrl  or 'not match'}</a>"
     # return router if test pass
     if targetUrl then router
 
