@@ -6,17 +6,22 @@ define(function(require) {
   collection = require('common/js/collection');
   version = '0.1';
   getExtData = function() {
-    var k, ret, v;
+    var e, error, k, ret, v;
     ret = {};
     for (k in localStorage) {
       if (!hasProp.call(localStorage, k)) continue;
       v = localStorage[k];
+      try {
+        v = JSON.parse(v);
+      } catch (error) {
+        e = error;
+      }
       ret[k] = v;
     }
     return ret;
   };
   restoreExtData = function(data) {
-    var e, error, k, v;
+    var e, error, error1, k, v;
     if (typeof data !== 'object') {
       try {
         data = JSON.parse(data);
@@ -27,9 +32,26 @@ define(function(require) {
     }
     for (k in data) {
       v = data[k];
-      localStorage.setItem(k, typeof v === 'string' ? v : String(v));
+      if (typeof v !== 'string') {
+        try {
+          v = JSON.stringify(v);
+        } catch (error1) {
+          e = error1;
+          return false;
+        }
+      }
+      localStorage.setItem(k, v);
     }
-    collection.initCollection();
+    if (v = data.config) {
+      setTimeout(function() {
+        if (typeof v !== 'string') {
+          v = JSON.stringify(v);
+        }
+        localStorage.setItem('config', v);
+        collection.setConfig('demo-custom-rule－showed', true);
+        return collection.initCollection();
+      }, 200);
+    }
     return true;
   };
 
@@ -41,7 +63,7 @@ define(function(require) {
   save2File = function(text, filename) {
     var dom;
     if (typeof text === 'object') {
-      text = JSON.stringify(text);
+      text = JSON.stringify(text, null, 2);
     } else {
       text = "" + text;
     }
@@ -55,7 +77,6 @@ define(function(require) {
     var reader, size;
     size = f.size;
     if (size > 1024 * 1024 * 5) {
-      alert('Are you kidding me? the config file is bigger than 5m!');
       fail('SIZE_OVERFLOW');
       return;
     }

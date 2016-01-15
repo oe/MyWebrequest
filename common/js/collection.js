@@ -63,7 +63,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       return {
         ruleId: rule.url,
         rule: "<div>" + rule.matchUrl + "</div><div>" + rule.redirectUrl + "</div>",
-        title: rule.matchUrl
+        title: '',
+        cls: 'cs-cell'
       };
     } else {
       return {
@@ -83,7 +84,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
         ret.push({
           ruleId: v.url,
           rule: "<div>" + v.matchUrl + "</div><div>" + v.redirectUrl + "</div>",
-          title: v.matchUrl
+          title: '',
+          cls: 'cs-cell'
         });
       }
       return ret;

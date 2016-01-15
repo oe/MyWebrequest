@@ -34,7 +34,7 @@ define (require)->
   document.getElementById('qrimg').onerror = (e) ->
     @setAttribute 'hidden', true
     dialog
-      title: utils.i18n 'opt_errtip_gtitle'
+      title: utils.i18n('opt_errtip_qrcode') + ': ' + vars.QR_API_HOST
       content: utils.i18n 'opt_errtip_gcontent'
       okValue: utils.i18n 'ok_btn'
       ok: ->

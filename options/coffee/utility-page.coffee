@@ -27,12 +27,6 @@ define (require)->
     collection.setSwitch 'gstatic', !!this.checked
     return
 
-  # press ok on the google domain edit dialog
-  $('#preferred-google').on 'keyup', (e)->
-    if e.keyCode is 13
-      do $('#input-dialog-wrapper .js-btn-ok').click
-    return
-
   # show google domain edit dialog
   $('#gsearch-rule-switch').on 'click', '.js-add-favor-gsearch', ->
     val = do getCustomFavorGsearch

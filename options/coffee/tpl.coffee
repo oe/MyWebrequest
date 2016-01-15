@@ -9,7 +9,7 @@ define (require)->
     tpl = '''
     <tr>
        <td><input type="checkbox" value="{{ruleId}}"></td>
-       <td title="{{title}}">{{rule}}</td>
+       <td title="{{title}}" class="{{cls}}">{{rule}}</td>
        <td class="delete">#{del}</td>
     </tr>
     '''
@@ -20,7 +20,7 @@ define (require)->
       arr.forEach (a)->
         res += tpl.replace /\{\{(\w+)\}\}/g, ($0, $1)->
           return deleteText if $1 is 'del'
-          a[ $1 ] or $1
+          a[ $1 ] ? $1
         return
       res
 

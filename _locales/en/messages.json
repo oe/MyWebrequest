@@ -50,6 +50,9 @@
   "pop_google_down": {
     "message": "Sorry, but I can't access Google api."
   },
+  "opt_dlg_title": {
+    "message": "Message"
+  },
   "opt_pg_tile": {
     "message": "Options"
   },
@@ -63,7 +66,7 @@
     "message": "delete"
   },
   "opt_rule_unit": {
-    "message": "rules"
+    "message": "rule(s)"
   },
   "opt_no_rules": {
     "message": "You haven't added any rules yet."
@@ -123,13 +126,28 @@
     "message": "paste a real url to test your rule"
   },
   "opt_ph_newurl": {
-    "message": "a url template to generate the new url"
+    "message": "a url template to generate the new url, like http://abc.us/m/{sub}/{newsid}"
   },
   "opt_ph_urlmatch": {
-    "message": "a url pattern to match a url"
+    "message": "a url pattern to match, like {sub}.abc.com/news/{newsid}.html"
   },
   "opt_custom_desc": {
     "message": "Custom where are your url going to"
+  },
+  "opt_path_rule_tip": {
+    "message": "The path should obey the following rules(please ommit the prefix <strong>/</strong>):<ul><li>you give a specific path, like<code>path</code>,<code>path?num=1</code></li><li>wildcard<code>*</code> is also available, like <ul><li><code>*</code>(aka any path, including empty path)</li><li><code>path*</code>(all path start with <strong>path</strong>)</li><li><code>path*.jsp</code>(start with <strong>path</strong> and end with <strong>.jsp</strong>)</li><li><code>*kwd*</code>(path contains <strong>kwd</strong>)</li><li><code>path?*</code>(all query request to <strong>path</strong>)</li><li><code>path?num=*</code>(all query request to <strong>path</strong>, and <strong>num</strong> is the first query parameter, NOTICE: <strong>path?ps=23&amp;num=23</strong> won't be matched)</li></ul></li></ul>"
+  },
+  "opt_host_rule_tip": {
+    "message": "The domain should obey the following rules:<ul><li>you give a specific domain, like<code>www.abc.com</code></li><li>IP address is ok too, like<code>8.8.8.8</code></li><li>wildcard <code>*</code> can be used to match any subdomains, but only available in domains under second-level domain. so <code>*.abc.com</code> and <code>*.api.abc.com</code> are valid. but <code>*.com</code> and <code>*.net</code>are invalid.</li></ul>"
+  },
+  "opt_custom_matchrule_tip": {
+    "message": "The match-url should obey the following rules:<ul><li>A URL must specify its second-level domain, <strong>{fld}.com</strong> is invalid</li><li><code>{kwd}</code>can be used to name the url part that you'd like to focus, and you can use them in redirect-url. like {name}.abc.com</li><li><code>{*kwd}</code>can be used to match anything in the end of the path,query string won't be matched. So <strong>abc.com/news/{*newspath}</strong> can match <strong>abc.com/news/intl/887.html?partno=2</strong>(now, newspath is intl/887.html)</li><li><code>{kwd}</code> can also be used to name the values in query string. like <strong>www.google.com.hk/search?q={kwd}</strong> can match all keywords you search via Google.</li><li>the extension has predefined several names, you should not defined them again:</li><ul><li><code>u</code>means URL itself</li><li><code>p</code>represents protocol, like http,https</li><li><code>h</code>means URL's domain, like g.cn, uk.abc.com</li><li><code>m</code>means second-level domain, for <strong>g.cn/search*</strong> it's g.cn. and for <strong>uk.abc.com/news/*</strong>, it's abc.com</li><li><code>r</code>means path(without prefix<strong>/</strong>), like <strong>search</strong>, <strong>news/998.html</strong></li><li><code>q</code>means query string(without prefix<strong>?</strong>), like newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_redirectrule_tip": {
+    "message": "The redirect-url should obey the following rules:<ul><li>the URL's should has its protocol, you can use http,https, and the predefined {p}</li><li>names defined in match-url can be used, bracket them with <strong>{}</strong></li><li>and so is the predefined names:</li><ul><li><code>u</code>means URL itself</li><li><code>p</code>represents protocol, like http,https</li><li><code>h</code>means URL's domain, like g.cn, uk.abc.com</li><li><code>m</code>means second-level domain, for <strong>g.cn/search*</strong> it's g.cn. and for <strong>uk.abc.com/news/*</strong>, it's abc.com</li><li><code>r</code>means path(without prefix<strong>/</strong>), like <strong>search</strong>, <strong>news/998.html</strong></li><li><code>q</code>means query string(without prefix<strong>?</strong>), like newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_demotip": {
+    "message": "Custom URL is a new feature, I just added a rule to demonstrate it: this rule can auto redirect your page to Google search results when searching via Baidu. To see how it works, you may enable this feature, then searching on Baidu(http://www.baidu.com) with any keywords and you will see something magic. Please make sure you can get access to Google, or you may be in China:)"
   },
   "opt_hotlink_desc": {
     "message": "Enable the accessibility of those hotlinking images"
@@ -172,6 +190,9 @@
   },
   "opt_errtip_invalid_undefinedkwd": {
     "message": "Undefined keywords found in the redirect-url"
+  },
+  "opt_errtip_invalid_redirectrule": {
+    "message": "Redirect-url is invalid"
   },
   "opt_errtip_urlneedtest": {
     "message": "You need type(or paste) a url to test your rule"
@@ -230,8 +251,8 @@
   "opt_qrtip_notext": {
     "message": "Do not leave everything empty"
   },
-  "opt_errtip_gtitle": {
-    "message": "Can't access Google API"
+  "opt_errtip_qrcode": {
+    "message": "Can't access QRCode service"
   },
   "opt_errtip_gcontent": {
     "message": "My webrequest is using Google api to generate QR Code.<br>Please check your network."
@@ -292,6 +313,21 @@
   },
   "opt_extstg_rstr": {
     "message": "Restore"
+  },
+  "opt_restore_confirmtip": {
+    "message": "This will override all settings you have"
+  },
+  "opt_restore_lbl": {
+    "message": "When restoring, the config file should be in json format and file name with <strong>json</strong> extension"
+  },
+  "opt_restore_readfail": {
+    "message": "Failed to read the file content"
+  },
+  "opt_restore_formarterr": {
+    "message": "The config file's format is invalid"
+  },
+  "opt_restore_success": {
+    "message": "Restore success!"
   },
   "opt_help_desc": {
     "message": "There must be something U need to know"

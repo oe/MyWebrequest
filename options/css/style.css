@@ -301,6 +301,8 @@ section .setting-title{
 	list-style-type: circle;
 }
 .input-tip ul li {
+	-ms-word-break: break-all;
+	word-break: break-all;
 	margin-bottom: 2px;
 }
 .input-tip:before, .input-tip:after {
@@ -399,8 +401,21 @@ table.rules tr td:nth-child(2) {
 	white-space:nowrap;
 	overflow:hidden;
 	text-overflow:ellipsis;
+	font-family: monospace;
 }
 
+table.rules .cs-cell {
+	position: relative;
+	padding-left: 16px;
+}
+.cs-cell:before {
+	content: '{';
+  position: absolute;
+  left: 0;
+  font-size: 2em;
+  color: lightgray;
+  font-weight: 100;
+}
 table.rules tr td:nth-child(3),table.rules tr th:nth-child(3) {
 	text-align: center;
 	cursor: pointer;

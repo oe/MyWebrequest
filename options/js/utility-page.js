@@ -26,11 +26,6 @@ define(function(require) {
   $('#switch-gstatic').on('change', function() {
     collection.setSwitch('gstatic', !!this.checked);
   });
-  $('#preferred-google').on('keyup', function(e) {
-    if (e.keyCode === 13) {
-      $('#input-dialog-wrapper .js-btn-ok').click();
-    }
-  });
   $('#gsearch-rule-switch').on('click', '.js-add-favor-gsearch', function() {
     var $ipt, content, dlg, val;
     val = getCustomFavorGsearch();

@@ -8,6 +8,10 @@ define (require)->
   getExtData = ->
     ret = {}
     for own k, v of localStorage
+      try
+        v = JSON.parse v
+      catch e
+
       ret[ k ] = v
     ret
     
@@ -19,9 +23,23 @@ define (require)->
       catch e
         return false
     for k, v of data
-      localStorage.setItem k, if typeof v is 'string' then v else String v
-    # reinit collection data in options page
-    collection.initCollection()
+      if typeof v isnt 'string'
+        try
+          v = JSON.stringify v
+        catch e
+          return false
+      localStorage.setItem k, v
+
+    if v = data.config
+      setTimeout ->
+        if typeof v isnt 'string'
+          v = JSON.stringify v
+
+        localStorage.setItem 'config', v
+        collection.setConfig 'demo-custom-rule－showed', true
+        # reinit collection data in options page
+        collection.initCollection()
+      , 200
     true
     
       
@@ -32,7 +50,7 @@ define (require)->
   ###
   save2File = (text, filename)->
     if typeof text is 'object'
-      text = JSON.stringify text
+      text = JSON.stringify text, null, 2
     else
       text = "#{text}"
     text = encodeURIComponent text
@@ -46,7 +64,7 @@ define (require)->
     size = f.size
     # file size bigger than 5mb
     if size > 1024 * 1024 * 5
-      alert 'Are you kidding me? the config file is bigger than 5m!'
+      # alert 'Are you kidding me? the config file is bigger than 5m!'
       fail 'SIZE_OVERFLOW'
       return
     

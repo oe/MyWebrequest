@@ -55,7 +55,8 @@
       {
         ruleId: rule.url
         rule: "<div>#{rule.matchUrl}</div><div>#{rule.redirectUrl}</div>"
-        title: rule.matchUrl
+        title: ''
+        cls: 'cs-cell'
       }
     else
       {
@@ -72,7 +73,8 @@
         ret.push
           ruleId: v.url
           rule: "<div>#{v.matchUrl}</div><div>#{v.redirectUrl}</div>"
-          title: v.matchUrl
+          title: ''
+          cls: 'cs-cell'
       ret
     else
       rules.map (rule)->

@@ -25,35 +25,52 @@ define (require)->
     extData = dataMaintain.getExtData()
     dataMaintain.save2File extData, "my-webrequest-#{getNowDate()}.json"
 
+  # show error message
+  showErrorInfo = (msg)->
+    dialog
+      title: utils.i18n 'opt_errdlg_title'
+      content: msg
+      okValue: utils.i18n 'ok_btn'
+      ok: ->
+    .showModal()
+
   # choose a file to read
   $('#restore-ext-data').on 'change', (e)->
     files = e.target.files
+    me = this
     if files.length
       dialog
-        title: utils.i18n 'opt_errtip_gtitle'
-        content: 'This will override all setting you have'
+        title: utils.i18n 'opt_errdlg_title'
+        content: utils.i18n 'opt_restore_confirmtip'
         okValue: utils.i18n 'ok_btn'
         cancelValue: utils.i18n 'cancel_btn'
         cancel: ->
+          # clear selected files
+          # to trigger change event after choose file again
+          me.value = ''
         ok: ->
           # set a flag to tell localStorage the change if from restoration
           collection.setRestoreStatus true
           dataMaintain.readFile files[0], (content)->
+            me.value = ''
             unless dataMaintain.restoreExtData content
               collection.setRestoreStatus false
-              alert 'format error!'
+              showErrorInfo utils.i18n 'opt_restore_formarterr'
               return
             # reinit this page because it can be affected
             setTimeout ->
               init()
             , 300
+            dialog
+              content: utils.i18n 'opt_restore_success'
+              width: 250
+            .show $(me).parents('a')[0]
           , (msg)->
-            alert msg
+            me.value = ''
+            showErrorInfo utils.i18n('opt_restore_readfail') + ': ' + msg
       .showModal()
 
-    # clear selected files
-    # to trigger change event after choose file again
-    this.value = ''
+
 
     
 

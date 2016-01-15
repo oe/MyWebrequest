@@ -107,6 +107,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result.protocol = RegExp.$1.toLowerCase();
     result.host = RegExp.$2;
     result.path = RegExp.$3;
+    result.raw = url;
     return result;
   };
 
@@ -241,7 +242,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
 
   /**
    * convert a url pattern to a regexp
-   * @param  {String} route url pattern
+   * @param  {String} route url match pattern
+   * @param  {String} redirectUrl url redirect pattern
    * @return {Object}
    *                 {
    *                    url: match url, which url will be captured used by chrome
@@ -251,10 +253,11 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    *                    params: two array of var name of each named param in path an querystring
    *                 }
    */
-  getRouter = function(route) {
+  getRouter = function(route, redirectUrl) {
     var params, part, parts, protocol, reg, result, url;
     result = {
-      matchUrl: route
+      matchUrl: route,
+      redirectUrl: redirectUrl
     };
     if (!/\w\//.test(route)) {
       route += '/';
@@ -266,8 +269,8 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       protocol = '\\w+';
     }
     route = route.replace(/^([\w\*]+)\:\/\//, '');
-    url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*').replace(/\?.*$/, '*').replace(/\{\w+\}.*$/, '*');
-    result.url = url;
+    url += route.replace(/\?.*$/, '*').replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*').replace(/\{\*?\w+\}.*$/, '*');
+    result.url = url.replace(/\*+$/, '') + '*';
     parts = route.split('?');
     if (parts.length > 2) {
       return result;
@@ -304,7 +307,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result.hasQs = !!Object.keys(params).length;
     return result;
   };
-  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q'];
+  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q', 'u'];
   hasReservedWord = function(router) {
     var j, len, params, ref, ref1, res, v;
     params = getKwdsInRoute(router);
@@ -424,6 +427,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     res.m = res.h.split('.').slice(-2).join('.');
     res.r = RegExp.$3;
     res.q = RegExp.$5;
+    res.u = url;
     return res;
   };
   fillPattern = function(pattern, data) {
@@ -435,7 +439,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     return pattern.replace(/\{(\w+)\}/g, function($0, $1) {
       var ref, val;
       val = (ref = data[$1]) != null ? ref : '';
-      if (~val.indexOf('/') || $1 === 'q') {
+      if (($1 !== 'u' && ~val.indexOf('/')) || $1 === 'q') {
         return val;
       } else {
         return encodeURIComponent(val);

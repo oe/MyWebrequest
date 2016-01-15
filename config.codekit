@@ -19458,19 +19458,6 @@
 		"outputStyle": 1,
 		"syntaxCheckerStyle": 1
 		},
-	"\/options\/coffee\/opt.coffee": {
-		"createSourceMap": 1,
-		"fileType": 32,
-		"ignore": 0,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/coffee\/opt.coffee",
-		"minifyOutput": 0,
-		"outputAbbreviatedPath": "\/options\/js\/opt.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 1,
-		"syntaxCheckerStyle": 1
-		},
 	"\/options\/coffee\/qr-page.coffee": {
 		"createSourceMap": 1,
 		"fileType": 32,

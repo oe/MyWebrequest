@@ -33,7 +33,7 @@ define(function(require) {
   document.getElementById('qrimg').onerror = function(e) {
     this.setAttribute('hidden', true);
     dialog({
-      title: utils.i18n('opt_errtip_gtitle'),
+      title: utils.i18n('opt_errtip_qrcode') + ': ' + vars.QR_API_HOST,
       content: utils.i18n('opt_errtip_gcontent'),
       okValue: utils.i18n('ok_btn'),
       ok: function() {}

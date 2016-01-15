@@ -89,6 +89,7 @@
     result.protocol = RegExp.$1.toLowerCase()
     result.host = RegExp.$2
     result.path = RegExp.$3
+    result.raw = url
     result
 
   ###*
@@ -223,7 +224,8 @@
   queryStrReg   = /([\w_\+%@!\.,\*\?\|~\/]+)=\{(\w+)\}/g
   ###*
    * convert a url pattern to a regexp
-   * @param  {String} route url pattern
+   * @param  {String} route url match pattern
+   * @param  {String} redirectUrl url redirect pattern
    * @return {Object}
    *                 {
    *                    url: match url, which url will be captured used by chrome
@@ -233,8 +235,10 @@
    *                    params: two array of var name of each named param in path an querystring
    *                 }
   ###
-  getRouter = (route)->
-    result = matchUrl: route
+  getRouter = (route, redirectUrl)->
+    result =
+      matchUrl: route
+      redirectUrl : redirectUrl
 
     # if the route doesnt has path and query string
     # like http://g.cn
@@ -249,14 +253,14 @@
     # remove protocol
     route = route.replace /^([\w\*]+)\:\/\//, ''
 
-    # replace named holder with * in host
-    url += route.replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
     # replace query string with *
-    .replace /\?.*$/, '*'
+    url += route.replace /\?.*$/, '*'
+    # replace named holder with * in host
+    .replace(/^[^\/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
     # replace named holder with * in path
-    .replace /\{\w+\}.*$/, '*'
-    result.url = url
-
+    .replace /\{\*?\w+\}.*$/, '*'
+    # add a asterisk to disable strict match
+    result.url = url.replace(/\*+$/, '') + '*'
 
     parts = route.split '?'
     # route contains more than one ?
@@ -287,10 +291,11 @@
         params[ $1 ] = $2
     result.qsParams = params
     result.hasQs = !!Object.keys(params).length
+
     result
 
   # pre-defined placeholders
-  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q']
+  RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q', 'u']
   # have reserved word in url pattern
   # return a reserved words list that has been miss used.
   hasReservedWord = (router)->
@@ -386,10 +391,12 @@
     res.h = RegExp.$2
     # main domain
     res.m = res.h.split('.').slice(-2).join '.'
-    # path
+    # path, without the prefix /
     res.r = RegExp.$3
     # query string without question mark
     res.q = RegExp.$5
+    # the whole url
+    res.u = url
     res
 
   # fill a pattern with data
@@ -401,10 +408,9 @@
     pattern.replace /\{(\w+)\}/g, ($0, $1)->
       val = data[ $1 ] ? ''
       # / in val, like abc/bdc, won't be encoded
-      # q is query string
-      # do not encode query string
-      if ~val.indexOf('/') or $1 is 'q' then val else encodeURIComponent val
-
+      #   q is query string, do not encode query string again
+      #   u is url, encoded anywhere
+      if ( $1 isnt 'u' and ~val.indexOf('/')) or $1 is 'q'  then val else encodeURIComponent val
 
   ###*
    * get target url

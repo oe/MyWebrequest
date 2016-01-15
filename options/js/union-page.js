@@ -2,7 +2,7 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var UNION_PAGES, addRule, checkCustomRule, collection, initSection, isRuleExists, isSafe4Qr, isUnionCat, removeRule, resetSectionCtrlsState, showInputErrorInfo, tpl, utils, vars;
+  var UNION_PAGES, addRule, addSamleCustomRule4demo, checkCustomRule, collection, initSection, isRuleExists, isSafe4Qr, isUnionCat, removeRule, resetSectionCtrlsState, shouldShowDemoCsRule, showInputErrorInfo, tpl, utils, vars;
   utils = require('common/js/utils');
   collection = require('common/js/collection');
   tpl = require('js/tpl');
@@ -90,6 +90,9 @@ define(function(require) {
     noRule = !$tbody.find('tr:not([nodata])').length;
     $tbody[noRule ? 'html' : 'prepend']($tr);
     $('.rule-field input').val('');
+    if (cat === 'custom') {
+      $('#custom-test-result').html('');
+    }
     $('#host').focus();
     collection.addRule(cat, rule);
     resetSectionCtrlsState(cat);
@@ -137,6 +140,11 @@ define(function(require) {
     isCustom = cat === 'custom';
     $('#request-settings .js-custom').prop('hidden', !isCustom);
     $('#request-settings .js-not-custom').prop('hidden', isCustom);
+    if (isCustom && shouldShowDemoCsRule()) {
+      setTimeout(function() {
+        return addSamleCustomRule4demo();
+      }, 300);
+    }
     rules.reverse();
     $('#fun-name').text($("#nav a[href^=#" + cat + "]").text());
     $('#fun-desc').text(utils.i18n("opt_" + cat + "_desc"));
@@ -311,15 +319,15 @@ define(function(require) {
     }
   });
   $('#host-c').on('paste', function(e) {
-    var url;
-    url = utils.getUrlFromClipboard(e);
-    if (!(url.protocol && utils.isProtocol(url.protocol))) {
+    var uri;
+    uri = utils.getUrlFromClipboard(e);
+    if (!(uri.protocol && utils.isProtocol(uri.protocol))) {
       return true;
     }
     if (!$('#protocol').prop('disabled')) {
-      $('#protocol-c').val(url.protocol);
+      $('#protocol-c').val(uri.protocol);
     }
-    $('#host-c').val("" + url.host + url.path);
+    $('#host-c').val(uri.raw.replace(uri.protocol + '://', ''));
     return false;
   });
   $('#host-c').on('keyup', function(e) {
@@ -340,6 +348,25 @@ define(function(require) {
       return false;
     }
   });
+  shouldShowDemoCsRule = function() {
+    return !collection.getConfig('demo-custom-rule－showed');
+  };
+
+  /**
+   * add a sample rule for user use it first time
+   */
+  addSamleCustomRule4demo = function() {
+    var router;
+    router = utils.getRouter('https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}');
+    addRule('custom', router);
+    collection.setConfig('demo-custom-rule－showed', true);
+    return dialog({
+      title: utils.i18n('opt_dlg_title'),
+      content: utils.i18n('opt_custom_demotip'),
+      okValue: utils.i18n('ok_btn'),
+      ok: function() {}
+    }).showModal();
+  };
 
   /**
    * Test the custom rule with a real url
@@ -375,7 +402,7 @@ define(function(require) {
       showInputErrorInfo($host, utils.i18n('opt_errtip_invalid_matchrule'));
       return;
     }
-    router = utils.getRouter(matchUrl);
+    router = utils.getRouter(matchUrl, redirectUrl);
     if (ret = utils.hasReservedWord(router)) {
       showInputErrorInfo($host, utils.i18n('opt_errtip_invalid_resvervedkwd') + ': ' + ret.join(','));
       return;
@@ -386,9 +413,11 @@ define(function(require) {
     }
     megaRule = isRuleExists(router.url, 'custom');
     if (megaRule != null) {
-      dialog({
-        content: utils.i18n('opt_errtip_duplicate') + megaRule
-      }).show($host[0]);
+      showInputErrorInfo($host, utils.i18n('opt_errtip_duplicate') + megaRule);
+    }
+    if (!redirectUrl || utils.isUrl(redirectUrl.replace(/\{\w+\}/g, 'xxx'))) {
+      showInputErrorInfo($redirectUrl, utils.i18n('opt_errtip_invalid_redirectrule'));
+      return;
     }
     if (ret = utils.hasUndefinedWord(router, redirectUrl)) {
       showInputErrorInfo($redirectUrl, utils.i18n('opt_errtip_invalid_undefinedkwd') + ': ' + ret.join(','));
@@ -402,7 +431,8 @@ define(function(require) {
     }
     if (!utils.isUrl(testUrl)) {
       dialog({
-        content: utils.i18n('opt_errtip_urlinvliad')
+        content: utils.i18n('opt_errtip_urlinvliad'),
+        "with": 250
       }).show($testUrl[0]);
       return;
     }
@@ -415,7 +445,6 @@ define(function(require) {
       }).showModal();
       return;
     }
-    router.redirectUrl = redirectUrl;
     targetUrl = utils.getTargetUrl(router, testUrl);
     $('#custom-test-result').html("<a target='_blank' href='" + (targetUrl || 'javascript:;') + "' class='" + (targetUrl ? '' : 'text-danger') + "'>" + (targetUrl || 'not match') + "</a>");
     if (targetUrl) {

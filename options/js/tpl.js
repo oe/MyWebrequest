@@ -9,17 +9,18 @@ define(function(require) {
   rulesTpl = (function() {
     var deleteText, tpl;
     deleteText = chrome.i18n.getMessage('opt_delete_text');
-    tpl = '<tr>\n   <td><input type="checkbox" value="{{ruleId}}"></td>\n   <td title="{{title}}">{{rule}}</td>\n   <td class="delete">#{del}</td>\n</tr>';
+    tpl = '<tr>\n   <td><input type="checkbox" value="{{ruleId}}"></td>\n   <td title="{{title}}" class="{{cls}}">{{rule}}</td>\n   <td class="delete">#{del}</td>\n</tr>';
     tpl = tpl.replace('#{del}', deleteText);
     return function(arr) {
       var res;
       res = '';
       arr.forEach(function(a) {
         res += tpl.replace(/\{\{(\w+)\}\}/g, function($0, $1) {
+          var ref;
           if ($1 === 'del') {
             return deleteText;
           }
-          return a[$1] || $1;
+          return (ref = a[$1]) != null ? ref : $1;
         });
       });
       return res;

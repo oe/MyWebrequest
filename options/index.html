@@ -25,7 +25,7 @@
 	</aside>
 	<section id="request-settings" data-id="block">
 		<div class="setting-title">
-			<span id="fun-name">Block</span> <span id="fun-desc" i18n-content="opt_block_desc" class="fun-desc"></span>
+			<span id="fun-name"></span> <span id="fun-desc" i18n-content="opt_block_desc" class="fun-desc"></span>
 		</div>
 		<div class="setting-content">
 			<div class="rule-switch">
@@ -52,15 +52,7 @@
 				<div class="input-field field-block host">
 					<label class="label" for="host" i18n-content="opt_host_lbl"></label>
 					<input id="host" name="host" class="input" i18n-value="placeholder:opt_ph_host">
-					<div class="input-tip">
-						<div>域名应遵守以下规则:
-							<ul>
-								<li>可以指定确切的域名, 如 <code>www.abc.com</code></li>
-								<li>也可以使用IP地址, 如 <code>8.8.8.8</code></li>
-								<li>你可以使用通配符 <code>*</code> 来匹配任意子域名, 但只能在二级及之上的域名中使用. 如 <code>*.abc.com</code> 和 <code>*.api.abc.com</code> 是允许的, 而诸如 <code>*.com</code> 和 <code>*.net</code> 则是非法的.</li>
-							</ul>
-						</div>
-					</div>
+					<div class="input-tip" i18n-content="opt_host_rule_tip"></div>
 				</div>
 				<div class="input-field field-block separator">
 					<label class="label">&nbsp;</label>
@@ -69,22 +61,7 @@
 				<div class="input-field field-block path">
 					<label class="label" for="path" i18n-content="opt_path_lbl"></label>
 					<input id="path" name="path" class="input" i18n-value="placeholder:opt_ph_path">
-					<div class="input-tip">
-						路径应遵守以下规则(请省略路径开头的 <strong>/</strong>):
-							<ul>
-								<li>可以指定确切的路径, 如 <code>path</code>, <code>path?num=1</code></li>
-								<li>你可以使用通配符 <code>*</code> 来模糊匹配路径, 如:
-								<ul>
-									<li><code>*</code>(即任意路径, 包括空)</li>
-									<li><code>path*</code>(所有以 path 开头的路径)</li>
-									<li><code>path*.jsp</code>(以 path 开头并以 .jsp 结尾的路径)</li>
-									<li><code>*kwd*</code>(任何包含 kwd 的路径)</li>
-									<li><code>path?*</code>(所有提交到 path 的query请求)</li>
-									<li> <code>path?num=*</code>(所有提交path的query请求, 且num是第一个请求参数，注意 path?ps=23&num=23 不会被匹配)</li>
-								</ul>
-							</li>
-						</ul>
-					</div>
+					<div class="input-tip" i18n-content="opt_path_rule_tip"></div>
 				</div>
 				<div class="input-field field-block">
 					<label class="label">&nbsp;</label>
@@ -110,23 +87,7 @@
 				<div class="input-field field-block host-c">
 					<label class="label">&nbsp;</label>
 					<input id="host-c" name="host-c" class="input" i18n-value="placeholder:opt_ph_urlmatch">
-					<div class="input-tip">
-						匹配URL应遵守以下规则:
-						<ul>
-							<li>可以使用<code>{kwd}</code>的方式来命名你所关注的URL部分, 你可以在跳转规则中使用他们, 如 {name}.abc.com/, uk.abc.com/news/{newsid}-{time}.html</li>
-							<li>URL必须指定一级域名, {fld}.com/ 规则是不允许的 </li>
-							<li>可以使用<code>{*kwd}</code>的方式来匹配路径中末尾的部分, query字符串不会被匹配. 如 uk.abc.com/news/{*newspath} 能匹配 uk.abc.com/news/intl/887.html (此时newspath代表 intl/887.html) </li>
-							<li>你也可以用<code>{kwd}</code>的方式来命名query字符串中你所关注的值. 如 www.google.com.hk/search?q={kwd} 能匹配你在谷歌中搜索的关键字</li>
-							<li>扩展已经预定义了以下的名字, 你自定义的名字不能和下面的重复:</li>
-							<ul>
-								<li><code>p</code> 代表协议如 http, https</li>
-								<li><code>h</code> 代表URL中的域名, 如 g.cn, uk.abc.com </li>
-								<li><code>m</code> 代表URL中的一级域名, 对于 g.cn/search* 则代表 g.cn, 对于 uk.abc.com/news/*则代表 abc.com </li>
-								<li><code>r</code> 代表URL中的路径(不包含开头的<strong>/</strong>), 如 search, news/998.html </li>
-								<li><code>q</code> 代表URL中的query字符串(不包含开头的的<strong>?</strong>), 如 newwindow=1&safe=2 </li>
-							</ul>
-						</ul>
-					</div>
+					<div class="input-tip" i18n-content="opt_custom_matchrule_tip"></div>
 				</div>
 			</div>
 			<!-- new url rule -->
@@ -134,20 +95,7 @@
 				<div class="input-field field-block large-block">
 					<label class="label" for="redirect-url-input" i18n-content="opt_redirect_to"></label>
 					<input type="text" id="redirect-url-input" class="input" i18n-value="placeholder:opt_ph_newurl">
-					<div class="input-tip">
-						跳转URL应遵守以下规则:
-						<ul>
-							<li>可以使用在匹配URL中定义的名字</li>
-							<li>也可以使用扩展预定义的:</li>
-							<ul>
-								<li><code>p</code> 代表协议如 http, https</li>
-								<li><code>h</code> 代表URL中的主机名(域名), 如 g.cn, uk.abc.com </li>
-								<li><code>m</code> 代表URL中的一级域名, 对于 g.cn/search* 则代表 g.cn, 对于 uk.abc.com/news/*则代表 abc.com </li>
-								<li><code>r</code> 代表URL中的路径(不包含开头的<strong>/</strong>), 如 search, news/998.html </li>
-								<li><code>q</code> 代表URL中的query字符串(不包含开头的的<strong>?</strong>), 如 newwindow=1&safe=2 </li>
-							</ul>
-						</ul>
-					</div>
+					<div class="input-tip" i18n-content="opt_custom_redirectrule_tip"></div>
 				</div>
 			</div>
 			<!-- test url input -->
@@ -175,7 +123,7 @@
 			<div class="item-title">
 				<span i18n-content="opt_mngrule_lbl"></span>
 				<div class="rule-cunt">
-					(<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>)
+					<span class="rule-cunt-num">0</span> <span i18n-content="opt_rule_unit"></span>
 				</div>
 			</div>
 			<table class="rules">
@@ -323,7 +271,7 @@
 					<input type="file" hidden accept=".json" id="restore-ext-data">
 					<label for="restore-ext-data" i18n-content="opt_extstg_rstr"></label>
 				</a>
-				<div><small>When restoring, the config file should be in json format and file name with json extension</small></div>
+				<div><small i18n-content="opt_restore_lbl"></small></div>
 			</div>
 			</div>
 		</div>

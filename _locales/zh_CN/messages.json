@@ -50,6 +50,9 @@
   "pop_google_down": {
     "message": "抱歉,貌似你现在访问不了谷歌."
   },
+  "opt_dlg_title": {
+    "message": "提示"
+  },
   "opt_pg_tile": {
     "message": "选项"
   },
@@ -123,13 +126,28 @@
     "message": "在此处粘贴真实链接地址来测试上述规则"
   },
   "opt_ph_newurl": {
-    "message": "用于生成新链接地址的模板"
+    "message": "用于生成新链接地址的模板, 如 http://abc.us/m/{sub}/{newsid}"
   },
   "opt_ph_urlmatch": {
-    "message": "用于匹配链接地址的规则"
+    "message": "用于匹配链接地址的规则, 如 {sub}.abc.com/news/{newsid}.html"
   },
   "opt_custom_desc": {
     "message": "自定义你的链接跳往何处"
+  },
+  "opt_path_rule_tip": {
+    "message": "路径应遵守以下规则(请省略路径开头的<strong>/</strong>):<ul><li>可以指定确切的路径,如<code>path</code>,<code>path?num=1</code></li><li>你可以使用通配符<code>*</code>来模糊匹配路径,如:<ul><li><code>*</code>(即任意路径,包括空)</li><li><code>path*</code>(所有以path开头的路径)</li><li><code>path*.jsp</code>(以path开头并以.jsp结尾的路径)</li><li><code>*kwd*</code>(任何包含kwd的路径)</li><li><code>path?*</code>(所有提交到path的query请求)</li><li><code>path?num=*</code>(所有提交path的query请求,且num是第一个请求参数，注意path?ps=23&amp;num=23不会被匹配)</li></ul></li></ul>"
+  },
+  "opt_host_rule_tip": {
+    "message": "域名应遵守以下规则:<ul><li>可以指定确切的域名,如<code>www.abc.com</code></li><li>也可以使用IP地址,如<code>8.8.8.8</code></li><li>你可以使用通配符<code>*</code>来匹配任意子域名,但只能在二级及之上的域名中使用.如<code>*.abc.com</code>和<code>*.api.abc.com</code>是允许的,而诸如<code>*.com</code>和<code>*.net</code>则是非法的.</li></ul>"
+  },
+  "opt_custom_matchrule_tip": {
+    "message": "匹配URL应遵守以下规则:<ul><li>URL必须指定二级域名, 规则 {fld}.com 是不允许的</li><li><li>可以使用<code>{kwd}</code>的方式来命名你所关注的URL部分,你可以在跳转规则中使用他们,如{name}.abc.com</li>可以使用<code>{*kwd}</code>的方式来匹配路径中末尾的部分,query字符串不会被匹配.如abc.com/news/{*newspath}能匹配abc.com/news/intl/887.html(此时newspath代表intl/887.html)</li><li>你也可以用<code>{kwd}</code>的方式来命名query字符串中你所关注的值.如www.google.com.hk/search?q={kwd}能匹配你在谷歌中搜索的关键字</li><li>扩展已经预定义了以下的名字,你自定义的名字不能和下面的重复:</li><ul><li><code>u</code>代表URL本身</li><li><code>p</code>代表协议, 如http,https</li><li><code>h</code>代表URL中的域名,如g.cn,uk.abc.com</li><li><code>m</code>代表URL中的一级域名,对于g.cn/search*则代表g.cn,对于uk.abc.com/news/*则代表abc.com</li><li><code>r</code>代表URL中的路径(不包含开头的<strong>/</strong>),如search,news/998.html</li><li><code>q</code>代表URL中的query字符串(不包含开头的的<strong>?</strong>),如newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_redirectrule_tip": {
+    "message": "跳转URL应遵守以下规则:<ul><li>URL的协议不能省略,可以使用http,https,或者预定义的{p}</li><li>可以使用在匹配URL中定义的名字</li><li>也可以使用扩展预定义的:</li><ul><li><code>u</code>代表URL本身</li><li><code>p</code>代表协议,如http,https</li><li><code>h</code>代表URL中的主机名(域名),如g.cn,uk.abc.com</li><li><code>m</code>代表URL中的一级域名,对于g.cn/search*则代表g.cn,对于uk.abc.com/news/*则代表abc.com</li><li><code>r</code>代表URL中的路径(不包含开头的<strong>/</strong>),如search,news/998.html</li><li><code>q</code>代表URL中的query字符串(不包含开头的的<strong>?</strong>),如newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_demotip": {
+    "message": "自定义URL是新增的特性, 为演示这个特性, 我增加了一个规则来演示: 这个规则可以在你搜索百度时自动跳转到谷歌的搜索结果页面. 你可以开启这个特性, 然后在百度上(http://www.baidu.com)搜索任意内容即可见效果, 请保证你可以正常访问谷歌，否则你看到的会是一个不存在的页面:)"
   },
   "opt_hotlink_desc": {
     "message": "帮你轻松的访问盗链图"
@@ -172,6 +190,9 @@
   },
   "opt_errtip_invalid_undefinedkwd": {
     "message": "跳转规则中有未定义的名字"
+  },
+  "opt_errtip_invalid_redirectrule": {
+    "message": "跳转规则格式错误"
   },
   "opt_errtip_urlneedtest": {
     "message": "你得输入(粘贴)一个链接来测试规则"
@@ -230,8 +251,8 @@
   "opt_qrtip_notext": {
     "message": "额,先填个空吧"
   },
-  "opt_errtip_gtitle": {
-    "message": "无法访问谷歌API"
+  "opt_errtip_qrcode": {
+    "message": "无法访问二维码服务"
   },
   "opt_errtip_gcontent": {
     "message": "My webrequest使用谷歌的API来生成二维码.<br>请检查你的网络连接是否正常,如果依旧无法生成二维码,看看帮助页吧."
@@ -292,6 +313,21 @@
   },
   "opt_extstg_rstr": {
     "message": "恢复"
+  },
+  "opt_restore_confirmtip": {
+    "message": "继续操作将会覆盖当前所有已有的设置"
+  },
+  "opt_restore_lbl": {
+    "message": "恢复数据时, 配置文件必须是json格式的, 而且文件后缀名也必须是<strong>json</strong>"
+  },
+  "opt_restore_readfail": {
+    "message": "读取配置文件失败"
+  },
+  "opt_restore_formarterr": {
+    "message": "配置文件格式错误"
+  },
+  "opt_restore_success": {
+    "message": "恢复成功啦!"
   },
   "opt_help_desc": {
     "message": "有些事你应当知道"

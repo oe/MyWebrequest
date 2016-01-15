@@ -84,6 +84,10 @@ define (require)->
     $tbody[ if noRule then 'html' else 'prepend' ] $tr
     # clear inputs
     $('.rule-field input').val ''
+
+    if cat is 'custom'
+      $('#custom-test-result').html ''
+
     $('#host').focus()
 
     collection.addRule cat, rule
@@ -131,6 +135,12 @@ define (require)->
     isCustom = cat is 'custom'
     $('#request-settings .js-custom').prop 'hidden', !isCustom
     $('#request-settings .js-not-custom').prop 'hidden', isCustom
+
+    if isCustom and shouldShowDemoCsRule()
+      setTimeout ->
+        addSamleCustomRule4demo()
+      , 300
+    
     # flip the rules
     # make the last added be the first
     do rules.reverse
@@ -325,11 +335,12 @@ define (require)->
   # -------------------- for custom rule inputs -------------------------
   # paste string to [custom host] input box
   $('#host-c').on 'paste', (e) ->
-    url = utils.getUrlFromClipboard e
-    return true unless url.protocol and utils.isProtocol url.protocol
-    $('#protocol-c').val url.protocol if not $('#protocol').prop 'disabled'
-    $('#host-c').val "#{url.host}#{url.path}"
+    uri = utils.getUrlFromClipboard e
+    return true unless uri.protocol and utils.isProtocol uri.protocol
+    $('#protocol-c').val uri.protocol if not $('#protocol').prop 'disabled'
+    $('#host-c').val uri.raw.replace uri.protocol + '://', ''
     return false
+
   # focus to next
   $('#host-c').on 'keyup', (e)->
     if e.keyCode is 13
@@ -345,6 +356,26 @@ define (require)->
     if e.keyCode is 13
       $('#test-url-btn').click()
       return false
+
+
+  shouldShowDemoCsRule = ->
+    !collection.getConfig 'demo-custom-rule－showed'
+
+  ###*
+   * add a sample rule for user use it first time
+  ###
+  addSamleCustomRule4demo = ->
+    router = utils.getRouter 'https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}'
+    addRule 'custom', router
+    collection.setConfig 'demo-custom-rule－showed', true
+    dialog
+      title: utils.i18n 'opt_dlg_title'
+      content: utils.i18n 'opt_custom_demotip'
+      okValue: utils.i18n 'ok_btn'
+      ok: ->
+    .showModal()
+
+
 
     
   ###*
@@ -385,7 +416,7 @@ define (require)->
       showInputErrorInfo $host, utils.i18n 'opt_errtip_invalid_matchrule'
       return
 
-    router = utils.getRouter matchUrl
+    router = utils.getRouter matchUrl, redirectUrl
     if ret = utils.hasReservedWord router
       showInputErrorInfo $host, utils.i18n('opt_errtip_invalid_resvervedkwd') + ': ' + ret.join ','
       return
@@ -398,10 +429,12 @@ define (require)->
     megaRule = isRuleExists router.url, 'custom'
     # custom rules has xcross area???
     if megaRule?
-      dialog
-        content: utils.i18n('opt_errtip_duplicate') + megaRule
-      .show $host[0]
+      showInputErrorInfo $host, utils.i18n('opt_errtip_duplicate') + megaRule
 
+    if not redirectUrl or utils.isUrl redirectUrl.replace /\{\w+\}/g, 'xxx'
+      showInputErrorInfo $redirectUrl, utils.i18n 'opt_errtip_invalid_redirectrule'
+      return
+    
     if ret = utils.hasUndefinedWord router, redirectUrl
       showInputErrorInfo $redirectUrl, utils.i18n('opt_errtip_invalid_undefinedkwd') + ': ' + ret.join ','
       return
@@ -416,6 +449,7 @@ define (require)->
     unless utils.isUrl testUrl
       dialog
         content: utils.i18n 'opt_errtip_urlinvliad'
+        with: 250
       .show $testUrl[0]
       return
     
@@ -428,7 +462,6 @@ define (require)->
       .showModal()
       return
     
-    router.redirectUrl = redirectUrl
     targetUrl = utils.getTargetUrl(router, testUrl)
     $('#custom-test-result').html "<a target='_blank' href='#{targetUrl or 'javascript:;'}' class='#{if targetUrl then '' else 'text-danger' }'>#{targetUrl  or 'not match'}</a>"
     # return router if test pass
