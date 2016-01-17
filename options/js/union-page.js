@@ -349,7 +349,7 @@ define(function(require) {
     }
   });
   shouldShowDemoCsRule = function() {
-    return !collection.getConfig('demo-custom-rule－showed');
+    return !collection.getConfig('demo-custom-rule-showed');
   };
 
   /**
@@ -359,7 +359,7 @@ define(function(require) {
     var router;
     router = utils.getRouter('https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}');
     addRule('custom', router);
-    collection.setConfig('demo-custom-rule－showed', true);
+    collection.setConfig('demo-custom-rule-showed', true);
     return dialog({
       title: utils.i18n('opt_dlg_title'),
       content: utils.i18n('opt_custom_demotip'),

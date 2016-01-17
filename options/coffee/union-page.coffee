@@ -359,7 +359,7 @@ define (require)->
 
 
   shouldShowDemoCsRule = ->
-    !collection.getConfig 'demo-custom-rule－showed'
+    !collection.getConfig 'demo-custom-rule-showed'
 
   ###*
    * add a sample rule for user use it first time
@@ -367,7 +367,7 @@ define (require)->
   addSamleCustomRule4demo = ->
     router = utils.getRouter 'https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}'
     addRule 'custom', router
-    collection.setConfig 'demo-custom-rule－showed', true
+    collection.setConfig 'demo-custom-rule-showed', true
     dialog
       title: utils.i18n 'opt_dlg_title'
       content: utils.i18n 'opt_custom_demotip'

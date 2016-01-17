@@ -36,7 +36,7 @@ define (require)->
           v = JSON.stringify v
 
         localStorage.setItem 'config', v
-        collection.setConfig 'demo-custom-rule－showed', true
+        collection.setConfig 'demo-custom-rule-showed', true
         # reinit collection data in options page
         collection.initCollection()
       , 200

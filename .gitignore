@@ -1,3 +1,4 @@
 *.map
 .DS_Store
 node_modules/
+app.zip

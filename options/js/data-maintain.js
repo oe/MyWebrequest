@@ -48,7 +48,7 @@ define(function(require) {
           v = JSON.stringify(v);
         }
         localStorage.setItem('config', v);
-        collection.setConfig('demo-custom-rule－showed', true);
+        collection.setConfig('demo-custom-rule-showed', true);
         return collection.initCollection();
       }, 200);
     }
