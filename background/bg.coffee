@@ -3,6 +3,8 @@ do ->
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*']
 
   RULES_TYPE = [ 'custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic']
+  # to avoid uglify dropb console in log feature
+  logger = window.console
 
   rules =
     block: { urls: [] }
@@ -102,7 +104,9 @@ do ->
       fn: (details)->
         rules = collection.getLocal 'custom', 'o'
         for own k, rule of rules
+          console.log "get target Url, rule: %o, url: %s", rule, details.url
           url = utils.getTargetUrl rule, details.url
+          console.log 'then target url is: %s', url
           if url
             return { redirectUrl: url }
 
@@ -152,7 +156,7 @@ do ->
         details.requestHeaders = formatHeaders details.requestHeaders
         if queryBody
           details.queryBody = queryBody
-        console.log '%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain
+        logger.log '%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain
         # 删除已打印的请求的缓存
         delete requestCache[ rid ]
         return
@@ -179,8 +183,6 @@ do ->
 
   # init, 检测配置中各个功能的开启状态, 予以开启或关闭
   init = ->
-    collection.setRestoreStatus false
-
     onoff = collection.getLocal 'onoff', 'o'
     reqApi = chrome.webRequest
     onRequest = null
@@ -194,7 +196,7 @@ do ->
         unless rule.urls.length or _rule.length
           onoff[ k ] = false
           continue
-
+        console.log 'enable feature: %s', k
         rule = urls : rule.urls.concat _rule if _rule
         if k is 'log'
           pushNotification utils.i18n('bg_logison'), utils.i18n('bg_logon_tip'), 'log-enabled-hint', ->
@@ -222,14 +224,14 @@ do ->
 
   # 监听localStroage的storage事件, 即监听配置信息的变化
   window.addEventListener 'storage', (event) ->
-    # console.log 'event fired %o', event
+    console.log 'storage event fired %o', event
     type = event.key
     reqApi = chrome.webRequest
     try
       newData = JSON.parse event.newValue or '[]'
       oldData = JSON.parse event.oldValue or '[]'
     catch e
-      console.warn "values(#{newData}/#{oldData}) of #{type} is invalid"
+      logger.warn "values(#{newData}/#{oldData}) of #{type} is invalid"
 
     do collection.initCollection
 
@@ -241,23 +243,19 @@ do ->
       return
     
     if type is 'onoff'
-      # if this change came from stroration, then do init after 1s
-      if collection.isRestoring()
-        setTimeout ->
-          # reset the onoff config then init every feature again
-          # to keep the onoff info wont be changed before init
-          collection.setLocal 'onoff', newData
-          init()
-        , 200
-        return
       
       for k in RULES_TYPE
         if newData[ k ] isnt oldData[ k ]
           method = if newData[ k ] then 'addListener' else 'removeListener'
           rule = rules[ k ]
+          console.log 'onoff change, feature: %s turned %s', k, newData[ k ]
           # return if this onoff is not supported
           return unless rule
           rule = urls: rule.urls.concat collection.getRules k
+          unless rule.urls.length
+            console.log 'disable feature because %s has no rule', k
+            collection.setSwitch k, false
+            return
           
           if k is 'log'
             onRequest = onRequests['logBody']
@@ -297,6 +295,7 @@ do ->
         return
       , 0
     else
+      console.log 'turn off feature %s bacause rules is empty', type
       collection.setSwitch type, false
 
     return

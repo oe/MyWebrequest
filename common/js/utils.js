@@ -286,9 +286,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       }
     }).replace(splatParam, function(match, $1) {
       params.push($1);
-      return '([^?]*?)';
+      return '([^?]*)';
     });
-    reg = "^" + protocol + ":\/\/" + part + "(?:\\?([\\s\\S]*))?";
+    reg = "^" + protocol + ":\\/\\/" + part + "(?:\\?(.*))?";
     result.reg = reg;
     result.params = params;
     params = {};
@@ -455,7 +455,9 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
    */
   getTargetUrl = function(router, url) {
     var params;
+    console.log('getTargetUrl, router: %o, url: %s', router, url);
     params = getUrlValues(router, url);
+    console.log('params in url: %o', params);
     if (!params) {
       return '';
     }

@@ -32,6 +32,9 @@ define(function(require) {
     }
     for (k in data) {
       v = data[k];
+      if (k === 'onoff') {
+        continue;
+      }
       if (typeof v !== 'string') {
         try {
           v = JSON.stringify(v);
@@ -42,12 +45,12 @@ define(function(require) {
       }
       localStorage.setItem(k, v);
     }
-    if (v = data.config) {
+    if (v = data.onoff) {
       setTimeout(function() {
         if (typeof v !== 'string') {
           v = JSON.stringify(v);
         }
-        localStorage.setItem('config', v);
+        localStorage.setItem('onoff', v);
         collection.setConfig('demo-custom-rule-showed', true);
         return collection.initCollection();
       }, 200);

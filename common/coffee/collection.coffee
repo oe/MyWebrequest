@@ -128,17 +128,17 @@
     saveRule cat
     return
 
-  # set restore status
-  # if flag true, then add status flag, or remove it
-  setRestoreStatus = (flag)->
-    if flag
-      localStorage.setItem '_is_restoring_', 'processing'
-    else
-      localStorage.removeItem '_is_restoring_'
+  # # set restore status
+  # # if flag true, then add status flag, or remove it
+  # setRestoreStatus = (flag)->
+  #   if flag
+  #     localStorage.setItem '_is_restoring_', 'processing'
+  #   else
+  #     localStorage.removeItem '_is_restoring_'
 
-  # whether if restoring
-  isRestoring = ->
-    !!localStorage.getItem '_is_restoring_'
+  # # whether if restoring
+  # isRestoring = ->
+  #   !!localStorage.getItem '_is_restoring_'
 
   # save rules into localStorage
   saveRule = (cat)->
@@ -214,8 +214,6 @@
   return {
     _collection      : collection
     initCollection   : initCollection
-    setRestoreStatus : setRestoreStatus
-    isRestoring      : isRestoring
     hasCat           : hasCat
     addRule          : addRule
     getRules         : getRules

@@ -49,12 +49,9 @@ define (require)->
           # to trigger change event after choose file again
           me.value = ''
         ok: ->
-          # set a flag to tell localStorage the change if from restoration
-          collection.setRestoreStatus true
           dataMaintain.readFile files[0], (content)->
             me.value = ''
             unless dataMaintain.restoreExtData content
-              collection.setRestoreStatus false
               showErrorInfo utils.i18n 'opt_restore_formarterr'
               return
             # reinit this page because it can be affected

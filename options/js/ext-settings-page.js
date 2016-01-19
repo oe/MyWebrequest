@@ -48,11 +48,9 @@ define(function(require) {
           return me.value = '';
         },
         ok: function() {
-          collection.setRestoreStatus(true);
           return dataMaintain.readFile(files[0], function(content) {
             me.value = '';
             if (!dataMaintain.restoreExtData(content)) {
-              collection.setRestoreStatus(false);
               showErrorInfo(utils.i18n('opt_restore_formarterr'));
               return;
             }

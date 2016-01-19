@@ -2,10 +2,11 @@
 var hasProp = {}.hasOwnProperty;
 
 (function() {
-  var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, init, logNum, onRequests, pushNotification, requestCache, rules, updateExtIcon;
+  var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, init, logNum, logger, onRequests, pushNotification, requestCache, rules, updateExtIcon;
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'];
   RULES_TYPE = ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic'];
+  logger = window.console;
   rules = {
     block: {
       urls: []
@@ -137,7 +138,9 @@ var hasProp = {}.hasOwnProperty;
         for (k in rules) {
           if (!hasProp.call(rules, k)) continue;
           rule = rules[k];
+          console.log("get target Url, rule: %o, url: %s", rule, details.url);
           url = utils.getTargetUrl(rule, details.url);
+          console.log('then target url is: %s', url);
           if (url) {
             return {
               redirectUrl: url
@@ -209,7 +212,7 @@ var hasProp = {}.hasOwnProperty;
         if (queryBody) {
           details.queryBody = queryBody;
         }
-        console.log('%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain);
+        logger.log('%c%d %o %csent to domain: %s', 'color: #086', logNum, details, 'color: #557c30', domain);
         delete requestCache[rid];
       },
       permit: ['requestHeaders'],
@@ -241,7 +244,6 @@ var hasProp = {}.hasOwnProperty;
   };
   init = function() {
     var _rule, j, k, len, onRequest, onoff, reqApi, rule;
-    collection.setRestoreStatus(false);
     onoff = collection.getLocal('onoff', 'o');
     reqApi = chrome.webRequest;
     onRequest = null;
@@ -257,6 +259,7 @@ var hasProp = {}.hasOwnProperty;
           onoff[k] = false;
           continue;
         }
+        console.log('enable feature: %s', k);
         if (_rule) {
           rule = {
             urls: rule.urls.concat(_rule)
@@ -284,6 +287,7 @@ var hasProp = {}.hasOwnProperty;
   init();
   window.addEventListener('storage', function(event) {
     var e, error, j, k, len, method, newData, oldData, onRequest, reqApi, rule, type;
+    console.log('storage event fired %o', event);
     type = event.key;
     reqApi = chrome.webRequest;
     try {
@@ -291,7 +295,7 @@ var hasProp = {}.hasOwnProperty;
       oldData = JSON.parse(event.oldValue || '[]');
     } catch (error) {
       e = error;
-      console.warn("values(" + newData + "/" + oldData + ") of " + type + " is invalid");
+      logger.warn("values(" + newData + "/" + oldData + ") of " + type + " is invalid");
     }
     collection.initCollection();
     onRequest = null;
@@ -302,24 +306,23 @@ var hasProp = {}.hasOwnProperty;
       return;
     }
     if (type === 'onoff') {
-      if (collection.isRestoring()) {
-        setTimeout(function() {
-          collection.setLocal('onoff', newData);
-          return init();
-        }, 200);
-        return;
-      }
       for (j = 0, len = RULES_TYPE.length; j < len; j++) {
         k = RULES_TYPE[j];
         if (newData[k] !== oldData[k]) {
           method = newData[k] ? 'addListener' : 'removeListener';
           rule = rules[k];
+          console.log('onoff change, feature: %s turned %s', k, newData[k]);
           if (!rule) {
             return;
           }
           rule = {
             urls: rule.urls.concat(collection.getRules(k))
           };
+          if (!rule.urls.length) {
+            console.log('disable feature because %s has no rule', k);
+            collection.setSwitch(k, false);
+            return;
+          }
           if (k === 'log') {
             onRequest = onRequests['logBody'];
             reqApi[onRequest.on][method](onRequest.fn, rule, onRequest.permit);
@@ -363,6 +366,7 @@ var hasProp = {}.hasOwnProperty;
         }
       }, 0);
     } else {
+      console.log('turn off feature %s bacause rules is empty', type);
       collection.setSwitch(type, false);
     }
   });

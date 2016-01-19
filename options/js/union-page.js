@@ -357,7 +357,7 @@ define(function(require) {
    */
   addSamleCustomRule4demo = function() {
     var router;
-    router = utils.getRouter('https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}');
+    router = utils.getRouter('*://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}');
     addRule('custom', router);
     collection.setConfig('demo-custom-rule-showed', true);
     return dialog({
@@ -415,7 +415,7 @@ define(function(require) {
     if (megaRule != null) {
       showInputErrorInfo($host, utils.i18n('opt_errtip_duplicate') + megaRule);
     }
-    if (!redirectUrl || utils.isUrl(redirectUrl.replace(/\{\w+\}/g, 'xxx'))) {
+    if (!redirectUrl || !utils.isUrl(redirectUrl.replace(/\{\w+\}/g, 'xxx'))) {
       showInputErrorInfo($redirectUrl, utils.i18n('opt_errtip_invalid_redirectrule'));
       return;
     }

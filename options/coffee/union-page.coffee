@@ -365,7 +365,7 @@ define (require)->
    * add a sample rule for user use it first time
   ###
   addSamleCustomRule4demo = ->
-    router = utils.getRouter 'https://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}'
+    router = utils.getRouter '*://www.baidu.com/s?wd={kwd}', 'https://www.google.com.hk/search?q={kwd}'
     addRule 'custom', router
     collection.setConfig 'demo-custom-rule-showed', true
     dialog
@@ -431,7 +431,8 @@ define (require)->
     if megaRule?
       showInputErrorInfo $host, utils.i18n('opt_errtip_duplicate') + megaRule
 
-    if not redirectUrl or utils.isUrl redirectUrl.replace /\{\w+\}/g, 'xxx'
+    # redirectUrl is empty or not a valid url
+    if not redirectUrl or not utils.isUrl redirectUrl.replace /\{\w+\}/g, 'xxx'
       showInputErrorInfo $redirectUrl, utils.i18n 'opt_errtip_invalid_redirectrule'
       return
     

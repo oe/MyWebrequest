@@ -276,8 +276,8 @@
       if $1 then match else '([^/?]+)'
     .replace splatParam, (match, $1)->
       params.push $1
-      '([^?]*?)'
-    reg = "^#{protocol}:\/\/#{part}(?:\\?([\\s\\S]*))?"
+      '([^?]*)'
+    reg = "^#{protocol}:\\/\\/#{part}(?:\\?(.*))?"
     result.reg = reg
     result.params = params
 
@@ -419,7 +419,9 @@
    * @return {String}         converted url
   ###
   getTargetUrl = (router, url)->
+    console.log 'getTargetUrl, router: %o, url: %s', router, url
     params = getUrlValues router, url
+    console.log 'params in url: %o', params
     return '' unless params
     fillPattern router.redirectUrl, params
 

@@ -16,7 +16,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     root.collection = factory(root);
   }
 })(this, function(root) {
-  var addRule, cats, collection, eachRule, getConfig, getLocal, getRule4Show, getRules, getRules4Show, getSwitch, hasCat, hasRule, initCollection, isRestoring, removeLocal, removeRule, saveRule, setConfig, setLocal, setRestoreStatus, setSwitch;
+  var addRule, cats, collection, eachRule, getConfig, getLocal, getRule4Show, getRules, getRules4Show, getSwitch, hasCat, hasRule, initCollection, removeLocal, removeRule, saveRule, setConfig, setLocal, setSwitch;
   collection = {};
   cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch'];
   initCollection = function() {
@@ -146,16 +146,6 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     }
     saveRule(cat);
   };
-  setRestoreStatus = function(flag) {
-    if (flag) {
-      return localStorage.setItem('_is_restoring_', 'processing');
-    } else {
-      return localStorage.removeItem('_is_restoring_');
-    }
-  };
-  isRestoring = function() {
-    return !!localStorage.getItem('_is_restoring_');
-  };
   saveRule = function(cat) {
     var rules;
     rules = collection[cat];
@@ -224,8 +214,6 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   return {
     _collection: collection,
     initCollection: initCollection,
-    setRestoreStatus: setRestoreStatus,
-    isRestoring: isRestoring,
     hasCat: hasCat,
     addRule: addRule,
     getRules: getRules,

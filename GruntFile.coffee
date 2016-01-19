@@ -43,7 +43,7 @@ module.exports = (grunt) ->
         # 移除console打印的日志
         compress: {}
         
-        # drop_console: true
+        drop_console: true
         
         # 设置不压缩的关键字
         mangle:

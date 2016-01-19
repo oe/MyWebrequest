@@ -132,7 +132,7 @@
     "message": "a url pattern to match, like {sub}.abc.com/news/{newsid}.html"
   },
   "opt_custom_desc": {
-    "message": "Custom where are your url going to"
+    "message": "Custom where are your url going"
   },
   "opt_path_rule_tip": {
     "message": "The path should obey the following rules(please ommit the prefix <strong>/</strong>):<ul><li>you give a specific path, like<code>path</code>,<code>path?num=1</code></li><li>wildcard<code>*</code> is also available, like <ul><li><code>*</code>(aka any path, including empty path)</li><li><code>path*</code>(all path start with <strong>path</strong>)</li><li><code>path*.jsp</code>(start with <strong>path</strong> and end with <strong>.jsp</strong>)</li><li><code>*kwd*</code>(path contains <strong>kwd</strong>)</li><li><code>path?*</code>(all query request to <strong>path</strong>)</li><li><code>path?num=*</code>(all query request to <strong>path</strong>, and <strong>num</strong> is the first query parameter, NOTICE: <strong>path?ps=23&amp;num=23</strong> won't be matched)</li></ul></li></ul>"

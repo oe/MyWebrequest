@@ -23,6 +23,8 @@ define (require)->
       catch e
         return false
     for k, v of data
+      # set onoff after all others have done
+      continue if k is 'onoff'
       if typeof v isnt 'string'
         try
           v = JSON.stringify v
@@ -30,12 +32,12 @@ define (require)->
           return false
       localStorage.setItem k, v
 
-    if v = data.config
+    if v = data.onoff
       setTimeout ->
         if typeof v isnt 'string'
           v = JSON.stringify v
 
-        localStorage.setItem 'config', v
+        localStorage.setItem 'onoff', v
         collection.setConfig 'demo-custom-rule-showed', true
         # reinit collection data in options page
         collection.initCollection()
