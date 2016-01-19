@@ -41,9 +41,10 @@ module.exports = (grunt) ->
         banner: "/*! <%= pkg.name %> <%= grunt.template.today('yyyy-mm-dd') %> */\n"
         
         # 移除console打印的日志
-        compress: {}
+        compress: {
+          drop_console: true
+        }
         
-        drop_console: true
         
         # 设置不压缩的关键字
         mangle:

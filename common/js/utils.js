@@ -132,7 +132,14 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     return (new RegExp(url1)).test(url2);
   };
   getQs = function(url) {
-    return ("" + url).replace(/^[^?]+\?/, '').replace(/#[^#]*/, '');
+    var matches;
+    url = ("" + url).replace(/#[^#]*$/, '');
+    matches = url.match(/\?(.*)$/);
+    if (matches) {
+      return matches[1];
+    } else {
+      return '';
+    }
   };
 
   /**

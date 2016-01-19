@@ -114,10 +114,9 @@
 
   # 获取URL的queryString
   getQs = (url) ->
-    "#{url}"
-    .replace /^[^?]+\?/, ''
-    .replace /#[^#]*/, ''
-
+    url = "#{url}".replace /#[^#]*$/, ''
+    matches = url.match /\?(.*)$/
+    if matches then matches[1] else ''
 
   ###*
    * parse a query string into a key-value object
