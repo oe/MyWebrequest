@@ -69,7 +69,7 @@
       return e.message
 
   ###*
-   * GET url info url the clipboard, returns {protocol, host, path}
+   * GET url info url the clipboard, returns {protocol, host, path, search}
    * @param  {Event} e  paste event
    * @return {Object}
   ###
@@ -89,6 +89,7 @@
     result.protocol = RegExp.$1.toLowerCase()
     result.host = RegExp.$2
     result.path = RegExp.$3
+    result.search = RegExp.$4
     result.raw = url
     result
 

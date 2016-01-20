@@ -93,7 +93,6 @@ define(function(require) {
     if (cat === 'custom') {
       $('#custom-test-result').html('');
     }
-    $('#host').focus();
     collection.addRule(cat, rule);
     resetSectionCtrlsState(cat);
     setTimeout(function() {
@@ -187,7 +186,7 @@ define(function(require) {
       $('#protocol').val(url.protocol);
     }
     $('#host').val(url.host);
-    $('#path').val(url.path.replace(/^\//, ''));
+    $('#path').val(url.path + url.search);
     return false;
   });
   $('#path').on('keyup', function(e) {

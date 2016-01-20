@@ -153,6 +153,7 @@ var hasProp = {}.hasOwnProperty;
     },
     block: {
       fn: function(details) {
+        console.log('block url: ' + details.url);
         return {
           cancel: true
         };

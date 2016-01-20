@@ -115,6 +115,7 @@ do ->
     # 屏蔽请求
     block:
       fn: (details)->
+        console.log 'block url: ' + details.url
         {cancel: true}
       permit: [ 'blocking' ]
       on: 'onBeforeRequest'

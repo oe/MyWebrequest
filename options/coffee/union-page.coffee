@@ -88,7 +88,6 @@ define (require)->
     if cat is 'custom'
       $('#custom-test-result').html ''
 
-    $('#host').focus()
 
     collection.addRule cat, rule
     resetSectionCtrlsState cat
@@ -195,7 +194,7 @@ define (require)->
     return true unless url.protocol and utils.isProtocol url.protocol
     $('#protocol').val url.protocol if not $('#protocol').prop 'disabled'
     $('#host').val url.host
-    $('#path').val url.path.replace /^\//, ''
+    $('#path').val url.path + url.search
     return false
 
   # input box [path] on enter key

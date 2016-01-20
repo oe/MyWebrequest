@@ -85,7 +85,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
   };
 
   /**
-   * GET url info url the clipboard, returns {protocol, host, path}
+   * GET url info url the clipboard, returns {protocol, host, path, search}
    * @param  {Event} e  paste event
    * @return {Object}
    */
@@ -107,6 +107,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     result.protocol = RegExp.$1.toLowerCase();
     result.host = RegExp.$2;
     result.path = RegExp.$3;
+    result.search = RegExp.$4;
     result.raw = url;
     return result;
   };
