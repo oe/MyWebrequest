@@ -57,7 +57,7 @@
     "message": "选项"
   },
   "opt_ena_lbl": {
-    "message": "启用"
+    "message": "启用该功能"
   },
   "opt_ena_lbltip": {
     "message": "添加一条规则才能启用"

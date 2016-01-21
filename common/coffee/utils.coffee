@@ -87,7 +87,7 @@
     return result unless url.match urlComponentReg
     # extract regexp results right now or things changed
     result.protocol = RegExp.$1.toLowerCase()
-    result.host = RegExp.$2
+    result.host = RegExp.$2.toLowerCase()
     result.path = RegExp.$3
     result.search = RegExp.$4
     result.raw = url

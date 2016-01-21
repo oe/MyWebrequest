@@ -57,7 +57,7 @@
     "message": "Options"
   },
   "opt_ena_lbl": {
-    "message": "Enable"
+    "message": "Enable this feature"
   },
   "opt_ena_lbltip": {
     "message": "add a rule to enable"

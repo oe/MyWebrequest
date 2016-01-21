@@ -105,7 +105,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
       return result;
     }
     result.protocol = RegExp.$1.toLowerCase();
-    result.host = RegExp.$2;
+    result.host = RegExp.$2.toLowerCase();
     result.path = RegExp.$3;
     result.search = RegExp.$4;
     result.raw = url;
