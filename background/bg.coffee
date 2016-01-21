@@ -284,21 +284,20 @@ do ->
       reqApi[ onRequest.on ].removeListener onRequest.fn
 
     if rule.urls.length
-      setTimeout ->
-        if type is 'log'
-          onRequest = onRequests['logBody']
-          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
-          onRequest = onRequests['logRequest']
-          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
-        else
-          onRequest = onRequests[ type ]
-          reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
-        return
-      , 0
+      if type is 'log'
+        onRequest = onRequests['logBody']
+        reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+        onRequest = onRequests['logRequest']
+        reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+      else
+        onRequest = onRequests[ type ]
+        reqApi[ onRequest.on ].addListener onRequest.fn, rule, onRequest.permit
+      return
     else
       console.log 'turn off feature %s bacause rules is empty', type
       collection.setSwitch type, false
-
+    # tell chrome to clear the rule cache
+    reqApi.handlerBehaviorChanged()
     return
 
   return
