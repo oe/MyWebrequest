@@ -2,12 +2,12 @@
 var hasProp = {}.hasOwnProperty;
 
 (function() {
-  var RULES_TYPE, cloneObj, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, init, logNum, logger, onRequests, pushNotification, requestCache, rules, updateExtIcon;
+  var RULES_TYPE, cloneObj, feature_rules, formatHeaders, formatQstr, gsearchRuleBasic, gstaticBasic, init, logNum, logger, onRequests, pushNotification, requestCache, updateExtIcon;
   gsearchRuleBasic = ['*://www.google.com/url*', '*://www.google.com.hk/url*'];
   gstaticBasic = ['http://ajax.googleapis.com/*', 'http://fonts.googleapis.com/*'];
   RULES_TYPE = ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'gstatic'];
   logger = window.console;
-  rules = {
+  feature_rules = {
     block: {
       urls: []
     },
@@ -133,7 +133,7 @@ var hasProp = {}.hasOwnProperty;
     },
     custom: {
       fn: function(details) {
-        var k, rule, url;
+        var k, rule, rules, url;
         rules = collection.getLocal('custom', 'o');
         for (k in rules) {
           if (!hasProp.call(rules, k)) continue;
@@ -252,7 +252,7 @@ var hasProp = {}.hasOwnProperty;
       k = RULES_TYPE[j];
       if (onoff[k]) {
         _rule = collection.getRules(k);
-        rule = rules[k];
+        rule = feature_rules[k];
         if (!rule) {
           continue;
         }
@@ -311,7 +311,7 @@ var hasProp = {}.hasOwnProperty;
         k = RULES_TYPE[j];
         if (newData[k] !== oldData[k]) {
           method = newData[k] ? 'addListener' : 'removeListener';
-          rule = rules[k];
+          rule = feature_rules[k];
           console.log('onoff change, feature: %s turned %s', k, newData[k]);
           if (!rule) {
             return;
@@ -324,6 +324,7 @@ var hasProp = {}.hasOwnProperty;
             collection.setSwitch(k, false);
             return;
           }
+          console.log('method %s', method);
           if (k === 'log') {
             onRequest = onRequests['logBody'];
             reqApi[onRequest.on][method](onRequest.fn, rule, onRequest.permit);
@@ -331,6 +332,7 @@ var hasProp = {}.hasOwnProperty;
             reqApi[onRequest.on][method](onRequest.fn, rule, onRequest.permit);
           } else {
             onRequest = onRequests[k];
+            console.log('feature onrequest object %o', onRequest);
             reqApi[onRequest.on][method](onRequest.fn, rule, onRequest.permit);
           }
         }
@@ -340,7 +342,7 @@ var hasProp = {}.hasOwnProperty;
     if (!collection.getSwitch(type)) {
       return;
     }
-    rule = rules[type];
+    rule = feature_rules[type];
     if (!rule) {
       return;
     }

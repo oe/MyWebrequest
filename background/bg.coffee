@@ -6,7 +6,7 @@ do ->
   # to avoid uglify dropb console in log feature
   logger = window.console
 
-  rules =
+  feature_rules =
     block: { urls: [] }
     hsts: { urls: [] }
     log: { urls: [] }
@@ -191,9 +191,9 @@ do ->
     for k in RULES_TYPE
       if onoff[ k ]
         _rule = collection.getRules k
-        rule = rules[ k ]
+        rule = feature_rules[ k ]
         continue unless rule
-        
+
         unless rule.urls.length or _rule.length
           onoff[ k ] = false
           continue
@@ -248,7 +248,7 @@ do ->
       for k in RULES_TYPE
         if newData[ k ] isnt oldData[ k ]
           method = if newData[ k ] then 'addListener' else 'removeListener'
-          rule = rules[ k ]
+          rule = feature_rules[ k ]
           console.log 'onoff change, feature: %s turned %s', k, newData[ k ]
           # return if this onoff is not supported
           return unless rule
@@ -257,7 +257,7 @@ do ->
             console.log 'disable feature because %s has no rule', k
             collection.setSwitch k, false
             return
-          
+          console.log 'method %s', method
           if k is 'log'
             onRequest = onRequests['logBody']
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
@@ -265,13 +265,14 @@ do ->
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
           else
             onRequest = onRequests[ k ]
+            console.log 'feature onrequest object %o', onRequest
             reqApi[ onRequest.on ][ method ] onRequest.fn, rule, onRequest.permit
       return
 
     # 如果当前功能未开启
     return unless collection.getSwitch type
     
-    rule = rules[ type ]
+    rule = feature_rules[ type ]
     # return if this type is not supported
     return unless rule
 
