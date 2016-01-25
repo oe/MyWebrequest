@@ -40,7 +40,7 @@ do ->
   # format query string
   formatQstr = (url) ->
     qs = utils.getQs url
-    params = utils.parseQs url
+    params = utils.parseQs qs
     return false unless qs
 
     result = {}

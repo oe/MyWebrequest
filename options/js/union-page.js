@@ -414,7 +414,7 @@ define(function(require) {
     if (megaRule != null) {
       showInputErrorInfo($host, utils.i18n('opt_errtip_duplicate') + megaRule);
     }
-    if (!redirectUrl || !utils.isUrl(redirectUrl.replace(/\{\w+\}/g, 'xxx'))) {
+    if (!utils.isRedirectRuleValid(redirectUrl)) {
       showInputErrorInfo($redirectUrl, utils.i18n('opt_errtip_invalid_redirectrule'));
       return;
     }

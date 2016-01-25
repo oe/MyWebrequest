@@ -19585,17 +19585,6 @@
 		"outputStyle": 0,
 		"syntaxCheckerStyle": 1
 		},
-	"\/options\/js\/opt.js": {
-		"fileType": 64,
-		"ignore": 1,
-		"ignoreWasSetByUser": 0,
-		"inputAbbreviatedPath": "\/options\/js\/opt.js",
-		"outputAbbreviatedPath": "\/options\/js\/min\/opt-min.js",
-		"outputPathIsOutsideProject": 0,
-		"outputPathIsSetByUser": 0,
-		"outputStyle": 0,
-		"syntaxCheckerStyle": 1
-		},
 	"\/options\/js\/qr-page.js": {
 		"fileType": 64,
 		"ignore": 1,

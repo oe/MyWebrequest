@@ -174,7 +174,7 @@
     "message": "路径格式错误. 请在<a href=\"#help\">帮助页面</a>查看相关信息."
   },
   "opt_errtip_duplicate": {
-    "message": "该规则和下面的规则重复,换别的试试?<br>"
+    "message": "该规则和下面的重复,换别的试试?<br>"
   },
   "opt_errtip_nochose": {
     "message": "你还啥也没选咧,选一个呗!"

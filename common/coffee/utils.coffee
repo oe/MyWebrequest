@@ -441,6 +441,7 @@
     getRouter           : getRouter
     getUrlValues        : getUrlValues
     isRegValid          : isRegValid
+    isRedirectRuleValid : isRedirectRuleValid
     hasUndefinedWord    : hasUndefinedWord
     isKwdsUniq          : isKwdsUniq
     hasReservedWord     : hasReservedWord

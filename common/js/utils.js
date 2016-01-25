@@ -485,6 +485,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     getRouter: getRouter,
     getUrlValues: getUrlValues,
     isRegValid: isRegValid,
+    isRedirectRuleValid: isRedirectRuleValid,
     hasUndefinedWord: hasUndefinedWord,
     isKwdsUniq: isKwdsUniq,
     hasReservedWord: hasReservedWord,

@@ -15,7 +15,7 @@
   # rules' collection
   collection = {}
   # categories
-  cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch']
+  cats = ['block', 'hsts', 'hotlink', 'log', 'custom', 'gsearch', 'gstatic']
 
   # init rules into collection from localStorage
   initCollection = ->

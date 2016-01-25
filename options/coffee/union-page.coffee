@@ -431,7 +431,7 @@ define (require)->
       showInputErrorInfo $host, utils.i18n('opt_errtip_duplicate') + megaRule
 
     # redirectUrl is empty or not a valid url
-    if not redirectUrl or not utils.isUrl redirectUrl.replace /\{\w+\}/g, 'xxx'
+    if not utils.isRedirectRuleValid redirectUrl
       showInputErrorInfo $redirectUrl, utils.i18n 'opt_errtip_invalid_redirectrule'
       return
     

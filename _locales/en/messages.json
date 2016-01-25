@@ -174,7 +174,7 @@
     "message": "The path is invalid. Get more info in <a href=\"#help\">Help</a>"
   },
   "opt_errtip_duplicate": {
-    "message": "This rule is duplicated with the rule below. Try something else. <br>"
+    "message": "This rule is duplicated with the rule below.<br>"
   },
   "opt_errtip_nochose": {
     "message": "You have not choose anything."

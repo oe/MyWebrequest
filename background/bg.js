@@ -60,7 +60,7 @@ var hasProp = {}.hasOwnProperty;
   formatQstr = function(url) {
     var k, params, qs, result, v;
     qs = utils.getQs(url);
-    params = utils.parseQs(url);
+    params = utils.parseQs(qs);
     if (!qs) {
       return false;
     }
