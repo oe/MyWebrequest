@@ -145,7 +145,7 @@ define (require)->
     do rules.reverse
     # init section name & description
     $('#fun-name').text $("#nav a[href^=##{cat}]").text()
-    $('#fun-desc').text utils.i18n "opt_#{cat}_desc"
+    $('#fun-desc').html utils.i18n "opt_#{cat}_desc"
 
     hasRule = !!rules.length
     isHsts = cat is 'hsts'
@@ -462,10 +462,22 @@ define (require)->
       .showModal()
       return
     
-    targetUrl = utils.getTargetUrl(router, testUrl)
-    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl or 'javascript:;'}' class='#{if targetUrl then '' else 'text-danger' }'>#{targetUrl  or 'not match'}</a>"
-    # return router if test pass
-    if targetUrl then router
+    targetUrl = utils.getTargetUrl router, testUrl
+    isValid = targetUrl and utils.isUrl targetUrl
+
+    text = targetUrl
+    unless isValid
+      if targetUrl
+        text = '[invalid url] ' + targetUrl
+      else
+        text = 'not matching'
+      
+    
+
+    $('#custom-test-result').html "<a target='_blank' href='#{targetUrl or 'javascript:;'}' class='#{if isValid then '' else 'text-danger' }'>#{text}</a>"
+
+    return router if isValid
+
 
 
   # test custom url

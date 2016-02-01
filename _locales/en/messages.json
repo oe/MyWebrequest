@@ -162,7 +162,7 @@
     "message": "Help U access anti-hotlinking pictures"
   },
   "opt_log_desc": {
-    "message": "Help U inspecting the webrequests"
+    "message": "Help U inspecting the webrequests<a class='help-icon' href=\"#help/help-log\"></a>"
   },
   "opt_errtip_protocol": {
     "message": "The protocol is invalid. Are U trying to do something? Just reload this page."

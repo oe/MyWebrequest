@@ -162,7 +162,7 @@
     "message": "帮助你浏览有盗链防护的图片"
   },
   "opt_log_desc": {
-    "message": "审查网络请求"
+    "message": "审查网络请求<a class='help-icon' href=\"#help/help-log\"></a>"
   },
   "opt_errtip_protocol": {
     "message": "协议错误. 不会想干坏事吧? 刷新本页面就好了."

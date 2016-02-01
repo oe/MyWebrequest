@@ -341,7 +341,9 @@
     # no params found in redirect url
     return false unless getRedirectParamList(redirectUrl).length
     # remove param placeholder and check the url
-    isUrl redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
+    # comment out this, the result url should be valid
+    # isUrl redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
+    return true
 
   ###*
    * return undefined if no undefined word, or a list contains undefined words

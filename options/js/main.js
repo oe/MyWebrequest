@@ -2,12 +2,13 @@
 var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 define(function(require) {
-  var dialog, isPageCat, pageCtrls, pageIds;
+  var dialog, isPageCat, onHashChange, pageCtrls, pageIds;
   pageCtrls = {
     union: require('js/union-page'),
     qrcode: require('js/qr-page'),
     utility: require('js/utility-page'),
-    'ext-settings': require('js/ext-settings-page')
+    'ext-settings': require('js/ext-settings-page'),
+    help: require('js/help-page')
   };
   pageIds = $('#nav>li>a').map(function() {
     var href;
@@ -28,9 +29,18 @@ define(function(require) {
     var ref;
     return ref = (cat || '').replace('#', ''), indexOf.call(pageIds, ref) >= 0;
   };
-  $(document).on('click', 'a[href^=#]', function(e) {
-    var $navLink, $unionCat, cat, ref;
-    cat = $(this).attr('href').replace('#', '');
+  onHashChange = function(e, hash) {
+    var $navLink, $unionCat, cat, hashes, matches, others, ref;
+    if (e) {
+      matches = /#(.*)$/.exec(e.newURL);
+      if (!matches) {
+        return;
+      }
+      hash = matches[1];
+    }
+    hashes = hash.split('/');
+    cat = hashes.shift();
+    others = hashes.join('/');
     if (!isPageCat(cat)) {
       return;
     }
@@ -38,29 +48,31 @@ define(function(require) {
     if ($navLink.hasClass('active')) {
       return;
     }
-    location.hash = cat;
     $navLink.siblings().removeClass('active');
     $navLink.addClass('active');
+    $('section').removeClass('active');
     $unionCat = $('#request-settings');
     $unionCat.removeClass('active');
     if (pageCtrls.union.isUnionCat(cat)) {
-      pageCtrls.union.init(cat);
+      pageCtrls.union.init(cat, others);
       setTimeout(function() {
         $unionCat.addClass('active');
       }, 100);
     } else {
+      $("section#" + cat).addClass('active');
       if ((ref = pageCtrls[cat]) != null) {
-        ref.init(cat);
+        ref.init(cat, others);
       }
     }
-  });
+  };
+  window.onhashchange = onHashChange;
   (function() {
     var cat;
     cat = location.hash.replace('#', '');
-    if (!isPageCat(cat)) {
+    if (!isPageCat(cat.split('/')[0])) {
       cat = 'custom';
     }
-    $("#nav a[href^=#" + cat + "]").click();
+    onHashChange(null, cat);
   })();
 });
 

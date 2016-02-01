@@ -372,7 +372,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     if (!getRedirectParamList(redirectUrl).length) {
       return false;
     }
-    return isUrl(redirectUrl.replace(/^\{\w+\}/, '*').replace(/^\{\w+\}/g, 'xxx'));
+    return true;
   };
 
   /**

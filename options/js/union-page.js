@@ -146,7 +146,7 @@ define(function(require) {
     }
     rules.reverse();
     $('#fun-name').text($("#nav a[href^=#" + cat + "]").text());
-    $('#fun-desc').text(utils.i18n("opt_" + cat + "_desc"));
+    $('#fun-desc').html(utils.i18n("opt_" + cat + "_desc"));
     hasRule = !!rules.length;
     isHsts = cat === 'hsts';
     if (hasRule) {
@@ -381,7 +381,7 @@ define(function(require) {
    *                 }
    */
   checkCustomRule = function() {
-    var $host, $protocol, $redirectUrl, $testUrl, host, matchUrl, megaRule, protocol, redirectUrl, ret, router, targetUrl, testUrl;
+    var $host, $protocol, $redirectUrl, $testUrl, host, isValid, matchUrl, megaRule, protocol, redirectUrl, ret, router, targetUrl, testUrl, text;
     $protocol = $('#protocol-c');
     $host = $('#host-c');
     $redirectUrl = $('#redirect-url-input');
@@ -445,8 +445,17 @@ define(function(require) {
       return;
     }
     targetUrl = utils.getTargetUrl(router, testUrl);
-    $('#custom-test-result').html("<a target='_blank' href='" + (targetUrl || 'javascript:;') + "' class='" + (targetUrl ? '' : 'text-danger') + "'>" + (targetUrl || 'not match') + "</a>");
-    if (targetUrl) {
+    isValid = targetUrl && utils.isUrl(targetUrl);
+    text = targetUrl;
+    if (!isValid) {
+      if (targetUrl) {
+        text = '[invalid url] ' + targetUrl;
+      } else {
+        text = 'not matching';
+      }
+    }
+    $('#custom-test-result').html("<a target='_blank' href='" + (targetUrl || 'javascript:;') + "' class='" + (isValid ? '' : 'text-danger') + "'>" + text + "</a>");
+    if (isValid) {
       return router;
     }
   };
