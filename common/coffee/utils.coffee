@@ -407,12 +407,13 @@
       val = data[ $2 ] ? ''
       toQueryString $1, val
 
-    pattern.replace /\{(\w+)\}/g, ($0, $1)->
+    url = pattern.replace /\{(\w+)\}/g, ($0, $1)->
       val = data[ $1 ] ? ''
       # / in val, like abc/bdc, won't be encoded
       #   q is query string, do not encode query string again
       #   u is url, encoded anywhere
       if ( $1 isnt 'u' and ~val.indexOf('/')) or $1 is 'q'  then val else encodeURIComponent val
+    url.replace /\?$/, ''
 
   ###*
    * get target url

@@ -439,12 +439,13 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
     return res;
   };
   fillPattern = function(pattern, data) {
+    var url;
     pattern = pattern.replace(/([\w\%+\[\]]+)=\{(\w+)\}/g, function($0, $1, $2) {
       var ref, val;
       val = (ref = data[$2]) != null ? ref : '';
       return toQueryString($1, val);
     });
-    return pattern.replace(/\{(\w+)\}/g, function($0, $1) {
+    url = pattern.replace(/\{(\w+)\}/g, function($0, $1) {
       var ref, val;
       val = (ref = data[$1]) != null ? ref : '';
       if (($1 !== 'u' && ~val.indexOf('/')) || $1 === 'q') {
@@ -453,6 +454,7 @@ var indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i 
         return encodeURIComponent(val);
       }
     });
+    return url.replace(/\?$/, '');
   };
 
   /**

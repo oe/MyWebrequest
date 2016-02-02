@@ -134,7 +134,7 @@ section {
 /*section:target,*/section.active{
 	visibility: visible;
 	transition: left 200ms, opacity 100ms;
-	left: 180px;
+	left: 185px;
 }
 
 section .setting-title{
@@ -183,11 +183,23 @@ section .setting-title{
 	color: grey;
 }
 
-.setting-content .item-title {
+.setting-content .item-title,
+.setting-content h2 {
 	border-bottom: 1px solid #ccc;
 	margin-bottom: 8px;
 	padding: 4px 0;
 	font-size: 18px;
+}
+
+.setting-content p {
+	line-height: 1.5;
+}
+.setting-content p strong,
+.setting-content em {
+	color: #777;
+}
+.setting-content p strong:first-child {
+	color: inherit;
 }
 
 .setting-content .item-content + .item-title {
