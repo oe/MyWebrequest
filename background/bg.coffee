@@ -65,8 +65,10 @@ do ->
 
   # 推送消息提醒, Chrome不同版本的API不一致, 故添加此函数
   pushNotification = do->
+    fn = null
     if chrome.notifications
-      (title, content, notifiId, cb)->
+      cbs = {}
+      fn = (title, content, notifiId, cb)->
         notifiId = notifiId or ''
         chrome.notifications.create notifiId,
           type: 'basic'
@@ -75,16 +77,21 @@ do ->
           message: content
         , ->
         if notifiId and cb instanceof Function
-          chrome.notifications.onClicked.addListener (nId)->
-            if nId is notifiId then do cb
-            return
+          cbs[ notifiId ] = cb
+        return
+      chrome.notifications.onClicked.addListener (nId)->
+        cbs[ nId ] and do cbs[ nId ]
+        return
+      chrome.notifications.onClosed.addListener (nId)->
+        delete cbs[ nId ]
         return
     else if window.webkitNotifications
-      (title, content)->
+      fn = (title, content)->
         notifi = webkitNotifications.createNotification '/img/icon48.png', title, content
         do notifi.show
     else
-      ->
+      fn = ->
+    fn
     
 
   # 请求的监听事件
