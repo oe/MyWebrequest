@@ -1,4 +1,6 @@
-*.map
 .DS_Store
-node_modules/
-app.zip
+node_modules/*
+dist/
+npm-debug.log
+config.codekit3
+*.pem

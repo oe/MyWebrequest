@@ -1,0 +1,26 @@
+{
+  "en": {
+    "prmpt_title": "Current page url's QRCode",
+    "action_tip": "(double click QRCode to edit)",
+    "text_toolong": "text too long",
+    "max_amount_tip": "Max amount to Selling is:",
+    "min_amount_tip": "Minimum sell amount:",
+    "cenmaso_sell_limit": "You can only sell once a day.",
+    "transfer_failed": "Failed to transfer:",
+    "transfer_success": "Transfer success!",
+    "submit": "Submit",
+    "cancel": "Cancel"
+  },
+  "zh-cn": {
+    "prmpt_title": "Current page url's QRCode",
+    "action_tip": "(double click QRCode to edit)",
+    "text_toolong": "text too long",
+    "min_amount_tip": "最小卖出金额:",
+    "submit": "提交",
+    "cancel": "取消",
+    "transfer_failed": "转账失败:",
+    "transfer_success": "转账成功!",
+    "cenmaso_sell_limit": "请注意, 一天仅能卖出一次.",
+    "max_amount_tip": "最大卖出金额:"
+  }
+}
