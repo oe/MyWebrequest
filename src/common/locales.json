@@ -1,0 +1,14 @@
+{
+  "en": {
+    "ok_btn": "OK",
+    "cancel_btn": "Cancel",
+    "qr_make_btn": "GO!(Ctrl+Enter)",
+    "qr_make_mac_btn": "GO!(⌘+Enter)"
+  },
+  "zh-cn": {
+    "ok_btn": "确认",
+    "cancel_btn": "取消",
+    "qr_make_btn": "GO!(Ctrl+Enter)",
+    "qr_make_mac_btn": "GO!(⌘+Enter)"
+  }
+}

@@ -12,11 +12,16 @@ body {
   margin: 0;
 }
 
+a {
+  color: #08c;
+}
+
 @import './widgets';
-// 
-// @TODO: Add docs to size!
-//
-@mixin size($size) {
-  width: $size;
-  height: $size;
+
+@mixin size($width, $height: 0) {
+  @if $height <= 0 {
+    $height: $width
+  }
+  width: $width;
+  height: $height;
 }

@@ -1,8 +1,8 @@
 <template>
 <div class="popup">
   <div class="title-wrapper">
-    {{ $t('prmpt_title') }}
-    <span class="action-tip">{{ $t('action_tip') }}</span>
+    {{ $t(isEdit ? 'edit_promp' : isCustomText ? 'get_new' : 'prompt') }}
+    <span class="action-tip">{{ $t(isEdit ? 'edit_tip' : 'action_tip') }}</span>
   </div>
   <div class="code-wrapper">
     <div class="text-container" v-show="isEdit">
@@ -12,6 +12,12 @@
           <span class="error-tip" :hidden="!isToolong">{{ $t('text_toolong') }}</span>
           <div class="letter-counter">{{text.trim().length}}/{{ maxLength }}</div>
         </div>
+      </div>
+      <div class="action-btn">
+        <button type="button" :disabled="isToolong" @click="onMakeBtnClick">
+          {{ $t(isMAC ? 'qr_make_mac_btn': 'qr_make_btn')}}
+        </button>
+        <a href="/options/index.html#qrcode" target="_blank">{{ $t('more_link') }}</a>
       </div>
     </div>
     <div class="qrcode" v-show="!isEdit" @dblclick="onEdit">
@@ -23,7 +29,7 @@
 
 <script>
 import qrcode from '@/common/qrcode'
-import locales from './lang.json'
+import locales from './locales.json'
 
 export default {
   name: 'main',
@@ -33,6 +39,8 @@ export default {
       text: '',
       isEdit: false,
       isToolong: false,
+      isCustomText: false,
+      isMAC: qrcode.isMAC,
       maxLength: qrcode.MAX_TEXT_LENGTH
     }
   },
@@ -60,10 +68,14 @@ export default {
         if (t.length) {
           e.preventDefault()
           this.getCode(t)
+          this.isCustomText = true
         }
       }
     },
-    getCode(text) {
+    onMakeBtnClick () {
+      this.getCode(this.text)
+    },
+    getCode (text) {
       this.isEdit = false
       qrcode.makeQRCode(text, (err, url) => {
         if (err) {
@@ -83,17 +95,17 @@ export default {
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss">
-@import '~@/common/common';
+@import '~@/common/base';
 
 $qr-size: 250px;
 
-body {
+html {
   min-width: 260px;
-  min-height: 260px;
+  min-height: 310px;
 }
 
 .title-wrapper {
@@ -117,7 +129,7 @@ body {
 
 .text-container {
   @include size(240px);
-  margin: 8px auto;
+  margin: 8px auto 0;
   position: relative;
 
   .textarea {
@@ -128,6 +140,24 @@ body {
     outline: 0;
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
     border-radius: 4px;
+
+    textarea {
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 0;
+      bottom: 20px;
+      border: none;
+      border-radius: 4px;
+      padding: 8px;
+      resize: none;
+      font-size: 14px;
+
+      &:focus {
+        outline: none;
+      }
+    }
+
 
     .text-footer {
       position: absolute;
@@ -149,22 +179,11 @@ body {
     }
   }
 
-  textarea {
-    position: absolute;
-    width: 100%;
-    left: 0;
-    top: 0;
-    bottom: 20px;
-    border: none;
-    border-radius: 4px;
-    padding: 8px;
-    resize: none;
-    font-size: 14px;
-
-    &:focus {
-      outline: none;
-    }
+  .action-btn {
+    text-align: center;
+    padding-top: 4px;
   }
+
 }
 .qrcode {
   position: relative;
