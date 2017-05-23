@@ -152,6 +152,7 @@ html {
       padding: 8px;
       resize: none;
       font-size: 14px;
+      @include hyphens;
 
       &:focus {
         outline: none;
@@ -192,6 +193,4 @@ html {
 
   img { width: 100%; height: 100%; }
 }
-
-
 </style>

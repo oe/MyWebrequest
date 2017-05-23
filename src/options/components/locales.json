@@ -1,0 +1,24 @@
+{
+  "en": {
+    "custom": "Custom",
+    "block": "Block",
+    "hsts": "Hsts",
+    "hotlink": "Hotlink",
+    "log": "Log",
+    "qrcode": "Qrcode",
+    "utility": "Utility",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "zh-cn": {
+    "custom": "Custom",
+    "block": "Block",
+    "hsts": "Hsts",
+    "hotlink": "Hotlink",
+    "log": "Log",
+    "qrcode": "Qrcode",
+    "utility": "Utility",
+    "settings": "Settings",
+    "help": "Help"
+  }
+}

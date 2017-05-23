@@ -7,11 +7,14 @@ import App from './main'
 Vue.use(VueI18n)
 Vue.config.lang = i18n.lang
 
+document.documentElement.innerHTML = i18n.internationalize( document.documentElement.innerHTML );
+
 for (var key in locales) {
   if (locales.hasOwnProperty(key)) {
     Vue.locale(key, locales[key])
   }
 }
+
 
 /* eslint-disable no-new */
 new Vue({

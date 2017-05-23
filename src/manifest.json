@@ -10,6 +10,7 @@
     "128": "static/icons/icon128.png"
   },
   "homepage_url": "http://www.evecalm.com",
+  "options_page": "options/index.html",
   "browser_action": {
     "default_icon": {
       "19": "static/icons/icon19.png",

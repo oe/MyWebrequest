@@ -76,7 +76,7 @@ var utils = {
   }
 }
 
-// 增加版本号
+// auto increaseVersion of manifest.json
 function increaseVersion (package) {
   if (increaseVersion.versionUpdated) return
   increaseVersion.versionUpdated = true
@@ -92,13 +92,12 @@ function increaseVersion (package) {
   package.version = vs.join('.')
 }
 
-increaseVersion(manifest)
-
 
 module.exports = {
   'entry': {
     // your entry file file (entry.ts or entry.js)
-    'popup/index': ['./src/popup/index.js']
+    'popup/index': ['./src/popup/index.js'],
+    'options/index': ['./src/options/index.js']
     // 'popup': ['./src/popup/index.js']
   },
   'output': {
@@ -192,6 +191,7 @@ if (process.env.NODE_ENV === 'production') {
       minimize: true
     }),
     new WebpackOnBuildPlugin((stats) => {
+      increaseVersion(manifest)
       try {
         fs.writeFileSync(manifestSrcPath, JSON.stringify(manifest, null, 2))
         fs.writeFileSync(manifestDistPath, JSON.stringify(manifest, null, 2))

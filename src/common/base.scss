@@ -10,6 +10,7 @@ html {
 
 body {
   margin: 0;
+  font-size: inherit;
 }
 
 a {
@@ -24,4 +25,11 @@ a {
   }
   width: $width;
   height: $height;
+}
+
+// 
+// auto hyphens
+@mixin hyphens {
+  word-break: break-all;
+  hyphens: auto;
 }
