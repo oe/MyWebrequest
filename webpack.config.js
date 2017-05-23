@@ -3,6 +3,14 @@ var webpack = require('webpack')
 var CopyWebpackPlugin = require('copy-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+var WebpackOnBuildPlugin = require('on-build-webpack')
+var chalk = require('chalk')
+var zipFolder = require('zip-folder')
+var fs = require('fs')
+
+var manifestSrcPath = './src/manifest.json'
+var manifestDistPath = './dist/manifest.json'
+var manifest = require(manifestSrcPath)
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
 
 var utils = {
@@ -67,6 +75,25 @@ var utils = {
     return output
   }
 }
+
+// 增加版本号
+function increaseVersion (package) {
+  if (increaseVersion.versionUpdated) return
+  increaseVersion.versionUpdated = true
+
+  let version = package.version;
+  const max = 20
+  const vs = version.split('.').map((i) => +i)
+  let len = vs.length
+  while (len--) {
+    if ((++vs[len]) < max) break
+    vs[len] = 0
+  }
+  package.version = vs.join('.')
+}
+
+increaseVersion(manifest)
+
 
 module.exports = {
   'entry': {
@@ -163,6 +190,23 @@ if (process.env.NODE_ENV === 'production') {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true
+    }),
+    new WebpackOnBuildPlugin((stats) => {
+      try {
+        fs.writeFileSync(manifestSrcPath, JSON.stringify(manifest, null, 2))
+        fs.writeFileSync(manifestDistPath, JSON.stringify(manifest, null, 2))
+      } catch(e) {
+        console.log(chalk.red('\n  update manifest(dist) file error: ' + e.message))
+      }
+      console.log(chalk.cyan('\n  manifest file updated successfully'))
+
+      zipFolder('./dist/', './ext.zip', (err) =>  {
+        if (err) {
+          console.log(chalk.red('Failed to zip dist folder ' + err))
+        } else {
+          console.log(chalk.cyan('An zip of ext is available in ./ext.zip'))
+        }
+      })
     })
     // new PrepackWebpackPlugin({})
   ])
