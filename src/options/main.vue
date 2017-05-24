@@ -11,6 +11,7 @@
 import qrcode from '@/common/qrcode'
 import locales from './locales.json'
 import sidebar from './components/sidebar'
+import sidebarItems from './components/sidebar-items'
 
 import custom from './pages/custom'
 
@@ -19,12 +20,24 @@ export default {
   locales,
   data () {
     return {
-      router: 'custom'
+      router: ''
     }
+  },
+  beforeMount() {
+    const hash = location.hash.replace(/^#/, '').toLowerCase()
+    let r = sidebarItems.indexOf(hash) === -1 ? sidebarItems[0] : hash
+    this.updateRouter(r)
   },
   components: {
     sidebar,
     custom
+  },
+  methods: {
+    updateRouter (r) {
+      const hash = location.hash.replace(/^#/, '').toLowerCase()
+      if (r !== hash) location.hash = r
+      this.router = r
+    }
   }
 }
 </script>
