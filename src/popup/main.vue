@@ -100,6 +100,7 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
+@import '~@/common/widgets';
 
 html {
   min-width: 260px;

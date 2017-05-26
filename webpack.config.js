@@ -13,69 +13,6 @@ var manifestDistPath = './dist/manifest.json'
 var manifest = require(manifestSrcPath)
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
 
-var utils = {
-  cssLoaders: function (options) {
-    options = options || {}
-
-    var cssLoader = {
-      loader: 'css-loader',
-      options: {
-        minimize: process.env.NODE_ENV === 'production',
-        sourceMap: options.sourceMap
-      }
-    }
-
-    // generate loader string to be used with extract text plugin
-    function generateLoaders (loader, loaderOptions) {
-      var loaders = [cssLoader]
-      if (loader) {
-        loaders.push({
-          loader: loader + '-loader',
-          options: Object.assign({}, loaderOptions, {
-            sourceMap: options.sourceMap
-          })
-        })
-      }
-
-      // Extract CSS when that option is specified
-      // (which is the case during production build)
-      if (options.extract) {
-        return ExtractTextPlugin.extract({
-          use: loaders,
-          fallback: 'vue-style-loader'
-        })
-      } else {
-        return ['vue-style-loader'].concat(loaders)
-      }
-    }
-
-    // http://vuejs.github.io/vue-loader/en/configurations/extract-css.html
-    return {
-      css: generateLoaders(),
-      postcss: generateLoaders(),
-      less: generateLoaders('less'),
-      sass: generateLoaders('sass', { indentedSyntax: true }),
-      scss: generateLoaders('sass'),
-      stylus: generateLoaders('stylus'),
-      styl: generateLoaders('stylus')
-    }
-  },
-
-  // Generate loaders for standalone style files (outside of .vue)
-  styleLoaders: function (options) {
-    var output = []
-    var loaders = utils.cssLoaders(options)
-    for (var extension in loaders) {
-      var loader = loaders[extension]
-      output.push({
-        test: new RegExp('\\.' + extension + '$'),
-        use: loader
-      })
-    }
-    return output
-  }
-}
-
 // auto increaseVersion of manifest.json
 function increaseVersion (package) {
   if (increaseVersion.versionUpdated) return
@@ -98,7 +35,6 @@ module.exports = {
     // your entry file file (entry.ts or entry.js)
     'popup/index': ['./src/popup/index.js'],
     'options/index': ['./src/options/index.js']
-    // 'popup': ['./src/popup/index.js']
   },
   'output': {
     'path': path.join(__dirname, './dist/'),
@@ -110,10 +46,24 @@ module.exports = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
-          loaders: utils.cssLoaders({
-            sourceMap: false,
-            extract: true
-          })
+          loaders: {
+            css: ExtractTextPlugin.extract({
+              use: 'css-loader',
+              fallback: 'vue-style-loader'
+            }),
+            scss: ExtractTextPlugin.extract({
+              use: ['css-loader','sass-loader'],
+              fallback: 'vue-style-loader'
+            }),
+            sass: ExtractTextPlugin.extract({
+              use: ['css-loader','sass-loader'],
+              fallback: 'vue-style-loader'
+            }),
+            less: ExtractTextPlugin.extract({
+              use: ['css-loader','less-loader'],
+              fallback: 'vue-style-loader'
+            })
+          }
         }
       },
       {
@@ -123,11 +73,15 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        loader: 'style-loader!css-loader'
+        loader: ExtractTextPlugin.extract({
+          use: "css-loader",
+          fallbackLoader: 'style-loader'
+        })
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
-        loader: 'file-loader'
+        // loader: 'file-loader'
+        loader: 'file-loader?name=/static/[name].[ext]'
       },
       {
         test: /\.(png|jpg|gif|svg)$/,

@@ -5,22 +5,14 @@
   </div>
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
   <div class="form-field">
-    <div class="input-field protocol">
-      <label>Match this url</label>
-      <select class="input">
-        <option value="*">*</option>
-        <option value="http">http</option>
-        <option value="https">https</option>
-      </select>
-    </div>
-    <div class="input-field">
-      <label>&nbsp;</label>
-      <div class="input">://</div>
-    </div>
-    <div class="input-field auto-width">
-      <label>&nbsp;</label>
-      <input type="text" class="input">
-    </div>
+    <el-input placeholder="请输入内容" v-model="host">
+      <el-select v-model="protocol" slot="prepend" placeholder="请选择">
+        <el-option label="餐厅名" value="1"></el-option>
+        <el-option label="订单号" value="2"></el-option>
+        <el-option label="用户电话" value="3"></el-option>
+      </el-select>
+      <el-button slot="append" icon="search"></el-button>
+    </el-input>
   </div>
 </div>
 </template>
@@ -33,7 +25,8 @@ export default {
   locales,
   data () {
     return {
-
+      host: '',
+      protocol: '',
     }
   }
 }
@@ -70,43 +63,6 @@ export default {
 
 .form-field {
   position: relative;
-  height: 55px;
-  margin-right: 4px;
-  display: flex;
-  
-  .input-field {
-    display: block;
-    margin-right: 4px;
-
-    &.protocol {
-      width: 70px;
-    }
-
-    &.full-width {
-      width: 100%;
-    }
-
-    &.auto-width {
-      flex: 1;
-    }
-    
-    &.right-side {
-      width: 100px;
-    }
-
-    label {
-      display: block;
-      white-space: nowrap;
-      margin-bottom: 4px;
-      visibility: visible;
-    }
-
-    .input {
-      display: block;
-      height: 28px;
-      width: 100%;
-      line-height: 28px;
-    }
-  }
+  margin-bottom: 6px;
 }
 </style>
