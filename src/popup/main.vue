@@ -1,23 +1,23 @@
 <template>
 <div class="popup">
   <div class="title-wrapper">
-    {{ $t(isEdit ? 'edit_promp' : isCustomText ? 'get_new' : 'prompt') }}
-    <span class="action-tip">{{ $t(isEdit ? 'edit_tip' : 'action_tip') }}</span>
+    {{ $t(isEdit ? 'editPromp' : isCustomText ? 'getNew' : 'prompt') }}
+    <span class="action-tip">{{ $t(isEdit ? 'editTip' : 'actionTip') }}</span>
   </div>
   <div class="code-wrapper">
     <div class="text-container" v-show="isEdit">
       <div class="textarea">
         <textarea v-model="text" @keydown="onEnter" ref="textarea"></textarea>
         <div class="text-footer">
-          <span class="error-tip" :hidden="!isToolong">{{ $t('text_toolong') }}</span>
+          <span class="error-tip" :hidden="!isToolong">{{ $t('textToolong') }}</span>
           <div class="letter-counter">{{text.trim().length}}/{{ maxLength }}</div>
         </div>
       </div>
       <div class="action-btn">
         <button type="button" :disabled="isToolong" @click="onMakeBtnClick">
-          {{ $t(isMAC ? 'qr_make_mac_btn': 'qr_make_btn')}}
+          {{ $t(isMAC ? 'qrMakeMacBtn': 'qrMakeBtn')}}
         </button>
-        <a href="/options/index.html#qrcode" target="_blank">{{ $t('more_link') }}</a>
+        <a href="/options/index.html#qrcode" target="_blank">{{ $t('moreLink') }}</a>
       </div>
     </div>
     <div class="qrcode" v-show="!isEdit" @dblclick="onEdit">
@@ -101,8 +101,6 @@ export default {
 <style lang="scss">
 @import '~@/common/base';
 
-$qr-size: 250px;
-
 html {
   min-width: 260px;
   min-height: 310px;
@@ -183,6 +181,7 @@ html {
   .action-btn {
     text-align: center;
     padding-top: 4px;
+    font-size: 14px;
   }
 
 }

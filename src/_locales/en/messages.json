@@ -5,12 +5,6 @@
   "iconTitle": {
   	"message": "Get current page's QRCode"
   },
-    "ok_btn": {
-    "message": "OK"
-  },
-  "cancel_btn": {
-    "message": "Cancel"
-  },
   "appDesc": {
   	"message": "Control your browser's web request."
   },
@@ -19,21 +13,6 @@
   },
   "bg_logon_tip": {
     "message": "If U no long need inspecting webrequest, just disable it."
-  },
-  "pop_prompt": {
-  	"message": "Current page url's QRCode"
-  },
-  "pop_action_tip": {
-  	"message": "(double click QRCode to edit)"
-  },
-  "pop_get_new": {
-  	"message": "You've got a new QRCode"
-  },
-  "pop_edit_promp": {
-  	"message": "Edit QRCode content"
-  },
-  "pop_edit_tip": {
-  	"message": "(Don't type too much)"
   },
   "qr_make_btn": {
   	"message": "GO!(Ctrl+Enter)"
@@ -53,7 +32,7 @@
   "opt_dlg_title": {
     "message": "Message"
   },
-  "opt_pg_tile": {
+  "optPgTitle": {
     "message": "Options"
   },
   "opt_ena_lbl": {
@@ -130,9 +109,6 @@
   },
   "opt_ph_urlmatch": {
     "message": "a url pattern to match, like {sub}.abc.com/news/{newsid}.html"
-  },
-  "opt_custom_desc": {
-    "message": "Custom where your urls are going"
   },
   "opt_path_rule_tip": {
     "message": "The path should obey the following rules(please ommit the prefix <strong>/</strong>):<ul><li>you give a specific path, like<code>path</code>,<code>path?num=1</code></li><li>wildcard<code>*</code> is also available, like <ul><li><code>*</code>(aka any path, including empty path)</li><li><code>path*</code>(all path start with <strong>path</strong>)</li><li><code>path*.jsp</code>(start with <strong>path</strong> and end with <strong>.jsp</strong>)</li><li><code>*kwd*</code>(path contains <strong>kwd</strong>)</li><li><code>path?*</code>(all query request to <strong>path</strong>)</li><li><code>path?num=*</code>(all query request to <strong>path</strong>, and <strong>num</strong> is the first query parameter, NOTICE: <strong>path?ps=23&amp;num=23</strong> won't be matched)</li></ul></li></ul>"

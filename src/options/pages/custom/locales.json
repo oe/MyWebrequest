@@ -1,6 +1,7 @@
 {
   "en": {
-    "prompt": "Current page url's QRCode",
+    "catTitle": "Custom",
+    "catSubTitle": "Custom where your urls are going",
     "actionTip": "( double click QRCode to edit )",
     "getNew": "You've got a new QRCode",
     "editPromp": "Edit QRCode content",
@@ -9,7 +10,8 @@
     "textToolong": "Too much words"
   },
   "zh-cn": {
-    "prompt": "当前页面地址的二维码",
+    "catTitle": "Custom",
+    "catSubTitle": "自定义你的链接跳往何处",
     "actionTip": "( 双击编辑二维码 )",
     "getNew": "新二维码生成啦",
     "editPromp": "编辑二维码内容",

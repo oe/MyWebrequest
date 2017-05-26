@@ -1,6 +1,5 @@
 {
   "en": {
-    "prompt": "Current page url's QRCode",
     "action_tip": "(double click QRCode to edit)",
     "get_new": "You've got a new QRCode",
     "edit_promp": "Edit QRCode content",
@@ -9,7 +8,6 @@
     "text_toolong": "Too much words"
   },
   "zh-cn": {
-    "prompt": "当前页面地址的二维码",
     "action_tip": "(双击编辑二维码)",
     "get_new": "新二维码生成啦",
     "edit_promp": "编辑二维码内容",

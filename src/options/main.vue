@@ -45,11 +45,9 @@ export default {
 <style lang="scss">
 @import '~@/common/base';
 
-$qr-size: 250px;
-
-html {
-  min-width: 260px;
-  min-height: 310px;
+.page {
+  width: $page-wdith;
+  margin-left: $sidebar-width + 8px;
+  padding-top: 80px;
 }
-
 </style>

@@ -4,6 +4,7 @@ export default {
   lang: lang === 'zh-cn' ? 'zh-cn'  : 'en',
   internationalize (str) {
     return str.replace( /__MSG_([^_]+)__/g, function ( m, key ) {
+      console.log('key', key)
       return chrome.i18n.getMessage( key );
     })
   }

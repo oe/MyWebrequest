@@ -1,11 +1,27 @@
+$main-font-color: #333;
+$sub-font-color: #666;
+$third-font-color: #999;
+
+$main-color: #08c;
+
+$sidebar-width: 180px;
+$sidebar-padding: 20px;
+
+$settings-title-padding: $sidebar-padding;
+
+
+$page-wdith: 760px;
+$qr-size: 250px;
+
 * {
   box-sizing: border-box;
 }
 
 html {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  font-size: 16px;
+  font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;;
+  font-size: 14px;
   line-height: 1.5;
+  color: $main-font-color;
 }
 
 body {
@@ -14,10 +30,16 @@ body {
 }
 
 a {
-  color: #08c;
+  color: $main-color;
 }
 
 @import './widgets';
+
+.invisible {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 @mixin size($width, $height: 0) {
   @if $height <= 0 {
@@ -27,9 +49,24 @@ a {
   height: $height;
 }
 
-// 
+
 // auto hyphens
 @mixin hyphens {
   word-break: break-all;
   hyphens: auto;
+}
+
+// border-bottom
+@mixin border-bottom {
+  border-bottom: 1px solid #ccc;
+}
+
+
+@mixin clearfix {
+  &:after {
+    content: '';
+    display: block;
+    float: none;
+    clear: both;
+  }
 }

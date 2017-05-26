@@ -5,12 +5,6 @@
   "iconTitle": {
     "message": "获取当前页面的二维码"
   },
-  "ok_btn": {
-    "message": "确认"
-  },
-  "cancel_btn": {
-    "message": "取消"
-  },
   "appDesc": {
     "message": "管理你浏览器的web请求"
   },
@@ -19,21 +13,6 @@
   },
   "bg_logon_tip": {
     "message": "如果你不再需要监控请求,那就把它关掉吧."
-  },
-  "pop_prompt": {
-    "message": "当前页面地址的二维码"
-  },
-  "pop_action_tip": {
-    "message": "(双击编辑二维码)"
-  },
-  "pop_get_new": {
-    "message": "新二维码生成啦"
-  },
-  "pop_edit_promp": {
-    "message": "编辑二维码内容"
-  },
-  "pop_edit_tip": {
-    "message": "(别输入太多文字)"
   },
   "qr_make_btn": {
     "message": "GO!(Ctrl+Enter)"
@@ -53,7 +32,7 @@
   "opt_dlg_title": {
     "message": "提示"
   },
-  "opt_pg_tile": {
+  "optPgTitle": {
     "message": "选项"
   },
   "opt_ena_lbl": {

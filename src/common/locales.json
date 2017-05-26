@@ -1,14 +1,18 @@
 {
   "en": {
-    "ok_btn": "OK",
-    "cancel_btn": "Cancel",
-    "qr_make_btn": "GO!(Ctrl+Enter)",
-    "qr_make_mac_btn": "GO!(⌘+Enter)"
+    "okBtn": "OK",
+    "cancelBtn": "Cancel",
+    "qrMakeBtn": "GO!(Ctrl+Enter)",
+    "qrMakeMacBtn": "GO!(⌘+Enter)",
+    "appName": "My Webrequest",
+    "addRuleTitle": "Add rule"
   },
   "zh-cn": {
-    "ok_btn": "确认",
-    "cancel_btn": "取消",
-    "qr_make_btn": "GO!(Ctrl+Enter)",
-    "qr_make_mac_btn": "GO!(⌘+Enter)"
+    "addRuleTitle": "添加规则",
+    "okBtn": "确认",
+    "cancelBtn": "取消",
+    "qrMakeBtn": "GO!(Ctrl+Enter)",
+    "qrMakeMacBtn": "GO!(⌘+Enter)",
+    "appName": "My Webrequest"
   }
 }
