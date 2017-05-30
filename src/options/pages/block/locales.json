@@ -1,0 +1,22 @@
+{
+  "en": {
+    "catTitle": "Block",
+    "catSubTitle": "Block website that U don't like",
+    "actionTip": "( double click QRCode to edit )",
+    "getNew": "You've got a new QRCode",
+    "editPromp": "Edit QRCode content",
+    "editTip": "( Don't type too much )",
+    "moreLink": "more...",
+    "textToolong": "Too much words"
+  },
+  "zh-cn": {
+    "catTitle": "Block",
+    "catSubTitle": "屏蔽你不喜欢的网站",
+    "actionTip": "( 双击编辑二维码 )",
+    "getNew": "新二维码生成啦",
+    "editPromp": "编辑二维码内容",
+    "editTip": "( 别输入太多文字 )",
+    "moreLink": "更多...",
+    "textToolong": "文字太长"
+  }
+}

@@ -4,25 +4,37 @@
     {{ $t('appName') }}
   </div>
   <ul class="menu">
-    <li class="menu-item" v-for="item in sidebarItems" :class="{active: current === item}">{{ $t(item)}}</li>
+    <router-link
+      tag="li"
+      class="menu-item"
+      v-for="item in sidebarItems"
+      key="item"
+      :to="'/' + item"
+      >{{ $t(item)}}</router-link>
   </ul>
 </div>
 </template>
 
 <script>
 import locales from './locales.json'
-import sidebarItems from './sidebar-items'
 
 export default {
   name: 'sidebar',
   locales,
   data () {
     return {
-      sidebarItems
+      sidebarItems: [
+        'custom',
+        'block',
+        'hsts',
+        'hotlink',
+        'log',
+        'qrcode',
+        'utility',
+        'settings',
+        'help'
+      ]
     }
-  },
-  props: {
-    current: String
   }
 };
 </script>
@@ -53,7 +65,7 @@ export default {
       border-left: 6px solid white;
       cursor: pointer;
 
-      &.active {
+      &.router-link-active {
         border-left-color: $sub-font-color;
         color: $main-font-color;
         cursor: default;

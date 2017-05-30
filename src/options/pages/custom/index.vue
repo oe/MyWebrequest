@@ -5,19 +5,69 @@
   </div>
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
   <div class="form-field">
-    <el-input placeholder="请输入内容" v-model="host">
-      <el-select v-model="protocol" slot="prepend" placeholder="请选择">
-        <el-option label="餐厅名" value="1"></el-option>
-        <el-option label="订单号" value="2"></el-option>
-        <el-option label="用户电话" value="3"></el-option>
+    <label>Math this url</label>
+    <el-input
+      v-model="url"
+      @paste.native="onPaste"
+      @keyup.native.enter="onAddRule"
+      placeholder="choose protocol" >
+      <el-select v-model="protocol" slot="prepend" placeholder="">
+        <el-option label="*://" value="*"></el-option>
+        <el-option label="http://" value="http"></el-option>
+        <el-option label="https://" value="https"></el-option>
       </el-select>
-      <el-button slot="append" icon="search"></el-button>
+      <el-button slot="append" @click="onAddRule">Add rule</el-button>
     </el-input>
   </div>
+  
+  <div class="form-field">
+    <label>Redirect url to</label>
+    <el-input
+      v-model="redirectUrl"
+      placeholder="choose protocol" >
+    </el-input>
+  </div>
+
+  <div class="form-field">
+    <label>Test your rule</label>
+    <el-input
+      v-model="testUrl"
+      placeholder="choose protocol" >
+    </el-input>
+  </div>
+
+
+  <div class="item-title">{{ $t('manageRule') }}</div>
+  <el-table
+    :data="tableData3"
+    stripe
+    border
+    tooltip-effect="dark">
+    <el-table-column
+      type="selection"
+      width="55">
+    </el-table-column>
+    <el-table-column
+      label="日期"
+      width="120">
+      <template scope="scope">{{ scope.row.date }}</template>
+    </el-table-column>
+    <el-table-column
+      prop="name"
+      label="姓名"
+      width="120">
+    </el-table-column>
+    <el-table-column
+      prop="address"
+      label="地址"
+      show-overflow-tooltip>
+    </el-table-column>
+  </el-table>
 </div>
 </template>
 
 <script>
+import utils from '@/options/components/utils'
 import locales from './locales.json'
 
 export default {
@@ -25,8 +75,28 @@ export default {
   locales,
   data () {
     return {
-      host: '',
+      url: '',
       protocol: '',
+      redirectUrl: '',
+      testUrl: '',
+      tableData3: [{
+        name: 'abc',
+        date: '2993934-3434-34',
+        address: 'Beijing'
+      }]
+    }
+  },
+  methods: {
+    onPaste (e) {
+      const uri = utils.getUrlFromClipboard(e)
+      if (!utils.isProtocol(uri.protocol)) return
+      this.protocol = uri.protocol
+      this.url = uri.raw.replace(`${uri.protocol}://`, '')
+      e.preventDefault()
+    },
+    // add rule
+    onAddRule () {
+      console.log('add rule')
     }
   }
 }
@@ -34,35 +104,4 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
-
-.setting-title {
-  padding-top: $settings-title-padding;
-  padding-bottom: 8px;
-  font-size: 22px;
-  @include border-bottom;
-  margin-bottom: 10px;
-  position: fixed;
-  top: 0;
-  width: $page-wdith;
-  background-color: rgba(255, 255, 255, .8);
-  z-index: 220;
-
-  small {
-    font-size: .8em;
-    color: $sub-font-color;
-  }
-}
-
-.item-title {
-  padding-top: 4px;
-  padding-bottom: 4px;
-  font-size: 18px;
-  margin-bottom: 10px;
-  @include border-bottom;
-}
-
-.form-field {
-  position: relative;
-  margin-bottom: 6px;
-}
 </style>

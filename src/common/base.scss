@@ -13,6 +13,8 @@ $settings-title-padding: $sidebar-padding;
 $page-wdith: 760px;
 $qr-size: 250px;
 
+$big-input-wdith: $page-wdith - 100px;
+
 * {
   box-sizing: border-box;
 }
