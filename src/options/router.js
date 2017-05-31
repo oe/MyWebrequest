@@ -10,7 +10,7 @@ Vue.use(VueRouter)
 
 export default new VueRouter({
   routes: [
-    { path: '/', component: custom},
+    { path: '/', redirect: '/block'},
     { path: '/custom', component: custom},
     { path: '/block', component: block},
     { path: '/hsts', component: block},

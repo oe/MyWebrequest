@@ -35,6 +35,7 @@
         <el-switch
           v-model="scope.row.active"
           on-color="#13ce66"
+          @change="onToggleItem"
           off-color="#aaa">
         </el-switch>
       </template>
@@ -54,6 +55,14 @@
 </template>
 
 <script>
+/**
+ * rules structure for block/hsts/hotlink/log
+ * [{
+ *    rule: '*://www.baidu.com/*', // rule text
+ *    active: true
+ * }]
+ */
+
 import utils from '@/options/components/utils'
 import collection from '@/common/collection'
 import locales from './locales.json'
@@ -86,11 +95,68 @@ export default {
       e.preventDefault()
     },
     onAddRule () {
-      console.log('ahah')
+      const url = this.url.trim().replace(/#.*$/, '')
+      const index = this.url.indexOf('/')
+      let host = url
+      let path = ''
+      if (index !== -1) {
+        host = url.slice(0, index)
+        path = url.slice(index + 1)
+      }
+      path = path || '*'
+
+      if (!utils.isProtocol(this.protocol)) {
+        alert('illegal protocol')
+        return
+      }
+      if (!host || !utils.isIp(host) || utils.isHost(host)) {
+        alert('illegal host')
+        return
+      }
+      if (!path || utils.isPath(path)) {
+        alert('illegal path')
+        return
+      }
+      const rule = `${this.protocol}://${host}/${path}`
+      if (rule.length > 500) {
+        alert('rule is too long')
+        return
+      }
+      const isExists = this.isRuleExists(rule)
+      if (isExists) {
+        alert('rule duplicated in two ways')
+        return
+      }
+
+      // affect many websites
+      if (host === '*' && ['block', 'hsts'].indexOf(this.module) !== -1) {
+        this.$confirm('* host will disable your web browser', 'warning', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.addRule(rule)
+        }).catch(() => {
+          console.log('rule')
+        });
+      } else {
+        this.addRule(rule)
+      }
     },
     onRemoveRule (item) {
-      console.log(item)
+      this.$confirm('* host will disable your web browser', 'warning', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.removeRule(item)
+      }).catch(() => {
+        console.log('rule')
+      });
     },
+    onToggleItem: utils.debounce(function () {
+      this.saveRules()
+    }, 400),
     updateModule () {
       this.module = this.$route.path.slice(1).toLowerCase()
       this.rules = collection.getRules(this.module)
@@ -100,6 +166,30 @@ export default {
         rule,
         active: true
       })
+      this.saveRules()
+    },
+    removeRule(item) {
+      const index = this.rules.indexOf(item)
+      if (index === -1) return
+      this.rules.splice(index, 0)
+      this.saveRules()
+    },
+    isRuleExists (rule) {
+      let len = this.rules.length
+      while (len--) {
+        const r = this.rules[len].rule
+        if (utils.isSubRule(r, rules)) {
+          // rule covered by r
+          return { code: 1, rule: r }
+        }
+        if (utils.isSubRule(rule, r)) {
+          // rule covers r
+          return { code: 2, rule: r }
+        }
+      }
+      return 0
+    },
+    saveRules() {
       collection.save(this.module, this.rules)
     }
 

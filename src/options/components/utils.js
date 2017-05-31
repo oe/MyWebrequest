@@ -90,7 +90,7 @@ let getUrlFromClipboard = function(e){
  * like: *://*.g.com covers http://ad.g.com or http://*.g.com
  * exmaple: to detect if a custom rule is conflicted with a block rule
 */
-let isSubRule = function(rule, subRule){
+function isSubRule (rule, subRule){
   let matches = urlComponentReg.exec(rule)
   let prtl1 = matches[1]
   let url1 = matches[2] + matches[3]
@@ -425,7 +425,7 @@ let getUrlValues = function(r, url){
 }
 
 // fill a pattern with data
-let fillPattern = function(pattern, data){
+function fillPattern(pattern, data){
   pattern = pattern.replace(/([\w\%+\[\]]+)=\{(\w+)\}/g, function($0, $1, $2){
     let val = data[ $2 ] != null ? data[ $2 ] : ''
     return toQueryString($1, val)
@@ -447,13 +447,35 @@ let fillPattern = function(pattern, data){
  * @param  {String} url     a real url that match route
  * @return {String}         converted url
 */
-let getTargetUrl = function(router, url){
+function getTargetUrl(router, url){
   console.log('getTargetUrl, router: %o, url: %s', router, url)
   let params = getUrlValues(router, url)
   console.log('params in url: %o', params)
   if (!params) { return ''; }
   return fillPattern(router.redirectUrl, params)
 }
+
+/**
+ * debounce
+ * @param  {Function} fn      [description]
+ * @param  {Object}   context [description]
+ * @param  {Number}   wait    [description]
+ * @return {Function}
+ */
+function debounce(fn, wait) {
+  let tid = null
+  let result
+  if (isNaN(wait) || wait < 0) wait = 200
+
+  return function debounced(...args) {
+    clearTimeout(tid)
+    tid = setTimeout(() => {
+      result = fn.apply(this, args)
+    }, wait)
+    return result
+  }
+}
+
 
 
 export default {
@@ -466,6 +488,7 @@ export default {
   isSubRule,
   getQs,
   parseQs,
+  debounce,
   isRouterStrValid,
   getRouter,
   getUrlValues,
