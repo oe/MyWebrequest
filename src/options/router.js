@@ -2,8 +2,8 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 
 import custom from './pages/custom'
-import block from './pages/block'
-import help from './pages/block'
+import union from './pages/union'
+import help from './pages/union'
 
 
 Vue.use(VueRouter)
@@ -12,10 +12,10 @@ export default new VueRouter({
   routes: [
     { path: '/', redirect: '/block'},
     { path: '/custom', component: custom},
-    { path: '/block', component: block},
-    { path: '/hsts', component: block},
-    { path: '/hotlink', component: block},
-    { path: '/log', component: block},
+    { path: '/block', component: union},
+    { path: '/hsts', component: union},
+    { path: '/hotlink', component: union},
+    { path: '/log', component: union},
     { path: '/help', component: help}
   ]
 })

@@ -74,12 +74,7 @@ export default {
       module: '',
       protocol: '',
       url: '',
-      rules:  [{
-        active: false,
-        name: 'abc',
-        rule: '2993934-3434-34',
-        address: 'Beijing'
-      }]
+      rules: []
     }
   },
   created() {
@@ -192,11 +187,18 @@ export default {
     saveRules() {
       collection.save(this.module, this.rules)
     }
-
   },
   watch: {
     $route () {
       this.updateModule()
+      this.$el.classList.add('slide-enter')
+      setTimeout(() => {
+        this.$el.classList.add('slide-enter-active')
+        this.$el.classList.remove('slide-enter')
+      }, 0)
+      setTimeout(() => {
+        this.$el.classList.remove('slide-enter-active')
+      }, 500)
     }
   }
 };

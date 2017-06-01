@@ -1,7 +1,7 @@
 <template>
 <div class="container">
-  <sidebar :current="router"></sidebar>
-  <transition name="fade" mode="out-in" appear>
+  <sidebar></sidebar>
+  <transition name="slide">
     <router-view class="page"></router-view>
   </transition>
 </div>
@@ -16,13 +16,6 @@ import sidebar from './components/sidebar'
 export default {
   name: 'main',
   locales,
-  data () {
-    return {
-      router: '',
-      input5: '',
-      select: ''
-    }
-  },
   components: {
     sidebar
   }
@@ -32,9 +25,12 @@ export default {
 <style lang="scss">
 @import '~@/common/base';
 .page {
+  position: absolute;
   width: $page-wdith;
-  margin-left: $sidebar-width + 8px;
+  left: $sidebar-width + 8px;
+  top: 0;
   padding-top: 80px;
+  // transition: transform 300ms, opacity 250ms;
 }
 
 .setting-title {
@@ -67,10 +63,15 @@ export default {
     margin-top: 0;
   }
 }
-// .el-form-item
-// .el-form-item:after {
-//   display: none;
-// }
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform 300ms, opacity 250ms;
+}
+.slide-enter, .slide-leave-to {
+  transform: translateX(-200%);
+  opacity: .8;
+}
+
 
 .el-form-item__content {
   &:before,

@@ -48,6 +48,8 @@ export default {
   top: 0;
   bottom: 0;
   width: $sidebar-width;
+  z-index: 100;
+  background-color: #fff;
 
   .app-name {
     padding: $sidebar-padding 0 10px $sidebar-padding;

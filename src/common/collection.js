@@ -1,8 +1,8 @@
 export default {
-  getRules (cat) {
-    return cat ? JSON.parse(localStorage.getItem(cat)) || [] : []
+  getRules (cat, type = 'array') {
+    return JSON.parse(localStorage.getItem(cat)) || (type === 'array' ? [] : {})
   },
-  save (cat, data) {
-    localStorage.setItem(cat, JSON.stringify(data))
+  save (key, data) {
+    localStorage.setItem(key, JSON.stringify(data))
   }
 }
