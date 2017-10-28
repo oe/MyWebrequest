@@ -14,6 +14,7 @@
   <el-form label-position="top">
     <el-form-item label="Match this url">
       <el-input
+        size="small"
         v-model="url"
         @paste.native="onPaste"
         @keyup.native.enter="onAddRule"
@@ -25,32 +26,11 @@
           <el-option label="https://" value="https"></el-option>
         </el-select>
       </el-input>
-      <el-button @click="onAddRule">Add rule</el-button>
+      <el-button size="small" @click="onAddRule">Add rule</el-button>
     </el-form-item>
   </el-form>
   <div class="item-title">{{ $t('manageRule') }}</div>
-  <el-table :data="rules" :show-header="false">
-    <el-table-column label="Active" width="90" >
-      <template scope="scope">
-        <el-switch
-          v-model="scope.row.active"
-          on-color="#13ce66"
-          @change="onToggleItem"
-          off-color="#aaa">
-        </el-switch>
-      </template>
-    </el-table-column>
-    <el-table-column
-      prop="rule"
-      label="地址"
-      show-overflow-tooltip>
-    </el-table-column>
-    <el-table-column width="80" label="action">
-      <template scope="scope">
-        <el-button type="text" size="mini" @click="onRemoveRule(scope.row)">delete</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
+  <rule-list :type="module" ref="list"></rule-list>
 </div>
 </template>
 
@@ -64,9 +44,9 @@
  */
 
 import utils from '@/options/components/utils'
+import RuleList from '@/options/components/rule-list'
 import collection from '@/common/collection'
 import locales from './locales.json'
-
 export default {
   locales,
   data () {
@@ -76,6 +56,9 @@ export default {
       url: '',
       rules: []
     }
+  },
+  components: {
+    RuleList
   },
   created() {
     window.pp = this
@@ -138,36 +121,17 @@ export default {
         this.addRule(rule)
       }
     },
-    onRemoveRule (item) {
-      this.$confirm('* host will disable your web browser', 'warning', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.removeRule(item)
-      }).catch(() => {
-        console.log('rule')
-      });
-    },
-    onToggleItem: utils.debounce(function () {
-      this.saveRules()
-    }, 400),
     updateModule () {
       this.module = this.$route.path.slice(1).toLowerCase()
-      this.rules = collection.getRules(this.module)
     },
     addRule (rule) {
-      this.rules.push({
+      this.$ref.list.addRule({
         rule,
-        active: true
+        active: true        
       })
-      this.saveRules()
     },
-    removeRule(item) {
-      const index = this.rules.indexOf(item)
-      if (index === -1) return
-      this.rules.splice(index, 0)
-      this.saveRules()
+    validateRule (rule) {
+
     },
     isRuleExists (rule) {
       let len = this.rules.length
@@ -183,9 +147,6 @@ export default {
         }
       }
       return 0
-    },
-    saveRules() {
-      collection.save(this.module, this.rules)
     }
   },
   watch: {

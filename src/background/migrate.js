@@ -5,38 +5,39 @@ const ver = '1.0'
 
 const version = {
   key: 'data-version',
-  get() {
+  get () {
     return localStorage.getItem(version.key) || ''
   },
-  set(ver) {
+  set (ver) {
     localStorage.setItem(version.key, ver)
   }
 }
 
-
-const simpleRules = ['block', 'hsts', 'hotlink', 'log']
-
-function migrateTo1() {
+function migrateTo1 () {
+  // add `active` prop
+  const simpleRules = ['block', 'hsts', 'hotlink', 'log']
   simpleRules.forEach((key) => {
     const rules = collection.getRules(key).map((item) => {
       return {
-        rule: item,
+        url: item,
         active: true
       }
     })
     collection.save(key, rules)
   })
 
+  // transfrom custom rules to array, and add `active` prop
   const custom = 'custom'
-  const rules = collection.getRules(custom, 'object')
-  Object.keys(rules).forEach((key) => {
-    rules[key].active = true
-  })
-
-  collection.save(custom, rules)
+  const rules = collection.getRules(custom)
+  if (!Array.isArray(rules)) {
+    rules = Object.keys(rules).map((key) => {
+      return rules[key].active = true
+    })
+    collection.save(custom, rules)
+  }
 }
 
-export default function migrate() {
+export default function migrate () {
   const curVer = version.get()
   if (ver === curVer) return
   migrateTo1()

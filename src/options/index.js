@@ -5,12 +5,10 @@ import enLocale from 'element-ui/lib/locale/lang/en'
 import zhLocale from 'element-ui/lib/locale/lang/zh-CN'
 import i18n from '@/common/i18n'
 import locales from '@/common/locales'
-import 'element-ui/lib/theme-default/index.css'
-
+import 'element-ui/lib/theme-chalk/index.css'
 
 import App from './main'
 import router from './router'
-
 
 Vue.use(VueI18n)
 Vue.use(ElementUI)
@@ -18,9 +16,8 @@ Vue.use(ElementUI)
 // Vue.config.lang = i18n.lang
 Vue.config.lang = 'en'
 
-
 // translate text out of vue app
-document.documentElement.innerHTML = i18n.internationalize( document.documentElement.innerHTML );
+document.documentElement.innerHTML = i18n.internationalize(document.documentElement.innerHTML)
 
 Vue.locale('zh-cn', zhLocale)
 Vue.locale('en', enLocale)
@@ -32,12 +29,11 @@ for (var key in locales) {
   }
 }
 
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
   router,
-  render(h) {
+  render (h) {
     return h('app')
   },
   components: { App }

@@ -8,6 +8,7 @@
     <label>Math this url</label>
     <el-input
       v-model="url"
+      size="small"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       placeholder="choose protocol" >
@@ -23,6 +24,7 @@
   <div class="form-field">
     <label>Redirect url to</label>
     <el-input
+      size="small"
       v-model="redirectUrl"
       placeholder="choose protocol" >
     </el-input>
@@ -31,59 +33,32 @@
   <div class="form-field">
     <label>Test your rule</label>
     <el-input
+      size="small"
       v-model="testUrl"
       placeholder="choose protocol" >
     </el-input>
   </div>
-
-
-  <div class="item-title">{{ $t('manageRule') }}</div>
-  <el-table
-    :data="tableData3"
-    stripe
-    border
-    tooltip-effect="dark">
-    <el-table-column
-      type="selection"
-      width="55">
-    </el-table-column>
-    <el-table-column
-      label="日期"
-      width="120">
-      <template scope="scope">{{ scope.row.date }}</template>
-    </el-table-column>
-    <el-table-column
-      prop="name"
-      label="姓名"
-      width="120">
-    </el-table-column>
-    <el-table-column
-      prop="address"
-      label="地址"
-      show-overflow-tooltip>
-    </el-table-column>
-  </el-table>
+  <rule-list type="custom" ref="list"></rule-list>
 </div>
 </template>
 
 <script>
 import utils from '@/options/components/utils'
+import RuleList from '@/options/components/rule-list'
 import locales from './locales.json'
 
 export default {
   name: 'custom',
   locales,
+  components: {
+    RuleList,
+  },
   data () {
     return {
       url: '',
       protocol: '',
       redirectUrl: '',
-      testUrl: '',
-      tableData3: [{
-        name: 'abc',
-        date: '2993934-3434-34',
-        address: 'Beijing'
-      }]
+      testUrl: ''
     }
   },
   methods: {
@@ -97,6 +72,7 @@ export default {
     // add rule
     onAddRule () {
       console.log('add rule')
+      this.$ref.list.updateTableData()
     }
   }
 }

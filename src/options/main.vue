@@ -59,6 +59,11 @@ export default {
   margin-top: 1em;
   @include border-bottom;
 
+  > small {
+    font-size: .8em;
+    color: #999;
+  }
+
   .setting-title + & {
     margin-top: 0;
   }

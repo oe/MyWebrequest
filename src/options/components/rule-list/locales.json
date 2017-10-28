@@ -1,0 +1,14 @@
+{
+  "en": {
+    "manageRule": "Manage Rules",
+    "ruleUnit": "rule(s)",
+    "noRules": "You haven't added any rules yet.",
+    "ruleIsActive": "actived"
+  },
+  "zh-cn": {
+    "manageRule": "管理规则",
+    "ruleUnit": "条",
+    "noRules": "你还没有添加任何规则",
+    "ruleIsActive": "正在使用中"
+  }
+}
