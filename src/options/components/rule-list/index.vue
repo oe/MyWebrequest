@@ -109,6 +109,8 @@ export default {
     },
     addRule: utils.debounce(function (rule) {
       const rl = JSON.parse(JSON.stringify(rule))
+      rl.createdAt = rl.updatedAt = Date.now()
+
       this.data.unshift(rl)
       this.save()
     }),

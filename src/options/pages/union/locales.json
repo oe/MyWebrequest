@@ -1,7 +1,13 @@
 {
   "en": {
-    "catTitle": "Block",
-    "catSubTitle": "Block website that U don't like",
+    "hotlinkDesc": "Enable the accessibility of those hotlinking images",
+    "customDesc": "Custom where your urls are going",
+    "blockDesc": "Block website that U don't like",
+    "hstsDesc": "Force HTTPS connection to some website",
+    "referDesc": "Help U access anti-hotlinking pictures",
+    "logDesc": "Help U inspecting the webrequests<a class='help-icon' href=\"#help/help-log\"></a>",
+    "addRuleTitle": "Add rule",
+    "enaFeatureLbl": "Enable this feature",
     "actionTip": "( double click QRCode to edit )",
     "getNew": "You've got a new QRCode",
     "editPromp": "Edit QRCode content",
@@ -10,7 +16,14 @@
     "textToolong": "Too much words"
   },
   "zh-cn": {
-    "catTitle": "Block",
+    "hotlinkDesc": "帮你轻松的访问盗链图",
+    "customDesc": "自定义你的链接跳往何处",
+    "blockDesc": "屏蔽你讨厌的网站",
+    "hstsDesc": "强制使用HTTPS来打开某些网站",
+    "referDesc": "帮助你浏览有盗链防护的图片",
+    "logDesc": "审查网络请求<a class='help-icon' href=\"#help/help-log\"></a>",
+    "addRuleTitle": "添加规则",
+    "enaFeatureLbl": "启用该功能",
     "catSubTitle": "屏蔽你不喜欢的网站",
     "actionTip": "( 双击编辑二维码 )",
     "getNew": "新二维码生成啦",

@@ -1,7 +1,7 @@
 # My Webrequest [![Build Status](https://travis-ci.org/evecalm/MyWebrequest.svg?branch=dev)](https://travis-ci.org/evecalm/MyWebrequest)
 Control your network connection  
 
-Please visit http://app.evecalm.com/MyWebrequest/ for more introduction and install instructions.
+Please visit http://app.evecalm.com/MyWebrequest/ for more introduction and installation instructions.
 
 
 ## Building Steps

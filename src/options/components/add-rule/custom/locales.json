@@ -1,0 +1,24 @@
+{
+  "en": {
+    "matchLbl": "Match this url",
+    "block": "Block",
+    "hsts": "Hsts",
+    "hotlink": "Hotlink",
+    "log": "Log",
+    "qrcode": "Qrcode",
+    "utility": "Utility",
+    "settings": "Settings",
+    "help": "Help"
+  },
+  "zh-cn": {
+    "matchLbl": "匹配下面的规则",
+    "block": "Block",
+    "hsts": "Hsts",
+    "hotlink": "Hotlink",
+    "log": "Log",
+    "qrcode": "Qrcode",
+    "utility": "Utility",
+    "settings": "Settings",
+    "help": "Help"
+  }
+}

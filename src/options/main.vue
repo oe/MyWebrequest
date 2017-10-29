@@ -9,13 +9,11 @@
 
 <script>
 import qrcode from '@/common/qrcode'
-import locales from './locales.json'
 import sidebar from './components/sidebar'
 
 
 export default {
   name: 'main',
-  locales,
   components: {
     sidebar
   }
@@ -29,13 +27,13 @@ export default {
   width: $page-wdith;
   left: $sidebar-width + 8px;
   top: 0;
-  padding-top: 80px;
+  padding-top: 70px;
   // transition: transform 300ms, opacity 250ms;
 }
 
 .setting-title {
   padding-top: $settings-title-padding;
-  padding-bottom: 8px;
+  padding-bottom: 4px;
   font-size: 22px;
   @include border-bottom;
   margin-bottom: 10px;

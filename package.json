@@ -10,6 +10,7 @@
   "license": "MIT",
   "repository": "https://github.com/evecalm/MyWebrequest/",
   "devDependencies": {
+    "@kazupon/vue-i18n-loader": "^0.2.1",
     "babel-core": "^6.24.1",
     "babel-helper-vue-jsx-merge-props": "^2.0.2",
     "babel-loader": "^7.0.0",
@@ -43,7 +44,7 @@
     "element-ui": "^2.0.0",
     "qrcode": "^0.8.1",
     "vue": ">2.2.6",
-    "vue-i18n": "=5.0.3",
+    "vue-i18n": "5",
     "vue-router": "^2.5.3",
     "vuex": "^2.3.1"
   }

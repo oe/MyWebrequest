@@ -1,51 +1,24 @@
 <template>
 <div>
   <div class="setting-title">
-    {{ $t('catTitle') }} <small>{{ $t('catSubTitle') }}</small>
+    {{ catTitle }} <small v-html="$t(module+'Desc')"></small>
   </div>
+  <el-checkbox
+    v-model="isEnabled"
+    @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}</el-checkbox>
+  
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
-  <el-popover
-    ref="urlPopover"
-    placement="bottom"
-    title="标题"
-    trigger="focus"
-    content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
-  </el-popover>
-  <el-form label-position="top">
-    <el-form-item label="Match this url">
-      <el-input
-        size="small"
-        v-model="url"
-        @paste.native="onPaste"
-        @keyup.native.enter="onAddRule"
-        v-popover:urlPopover
-        placeholder="choose protocol" >
-        <el-select v-model="protocol" slot="prepend" placeholder="">
-          <el-option label="*://" value="*"></el-option>
-          <el-option label="http://" value="http"></el-option>
-          <el-option label="https://" value="https"></el-option>
-        </el-select>
-      </el-input>
-      <el-button size="small" @click="onAddRule">Add rule</el-button>
-    </el-form-item>
-  </el-form>
-  <div class="item-title">{{ $t('manageRule') }}</div>
+  <component :is="formType"></component>
   <rule-list :type="module" ref="list"></rule-list>
 </div>
 </template>
 
 <script>
-/**
- * rules structure for block/hsts/hotlink/log
- * [{
- *    rule: '*://www.baidu.com/*', // rule text
- *    active: true
- * }]
- */
-
 import utils from '@/options/components/utils'
 import RuleList from '@/options/components/rule-list'
 import collection from '@/common/collection'
+import CustomForm from '@/options/components/add-rule/custom'
+import NormalForm from '@/options/components/add-rule/normal'
 import locales from './locales.json'
 export default {
   locales,
@@ -54,24 +27,27 @@ export default {
       module: '',
       protocol: '',
       url: '',
+      isEnabled: false,
       rules: []
     }
   },
   components: {
-    RuleList
+    RuleList,
+    CustomForm,
+    NormalForm
   },
   created() {
-    window.pp = this
     this.updateModule()
   },
-  methods: {
-    onPaste (e) {
-      const uri = utils.getUrlFromClipboard(e)
-      if (!utils.isProtocol(uri.protocol)) return
-      this.protocol = uri.protocol
-      this.url = uri.raw.replace(`${uri.protocol}://`, '')
-      e.preventDefault()
+  computed: {
+    catTitle () {
+      return this.module.charAt(0).toUpperCase() + this.module.slice(1)
     },
+    formType () {
+      return this.module === 'custom' ? 'CustomForm' : 'NormalForm'
+    }
+  },
+  methods: {
     onAddRule () {
       const url = this.url.trim().replace(/#.*$/, '')
       const index = this.url.indexOf('/')
@@ -121,8 +97,14 @@ export default {
         this.addRule(rule)
       }
     },
+    onFeatureSatusChange () {
+      const onoff = collection.getRules('onoff')
+      onoff[this.module] = this.isEnabled
+      collection.save('onoff', onoff)
+    },
     updateModule () {
       this.module = this.$route.path.slice(1).toLowerCase()
+      this.isEnabled = !!collection.getRules('onoff')[this.module]
     },
     addRule (rule) {
       this.$ref.list.addRule({

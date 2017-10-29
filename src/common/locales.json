@@ -4,17 +4,13 @@
     "cancelBtn": "Cancel",
     "qrMakeBtn": "GO!(Ctrl+Enter)",
     "qrMakeMacBtn": "GO!(⌘+Enter)",
-    "appName": "My Webrequest",
-    "addRuleTitle": "Add rule",
-    "manageRule": "Manage rules"
+    "appName": "My Webrequest"
   },
   "zh-cn": {
     "okBtn": "确认",
     "cancelBtn": "取消",
     "qrMakeBtn": "GO!(Ctrl+Enter)",
     "qrMakeMacBtn": "GO!(⌘+Enter)",
-    "appName": "My Webrequest",
-    "addRuleTitle": "添加规则",
-    "manageRule": "管理规则"
+    "appName": "My Webrequest"
   }
 }

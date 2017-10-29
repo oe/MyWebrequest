@@ -1,11 +1,7 @@
 <template>
-<div>
-  <div class="setting-title">
-    {{ $t('catTitle') }} <small>{{ $t('catSubTitle') }}</small>
-  </div>
-  <div class="item-title">{{ $t('addRuleTitle') }}</div>
+<div class="rule-form-custom">
   <div class="form-field">
-    <label>Math this url</label>
+    <label>{{$t('matchLbl')}}</label>
     <el-input
       v-model="url"
       size="small"
@@ -17,7 +13,7 @@
         <el-option label="http://" value="http"></el-option>
         <el-option label="https://" value="https"></el-option>
       </el-select>
-      <el-button slot="append" @click="onAddRule">Add rule</el-button>
+      <el-button slot="append" @click="onAddRule">{{$t('addRuleTitle')}}</el-button>
     </el-input>
   </div>
   
@@ -38,46 +34,27 @@
       placeholder="choose protocol" >
     </el-input>
   </div>
-  <rule-list type="custom" ref="list"></rule-list>
 </div>
 </template>
 
 <script>
-import utils from '@/options/components/utils'
-import RuleList from '@/options/components/rule-list'
+import mixin, { mergeLang } from '../common-mixin'
 import locales from './locales.json'
+const lang = mergeLang(locales)
 
 export default {
-  name: 'custom',
-  locales,
-  components: {
-    RuleList,
-  },
+  locales: lang,
+  mixins: [mixin],
   data () {
     return {
       url: '',
-      protocol: '',
+      protocol: '*',
       redirectUrl: '',
       testUrl: ''
-    }
-  },
-  methods: {
-    onPaste (e) {
-      const uri = utils.getUrlFromClipboard(e)
-      if (!utils.isProtocol(uri.protocol)) return
-      this.protocol = uri.protocol
-      this.url = uri.raw.replace(`${uri.protocol}://`, '')
-      e.preventDefault()
-    },
-    // add rule
-    onAddRule () {
-      console.log('add rule')
-      this.$ref.list.updateTableData()
     }
   }
 }
 </script>
 
 <style lang="scss">
-@import '~@/common/base';
 </style>
