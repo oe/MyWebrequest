@@ -1,0 +1,22 @@
+language: node_js
+node_js:
+- node
+- 8
+cache:
+  directories:
+  - node_modules
+install:
+- yarn
+script:
+- yarn run build
+deploy:
+  provider: releases
+  api_key:
+    secure: hTdcDYNSlGpPy8qTyfpnGZ7sk0PR61TVLJdgdFtZHBgfnqhuVWrq+RNm9A0QzXWNBc76HHe6qDLijYKIxvduGnIjwAzRaou69Y3dM3iBRGh1x6wa6D1DpPNnlfKgPYjEaAma4012Gfa0n0y9PjjmB7tDrqc8cBoPaYVOH9XAGORO1rVqKUmhJvAFwYuPLZggssdTx60vzaz5FRDHrISLkiit7gkASQRz6oUzn8BSZ11KlE/RgT1I0X4RCoMHhnJQsankBltyZ0UQ1lXiqRKVXay+hkp33TCfOhB8Gip/NE3pxpwdHiqLywEseb7U4kvBr0bSqJBpVTMSWw9/LzlqB0oRi5k7K8wH2KM55YT9k41sYuNz+KmLy2sLJ63HwnYWNXptC0/wOFLwnSTyZ6duzZQ3R+X6+4HHJqVekbr8Kcv+UY2UmESnc6mVQgK215leI4ZHPzmiSArwGGltsXTq8dbkmrBk/8uCduSoez1TiLZTLYLTjjURnx8fq+1PMqasCvafY6mSCCWssoTLD4c7VO7ZfCv6haVwVxKpNIC8k68Be2NEWBgQfBonKrzwVrzTxh8pomwftFsSYFSzfilu7aYLGVjA7/i6jhcNe5aBwg8TwcPypPHCBuv+KQuBuzkgJWN3DLYPup97KZ6iZUkw3pTqfN8HNo2WMQGe4sHdiqI=
+  file: "./ext.zip"
+  branches:
+    only:
+    - master
+  on:
+    tags: true
+    repo: evecalm/MyWebrequest
