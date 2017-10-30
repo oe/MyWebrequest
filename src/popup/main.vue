@@ -32,7 +32,7 @@ import locales from './locales.json'
 
 export default {
   name: 'main',
-  i18n: locales,
+  locales,
   data () {
     return {
       text: '',

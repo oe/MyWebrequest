@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 
 // import custom from './pages/custom'
 import union from './pages/union'
-import help from './pages/union'
+import help from './pages/help'
 
 Vue.use(VueRouter)
 
