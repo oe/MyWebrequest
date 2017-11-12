@@ -1,16 +1,22 @@
-var path = require('path')
-var webpack = require('webpack')
-var CopyWebpackPlugin = require('copy-webpack-plugin')
-var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-var WebpackOnBuildPlugin = require('on-build-webpack')
-var chalk = require('chalk')
-var zipFolder = require('zip-folder')
-var fs = require('fs')
+const path = require('path')
+const webpack = require('webpack')
+const WebpackDevServer = require('webpack-dev-server')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const WebpackOnBuildPlugin = require('on-build-webpack')
+const WriteFilePlugin = require('write-file-webpack-plugin')
+const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
+const chalk = require('chalk')
+const zipFolder = require('zip-folder')
+const fs = require('fs')
 
-var manifestSrcPath = './src/manifest.json'
-var manifestDistPath = './dist/manifest.json'
-var manifest = require(manifestSrcPath)
+const manifestSrcPath = './src/manifest.json'
+const manifestDistPath = './dist/manifest.json'
+const manifest = require(manifestSrcPath)
+
+const serverPort = 3031
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
 
 // auto increaseVersion of manifest.json
@@ -30,17 +36,20 @@ function increaseVersion (package) {
 }
 
 
-module.exports = {
-  'entry': {
+const config = {
+  entry: {
     // your entry file file (entry.ts or entry.js)
     'popup/index': ['./src/popup/index.js'],
     'options/index': ['./src/options/index.js']
   },
-  'output': {
+  notHotReload: [],
+  devServer: { inline: true, progress: true },
+  output: {
     'path': path.join(__dirname, './dist/'),
-    'filename': '[name].js'
+    'filename': '[name].js',
+    publicPath: '/'
   },
-  'module': {
+  module: {
     rules: [
       {
         test: /\.vue$/,
@@ -75,13 +84,16 @@ module.exports = {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
           use: "css-loader",
-          fallbackLoader: 'style-loader'
+          fallback: 'style-loader'
         })
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
         // loader: 'file-loader'
-        loader: 'file-loader?name=/static/[name].[ext]'
+        loader: 'file-loader',
+        options: {
+          name: 'static/[name].[ext]?[hash]'
+        }
       },
       {
         test: /\.(png|jpg|gif|svg)$/,
@@ -93,6 +105,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new CleanWebpackPlugin(['dist', 'ext.zip']),
     // copy custom static assets
     new CopyWebpackPlugin([
       {
@@ -136,8 +149,9 @@ module.exports = {
 };
 
 if (process.env.NODE_ENV === 'production') {
+  delete config.notHotReload
   // http://vue-loader.vuejs.org/en/workflow/production.html
-  module.exports.plugins = (module.exports.plugins || []).concat([
+  config.plugins = (config.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
@@ -172,5 +186,34 @@ if (process.env.NODE_ENV === 'production') {
     })
     // new PrepackWebpackPlugin({})
   ])
+  module.exports = config
+  // webpack(config, (err) => { if (err) throw err})
+  
+
+} else {
+  // config.devtool = "#cheap-module-eval-source-map"
+  config.devtool = "sourcemap"
+  config.plugins =
+    [new webpack.HotModuleReplacementPlugin()].concat(config.plugins || []);
+  config.plugins.push(new WriteFilePlugin())
+  config.plugins.push(new FriendlyErrorsPlugin())
+
+  const notHotReload = config.notHotReload || []
+  for (let entryName in config.entry) {
+    if (config.entry.hasOwnProperty(entryName) && notHotReload.indexOf(entryName) === -1) {
+      config.entry[entryName] = [
+        ("webpack-dev-server/client?http://localhost:" + serverPort),
+        "webpack/hot/dev-server"
+      ].concat(config.entry[entryName]);
+    }
+  }
+  delete config.notHotReload
+  const compiler = webpack(config)
+  const server = new WebpackDevServer(compiler, {
+    hot: true,
+    contentBase: path.join(__dirname, "dist"),
+    headers: { "Access-Control-Allow-Origin": "*" }
+  });
+  server.listen(serverPort)
 }
 
