@@ -65,7 +65,7 @@ const config = {
               fallback: 'vue-style-loader'
             }),
             sass: ExtractTextPlugin.extract({
-              use: ['css-loader','sass-loader'],
+              use: ['css-loader','sass-loader?indentedSyntax=1'],
               fallback: 'vue-style-loader'
             }),
             less: ExtractTextPlugin.extract({
