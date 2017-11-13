@@ -43,7 +43,6 @@ const config = {
     'options/index': ['./src/options/index.js']
   },
   notHotReload: [],
-  devServer: { inline: true, progress: true },
   output: {
     'path': path.join(__dirname, './dist/'),
     'filename': '[name].js',
