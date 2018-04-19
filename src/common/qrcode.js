@@ -7,4 +7,3 @@ export default {
     qrcode.toDataURL(text, {margin: 0}, cb)
   }
 }
-

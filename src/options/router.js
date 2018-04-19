@@ -9,12 +9,12 @@ Vue.use(VueRouter)
 
 export default new VueRouter({
   routes: [
-    { path: '/', redirect: '/block'},
-    { path: '/custom', component: union},
-    { path: '/block', component: union},
-    { path: '/hsts', component: union},
-    { path: '/hotlink', component: union},
-    { path: '/log', component: union},
-    { path: '/help', component: help}
+    { path: '/', redirect: '/block' },
+    { path: '/custom', component: union },
+    { path: '/block', component: union },
+    { path: '/hsts', component: union },
+    { path: '/hotlink', component: union },
+    { path: '/log', component: union },
+    { path: '/help', component: help }
   ]
 })

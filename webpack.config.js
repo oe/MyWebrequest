@@ -20,21 +20,20 @@ const serverPort = 3031
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
 
 // auto increaseVersion of manifest.json
-function increaseVersion (package) {
+function increaseVersion(package) {
   if (increaseVersion.versionUpdated) return
   increaseVersion.versionUpdated = true
 
-  let version = package.version;
+  let version = package.version
   const max = 20
-  const vs = version.split('.').map((i) => +i)
+  const vs = version.split('.').map(i => +i)
   let len = vs.length
   while (len--) {
-    if ((++vs[len]) < max) break
+    if (++vs[len] < max) break
     vs[len] = 0
   }
   package.version = vs.join('.')
 }
-
 
 const config = {
   entry: {
@@ -44,12 +43,23 @@ const config = {
   },
   notHotReload: [],
   output: {
-    'path': path.join(__dirname, './dist/'),
-    'filename': '[name].js',
+    path: path.join(__dirname, './dist/'),
+    filename: '[name].js',
     publicPath: '/'
   },
   module: {
     rules: [
+      {
+        test: /\.(js|vue)$/,
+        enforce: 'pre',
+        exclude: /node_modules/,
+        use: {
+          loader: 'eslint-loader',
+          options: {
+            formatter: require('eslint-friendly-formatter')
+          }
+        }
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
@@ -60,15 +70,15 @@ const config = {
               fallback: 'vue-style-loader'
             }),
             scss: ExtractTextPlugin.extract({
-              use: ['css-loader','sass-loader'],
+              use: ['css-loader', 'sass-loader'],
               fallback: 'vue-style-loader'
             }),
             sass: ExtractTextPlugin.extract({
-              use: ['css-loader','sass-loader?indentedSyntax=1'],
+              use: ['css-loader', 'sass-loader?indentedSyntax=1'],
               fallback: 'vue-style-loader'
             }),
             less: ExtractTextPlugin.extract({
-              use: ['css-loader','less-loader'],
+              use: ['css-loader', 'less-loader'],
               fallback: 'vue-style-loader'
             })
           }
@@ -82,7 +92,7 @@ const config = {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
-          use: "css-loader",
+          use: 'css-loader',
           fallback: 'style-loader'
         })
       },
@@ -106,31 +116,30 @@ const config = {
   plugins: [
     new CleanWebpackPlugin(['dist', 'ext.zip']),
     // copy custom static assets
-    new CopyWebpackPlugin([
+    new CopyWebpackPlugin(
+      [
+        {
+          from: path.resolve(__dirname, 'src/static/'),
+          to: path.resolve(__dirname, 'dist/static/')
+        },
+        {
+          context: path.resolve(__dirname, 'src/'),
+          from: '**/index.html',
+          to: path.resolve(__dirname, 'dist')
+        },
+        {
+          from: path.resolve(__dirname, 'src/_locales/'),
+          to: path.resolve(__dirname, 'dist/_locales/')
+        },
+        {
+          from: path.resolve(__dirname, 'src/manifest.json'),
+          to: path.resolve(__dirname, 'dist/manifest.json')
+        }
+      ],
       {
-        from: path.resolve(__dirname, 'src/static/'),
-        to: path.resolve(__dirname, 'dist/static/')
-      },
-      {
-        context: path.resolve(__dirname, 'src/'),
-        from: '**/index.html',
-        to: path.resolve(__dirname, 'dist')
-      },
-      {
-        from: path.resolve(__dirname, 'src/_locales/'),
-        to: path.resolve(__dirname, 'dist/_locales/')
-      },
-      {
-        from: path.resolve(__dirname, 'src/manifest.json'),
-        to: path.resolve(__dirname, 'dist/manifest.json')
+        ignore: ['**/.*', '**/*.map', '**/node_modules/*']
       }
-    ], {
-      ignore: [
-        '**/.*',
-        '**/*.map',
-        '**/node_modules/*'
-      ]
-    }),
+    ),
     // extract css into its own file
     new ExtractTextPlugin({
       filename: '[name].css'
@@ -140,12 +149,12 @@ const config = {
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
-      'vue$': 'vue/dist/vue.esm.js',
+      vue$: 'vue/dist/vue.esm.js',
       // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
       '@': path.resolve(__dirname, 'src')
     }
   }
-};
+}
 
 if (process.env.NODE_ENV === 'production') {
   delete config.notHotReload
@@ -165,17 +174,19 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.LoaderOptionsPlugin({
       minimize: true
     }),
-    new WebpackOnBuildPlugin((stats) => {
+    new WebpackOnBuildPlugin(stats => {
       increaseVersion(manifest)
       try {
         fs.writeFileSync(manifestSrcPath, JSON.stringify(manifest, null, 2))
         fs.writeFileSync(manifestDistPath, JSON.stringify(manifest, null, 2))
-      } catch(e) {
-        console.log(chalk.red('\n  update manifest(dist) file error: ' + e.message))
+      } catch (e) {
+        console.log(
+          chalk.red('\n  update manifest(dist) file error: ' + e.message)
+        )
       }
       console.log(chalk.cyan('\n  manifest file updated successfully'))
 
-      zipFolder('./dist/', './ext.zip', (err) =>  {
+      zipFolder('./dist/', './ext.zip', err => {
         if (err) {
           console.log(chalk.red('Failed to zip dist folder ' + err))
         } else {
@@ -187,32 +198,33 @@ if (process.env.NODE_ENV === 'production') {
   ])
   module.exports = config
   // webpack(config, (err) => { if (err) throw err})
-  
-
 } else {
   // config.devtool = "#cheap-module-eval-source-map"
-  config.devtool = "sourcemap"
-  config.plugins =
-    [new webpack.HotModuleReplacementPlugin()].concat(config.plugins || []);
+  config.devtool = 'sourcemap'
+  config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
+    config.plugins || []
+  )
   config.plugins.push(new WriteFilePlugin())
   config.plugins.push(new FriendlyErrorsPlugin())
 
   const notHotReload = config.notHotReload || []
   for (let entryName in config.entry) {
-    if (config.entry.hasOwnProperty(entryName) && notHotReload.indexOf(entryName) === -1) {
+    if (
+      config.entry.hasOwnProperty(entryName) &&
+      notHotReload.indexOf(entryName) === -1
+    ) {
       config.entry[entryName] = [
-        ("webpack-dev-server/client?http://localhost:" + serverPort),
-        "webpack/hot/dev-server"
-      ].concat(config.entry[entryName]);
+        'webpack-dev-server/client?http://localhost:' + serverPort,
+        'webpack/hot/dev-server'
+      ].concat(config.entry[entryName])
     }
   }
   delete config.notHotReload
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
     hot: true,
-    contentBase: path.join(__dirname, "dist"),
-    headers: { "Access-Control-Allow-Origin": "*" }
-  });
+    contentBase: path.join(__dirname, 'dist'),
+    headers: { 'Access-Control-Allow-Origin': '*' }
+  })
   server.listen(serverPort)
 }
-

@@ -36,7 +36,7 @@ export default {
     CustomForm,
     NormalForm
   },
-  created() {
+  created () {
     this.updateModule()
   },
   computed: {
@@ -92,7 +92,7 @@ export default {
           this.addRule(rule)
         }).catch(() => {
           console.log('rule')
-        });
+        })
       } else {
         this.addRule(rule)
       }
@@ -109,7 +109,7 @@ export default {
     addRule (rule) {
       this.$ref.list.addRule({
         rule,
-        active: true        
+        active: true
       })
     },
     validateRule (rule) {
@@ -119,7 +119,7 @@ export default {
       let len = this.rules.length
       while (len--) {
         const r = this.rules[len].rule
-        if (utils.isSubRule(r, rules)) {
+        if (utils.isSubRule(r, this.rules)) {
           // rule covered by r
           return { code: 1, rule: r }
         }
@@ -144,7 +144,7 @@ export default {
       }, 500)
     }
   }
-};
+}
 </script>
 
 <style lang="scss">

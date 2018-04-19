@@ -16,7 +16,7 @@ for (var key in locales) {
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  render(h) {
+  render (h) {
     return h('app')
   },
   components: { App }

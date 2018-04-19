@@ -42,7 +42,7 @@ export default {
       maxLength: qrcode.MAX_TEXT_LENGTH
     }
   },
-  mounted() {
+  mounted () {
     chrome.tabs.query({
       active: true,
       lastFocusedWindow: true
@@ -60,7 +60,7 @@ export default {
       })
     },
     onEnter (e) {
-      if ( !this.isToolong && (e.metaKey || e.ctrlKey ) && e.keyCode === 13 ) {
+      if (!this.isToolong && (e.metaKey || e.ctrlKey) && e.keyCode === 13) {
         const t = this.text.trim()
         console.log('e', e, t)
         if (t.length) {

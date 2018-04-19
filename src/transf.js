@@ -10,4 +10,3 @@ for (var key in o) {
 }
 
 fs.writeFileSync('./zh_CN.json', JSON.stringify(r, null, 2))
-

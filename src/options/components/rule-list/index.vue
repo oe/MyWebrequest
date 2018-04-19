@@ -75,13 +75,13 @@ export default {
     onActiveChange () {
       this.save()
     },
-    onClickItemDelete(scope) {
+    onClickItemDelete (scope) {
       this.data.splice(scope.$index, 1)
       this.save()
     },
     removeSelectedRows () {
       const selected = this.$refs.tbl.selection
-      selected.forEach( itm => {
+      selected.forEach(itm => {
         // const idx = this.data.indexOf(itm)
         // this.data.splice(idx, 1)
       })
