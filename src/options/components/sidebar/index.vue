@@ -8,7 +8,7 @@
       tag="li"
       class="menu-item"
       v-for="item in sidebarItems"
-      key="item"
+      :key="item"
       :to="'/' + item"
       >{{ $t(item)}}</router-link>
   </ul>
@@ -19,7 +19,6 @@
 import locales from './locales.json'
 
 export default {
-  name: 'sidebar',
   locales,
   data () {
     return {

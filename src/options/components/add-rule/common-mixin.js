@@ -1,5 +1,6 @@
 // import VueI18n from 'vue-i18n'
 import utils from '@/options/components/utils'
+import { mapMutations } from 'vuex'
 import locales from './locales.json'
 
 export function mergeLang (lang = {}) {
@@ -8,13 +9,17 @@ export function mergeLang (lang = {}) {
   keys = keys.filter((k, i) => keys.indexOf(k) === i)
 
   keys.forEach(k => {
-    result[ k ] = Object.assign(lang[k] || {}, locales[k] || {})
+    result[k] = Object.assign(lang[k] || {}, locales[k] || {})
   })
   return result
 }
 
 export default {
+  props: {
+    module: String
+  },
   methods: {
+    ...mapMutations(['addRule']),
     onPaste (e) {
       const uri = utils.getUrlFromClipboard(e)
       if (!utils.isProtocol(uri.protocol)) return
@@ -22,8 +27,6 @@ export default {
       this.url = uri.raw.replace(`${uri.protocol}://`, '')
       e.preventDefault()
     },
-    onAddRule () {
-
-    }
+    onAddRule () {}
   }
 }

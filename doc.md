@@ -7,8 +7,8 @@
 {
   // rule url match pattern
   '*://www.baidu.com/s*': {
-    // rule is active or not
-    active: true,
+    // rule is enabled or not
+    enabled: true,
     // original match url
     matchUrl: '*://www.baidu.com/s?wd={kwd}',
     // original redirect url
@@ -35,9 +35,9 @@
 ```js
 [{
     // rule is active or not
-    active: true,
+    enabled: true,
     // original match url pattern
-    url: '*://www.baidu.com/s?wd={kwd}',
+    url: '*://www.baidu.com/s*',
     createdAt: 1509113934778,
     updatedAt: 1509113934778
 }]

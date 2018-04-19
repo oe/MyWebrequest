@@ -15,7 +15,7 @@
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       v-popover:urlPopover
-      placeholder="choose protocol" >
+      placeholder="url content" >
       <el-select v-model="protocol" slot="prepend" placeholder="">
         <el-option label="*://" value="*"></el-option>
         <el-option label="http://" value="http"></el-option>
@@ -33,11 +33,14 @@ export default {
   mixins: [mixin],
   data () {
     return {
-      module: '',
       protocol: '*',
-      url: '',
-      isEnabled: false,
-      rules: []
+      url: ''
+    }
+  },
+  methods: {
+    onAddRule () {
+      const url = `${this.protocol}://${this.url}`
+      this.addRule(url)
     }
   }
 }

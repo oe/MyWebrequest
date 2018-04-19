@@ -8,14 +8,28 @@
 </template>
 
 <script>
-import qrcode from '@/common/qrcode'
+import { mapActions } from 'vuex'
 import sidebar from './components/sidebar'
 
-
 export default {
-  name: 'main',
   components: {
     sidebar
+  },
+  created () {
+    this.changeRoute(this.$route)
+  },
+  methods: {
+    ...mapActions(['changeModule']),
+    changeRoute (router) {
+      this.changeModule({
+        module: router.path.replace('/', '')
+      })
+    }
+  },
+  watch: {
+    $route (val) {
+      this.changeRoute(val)
+    }
   }
 }
 </script>

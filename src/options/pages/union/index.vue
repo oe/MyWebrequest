@@ -8,7 +8,7 @@
     @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}</el-checkbox>
   
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
-  <component :is="formType"></component>
+  <component :is="formType" :module="module"></component>
   <rule-list :type="module" ref="list"></rule-list>
 </div>
 </template>
@@ -98,13 +98,13 @@ export default {
       }
     },
     onFeatureSatusChange () {
-      const onoff = collection.getRules('onoff')
+      const onoff = collection.get('onoff')
       onoff[this.module] = this.isEnabled
       collection.save('onoff', onoff)
     },
     updateModule () {
       this.module = this.$route.path.slice(1).toLowerCase()
-      this.isEnabled = !!collection.getRules('onoff')[this.module]
+      this.isEnabled = !!collection.get('onoff')[this.module]
     },
     addRule (rule) {
       this.$ref.list.addRule({

@@ -1,9 +1,9 @@
 <template>
 <div>
   <div class="item-title">{{ $t('manageRule') }}
-    <small >{{data.length}} {{$t('ruleUnit')}}, {{activeCount}} {{$t('ruleUnit')}} {{$t('ruleIsActive')}}</small></div>
+    <small >{{rules.length}} {{$t('ruleUnit')}}, {{activeCount}} {{$t('ruleUnit')}} {{$t('ruleIsActive')}}</small></div>
   <el-table
-    :data="data"
+    :data="rules"
     stripe
     ref="tbl"
     :empty-text="$t('noRules')"
@@ -13,6 +13,14 @@
       type="selection"
       align="center"
       width="40">
+    </el-table-column>
+    <el-table-column
+      label="Enabled"
+      align="center"
+      width="80">
+      <template slot-scope="scope">
+        <el-switch v-model="scope.row.enabled"></el-switch>
+      </template>
     </el-table-column>
     <el-table-column
       label="Rule"
@@ -27,16 +35,10 @@
       </template>
     </el-table-column>
     <el-table-column 
-      label-class-name="tbl-del-th"
-      :render-header="addDeleteBtn"
+      label="actions"
       align="center"
       width="120">
       <template slot-scope="scope">
-        <el-switch
-          v-model="scope.row.active"
-          @change="onActiveChange"
-          >
-        </el-switch>
         <el-button
           plain
           size="mini"
@@ -49,6 +51,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import utils from '@/options/components/utils'
 import collection from '@/common/collection.js'
 import locales from './locales.json'
@@ -61,34 +64,10 @@ export default {
       required: true
     }
   },
-  data() {
-    return {
-      data: []
-    }
-  },
-  created () {
-    this.updateTableData()
-  },
   mounted () {
     window.tbl = this.$refs.tbl
   },
   methods: {
-    updateTableData () {
-      this.data = collection.getRules(this.type)
-    },
-    addDeleteBtn (h, scope) {
-      return (
-        <el-tooltip
-          disabled={this.hasSelection}
-          content="please check at least one row"
-          placement="bottom"
-          effect="light">
-          <el-button
-            size="small"
-            onClick={this.onClickDeleteBtn}>Delete</el-button>
-        </el-tooltip>
-      )
-    },
     onClickDeleteBtn () {
       if (!this.hasSelection) return
       this.removeSelectedRows()
@@ -103,32 +82,31 @@ export default {
     removeSelectedRows () {
       const selected = this.$refs.tbl.selection
       selected.forEach( itm => {
-        const idx = this.data.indexOf(itm)
-        this.data.splice(idx, 1)
+        // const idx = this.data.indexOf(itm)
+        // this.data.splice(idx, 1)
       })
     },
     addRule: utils.debounce(function (rule) {
       const rl = JSON.parse(JSON.stringify(rule))
       rl.createdAt = rl.updatedAt = Date.now()
 
-      this.data.unshift(rl)
+      // this.data.unshift(rl)
       this.save()
     }),
     save: utils.debounce(function (rule) {
-      collection.save(this.type, this.data)
+      // collection.save(this.type, this.data)
     })
   },
   computed: {
+    ...mapState({
+      rules: state => state.rules.rules
+    }),
     hasSelection () {
       return this.$refs.tbl.selection.length !== 0
     },
     activeCount () {
-      return this.data.filter(itm => itm.active ).length
-    }
-  },
-  watch: {
-    type (val, oldVal) {
-      this.updateTableData()
+      return 0
+      // return this.data.filter(itm => itm.active ).length
     }
   }
 }
@@ -139,13 +117,6 @@ export default {
   padding: 10px 0;
 }
 
-.tbl-del-th button {
-  &:focus {
-    background-color: inherit;
-    color: inherit;
-    border-color: inherit;
-  }
-}
 .rule-cell {
   white-space: nowrap;
   overflow: hidden;

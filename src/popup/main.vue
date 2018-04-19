@@ -31,7 +31,6 @@ import qrcode from '@/common/qrcode'
 import locales from './locales.json'
 
 export default {
-  name: 'main',
   locales,
   data () {
     return {
