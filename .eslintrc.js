@@ -10,11 +10,9 @@ module.exports = {
   },
   extends: 'standard',
   globals: {
-    __static: true
+    chrome: true
   },
-  plugins: [
-    'html'
-  ],
+  plugins: ['html'],
   rules: {
     // allow paren-less arrow functions
     'arrow-parens': 0,

@@ -53,7 +53,6 @@
 <script>
 import { mapState } from 'vuex'
 import utils from '@/options/components/utils'
-import collection from '@/common/collection.js'
 import locales from './locales.json'
 
 export default {

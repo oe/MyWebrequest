@@ -12,7 +12,7 @@ let hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([
 let isHost = host => hostReg.test(host)
 
 // check a path. eg. path/subpath/file.html?querystring
-let pathReg = /^[a-z0-9-_\+=&%@!\.,\*\?\|~\/]+$/i
+let pathReg = /^[a-z0-9-_+=&%@!.,*?|~/]+$/i
 let isPath = path => pathReg.test(path)
 
 // reg to match protocol, host, path, query
@@ -59,6 +59,7 @@ let getObjVals = function (o) {
 // return undefined if valid or a error message
 let isRegValid = function (reg) {
   try {
+    /* eslint no-new: "off" */
     new RegExp(reg)
     return
   } catch (e) {
@@ -177,7 +178,7 @@ let toQueryString = function (key, val) {
   if (Array.isArray(val)) {
     try {
       key = decodeURIComponent(key)
-      key = key.replace(/[]$/, '') + '[]'
+      key = key.replace(/\[\]$/, '') + '[]'
       key = encodeURIComponent(key).replace('%20', '+')
     } catch (e) {}
     return (
@@ -213,7 +214,7 @@ let isRouterStrValid = function (route) {
     return false
   }
 
-  let protocol = matches[1]
+  // let protocol = matches[1]
   // path is host + real path
   let path = matches[2] + '/' + matches[3]
   // query string without prefix ?
@@ -221,7 +222,7 @@ let isRouterStrValid = function (route) {
 
   // path basic format
   if (
-    !/^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_+=&%@!.,*?\|~\/])*(\{\*\w+\})?$/.test(
+    !/^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_+=&%@!.,*?|~/])*(\{\*\w+\})?$/.test(
       path
     )
   ) {
@@ -234,7 +235,7 @@ let isRouterStrValid = function (route) {
   if (qs) {
     // query string basic format
     if (
-      !/^(([\w_+%@!\.,*?\|~\/]+=\{\w+\})|([\w_+%@!.,*?|~/]+=[\w_+%@!.,*?|~/]+)|&)*$/.test(
+      !/^(([\w_+%@!.,*?|~/]+=\{\w+\})|([\w_+%@!.,*?|~/]+=[\w_+%@!.,*?|~/]+)|&)*$/.test(
         qs
       )
     ) {
@@ -262,7 +263,7 @@ let isRouterStrValid = function (route) {
 let namedParam = /\{(\(\?)?(\w+)\}/g
 let splatParam = /\{\*(\w+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
-var escapeRegExp = /[-[\]+?.,\\\^$|#\s]/g
+var escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
 let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
 /**
  * convert a url pattern to a regexp
