@@ -19,7 +19,9 @@
       align="center"
       width="80">
       <template slot-scope="scope">
-        <el-switch v-model="scope.row.enabled"></el-switch>
+        <el-switch
+          v-model="scope.row.enabled"
+          @click.native.capture="onToggleRule($event, scope)"></el-switch>
       </template>
     </el-table-column>
     <el-table-column
@@ -40,10 +42,15 @@
       width="120">
       <template slot-scope="scope">
         <el-button
-          plain
           size="mini"
-          @click="onClickItemDelete(scope)"
+          @click="onEditItem(scope)"
+          type="text">edit</el-button>
+
+        <el-button
+          size="mini"
+          @click="onDeleteItem(scope)"
           type="text">delete</el-button>
+
       </template>
     </el-table-column>
   </el-table>
@@ -51,7 +58,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 import utils from '@/options/components/utils'
 import locales from './locales.json'
 
@@ -67,16 +74,20 @@ export default {
     window.tbl = this.$refs.tbl
   },
   methods: {
+    ...mapActions(['toggleRule', 'removeRules']),
     onClickDeleteBtn () {
       if (!this.hasSelection) return
       this.removeSelectedRows()
     },
-    onActiveChange () {
-      this.save()
+    onToggleRule (e, scope) {
+      e.preventDefault()
+      this.toggleRule(scope.$index)
     },
-    onClickItemDelete (scope) {
-      this.data.splice(scope.$index, 1)
-      this.save()
+    onDeleteItem (scope) {
+      this.removeRules(scope.$index)
+    },
+    onEditItem (scope) {
+
     },
     removeSelectedRows () {
       const selected = this.$refs.tbl.selection
@@ -97,15 +108,14 @@ export default {
     })
   },
   computed: {
-    ...mapState({
-      rules: state => state.rules.rules
+    ...mapGetters({
+      rules: 'sortedRules'
     }),
     hasSelection () {
       return this.$refs.tbl.selection.length !== 0
     },
     activeCount () {
-      return 0
-      // return this.data.filter(itm => itm.active ).length
+      return this.rules.filter(itm => itm.enabled).length
     }
   }
 }
