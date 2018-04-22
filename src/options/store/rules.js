@@ -28,9 +28,10 @@ const mutations = {
   saveRules (state) {
     collection.save(state.module, state.rules)
   },
-  toggleRule (state, idx) {
-    console.warn('toogle ru', idx)
-    const rule = state.rules && state.rules[idx]
+  toggleRule (state, url) {
+    const rules = state.rules
+    if (!Array.isArray(rules)) return
+    const rule = cutils.findInArr(rules, el => el.url === url)
     if (!rule) return
     rule.enabled = !rule.enabled
   },
@@ -51,13 +52,12 @@ const mutations = {
     )
     state.rules.push(rule)
   },
-  removeRules (state, idxs) {
+  removeRules (state, urls) {
     const rules = state.rules && state.rules.length && state.rules
     if (!rules) return
-    if (!Array.isArray(idxs)) idxs = [idxs]
-    console.warn('idxs', idxs)
-    state.rules = rules.filter((r, idx) => {
-      return !cutils.inArray(idxs, idx)
+    if (!Array.isArray(urls)) urls = [urls]
+    state.rules = rules.filter(r => {
+      return !cutils.inArray(urls, r.url)
     })
   }
 }
@@ -75,8 +75,9 @@ const actions = {
     ctx.commit('toggleRule', payload)
     ctx.commit('saveRules')
   },
-  removeRules (ctx, payload) {
-    ctx.commit('removeRules', payload)
+  removeRules (ctx, urls) {
+    if (!Array.isArray(urls)) urls = [urls]
+    ctx.commit('removeRules', urls)
     ctx.commit('saveRules')
   }
 }

@@ -1,69 +1,96 @@
-let protocols = ['*', 'https', 'http']
-let isProtocol = protocol => Array.from(protocols).includes(protocol)
-
-// check an ip addr. eg. 102.33.22.1
-let ipReg = /^((25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])\.){3}(25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9][0-9]|[0-9])$/
-let isIp = ip => ipReg.test(ip)
-
-// check a host. eg. google.com, dev.fb.com, etc.
-// top level domain's length extend to 10
-// for there are so many new TLDs have long names, like .software
-let hostReg = /^(\*((\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*\.[a-z]{2,4})?|([a-z0-9]([a-z0-9-]*[a-z0-9])?\.)+[a-z]{2,10})$/
-let isHost = host => hostReg.test(host)
-
-// check a path. eg. path/subpath/file.html?querystring
-let pathReg = /^[a-z0-9-_+=&%@!.,*?|~/]+$/i
-let isPath = path => pathReg.test(path)
+/**
+ * is string a supported protocol
+ * @param  {String}  protocol
+ * @return {Boolean}
+ */
+// all supported protocols
+const protocols = ['*', 'https', 'http']
+function isProtocol (protocol) {
+  return protocols.indexOf(protocol) !== -1
+}
 
 // reg to match protocol, host, path, query
-let urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
-let isUrl = function (url) {
-  let matches = urlComponentReg.exec(url)
-  if (!matches) {
+const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
+/**
+ * is string a valid host
+ *   use native object URL to test
+ * @param  {String}  host
+ * @return {Boolean}
+ */
+function isHost (host) {
+  try {
+    const u = new URL(`http://${host}`)
+    return u.host === host
+  } catch (e) {
     return false
   }
-  if (!isProtocol(matches[1])) {
-    return false
-  }
-  if (!isHost(matches[2]) && !isIp(matches[2])) {
-    return false
-  }
-  let path = matches[3] + matches[4]
-  if (!isPath(path)) {
-    return false
-  }
-  return true
 }
 
 /**
- * get i18n text
- * @param  {String} msgid text label id
- * @return {String}
+ * is string a valid IP address
+ *   simplify judgement, performance may low
+ * @param  {String}  ip
+ * @return {Boolean}
  */
-let i18n = msgid => chrome.i18n.getMessage(msgid)
+function isIP (ip) {
+  if (isHost(ip)) {
+    const pts = ip.split('.')
+    return pts.length === 4 && /^\d+$/.test(pts.join(''))
+  } else {
+    return false
+  }
+}
+
+/**
+ * check a path. eg. path/subpath/file.html?querystring
+ * @param  {String}  path      path, without leading '/'
+ * @param  {Boolean}  withoutQS is path without qs
+ * @return {Boolean}
+ */
+function isPath (path, withoutQS) {
+  const url = `http://evecalm.com/${path}`
+  const u = parseURL(url)
+  if (!u) return false
+  let targetStr = u.pathname
+  if (!withoutQS) targetStr += u.search
+  return '/' + path === targetStr
+}
+
+function isURL (url) {
+  try {
+    const u = new URL(url)
+    return isProtocol(u.protocol)
+  } catch (e) {
+    return false
+  }
+}
 
 /**
  * get object's values into an array
  * @param  {Object} o
  * @return {Array}
  */
-let getObjVals = function (o) {
-  let res = []
-  for (let k of Object.keys(o || {})) {
-    let v = o[k]
-    res.push(v)
+const getObjVals = (function () {
+  if (Object.values) {
+    return function (o) {
+      return Object.values(o || {})
+    }
+  } else {
+    return function (o) {
+      o = o || {}
+      return Object.keys(o).map(k => o[k])
+    }
   }
-  return res
-}
+})()
 
-// return undefined if valid or a error message
-let isRegValid = function (reg) {
+// return true if valid or a error object
+function isValidReg (reg) {
   try {
     /* eslint no-new: "off" */
     new RegExp(reg)
-    return
+    return true
   } catch (e) {
-    return e.message
+    return e
   }
 }
 
@@ -72,32 +99,13 @@ let isRegValid = function (reg) {
  * @param  {Event} e  paste event
  * @return {Object}
  */
-let getUrlFromClipboard = function (e) {
-  let result = {}
-  let url = e.clipboardData.getData('text/plain')
-  if (!url) {
-    return result
+function parseURL (url) {
+  if (!url) return
+  try {
+    return new URL(url)
+  } catch (e) {
+    console.error('invalid url in clipboard', url, e)
   }
-
-  // trim hash(search) in url
-  url = url.replace(/#.*$/, '')
-
-  let i = url.indexOf('://')
-  if (i === -1) {
-    url = `*://${url}`
-  }
-
-  if (!url.match(urlComponentReg)) {
-    return result
-  }
-  // extract regexp results right now or things changed
-  result.protocol = RegExp.$1.toLowerCase()
-  result.host = RegExp.$2.toLowerCase()
-  result.path = RegExp.$3
-  result.search = RegExp.$4
-  // remove hash
-  result.raw = url.replace(/#.*$/, '')
-  return result
 }
 
 /**
@@ -123,14 +131,10 @@ function isSubRule (rule, subRule) {
 }
 
 // 获取URL的queryString
-let getQs = function (url) {
+function getQs (url) {
   url = `${url}`.replace(/#[^#]*$/, '')
-  let matches = url.match(/\?(.*)$/)
-  if (matches) {
-    return matches[1]
-  } else {
-    return ''
-  }
+  const matches = url.match(/\?(.*)$/)
+  return matches ? matches[1] : ''
 }
 
 /**
@@ -138,8 +142,8 @@ let getQs = function (url) {
  * @param  {String} qs
  * @return {Object}
  */
-let parseQs = function (qs) {
-  let params = {}
+function parseQs (qs) {
+  const params = {}
   let canDecode = true
   qs.split('&').forEach(function (el) {
     let parts = el.split('=')
@@ -174,7 +178,7 @@ let parseQs = function (qs) {
  * @param  {String|Array} val
  * @return {String}
  */
-let toQueryString = function (key, val) {
+function toQueryString (key, val) {
   if (Array.isArray(val)) {
     try {
       key = decodeURIComponent(key)
@@ -254,7 +258,7 @@ let isRouterStrValid = function (route) {
   }
 
   let n = route.replace(/\{\*?\w+\}/g, 'xxx')
-  return isUrl(n)
+  return isURL(n)
 }
 
 // // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
@@ -385,13 +389,11 @@ let hasReservedWord = function (router) {
  * @param  {Object}  res result returned by getRouter
  * @return {Boolean|Array|undefined}
  */
-let isKwdsUniq = function (router) {
-  let params = getKwdsInRoute(router)
-  let res = []
-  res = params.filter((v, k) => k !== params.indexOf(v))
-  if (res.length) {
-    return res
-  }
+function isKwdsUniq (router) {
+  const params = getKwdsInRoute(router)
+  // find duplicated
+  const res = params.filter((v, k) => k !== params.indexOf(v))
+  return !res.length
 }
 
 // get a list from redirect to url, eg. http://{sub}.github.com/{name}/{protol}
@@ -418,7 +420,7 @@ let isRedirectRuleValid = function (redirectUrl) {
   }
   // remove param placeholder and check the url
   // comment out this, the result url should be valid
-  // isUrl redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
+  // isURL redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
   return true
 }
 
@@ -428,18 +430,12 @@ let isRedirectRuleValid = function (redirectUrl) {
  * @param  {String}  url   a url pattern that use words in refer
  * @return {Array|undefined}
  */
-let hasUndefinedWord = function (router, url) {
-  let params = getKwdsInRoute(router)
-  let res = []
-  let sample = getRedirectParamList(url)
-  for (let v of Array.from(sample)) {
-    if (!Array.from(params).includes(v)) {
-      res.push(v)
-    }
-  }
-  if (res.length) {
-    return res
-  }
+function hasUndefinedWord (router, url) {
+  const params = getKwdsInRoute(router)
+  const sample = getRedirectParamList(url)
+  return sample.some(k => {
+    return params.indexOf(k) === -1
+  })
 }
 
 /**
@@ -554,11 +550,10 @@ function debounce (fn, wait) {
 
 export default {
   isProtocol,
-  isIp,
+  isIP,
   isHost,
   isPath,
-  isUrl,
-  i18n,
+  isURL,
   isSubRule,
   getQs,
   parseQs,
@@ -566,11 +561,11 @@ export default {
   isRouterStrValid,
   getRouter,
   getUrlValues,
-  isRegValid,
+  isValidReg,
   isRedirectRuleValid,
   hasUndefinedWord,
   isKwdsUniq,
   hasReservedWord,
   getTargetUrl,
-  getUrlFromClipboard
+  parseURL
 }

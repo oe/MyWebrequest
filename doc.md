@@ -4,9 +4,9 @@
 ### Custom rule
 ```js
 // { [rule-url-match-pattern]: [rule-detail] }
-{
+[
   // rule url match pattern
-  '*://www.baidu.com/s*': {
+  {
     // rule is enabled or not
     enabled: true,
     // original match url
@@ -28,7 +28,7 @@
     createdAt: 1509113934778,
     updatedAt: 1509113934778
   }
-}
+]
 ```
 
 ### Normal rule

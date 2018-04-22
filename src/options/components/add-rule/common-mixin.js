@@ -1,6 +1,7 @@
 // import VueI18n from 'vue-i18n'
 import utils from '@/options/components/utils'
-import { mapActions } from 'vuex'
+import cutils from '@/common/utils'
+import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
 
 export function mergeLang (lang = {}) {
@@ -15,18 +16,23 @@ export function mergeLang (lang = {}) {
 }
 
 export default {
-  props: {
-    module: String
-  },
   methods: {
     ...mapActions(['addRule']),
     onPaste (e) {
-      const uri = utils.getUrlFromClipboard(e)
+      const uri = utils.parseURL(e.clipboardData.getData('text/plain'))
       if (!utils.isProtocol(uri.protocol)) return
       this.protocol = uri.protocol
       this.url = uri.raw.replace(`${uri.protocol}://`, '')
       e.preventDefault()
     },
-    onAddRule () {}
+    isRuleExist (rule) {
+      const url = typeof rule === 'object' ? rule.url : rule
+      return cutils.findInArr(this.rules, itm => itm.url === url)
+    }
+  },
+  computed: {
+    ...mapState({
+      rules: state => state.rules.rules
+    })
   }
 }

@@ -8,7 +8,7 @@
     @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}</el-checkbox>
   
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
-  <component :is="formType" :module="module"></component>
+  <component :is="formType"></component>
   <rule-list :type="module" ref="list"></rule-list>
 </div>
 </template>

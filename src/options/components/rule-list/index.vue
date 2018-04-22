@@ -59,7 +59,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
-import utils from '@/options/components/utils'
+// import utils from '@/options/components/utils'
 import locales from './locales.json'
 
 export default {
@@ -75,37 +75,21 @@ export default {
   },
   methods: {
     ...mapActions(['toggleRule', 'removeRules']),
-    onClickDeleteBtn () {
+    onDeleteSelected () {
       if (!this.hasSelection) return
-      this.removeSelectedRows()
+      const urls = this.$refs.tbl.selection.map(itm => itm.url)
+      this.removeSelectedRows(urls)
     },
     onToggleRule (e, scope) {
       e.preventDefault()
-      this.toggleRule(scope.$index)
+      this.toggleRule(scope.row.url)
     },
     onDeleteItem (scope) {
-      this.removeRules(scope.$index)
+      this.removeRules(scope.row.url)
     },
     onEditItem (scope) {
 
-    },
-    removeSelectedRows () {
-      const selected = this.$refs.tbl.selection
-      selected.forEach(itm => {
-        // const idx = this.data.indexOf(itm)
-        // this.data.splice(idx, 1)
-      })
-    },
-    addRule: utils.debounce(function (rule) {
-      const rl = JSON.parse(JSON.stringify(rule))
-      rl.createdAt = rl.updatedAt = Date.now()
-
-      // this.data.unshift(rl)
-      this.save()
-    }),
-    save: utils.debounce(function (rule) {
-      // collection.save(this.type, this.data)
-    })
+    }
   },
   computed: {
     ...mapGetters({

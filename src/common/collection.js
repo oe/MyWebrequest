@@ -1,9 +1,8 @@
 import utils from './utils'
-const arrType = ['block', 'hsts', 'hotlink', 'log', 'custom']
 
 export default {
   get (cat) {
-    const defVal = utils.inArray(arrType, cat) ? [] : {}
+    const defVal = utils.isUrlRuleType(cat) ? [] : {}
     return JSON.parse(localStorage.getItem(cat)) || defVal
   },
   save (key, data) {
@@ -12,7 +11,7 @@ export default {
   // get rules for background
   get4Bg (cat) {
     let result = this.get(cat)
-    if (!utils.inArray(arrType, cat)) return result
+    if (!utils.isUrlRuleType(cat)) return result
     // ignore disabled
     result = result.filter(itm => itm.enabled)
     // for custom rules
