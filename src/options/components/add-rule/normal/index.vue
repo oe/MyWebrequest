@@ -7,17 +7,18 @@
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover>
-  <el-form :model="rule" label-position="top" :rules="validateRules" ref="ruleForm">
-    <el-form-item label="Math this url" :gutter="0">
+  <el-form label-position="top" ref="ruleForm">
+    <el-form-item label="Math this url" :error="errorMsg">
       <el-col :span="10">
         <el-input
           size="small"
-          v-model="rule.host"
+          v-model="host"
+          @input="onFormChange"
           @paste.native="onPaste"
           @keyup.native.enter="onAddRule"
           v-popover:urlPopover
           placeholder="host, required, paste a url here" >
-          <el-select v-model="rule.protocol" slot="prepend" placeholder="">
+          <el-select v-model="protocol" slot="prepend">
             <el-option label="*://" value="*"></el-option>
             <el-option label="http://" value="http"></el-option>
             <el-option label="https://" value="https"></el-option>
@@ -28,7 +29,8 @@
       <el-col :span="13">
         <el-input
           size="small"
-          v-model="rule.pathname"
+          v-model="pathname"
+          @input="onFormChange"
           @paste.native="onPaste"
           @keyup.native.enter="onAddRule"
           placeholder="pathname and querystring, optional" >
@@ -46,38 +48,43 @@ export default {
   mixins: [mixin],
   data () {
     return {
-      rule: {
-        protocol: '*',
-        host: '',
-        pathname: ''
-      }
+      protocol: '*',
+      host: '',
+      pathname: '',
+      // 错误信息
+      errorMsg: '',
+      etid: 0,
+      isHiding: false
     }
   },
   computed: {
-    validateRules () {
-      return {
-        protocol: [
-          {required: true, message: 'please choose protocol'}
-        ],
-        host: [
-          {required: true, message: 'host is needed'}
-        ]
-      }
-    }
   },
   methods: {
-    async onAddRule () {
-      const url = `${this.protocol}://${this.url}`
-      const isOK = await this.$refs.ruleForm.validate()
-      if (!isOK) return
+    onAddRule () {
+      const path = this.pathname || '*'
+      const url = `${this.protocol}://${this.host}/${path}`
       if (this.isRuleExist(url)) {
-        this.$message({
-          message: 'Same rule has already added',
-          type: 'error'
-        })
+        this.showInputError('Same rule has already added')
         return
       }
       this.addRule(url)
+    },
+    onFormChange () {
+      this.hideInputError()
+    },
+    showInputError (msg) {
+      clearTimeout(this.etid)
+      this.isHiding = false
+      this.errorMsg = msg
+    },
+    hideInputError () {
+      if (this.isHiding || !this.errorMsg) return
+      console.log('on change')
+      this.isHiding = true
+      this.etid = setTimeout(() => {
+        this.errorMsg = ''
+        this.isHiding = false
+      }, 1000)
     }
   }
 }
