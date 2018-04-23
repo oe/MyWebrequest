@@ -8,6 +8,18 @@ export default {
   save (key, data) {
     localStorage.setItem(key, JSON.stringify(data))
   },
+  getKey (key) {
+    return localStorage.getItem(key)
+  },
+  setOnoff (type, val) {
+    const onoff = this.get('onoff')
+    onoff[type] = !!val
+    this.save('onoff', onoff)
+  },
+  getOnoff (type) {
+    const onoff = this.get('onoff')
+    return onoff[type]
+  },
   // get rules for background
   get4Bg (cat) {
     let result = this.get(cat)

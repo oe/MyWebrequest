@@ -9,8 +9,10 @@ module.exports = {
     node: true
   },
   extends: 'standard',
+  // define global variables
   globals: {
-    chrome: true
+    chrome: true,
+    webkitNotifications: true
   },
   plugins: ['html'],
   rules: {

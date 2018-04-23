@@ -16,8 +16,8 @@ const version = {
 function migrateTo1 () {
   // add `active` prop
   const simpleRules = ['block', 'hsts', 'hotlink', 'log']
-  simpleRules.forEach((key) => {
-    const rules = collection.getRules(key).map((item) => {
+  simpleRules.forEach(key => {
+    const rules = collection.getRules(key).map(item => {
       return {
         url: item,
         active: true
@@ -28,10 +28,11 @@ function migrateTo1 () {
 
   // transfrom custom rules to array, and add `active` prop
   const custom = 'custom'
-  const rules = collection.getRules(custom)
+  let rules = collection.getRules(custom)
   if (!Array.isArray(rules)) {
-    rules = Object.keys(rules).map((key) => {
-      return rules[key].active = true
+    rules = Object.keys(rules).map(key => {
+      rules[key].active = true
+      return rules[key]
     })
     collection.save(custom, rules)
   }

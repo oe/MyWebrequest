@@ -58,6 +58,7 @@
   },
   "dependencies": {
     "element-ui": "^2.0.0",
+    "lodash.clonedeep": "^4.5.0",
     "qrcode": "^0.8.1",
     "vue": ">2.2.6",
     "vue-i18n": "5",
