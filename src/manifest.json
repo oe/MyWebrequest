@@ -19,6 +19,9 @@
     "default_title": "__MSG_iconTitle__",
     "default_popup": "popup/index.html"
   },
+  "background": {
+    "scripts": ["background/index.js"]
+  },
   "permissions": [
     "*://*/*",
     "webRequest",

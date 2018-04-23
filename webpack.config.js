@@ -38,6 +38,7 @@ function increaseVersion(package) {
 const config = {
   entry: {
     // your entry file file (entry.ts or entry.js)
+    'background/index': ['./src/background/index.js'],
     'popup/index': ['./src/popup/index.js'],
     'options/index': ['./src/options/index.js']
   },
