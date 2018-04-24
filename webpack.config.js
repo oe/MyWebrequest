@@ -36,6 +36,7 @@ function increaseVersion(package) {
 }
 
 const config = {
+  mode: process.env.NODE_ENV,
   entry: {
     // your entry file file (entry.ts or entry.js)
     'background/index': ['./src/background/index.js'],
@@ -50,6 +51,26 @@ const config = {
   },
   module: {
     rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        enforce: 'pre',
+        loader: 'tslint-loader'
+      },
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        type: 'javascript/auto',
+        use: [
+          {
+            loader: 'ts-loader',
+            options: {
+              appendTsSuffixTo: [/\.vue$/],
+              transpileOnly: true
+            }
+          }
+        ]
+      },
       {
         test: /\.(js|vue)$/,
         enforce: 'pre',
@@ -148,7 +169,7 @@ const config = {
     new OptimizeCSSPlugin()
   ],
   resolve: {
-    extensions: ['.js', '.vue', '.json'],
+    extensions: ['.ts', 'tsx', '.js', '.vue', '.json'],
     alias: {
       vue$: 'vue/dist/vue.esm.js',
       // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
@@ -194,8 +215,8 @@ if (process.env.NODE_ENV === 'production') {
           console.log(chalk.cyan('An zip of ext is available in ./ext.zip'))
         }
       })
-    })
-    // new PrepackWebpackPlugin({})
+    }),
+    new ProgressBarPlugin()
   ])
   module.exports = config
   // webpack(config, (err) => { if (err) throw err})
