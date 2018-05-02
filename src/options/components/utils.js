@@ -5,11 +5,14 @@
  */
 // all supported protocols
 const protocols = ['*', 'https', 'http']
+// pre-defined placeholders
+const RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q', 'u']
+
 function isProtocol (protocol) {
   return protocols.indexOf(protocol) !== -1
 }
 
-// reg to match protocol, host, path, query
+// reg to match [protocol, host, path, query]
 const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
 /**
  * is string a valid host
@@ -65,24 +68,6 @@ function isURL (url) {
   }
 }
 
-/**
- * get object's values into an array
- * @param  {Object} o
- * @return {Array}
- */
-const getObjVals = (function () {
-  if (Object.values) {
-    return function (o) {
-      return Object.values(o || {})
-    }
-  } else {
-    return function (o) {
-      o = o || {}
-      return Object.keys(o).map(k => o[k])
-    }
-  }
-})()
-
 // return true if valid or a error object
 function isValidReg (reg) {
   try {
@@ -130,47 +115,6 @@ function isSubRule (rule, subRule) {
   return new RegExp(url1).test(url2)
 }
 
-// 获取URL的queryString
-function getQs (url) {
-  url = `${url}`.replace(/#[^#]*$/, '')
-  const matches = url.match(/\?(.*)$/)
-  return matches ? matches[1] : ''
-}
-
-/**
- * parse a query string into a key-value object
- * @param  {String} qs
- * @return {Object}
- */
-function parseQs (qs) {
-  const params = {}
-  let canDecode = true
-  qs.split('&').forEach(function (el) {
-    let parts = el.split('=')
-    let k = parts[0]
-    let v = parts[1] != null ? parts[1] : ''
-    if (canDecode) {
-      try {
-        k = decodeURIComponent(k)
-        v = decodeURIComponent(v)
-      } catch (e) {
-        canDecode = false
-      }
-    }
-    // combine array query param into an real array
-    if (params[k] != null) {
-      if (!Array.isArray(params[k])) {
-        params[k] = [params[k]]
-      }
-      return params[k].push(v)
-    } else {
-      return (params[k] = v)
-    }
-  })
-
-  return params
-}
-
 /**
  * convert key-val into an querysting: encode(key)=encode(val)
  * if val is an array, there will be an auto conversion
@@ -196,8 +140,9 @@ function toQueryString (key, val) {
 }
 
 // get keywords list(array) in route object
-let getKwdsInRoute = router =>
-  [].concat(router.params, RESERVED_HOLDERS, getObjVals(router.qsParams))
+function getKwdsInRoute (router) {
+  return RESERVED_HOLDERS.concat(router.params, getObjVals(router.qsParams))
+}
 
 /**
  * is route string valid
@@ -206,7 +151,7 @@ let getKwdsInRoute = router =>
  * @param  {String}  route
  * @return {Boolean}
  */
-let isRouterStrValid = function (route) {
+function isRouterStrValid (route) {
   // if the route doesnt has path and query string
   // like http://g.cn
   // then add a / in the end
@@ -267,7 +212,7 @@ let isRouterStrValid = function (route) {
 let namedParam = /\{(\(\?)?(\w+)\}/g
 let splatParam = /\{\*(\w+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
-var escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
+const escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
 let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
 /**
  * convert a url pattern to a regexp
@@ -282,7 +227,7 @@ let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
  *                    params: two array of var name of each named param in path an querystring
  *                 }
  */
-let getRouter = function (route, redirectUrl) {
+function getRouter (route, redirectUrl) {
   let result = {
     matchUrl: route,
     redirectUrl
@@ -359,8 +304,6 @@ let getRouter = function (route, redirectUrl) {
   return result
 }
 
-// pre-defined placeholders
-var RESERVED_HOLDERS = ['p', 'h', 'm', 'r', 'q', 'u']
 // have reserved word in url pattern
 // return a reserved words list that has been miss used.
 let hasReservedWord = function (router) {
@@ -509,22 +452,6 @@ function fillPattern (pattern, data) {
     }
   })
   return url.replace(/\?$/, '')
-}
-
-/**
- * get target url
- * @param  {Object} router   url pattern to match a url
- * @param  {String} url     a real url that match route
- * @return {String}         converted url
- */
-function getTargetUrl (router, url) {
-  console.log('getTargetUrl, router: %o, url: %s', router, url)
-  let params = getUrlValues(router, url)
-  console.log('params in url: %o', params)
-  if (!params) {
-    return ''
-  }
-  return fillPattern(router.redirectUrl, params)
 }
 
 /**

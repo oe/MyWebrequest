@@ -7,7 +7,7 @@ const gsearchRuleBasic = [
   '*://www.google.com.hk/url*'
 ]
 
-const RULES_TYPE = ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch']
+const RULE_TYPES = utils.RULE_TYPES
 
 const logger = window.console
 
@@ -37,22 +37,11 @@ const requestCache = {}
 // format querystring
 function formatQstr (url) {
   const qs = utils.getQs(url)
-  const params = utils.parseQs(qs)
   if (!qs) {
     return false
   }
-  const result = {}
-  let k, v
-  for (k in params) {
-    if (!params.hasOwnProperty(k)) continue
-    v = params[k]
-    if (Array.isArray(v)) {
-      k = k.replace(/\[\]$/, '')
-    }
-    result[k] = v
-  }
   return {
-    formatedData: result,
+    formatedData: utils.parseQs(qs),
     rawData: qs
   }
 }
@@ -244,6 +233,7 @@ function toggleRule (type, rule, isOn) {
 
 // get rule object by rule type
 function getRule (type) {
+  // clone Depp to avoid urls duplication
   const rule = clonedeep(FEATURE_RULES[type])
   if (!rule) return
   rule.urls.push(...collection.get4Bg(type))
@@ -267,10 +257,10 @@ function updateExtIcon (iconStyle) {
 
 function init () {
   const onoff = collection.get4Bg('onoff')
-  let len = RULES_TYPE.length
+  let len = RULE_TYPES.length
   let type
   while (len--) {
-    type = RULES_TYPE[len]
+    type = RULE_TYPES[len]
     if (!onoff[type]) {
       onoff[type] = false
       continue
@@ -320,9 +310,9 @@ window.addEventListener('storage', function (event) {
     return
   }
   if (type === 'onoff') {
-    let len = RULES_TYPE.length
+    let len = RULE_TYPES.length
     while (len--) {
-      let k = RULES_TYPE[len]
+      let k = RULE_TYPES[len]
       if (newData[k] === oldData[k]) continue
       const rule = getRule(k)
       console.log('onoff change, feature: %s turned %s', k, newData[k])

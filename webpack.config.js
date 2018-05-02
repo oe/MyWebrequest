@@ -43,6 +43,7 @@ const config = {
     'options/index': ['./src/options/index.js']
   },
   notHotReload: [],
+  mode: process.env.NODE_ENV,
   output: {
     path: path.join(__dirname, './dist/'),
     filename: '[name].js',
