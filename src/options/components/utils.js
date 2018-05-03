@@ -62,7 +62,8 @@ function isPath (path, withoutQS) {
 function isURL (url) {
   try {
     const u = new URL(url)
-    return isProtocol(u.protocol)
+    // some invalid http url has empty host
+    return u.host && isProtocol(u.protocol)
   } catch (e) {
     return false
   }
@@ -228,6 +229,14 @@ let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
  *                 }
  */
 function getRouter (route, redirectUrl) {
+  if (!isURL(route.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
+    throw new Error('route is invalid')
+  }
+  if (!isURL(redirectUrl.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
+    throw new Error('redirectUrl is invalid')
+  }
+  // remove hash
+  route = route.replace(/(#[^#]*)?$/, '')
   let result = {
     matchUrl: route,
     redirectUrl
@@ -253,6 +262,7 @@ function getRouter (route, redirectUrl) {
   // replace query string with *
   url += route
     .replace(/\?.*$/, '*')
+    // TODO: may cause bug
     // replace named holder with * in host
     .replace(/^[^/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
     // replace named holder with * in path
@@ -306,23 +316,16 @@ function getRouter (route, redirectUrl) {
 
 // have reserved word in url pattern
 // return a reserved words list that has been miss used.
-let hasReservedWord = function (router) {
-  let params = getKwdsInRoute(router)
-  let res = []
-  for (let v of Array.from(RESERVED_HOLDERS)) {
-    if (
-      Array.from(params).includes(v) ||
-      Array.from(params).includes(`%${v}`) ||
-      Array.from(params).includes(`=${v}`)
-    ) {
-      res.push(v)
-    }
-  }
+function hasReservedWord (router) {
+  const params = getKwdsInRoute(router)
+  let res = RESERVED_HOLDERS.filter(v => {
+    return (
+      params.includes(v) || params.includes(`%${v}`) || params.includes(`=${v}`)
+    )
+  })
   // remove duplicated names
-  res = res.filter((v, k) => k !== res.indexOf(v))
-  if (res.length) {
-    return res
-  }
+  res = res.filter((v, k) => k === res.indexOf(v))
+  return res.length ? res : false
 }
 
 /**
@@ -334,36 +337,39 @@ let hasReservedWord = function (router) {
  */
 function isKwdsUniq (router) {
   const params = getKwdsInRoute(router)
-  // find duplicated
-  const res = params.filter((v, k) => k !== params.indexOf(v))
-  return !res.length
+  // has duplicated
+  return params.some((v, k) => k !== params.indexOf(v))
 }
 
 // get a list from redirect to url, eg. http://{sub}.github.com/{name}/{protol}
 // %name mean encodeURIComponent name
 // =name mean decodeURIComponent name
-let getRedirectParamList = function (url) {
+function getRedirectParamList (url) {
   let matches = url.match(/\{(\w+)\}/g) || []
   return matches.map(v => v.slice(1, -1))
 }
 
 /**
  * redirect rule valid
- * @param  {String}  redirectUrl
+ * @param  {String}  url
+ * @param {Boolean} hasNamedParams
  * @return {Boolean}
  */
-let isRedirectRuleValid = function (redirectUrl) {
+function isURLRuleValid (url, hasNamedParams) {
   // redirectUrl is empty
-  if (!redirectUrl) {
-    return false
-  }
-  // no params found in redirect url
-  if (!getRedirectParamList(redirectUrl).length) {
+  if (!url) {
     return false
   }
   // remove param placeholder and check the url
-  // comment out this, the result url should be valid
-  // isURL redirectUrl.replace(/^\{\w+\}/, '*').replace /^\{\w+\}/g, 'xxx'
+  let normalized = url.replace(/\*/g, 'abc')
+  if (hasNamedParams) {
+    normalized = url.replace(/\{[^}]+\}/g, 'abc')
+  }
+  if (!isURL(normalized)) return false
+  // no params found in redirect url
+  if (hasNamedParams && !getRedirectParamList(url).length) {
+    return false
+  }
   return true
 }
 
@@ -387,7 +393,7 @@ function hasUndefinedWord (router, url) {
  * @param  {String} url a real url that match that pattern
  * @return {Object}
  */
-let getUrlValues = function (r, url) {
+function getUrlValues (r, url) {
   let k, matches, v
   let res = {}
   try {
