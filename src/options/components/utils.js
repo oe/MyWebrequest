@@ -1,3 +1,4 @@
+import cutils from '../../common/utils'
 /**
  * is string a supported protocol
  * @param  {String}  protocol
@@ -59,17 +60,26 @@ function isPath (path, withoutQS) {
   return '/' + path === targetStr
 }
 
+/**
+ * is string a valid https? url
+ * @param  {String}  url
+ * @return {Boolean}
+ */
 function isURL (url) {
   try {
     const u = new URL(url)
-    // some invalid http url has empty host
-    return u.host && isProtocol(u.protocol)
+    // some invalid http url has empty host, & contains no special chars
+    return u.host && isProtocol(u.protocol) && encodeURI(url) === url
   } catch (e) {
     return false
   }
 }
 
-// return true if valid or a error object
+/**
+ * is string a valid reg
+ * @param  {String}  reg
+ * @return {Boolean}
+ */
 function isValidReg (reg) {
   try {
     /* eslint no-new: "off" */
@@ -81,8 +91,9 @@ function isValidReg (reg) {
 }
 
 /**
- * GET url info url the clipboard, returns {protocol, host, path, search}
- * @param  {Event} e  paste event
+ * parse a url string returns {protocol, host, path, search}
+ *   use native URL to parse
+ * @param  {String} url
  * @return {Object}
  */
 function parseURL (url) {
@@ -91,6 +102,7 @@ function parseURL (url) {
     return new URL(url)
   } catch (e) {
     console.error('invalid url in clipboard', url, e)
+    return false
   }
 }
 
@@ -142,7 +154,10 @@ function toQueryString (key, val) {
 
 // get keywords list(array) in route object
 function getKwdsInRoute (router) {
-  return RESERVED_HOLDERS.concat(router.params, getObjVals(router.qsParams))
+  return RESERVED_HOLDERS.concat(
+    router.params,
+    cutils.getObjVals(router.qsParams)
+  )
 }
 
 /**
@@ -159,38 +174,35 @@ function isRouterStrValid (route) {
   if (!/\w\//.test(route)) {
     route += '/'
   }
+  // should be a valid url format
   let matches = urlComponentReg.exec(route)
   if (!matches) {
     return false
   }
+  // should has no continues params in route
+  //    {a}{b}.google.com is invalid
+  if (/(\{[-\w\*]+\}){2,}/.test(route)) {
+    return false
+  }
 
-  // let protocol = matches[1]
+  // protocol is valid
+  const protocol = matches[1]
+  if (!isProtocol(protocol)) return false
+  // subdomain must be specified
+  //    abc.{xxx} is invalid
+  //    {xxx}.com is invalid
+  //    *.com  is invalid
+  if (!/(?<=(^|\.))[-\w]+\.\w+$/.test(matches[2])) false
+
   // path is host + real path
-  let path = matches[2] + '/' + matches[3]
+  const path = matches[2] + '/' + matches[3]
   // query string without prefix ?
-  let qs = matches[5]
+  const qs = matches[5]
 
-  // path basic format
-  if (
-    !/^(\{\w+\}\.)*(\w+\.)+\w+\/(\{\w+\}|[a-z0-9-_+=&%@!.,*?|~/])*(\{\*\w+\})?$/.test(
-      path
-    )
-  ) {
-    return false
-  }
   // {*named} should only used in the end of the path
-  if (/(\{\*\w+\}).+$/.test(path)) {
-    return false
-  }
+  if (/(\{\*\w+\}).+$/.test(path)) return false
+
   if (qs) {
-    // query string basic format
-    if (
-      !/^(([\w_+%@!.,*?|~/]+=\{\w+\})|([\w_+%@!.,*?|~/]+=[\w_+%@!.,*?|~/]+)|&)*$/.test(
-        qs
-      )
-    ) {
-      return false
-    }
     // /\{\*\w+\}/  for {*named}, not allowed
     // /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
     // /\{\w+\}(?!&|$)/ for letter followed not & or eof
@@ -202,19 +214,19 @@ function isRouterStrValid (route) {
       return false
     }
   }
-
-  let n = route.replace(/\{\*?\w+\}/g, 'xxx')
-  return isURL(n)
+  const normalized = route.replace(/^\*/, 'http').replace(/\{\*?\w+\}/g, '')
+  // should be a valid path
+  return isURL(normalized)
 }
 
 // // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // optionalParam = /\((.*?)\)/g
-let namedParam = /\{(\(\?)?(\w+)\}/g
-let splatParam = /\{\*(\w+)\}/g
+const namedParam = /\{(\(\?)?(\w+)\}/g
+const splatParam = /\{\*(\w+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
 const escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
-let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
+const queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
 /**
  * convert a url pattern to a regexp
  * @param  {String} route url match pattern
@@ -229,14 +241,14 @@ let queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
  *                 }
  */
 function getRouter (route, redirectUrl) {
-  if (!isURL(route.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
+  // remove hash
+  route = route.replace(/(#[^#]*)?$/, '')
+  if (!isRouterStrValid(route)) {
     throw new Error('route is invalid')
   }
   if (!isURL(redirectUrl.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
     throw new Error('redirectUrl is invalid')
   }
-  // remove hash
-  route = route.replace(/(#[^#]*)?$/, '')
   let result = {
     matchUrl: route,
     redirectUrl
@@ -262,20 +274,22 @@ function getRouter (route, redirectUrl) {
   // replace query string with *
   url += route
     .replace(/\?.*$/, '*')
-    // TODO: may cause bug
     // replace named holder with * in host
-    .replace(/^[^/]*(\.|\{\w+\}|\w+)*\.{\w+\}/, '*')
+    //   goos.{sub}.abc.com => *.abc.com
+    //   goos{sub}.abc.com => *.abc.com
+    //   {sub}.abc.com => *.abc.com
+    .replace(/^(\.|\{\w+\}|\w+)*\{\w+\}/, '*')
     // replace named holder with * in path
     .replace(/\{\*?\w+\}.*$/, '*')
   // add a asterisk to disable strict match
-  result.url = url.replace(/\*+$/, '') + '*'
+  result.url = url.replace(/\*+/, '') + '*'
 
   let parts = route.split('?')
   // route contains more than one ?
   if (parts.length > 2) {
     return result
   }
-  result.hasQs = parts.length === 2
+  result.hasQs = parts.length === 2 && !!parts[1]
   let params = []
 
   // hand named params in path
@@ -357,9 +371,7 @@ function getRedirectParamList (url) {
  */
 function isURLRuleValid (url, hasNamedParams) {
   // redirectUrl is empty
-  if (!url) {
-    return false
-  }
+  if (!url) return false
   // remove param placeholder and check the url
   let normalized = url.replace(/\*/g, 'abc')
   if (hasNamedParams) {

@@ -4,7 +4,7 @@ import { internationalize } from './i18n'
 // const arrType = ['block', 'hsts', 'hotlink', 'log', 'custom']
 
 export default {
-  RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch'],
+  RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'cors'],
   // parse querystring to object
   parseQs: qs.parse,
   // get qs from url, return '' if no querystring found
