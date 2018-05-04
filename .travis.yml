@@ -1,14 +1,14 @@
 language: node_js
 node_js:
-- node
-- 8
+  - "node"
+  - "9"
 cache:
   directories:
-  - node_modules
+    - node_modules
 install:
-- yarn
+  - yarn
 script:
-- yarn run build
+  - yarn run build
 deploy:
   provider: releases
   api_key:
@@ -16,7 +16,7 @@ deploy:
   file: "./ext.zip"
   branches:
     only:
-    - master
+      - master
   on:
     tags: true
     repo: evecalm/MyWebrequest
