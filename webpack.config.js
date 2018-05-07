@@ -225,6 +225,7 @@ if (process.env.NODE_ENV === 'production') {
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
     hot: true,
+    stats: { colors: true },
     contentBase: path.join(__dirname, 'dist'),
     headers: { 'Access-Control-Allow-Origin': '*' }
   })

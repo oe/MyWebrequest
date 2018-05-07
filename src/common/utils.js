@@ -1,5 +1,5 @@
 import qs from 'qs'
-import { internationalize } from './i18n'
+import i18n from './i18n'
 
 // const arrType = ['block', 'hsts', 'hotlink', 'log', 'custom']
 
@@ -13,7 +13,7 @@ export default {
     if (!/.+\?/.test(url)) return ''
     return url.replace(/(#[^#]*)?$/, '').replace(/^([^?]*\?)?/, '')
   },
-  i18n: internationalize,
+  i18n: i18n.internationalize,
   isUrlRuleType (type) {
     return this.inArray(this.RULE_TYPES, type)
   },

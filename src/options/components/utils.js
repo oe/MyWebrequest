@@ -97,7 +97,6 @@ function isValidReg (reg) {
  * @return {Object}
  */
 function parseURL (url) {
-  if (!url) return
   try {
     return new URL(url)
   } catch (e) {
@@ -161,69 +160,101 @@ function getKwdsInRoute (router) {
 }
 
 /**
- * is route string valid
+ * redirect rule valid
+ * @param  {String}  url
+ * @param  {Boolean} hasNamedParams true for custom rule
+ * @param  {Boolean} isMathRule     true for custom match rule
+ * @return {Boolean}
+ */
+function isURLRuleValid (url, hasNamedParams, isMathRule) {
+  // url is empty
+  if (!url) return false
+
+  // should be a valid url format
+  const matches = urlComponentReg.exec(url)
+  if (!matches) return false
+  const [, protocol, host, path] = matches
+  // protocol is valid
+  // const protocol = matches[1]
+  if (!isProtocol(protocol)) return false
+
+  // subdomain must be specified (except custom redirect rule)
+  //    abc.{xxx} is invalid
+  //    {xxx}.com is invalid
+  //    *.com  is invalid
+  if (
+    !(hasNamedParams && !isMathRule) &&
+    !/(?<=(^|\.))[-\w]+\.\w+$/.test(host)
+  ) {
+    return false
+  }
+
+  // remove param placeholder and check the url
+  let normalized = url
+  if (hasNamedParams) {
+    // should has no continues params in custom match rule
+    //    {a}{b}.google.com is invalid
+    if (isMathRule && /(\{[-\w*]+\}){2,}/.test(normalized)) return false
+
+    // {*named} should only used in the end of the path
+    if (!isMathRule && /(\{\*[^}]+\}).+$/.test(path)) return false
+    // replace named params to xxx
+    normalized = url.replace(/\{[^}]+\}/g, 'abc')
+  }
+  // no continuous *s
+  if (/\*{2,}/.test(normalized)) return false
+  // replace * to xxx
+  normalized = normalized.replace(/\*/g, 'xxx')
+  // not a valid rule
+  if (!isURL(normalized)) return false
+  // no params found in redirect url
+  // if (hasNamedParams && !getRedirectParamList(url).length) {
+  //   return false
+  // }
+  return true
+}
+
+/**
+ * is custom route string valid
  * return false if invalid
  * validate string like {abc}.user.com/{hous}/d.html?hah
  * @param  {String}  route
  * @return {Boolean}
  */
-function isRouterStrValid (route) {
+function isRouterValid (route) {
   // if the route doesnt has path and query string
   // like http://g.cn
   // then add a / in the end
   if (!/\w\//.test(route)) {
     route += '/'
   }
+  if (!isURLRuleValid(route)) return
   // should be a valid url format
-  let matches = urlComponentReg.exec(route)
-  if (!matches) {
-    return false
-  }
-  // should has no continues params in route
-  //    {a}{b}.google.com is invalid
-  if (/(\{[-\w\*]+\}){2,}/.test(route)) {
-    return false
-  }
+  const matches = urlComponentReg.exec(route)
 
-  // protocol is valid
-  const protocol = matches[1]
-  if (!isProtocol(protocol)) return false
-  // subdomain must be specified
-  //    abc.{xxx} is invalid
-  //    {xxx}.com is invalid
-  //    *.com  is invalid
-  if (!/(?<=(^|\.))[-\w]+\.\w+$/.test(matches[2])) false
-
-  // path is host + real path
-  const path = matches[2] + '/' + matches[3]
   // query string without prefix ?
   const qs = matches[5]
 
-  // {*named} should only used in the end of the path
-  if (/(\{\*\w+\}).+$/.test(path)) return false
-
-  if (qs) {
-    // /\{\*\w+\}/  for {*named}, not allowed
-    // /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
-    // /\{\w+\}(?!&|$)/ for letter followed not & or eof
-    if (
-      /\{\*\w+\}/.test(qs) ||
-      /[?&]\{\w+\}/.test(qs) ||
-      /\{\w+\}(?!&|$)/.test(qs)
-    ) {
-      return false
-    }
+  // Test for named params in querystring
+  // /\{\*\w+\}/  for {*named}, not allowed
+  // /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
+  // /\{\w+\}(?!&|$)/ should followed by & or eof
+  if (
+    qs &&
+    (/\{\*[^}]+\}/.test(qs) ||
+      /[?&]\{[^}]+\}/.test(qs) ||
+      /\{[^}]+\}(?!&|$)/.test(qs))
+  ) {
+    return false
   }
-  const normalized = route.replace(/^\*/, 'http').replace(/\{\*?\w+\}/g, '')
-  // should be a valid path
-  return isURL(normalized)
+  return true
 }
 
-// // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
-// // http://www.baidu.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
+// // http://www.bing.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
+// // http://www.bing.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // optionalParam = /\((.*?)\)/g
-const namedParam = /\{(\(\?)?(\w+)\}/g
-const splatParam = /\{\*(\w+)\}/g
+const namedParam = /\{(\(\?)?([^}]+)\}/g
+const splatParam = /\{\*([^}]+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
 const escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
 const queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
@@ -236,14 +267,15 @@ const queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
  *                    url: match url, which url will be captured used by chrome
  *                    reg: regexp string can match an url & extract params
  *                    matchUrl: source rule, aka the in-param route
+ *                    params: array of var name of each named param in path
  *                    hasQs: has named params in query string
- *                    params: two array of var name of each named param in path an querystring
+ *                    qsParams: queryString params object { originalName: namedParam}
  *                 }
  */
 function getRouter (route, redirectUrl) {
   // remove hash
   route = route.replace(/(#[^#]*)?$/, '')
-  if (!isRouterStrValid(route)) {
+  if (!isRouterValid(route)) {
     throw new Error('route is invalid')
   }
   if (!isURL(redirectUrl.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
@@ -364,28 +396,6 @@ function getRedirectParamList (url) {
 }
 
 /**
- * redirect rule valid
- * @param  {String}  url
- * @param {Boolean} hasNamedParams
- * @return {Boolean}
- */
-function isURLRuleValid (url, hasNamedParams) {
-  // redirectUrl is empty
-  if (!url) return false
-  // remove param placeholder and check the url
-  let normalized = url.replace(/\*/g, 'abc')
-  if (hasNamedParams) {
-    normalized = url.replace(/\{[^}]+\}/g, 'abc')
-  }
-  if (!isURL(normalized)) return false
-  // no params found in redirect url
-  if (hasNamedParams && !getRedirectParamList(url).length) {
-    return false
-  }
-  return true
-}
-
-/**
  * return undefined if no undefined word, or a list contains undefined words
  * @param  {Object}  router a defined word list
  * @param  {String}  url   a url pattern that use words in refer
@@ -424,7 +434,7 @@ function getUrlValues (r, url) {
 
   // get query string values
   if (r.hasQs) {
-    let qsParams = parseQs(getQs(url))
+    let qsParams = cutils.parseQs(cutils.getQs(url))
 
     for (k of Object.keys(r.qsParams || {})) {
       v = r.qsParams[k]
@@ -451,24 +461,19 @@ function getUrlValues (r, url) {
   return res
 }
 
-// fill a pattern with data
+// fill a custom url redirect rule with data
 function fillPattern (pattern, data) {
   pattern = pattern.replace(/([\w%+[\]]+)=\{(\w+)\}/g, function ($0, $1, $2) {
-    let val = data[$2] != null ? data[$2] : ''
+    const val = data[$2] != null ? data[$2] : ''
     return toQueryString($1, val)
   })
 
-  let url = pattern.replace(/\{(\w+)\}/g, function ($0, $1) {
-    let val = data[$1] != null ? data[$1] : ''
-    // / in val, like abc/bdc, won't be encoded
-    //   q is query string, do not encode query string again
-    //   u is url, encoded anywhere
-    if (($1 !== 'u' && ~val.indexOf('/')) || $1 === 'q') {
-      return val
-    } else {
-      return encodeURIComponent(val)
-    }
+  const url = pattern.replace(/\{(\w+)\}/g, function ($0, $1) {
+    const val = data[$1] != null ? data[$1] : ''
+    // encodeURI instead of encodeURIComponent
+    return encodeURI(val)
   })
+  // final url may not be a valid url
   return url.replace(/\?$/, '')
 }
 
@@ -500,17 +505,15 @@ export default {
   isPath,
   isURL,
   isSubRule,
-  getQs,
-  parseQs,
+  fillPattern,
+  isURLRuleValid,
   debounce,
-  isRouterStrValid,
+  isRouterValid,
   getRouter,
   getUrlValues,
   isValidReg,
-  isRedirectRuleValid,
   hasUndefinedWord,
   isKwdsUniq,
   hasReservedWord,
-  getTargetUrl,
   parseURL
 }
