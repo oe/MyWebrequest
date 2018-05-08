@@ -5,6 +5,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
@@ -20,11 +21,11 @@ const serverPort = 3031
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
 
 // auto increaseVersion of manifest.json
-function increaseVersion(package) {
+function increaseVersion (pkg) {
   if (increaseVersion.versionUpdated) return
   increaseVersion.versionUpdated = true
 
-  let version = package.version
+  let version = pkg.version
   const max = 20
   const vs = version.split('.').map(i => +i)
   let len = vs.length
@@ -32,7 +33,7 @@ function increaseVersion(package) {
     if (++vs[len] < max) break
     vs[len] = 0
   }
-  package.version = vs.join('.')
+  pkg.version = vs.join('.')
 }
 
 const config = {
@@ -160,17 +161,26 @@ const config = {
 
 if (process.env.NODE_ENV === 'production') {
   delete config.notHotReload
+  config.optimization = {
+    minimizer: [
+      // we specify a custom UglifyJsPlugin here to get source maps in production
+      new UglifyJsPlugin({
+        cache: true,
+        parallel: true,
+        uglifyOptions: {
+          compress: false,
+          ecma: 6,
+          mangle: true
+        },
+        sourceMap: true
+      })
+    ]
+  }
   // http://vue-loader.vuejs.org/en/workflow/production.html
   config.plugins = (config.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
-      }
-    }),
-    new webpack.optimize.UglifyJsPlugin({
-      sourceMap: false,
-      compress: {
-        warnings: false
       }
     }),
     new webpack.LoaderOptionsPlugin({
