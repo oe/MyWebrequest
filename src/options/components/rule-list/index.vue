@@ -7,7 +7,7 @@
     stripe
     ref="tbl"
     :empty-text="$t('noRules')"
-    current-row-key="url"
+    current-row-key="id"
     tooltip-effect="dark">
     <el-table-column
       type="selection"
@@ -77,15 +77,15 @@ export default {
     ...mapActions(['toggleRule', 'removeRules']),
     onDeleteSelected () {
       if (!this.hasSelection) return
-      const urls = this.$refs.tbl.selection.map(itm => itm.url)
-      this.removeSelectedRows(urls)
+      const ids = this.$refs.tbl.selection.map(itm => itm.id)
+      this.removeSelectedRows(ids)
     },
     onToggleRule (e, scope) {
       e.preventDefault()
-      this.toggleRule(scope.row.url)
+      this.toggleRule(scope.row.id)
     },
     onDeleteItem (scope) {
-      this.removeRules(scope.row.url)
+      this.removeRules(scope.row.id)
     },
     onEditItem (scope) {
 

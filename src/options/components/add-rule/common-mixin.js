@@ -4,6 +4,7 @@ import cutils from '@/common/utils'
 import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
 
+// merger langs with locales
 export function mergeLang (lang = {}) {
   const result = {}
   let keys = Object.keys(lang).concat(Object.keys(locales))
@@ -25,6 +26,7 @@ export default {
       this.url = uri.raw.replace(`${uri.protocol}://`, '')
       e.preventDefault()
     },
+    onAddRule () {},
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
       return cutils.findInArr(this.rules, itm => itm.url === url)

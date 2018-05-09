@@ -74,7 +74,7 @@ const pushNotification = (function () {
         notifiId,
         {
           type: 'basic',
-          iconUrl: '/img/icon38.png',
+          iconUrl: '/static/icons/icon38.png',
           title: title,
           message: content
         },
@@ -94,7 +94,7 @@ const pushNotification = (function () {
     fn = function (title, content) {
       var notifi
       notifi = webkitNotifications.createNotification(
-        '/img/icon48.png',
+        '/static/icons/icon38.png',
         title,
         content
       )
@@ -249,8 +249,8 @@ function updateExtIcon (iconStyle) {
 
   chrome.browserAction.setIcon({
     path: {
-      '19': '/img/' + iconStyle + 'icon19.png',
-      '38': '/img/' + iconStyle + 'icon38.png'
+      '19': '/static/icons/' + iconStyle + 'icon19.png',
+      '38': '/static/icons/' + iconStyle + 'icon38.png'
     }
   })
 }

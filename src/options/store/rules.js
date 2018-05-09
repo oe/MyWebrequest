@@ -1,5 +1,6 @@
 import collection from '@/common/collection'
 import cutils from '@/common/utils'
+import utils from '@/options/components/utils'
 
 const state = {
   module: '',
@@ -28,23 +29,23 @@ const mutations = {
   saveRules (state) {
     collection.save(state.module, state.rules)
   },
-  toggleRule (state, url) {
+  toggleRule (state, id) {
     const rules = state.rules
     if (!Array.isArray(rules)) return
-    const rule = cutils.findInArr(rules, el => el.url === url)
+    const rule = cutils.findInArr(rules, el => el.id === id)
     if (!rule) return
     rule.enabled = !rule.enabled
   },
   addRule (state, rule) {
     const now = Date.now()
     if (typeof rule === 'string') {
-      rule = {
-        url: rule,
-        createdAt: now
-      }
+      rule = { url: rule }
     }
+
     rule = Object.assign(
       {
+        id: utils.guid(),
+        createdAt: now,
         updatedAt: now,
         enabled: true
       },
@@ -52,12 +53,12 @@ const mutations = {
     )
     state.rules.push(rule)
   },
-  removeRules (state, urls) {
+  removeRules (state, ids) {
     const rules = state.rules && state.rules.length && state.rules
-    if (!rules) return
-    if (!Array.isArray(urls)) urls = [urls]
+    if (!ids) return
+    if (!Array.isArray(ids)) ids = [ids]
     state.rules = rules.filter(r => {
-      return !cutils.inArray(urls, r.url)
+      return !cutils.inArray(ids, r.id)
     })
   }
 }

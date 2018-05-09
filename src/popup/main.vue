@@ -100,9 +100,8 @@ export default {
 @import '~@/common/base';
 @import '~@/common/widgets';
 
-html {
-  min-width: 260px;
-  min-height: 310px;
+html, body {
+  width: 260px;
 }
 
 .title-wrapper {

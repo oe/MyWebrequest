@@ -1,4 +1,27 @@
 import cutils from '../../common/utils'
+// get a UUID
+function guid () {
+  function s4 () {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1)
+  }
+  return (
+    s4() +
+    s4() +
+    '-' +
+    s4() +
+    '-' +
+    s4() +
+    '-' +
+    s4() +
+    '-' +
+    s4() +
+    s4() +
+    s4()
+  )
+}
+
 /**
  * is string a supported protocol
  * @param  {String}  protocol
@@ -69,7 +92,11 @@ function isURL (url) {
   try {
     const u = new URL(url)
     // some invalid http url has empty host, & contains no special chars
-    return u.host && isProtocol(u.protocol) && encodeURI(url) === url
+    return (
+      u.host &&
+      isProtocol(u.protocol.replace(/:$/, '')) &&
+      encodeURI(url) === url
+    )
   } catch (e) {
     return false
   }
@@ -166,17 +193,18 @@ function getKwdsInRoute (router) {
  * @param  {Boolean} isMathRule     true for custom match rule
  * @return {Boolean}
  */
-function isURLRuleValid (url, hasNamedParams, isMathRule) {
+function testURLRuleValid (url, hasNamedParams, isMathRule) {
+  console.log('test url', url)
   // url is empty
-  if (!url) return false
+  if (!url) throw new Error('ruleIsEmpty')
 
   // should be a valid url format
   const matches = urlComponentReg.exec(url)
-  if (!matches) return false
+  if (!matches) throw new Error('invalidURLFormat')
   const [, protocol, host, path] = matches
   // protocol is valid
   // const protocol = matches[1]
-  if (!isProtocol(protocol)) return false
+  if (!isProtocol(protocol)) throw new Error('invalidProtocol')
 
   // subdomain must be specified (except custom redirect rule)
   //    abc.{xxx} is invalid
@@ -186,7 +214,7 @@ function isURLRuleValid (url, hasNamedParams, isMathRule) {
     !(hasNamedParams && !isMathRule) &&
     !/(?<=(^|\.))[-\w]+\.\w+$/.test(host)
   ) {
-    return false
+    throw new Error('subdomainNotSpecified')
   }
 
   // remove param placeholder and check the url
@@ -194,19 +222,24 @@ function isURLRuleValid (url, hasNamedParams, isMathRule) {
   if (hasNamedParams) {
     // should has no continues params in custom match rule
     //    {a}{b}.google.com is invalid
-    if (isMathRule && /(\{[-\w*]+\}){2,}/.test(normalized)) return false
+    if (isMathRule && /(\{[-\w*]+\}){2,}/.test(normalized)) {
+      throw new Error('noContinuesNamedParams')
+    }
 
     // {*named} should only used in the end of the path
-    if (!isMathRule && /(\{\*[^}]+\}).+$/.test(path)) return false
+    if (!isMathRule && /(\{\*[^}]+\}).+$/.test(path)) {
+      throw new Error('starParamsNotAtEnd')
+    }
     // replace named params to xxx
     normalized = url.replace(/\{[^}]+\}/g, 'abc')
   }
   // no continuous *s
-  if (/\*{2,}/.test(normalized)) return false
+  if (/\*{2,}/.test(normalized)) throw new Error('noContinuesStars')
   // replace * to xxx
-  normalized = normalized.replace(/\*/g, 'xxx')
+  normalized = normalized.replace(/^\*/, 'http').replace(/\*/g, 'xxx')
+  console.log('test normalized', normalized)
   // not a valid rule
-  if (!isURL(normalized)) return false
+  if (!isURL(normalized)) throw new Error('notAValidURL')
   // no params found in redirect url
   // if (hasNamedParams && !getRedirectParamList(url).length) {
   //   return false
@@ -228,7 +261,7 @@ function isRouterValid (route) {
   if (!/\w\//.test(route)) {
     route += '/'
   }
-  if (!isURLRuleValid(route)) return
+  testURLRuleValid(route)
   // should be a valid url format
   const matches = urlComponentReg.exec(route)
 
@@ -499,6 +532,7 @@ function debounce (fn, wait) {
 }
 
 export default {
+  guid,
   isProtocol,
   isIP,
   isHost,
@@ -506,7 +540,7 @@ export default {
   isURL,
   isSubRule,
   fillPattern,
-  isURLRuleValid,
+  testURLRuleValid,
   debounce,
   isRouterValid,
   getRouter,

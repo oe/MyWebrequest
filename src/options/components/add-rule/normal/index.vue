@@ -18,7 +18,7 @@
           @keyup.native.enter="onAddRule"
           v-popover:urlPopover
           placeholder="host, required, paste a url here" >
-          <el-select v-model="protocol" slot="prepend">
+          <el-select v-model="protocol" slot="prepend" :disabled="disableProtocol">
             <el-option label="*://" value="*"></el-option>
             <el-option label="http://" value="http"></el-option>
             <el-option label="https://" value="https"></el-option>
@@ -43,11 +43,13 @@
 </template>
 
 <script>
+import utils from '@/options/components/utils'
 import mixin from '../common-mixin'
 export default {
   mixins: [mixin],
   data () {
     return {
+      disableProtocol: false,
       protocol: '*',
       host: '',
       pathname: '',
@@ -57,17 +59,18 @@ export default {
       isHiding: false
     }
   },
-  computed: {
+  created () {
+    this.updateModule()
   },
   methods: {
     onAddRule () {
-      const path = this.pathname || '*'
-      const url = `${this.protocol}://${this.host}/${path}`
-      if (this.isRuleExist(url)) {
+      try {
+        const url = this.validateRule(this.protocol, this.host, this.pathname)
+        this.addRule(url)
+      } catch (e) {
         this.showInputError('Same rule has already added')
-        return
+        console.log(e)
       }
-      this.addRule(url)
     },
     onFormChange () {
       this.hideInputError()
@@ -85,6 +88,38 @@ export default {
         this.errorMsg = ''
         this.isHiding = false
       }, 1000)
+    },
+    updateModule () {
+      const isHsts = this.$route.path.slice(1).toLowerCase() === 'hsts'
+      this.disableProtocol = isHsts
+      this.protocol = isHsts ? 'http' : '*'
+    },
+    validateRule (protocol, host, path) {
+      path = path.trim() || '*'
+      host = host.trim()
+      if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
+      if (!host) throw new Error('emptyHost')
+      const url = `${protocol}://${host}/${path}`
+      utils.testURLRuleValid(url)
+      if (this.isRuleExist(url)) throw new Error('ruleExists')
+      this.rules.some((rule) => {
+        let err
+        if (utils.isSubRule(rule.url, url)) {
+          err = new Error('ruleBeIncluded')
+        } else if (utils.isSubRule(url, rule.url)) {
+          err = new Error('ruleIncludOthers')
+        }
+        if (err) {
+          err.rule = rule
+          throw err
+        }
+      })
+      return url
+    }
+  },
+  watch: {
+    $route () {
+      this.updateModule()
     }
   }
 }
