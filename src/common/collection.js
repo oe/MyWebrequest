@@ -6,6 +6,7 @@ export default {
     return JSON.parse(localStorage.getItem(cat)) || defVal
   },
   save (key, data) {
+    console.warn('save', arguments)
     localStorage.setItem(key, JSON.stringify(data))
   },
   getKey (key) {

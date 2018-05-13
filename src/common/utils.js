@@ -7,6 +7,14 @@ export default {
   RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'cors'],
   // parse querystring to object
   parseQs: qs.parse,
+  // is url1 cross domain of url2
+  isXDomain (url1, url2) {
+    if (!url1) return false
+    // origins not the same
+    return (
+      url1.replace(/(?<=(\w))\/.*$/, '') !== url2.replace(/(?<=(\w))\/.*$/, '')
+    )
+  },
   // get qs from url, return '' if no querystring found
   getQs (url) {
     // no query string, return ''

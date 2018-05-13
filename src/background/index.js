@@ -48,10 +48,7 @@ const corsRequestRules = [
   {
     name: 'Access-Control-Request-Headers',
     fn (rule, header, details) {
-      const cache =
-        corsRequestCache[details.requestId] ||
-        (corsRequestCache[details.requestId] = {})
-      cache.allowHeaders = header.value
+      corsRequestCache[details.requestId].allowHeaders = header.value
     }
   }
 ]
@@ -67,7 +64,6 @@ const corsResponseRules = [
       const cache = corsRequestCache[details.requestId]
       if (!cache) return
       header.value = cache.allowHeaders
-      delete corsRequestCache[details.requestId]
     }
   },
   {
@@ -154,23 +150,29 @@ const onRequests = {
   },
   corsRequest: {
     fn (details) {
-      corsRequestRules.forEach(rule => {
-        let found
-        details.requestHeaders.forEach(header => {
-          if (header.name !== rule.name) return
-          found = true
-          if (rule.fn) {
-            rule.fn.call(null, rule, header, details)
-          } else if (rule.value) {
-            header.value = rule.value
-          }
+      const originHeader = details.requestHeaders.find(
+        header => header.name === 'Origin'
+      )
+      if (utils.isXDomain(originHeader && originHeader.value, details.url)) {
+        corsRequestCache[details.requestId] = {}
+        corsRequestRules.forEach(rule => {
+          let found
+          details.requestHeaders.forEach(header => {
+            if (header.name !== rule.name) return
+            found = true
+            if (rule.fn) {
+              rule.fn.call(null, rule, header, details)
+            } else if (rule.value) {
+              header.value = rule.value
+            }
+          })
+          if (found || !rule.value) return
+          details.requestHeaders.push({
+            name: rule.name,
+            value: rule.value
+          })
         })
-        if (found || !rule.value) return
-        details.requestHeaders.push({
-          name: rule.name,
-          value: rule.value
-        })
-      })
+      }
       return {
         requestHeaders: details.requestHeaders
       }
@@ -180,23 +182,29 @@ const onRequests = {
   },
   cors: {
     fn (details) {
-      corsResponseRules.forEach(rule => {
-        let found
-        details.responseHeaders.forEach(header => {
-          if (header.name !== rule.name) return
-          found = true
-          if (rule.fn) {
-            rule.fn.call(null, rule, header, details)
-          } else if (rule.value) {
-            header.value = rule.value
-          }
+      if (corsRequestCache[details.requestId]) {
+        corsResponseRules.forEach(rule => {
+          let found
+          details.responseHeaders.forEach(header => {
+            if (header.name !== rule.name) return
+            found = true
+            if (rule.fn) {
+              rule.fn.call(null, rule, header, details)
+            } else if (rule.value) {
+              header.value = rule.value
+            }
+          })
+          if (found || !rule.value) return
+          details.responseHeaders.push({
+            name: rule.name,
+            value: rule.value
+          })
         })
-        if (found || !rule.value) return
-        details.responseHeaders.push({
-          name: rule.name,
-          value: rule.value
-        })
-      })
+        delete corsRequestCache[details.requestId]
+      }
+      return {
+        responseHeaders: details.responseHeaders
+      }
     },
     deps: ['corsRequest'],
     permit: ['blocking', 'responseHeaders'],
@@ -335,10 +343,15 @@ function toggleRule (type, rule, isOn) {
 
 // get rule object by rule type
 function getRule (type) {
+  console.warn('get rule type', type)
   // clone Depp to avoid urls duplication
   const rule = clonedeep(FEATURE_RULES[type])
-  if (!rule) return
+  if (!rule) {
+    console.warn('cant find rules of', type)
+    return
+  }
   rule.urls.push(...collection.get4Bg(type))
+  console.warn(`all rules of ${type}`, rule.urls)
   // return rule of has urls
   return rule.urls.length && rule
 }
@@ -358,9 +371,11 @@ function updateExtIcon (iconStyle) {
 }
 
 function init () {
+  console.warn('init all settings')
   const onoff = collection.get4Bg('onoff')
   let len = RULE_TYPES.length
   let type
+  console.warn('init', onoff, RULE_TYPES)
   while (len--) {
     type = RULE_TYPES[len]
     if (!onoff[type]) {
