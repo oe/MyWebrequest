@@ -15,6 +15,7 @@ export default new VueRouter({
     { path: '/hsts', component: union },
     { path: '/hotlink', component: union },
     { path: '/log', component: union },
+    { path: '/cors', component: union },
     { path: '/help', component: help }
   ]
 })

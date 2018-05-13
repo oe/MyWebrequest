@@ -27,6 +27,7 @@ export default {
         'block',
         'hsts',
         'hotlink',
+        'cors',
         'log',
         'qrcode',
         'utility',

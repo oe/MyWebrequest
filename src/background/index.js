@@ -8,6 +8,8 @@ const gsearchRuleBasic = [
 ]
 
 const RULE_TYPES = utils.RULE_TYPES
+let logNum = 0
+const requestCache = {}
 
 const logger = window.console
 
@@ -21,6 +23,9 @@ const FEATURE_RULES = {
   log: {
     urls: []
   },
+  cors: {
+    urls: []
+  },
   hotlink: {
     urls: []
   },
@@ -31,8 +36,213 @@ const FEATURE_RULES = {
     urls: gsearchRuleBasic
   }
 }
-let logNum = 0
-const requestCache = {}
+
+const corsRequestCache = {}
+const corsRequestRules = [
+  {
+    name: 'Origin',
+    fn (rule, header, details) {
+      header.value = details.url
+    }
+  },
+  {
+    name: 'Access-Control-Request-Headers',
+    fn (rule, header, details) {
+      const cache =
+        corsRequestCache[details.requestId] ||
+        (corsRequestCache[details.requestId] = {})
+      cache.allowHeaders = header.value
+    }
+  }
+]
+
+const corsResponseRules = [
+  {
+    name: 'Access-Control-Allow-Origin',
+    value: '*'
+  },
+  {
+    name: 'Access-Control-Allow-Headers',
+    fn (rule, header, details) {
+      const cache = corsRequestCache[details.requestId]
+      if (!cache) return
+      header.value = cache.allowHeaders
+      delete corsRequestCache[details.requestId]
+    }
+  },
+  {
+    name: 'Access-Control-Allow-Credentials',
+    value: 'true'
+  },
+  {
+    name: 'Access-Control-Allow-Methods',
+    value: 'POST, GET, OPTIONS, PUT, DELETE'
+  },
+  {
+    name: 'Allow',
+    value: 'POST, GET, OPTIONS, PUT, DELETE'
+  }
+]
+
+// handlers for every feature
+const onRequests = {
+  gsearch: {
+    fn (details) {
+      const qs = formatQstr(details.url).formatedData
+      const url = (qs && qs.url) || details.url
+      return { redirectUrl: url }
+    },
+    permit: ['blocking'],
+    on: 'onBeforeRequest'
+  },
+  custom: {
+    fn (details) {
+      let k, rule, url
+      const rules = collection.get4Bg('custom')
+      for (k in rules) {
+        if (!rules.hasOwnProperty(k)) continue
+        rule = rules[k]
+        console.log('get target Url, rule: %o, url: %s', rule, details.url)
+        url = utils.getTargetUrl(rule, details.url)
+        console.log('then target url is: %s', url)
+        if (url) {
+          return {
+            redirectUrl: url
+          }
+        }
+      }
+    },
+    permit: ['blocking'],
+    on: 'onBeforeRequest'
+  },
+  block: {
+    fn (details) {
+      console.log('block url: ' + details.url)
+      return {
+        cancel: true
+      }
+    },
+    permit: ['blocking'],
+    on: 'onBeforeRequest'
+  },
+  hsts: {
+    fn (details) {
+      return {
+        redirectUrl: details.url.replace(/^http:\/\//, 'https://')
+      }
+    },
+    permit: ['blocking'],
+    on: 'onBeforeRequest'
+  },
+  hotlink: {
+    fn (details) {
+      const headers = details.requestHeaders
+      let len = headers.length
+      // remove referer
+      while (len--) {
+        if (headers[len] === 'Referer') {
+          headers.splice(len, 1)
+          break
+        }
+      }
+      return {
+        requestHeaders: headers
+      }
+    },
+    permit: ['requestHeaders', 'blocking'],
+    on: 'onBeforeSendHeaders'
+  },
+  corsRequest: {
+    fn (details) {
+      corsRequestRules.forEach(rule => {
+        let found
+        details.requestHeaders.forEach(header => {
+          if (header.name !== rule.name) return
+          found = true
+          if (rule.fn) {
+            rule.fn.call(null, rule, header, details)
+          } else if (rule.value) {
+            header.value = rule.value
+          }
+        })
+        if (found || !rule.value) return
+        details.requestHeaders.push({
+          name: rule.name,
+          value: rule.value
+        })
+      })
+      return {
+        requestHeaders: details.requestHeaders
+      }
+    },
+    permit: ['requestHeaders', 'blocking'],
+    on: 'onBeforeSendHeaders'
+  },
+  cors: {
+    fn (details) {
+      corsResponseRules.forEach(rule => {
+        let found
+        details.responseHeaders.forEach(header => {
+          if (header.name !== rule.name) return
+          found = true
+          if (rule.fn) {
+            rule.fn.call(null, rule, header, details)
+          } else if (rule.value) {
+            header.value = rule.value
+          }
+        })
+        if (found || !rule.value) return
+        details.responseHeaders.push({
+          name: rule.name,
+          value: rule.value
+        })
+      })
+    },
+    deps: ['corsRequest'],
+    permit: ['blocking', 'responseHeaders'],
+    on: 'onHeadersReceived'
+  },
+  logBody: {
+    fn (details) {
+      if (details.requestBody) {
+        return (requestCache[details.requestId] = clonedeep(
+          details.requestBody
+        ))
+      }
+    },
+    permit: ['requestBody'],
+    on: 'onBeforeRequest'
+  },
+  log: {
+    fn (details) {
+      ++logNum
+      const url = details.url
+      const rid = details.requestId
+
+      const queryBody = formatQstr(details.url)
+      if (queryBody) details.queryBody = queryBody
+
+      let domain = /^(?:[\w-]+):\/\/([^/]+)\//.exec(url)
+      domain = domain ? domain[1] : url
+
+      if (requestCache[rid]) details.requestBody = requestCache[rid]
+      details.requestHeaders = formatHeaders(details.requestHeaders)
+      logger.log(
+        '%c%d %o %csent to domain: %s',
+        'color: #086',
+        logNum,
+        details,
+        'color: #557c30',
+        domain
+      )
+      delete requestCache[rid]
+    },
+    // dependence requests
+    deps: ['logBody'],
+    permit: ['requestHeaders'],
+    on: 'onSendHeaders'
+  }
+}
 
 // format querystring
 function formatQstr (url) {
@@ -105,114 +315,6 @@ const pushNotification = (function () {
   }
   return fn
 })()
-
-const onRequests = {
-  gsearch: {
-    fn: function (details) {
-      const qs = formatQstr(details.url).formatedData
-      const url = (qs && qs.url) || details.url
-      return { redirectUrl: url }
-    },
-    permit: ['blocking'],
-    on: 'onBeforeRequest'
-  },
-  custom: {
-    fn: function (details) {
-      let k, rule, url
-      const rules = collection.get4Bg('custom')
-      for (k in rules) {
-        if (!rules.hasOwnProperty(k)) continue
-        rule = rules[k]
-        console.log('get target Url, rule: %o, url: %s', rule, details.url)
-        url = utils.getTargetUrl(rule, details.url)
-        console.log('then target url is: %s', url)
-        if (url) {
-          return {
-            redirectUrl: url
-          }
-        }
-      }
-    },
-    permit: ['blocking'],
-    on: 'onBeforeRequest'
-  },
-  block: {
-    fn: function (details) {
-      console.log('block url: ' + details.url)
-      return {
-        cancel: true
-      }
-    },
-    permit: ['blocking'],
-    on: 'onBeforeRequest'
-  },
-  hsts: {
-    fn: function (details) {
-      return {
-        redirectUrl: details.url.replace(/^http:\/\//, 'https://')
-      }
-    },
-    permit: ['blocking'],
-    on: 'onBeforeRequest'
-  },
-  hotlink: {
-    fn: function (details) {
-      const headers = details.requestHeaders
-      let len = headers.length
-      while (len--) {
-        if (headers[len] === 'Referer') {
-          headers.splice(len, 1)
-          break
-        }
-      }
-      return {
-        requestHeaders: headers
-      }
-    },
-    permit: ['requestHeaders', 'blocking'],
-    on: 'onBeforeSendHeaders'
-  },
-  logBody: {
-    fn: function (details) {
-      if (details.requestBody) {
-        return (requestCache[details.requestId] = clonedeep(
-          details.requestBody
-        ))
-      }
-    },
-    permit: ['requestBody'],
-    on: 'onBeforeRequest'
-  },
-  log: {
-    fn: function (details) {
-      ++logNum
-      const url = details.url
-      const rid = details.requestId
-
-      const queryBody = formatQstr(details.url)
-      if (queryBody) details.queryBody = queryBody
-
-      let domain = /^(?:[\w-]+):\/\/([^/]+)\//.exec(url)
-      domain = domain ? domain[1] : url
-
-      if (requestCache[rid]) details.requestBody = requestCache[rid]
-      details.requestHeaders = formatHeaders(details.requestHeaders)
-      logger.log(
-        '%c%d %o %csent to domain: %s',
-        'color: #086',
-        logNum,
-        details,
-        'color: #557c30',
-        domain
-      )
-      delete requestCache[rid]
-    },
-    // dependence requests
-    deps: ['logBody'],
-    permit: ['requestHeaders'],
-    on: 'onSendHeaders'
-  }
-}
 
 // toggle rule on or off
 function toggleRule (type, rule, isOn) {
