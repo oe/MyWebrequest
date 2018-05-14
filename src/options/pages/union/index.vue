@@ -25,11 +25,9 @@ export default {
   locales,
   data () {
     return {
-      module: '',
       protocol: '',
       url: '',
-      isEnabled: false,
-      disabled: false
+      isEnabled: false
     }
   },
   components: {
@@ -42,7 +40,8 @@ export default {
   },
   computed: {
     ...mapState({
-      disabled: state => !state.rules.rules.length
+      disabled: state => !state.rules.length,
+      module: state => state.module
     }),
     catTitle () {
       return this.module.charAt(0).toUpperCase() + this.module.slice(1)
@@ -59,14 +58,17 @@ export default {
       collection.save('onoff', onoff)
     },
     updateModule () {
-      this.module = this.$route.path.slice(1).toLowerCase()
       this.isEnabled = !!collection.get('onoff')[this.module]
     }
   },
   watch: {
+    disabled (val) {
+      this.isEnabled = false
+    },
     $route () {
       this.updateModule()
       this.$el.classList.add('slide-enter')
+
       setTimeout(() => {
         this.$el.classList.add('slide-enter-active')
         this.$el.classList.remove('slide-enter')

@@ -34,7 +34,7 @@ export default {
   },
   computed: {
     ...mapState({
-      rules: state => state.rules.rules
+      rules: state => state.rules
     })
   }
 }
