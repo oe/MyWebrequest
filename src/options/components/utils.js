@@ -38,6 +38,16 @@ function isProtocol (protocol) {
 
 // reg to match [protocol, host, path, query]
 const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
+
+/**
+ * parse url by reg
+ *   difference from parseURL: (url) may be invalid url but a valid rule
+ * @param  {String} url string
+ * @return {Array}
+ */
+function getURLParts (url) {
+  return url.match(urlComponentReg)
+}
 /**
  * is string a valid host
  *   use native object URL to test
@@ -533,6 +543,7 @@ function debounce (fn, wait) {
 
 export default {
   guid,
+  getURLParts,
   isProtocol,
   isIP,
   isHost,

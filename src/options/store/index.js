@@ -20,6 +20,12 @@ const getters = {
       if (a.updatedAt && b.updatedAt) return b.updatedAt - a.updatedAt
       return a.updatedAt ? -1 : b.updatedAt ? 1 : 0
     })
+  },
+  ruleCount (state) {
+    return state.rules.length
+  },
+  hasNoEnabledRule (state) {
+    return !state.rules.some(rule => rule.enabled)
   }
 }
 

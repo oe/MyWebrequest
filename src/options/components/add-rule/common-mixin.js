@@ -20,11 +20,21 @@ export default {
   methods: {
     ...mapActions(['addRule']),
     onPaste (e) {
-      const uri = utils.parseURL(e.clipboardData.getData('text/plain'))
-      if (!utils.isProtocol(uri.protocol)) return
-      this.protocol = uri.protocol
-      this.url = uri.raw.replace(`${uri.protocol}://`, '')
-      e.preventDefault()
+      let url = e.clipboardData.getData('text/plain')
+      try {
+        // remove hash
+        url = url.replace(/#.*$/, '')
+        utils.testURLRuleValid(url)
+        const parts = utils.getURLParts(url)
+        if (!parts) return
+        this.protocol = parts[1]
+        this.host = parts[2]
+        this.pathname = (parts[3] || '') + (parts[4] || '')
+        e.preventDefault()
+      } catch (e) {
+        // statements
+        console.log(e)
+      }
     },
     onAddRule () {},
     isRuleExist (rule) {

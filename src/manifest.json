@@ -30,7 +30,6 @@
     "webRequestBlocking",
     "notifications",
     "tabs",
-    "desktopCapture",
-    "tabCapture"
+    "storage"
   ]
 }

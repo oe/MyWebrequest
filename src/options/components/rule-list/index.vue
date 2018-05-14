@@ -7,7 +7,7 @@
     stripe
     ref="tbl"
     :empty-text="$t('noRules')"
-    current-row-key="id"
+    row-key="id"
     tooltip-effect="dark">
     <el-table-column
       type="selection"
@@ -15,7 +15,7 @@
       width="40">
     </el-table-column>
     <el-table-column
-      label="Enabled"
+      :label="$t('enabled')"
       align="center"
       width="80">
       <template slot-scope="scope">
@@ -25,7 +25,7 @@
       </template>
     </el-table-column>
     <el-table-column
-      label="Rule"
+      :label="$t('rule')"
       cell-class-name="rule-cell"
       show-overflow-tooltip>
       <template slot-scope="scope">
@@ -37,20 +37,19 @@
       </template>
     </el-table-column>
     <el-table-column 
-      label="actions"
+      :label="$t('actions')"
       align="center"
       width="120">
       <template slot-scope="scope">
         <el-button
           size="mini"
           @click="onEditItem(scope)"
-          type="text">edit</el-button>
+          type="text">{{$t('edit')}}</el-button>
 
         <el-button
           size="mini"
           @click="onDeleteItem(scope)"
-          type="text">delete</el-button>
-
+          type="text">{{$t('delete')}}</el-button>
       </template>
     </el-table-column>
   </el-table>

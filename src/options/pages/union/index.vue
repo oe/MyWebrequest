@@ -6,7 +6,11 @@
   <el-checkbox
     v-model="isEnabled"
     :disabled="disabled"
-    @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}</el-checkbox>
+    @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}
+    <span v-show="this.disabled">
+      (<span v-show="this.ruleCount">{{$t('needARuleEnable')}}</span><span v-show="!this.ruleCount">{{$t('addARule2Enable')}}</span>)
+    </span>
+  </el-checkbox>
   
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
   <component :is="formType"></component>
@@ -19,7 +23,7 @@ import RuleList from '@/options/components/rule-list'
 import collection from '@/common/collection'
 import CustomForm from '@/options/components/add-rule/custom'
 import NormalForm from '@/options/components/add-rule/normal'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 import locales from './locales.json'
 export default {
   locales,
@@ -40,8 +44,11 @@ export default {
   },
   computed: {
     ...mapState({
-      disabled: state => !state.rules.length,
       module: state => state.module
+    }),
+    ...mapGetters({
+      ruleCount: 'ruleCount',
+      disabled: 'hasNoEnabledRule'
     }),
     catTitle () {
       return this.module.charAt(0).toUpperCase() + this.module.slice(1)
@@ -54,7 +61,6 @@ export default {
     onFeatureSatusChange () {
       const onoff = collection.get('onoff')
       onoff[this.module] = this.isEnabled
-      console.log('this.module', this.module, this.isEnabled, onoff)
       collection.save('onoff', onoff)
     },
     updateModule () {

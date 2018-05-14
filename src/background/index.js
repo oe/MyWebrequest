@@ -80,6 +80,27 @@ const corsResponseRules = [
   }
 ]
 
+/**
+ * remove headers with names
+ * @param  {Array} headers headers
+ * @param  {Array|String} names   names to remove
+ * @return {Array}
+ */
+function removeHeaders (headers, names) {
+  let isInNames
+  if (Array.isArray(names)) {
+    isInNames = name => names.includes(name)
+  } else {
+    isInNames = name => names === name
+  }
+  let len = headers.length
+  while (len--) {
+    if (isInNames(headers[len])) {
+      headers.splice(len, 1)
+    }
+  }
+}
+
 // handlers for every feature
 const onRequests = {
   gsearch: {
@@ -133,14 +154,8 @@ const onRequests = {
   hotlink: {
     fn (details) {
       const headers = details.requestHeaders
-      let len = headers.length
       // remove referer
-      while (len--) {
-        if (headers[len] === 'Referer') {
-          headers.splice(len, 1)
-          break
-        }
-      }
+      removeHeaders(headers, 'Referer')
       return {
         requestHeaders: headers
       }
