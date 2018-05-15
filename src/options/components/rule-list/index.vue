@@ -100,6 +100,11 @@ export default {
     activeCount () {
       return this.rules.filter(itm => itm.enabled).length
     }
+  },
+  watch: {
+    // rules (newVal, oldValue) {
+    //   debugger
+    // }
   }
 }
 </script>

@@ -1,4 +1,6 @@
 import cutils from '../../common/utils'
+
+window.cutils = cutils
 // get a UUID
 function guid () {
   function s4 () {
@@ -37,7 +39,7 @@ function isProtocol (protocol) {
 }
 
 // reg to match [protocol, host, path, query]
-const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
+// const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
 
 /**
  * parse url by reg
@@ -46,7 +48,7 @@ const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
  * @return {Array}
  */
 function getURLParts (url) {
-  return url.match(urlComponentReg)
+  return url.match(cutils.urlComponentReg)
 }
 /**
  * is string a valid host
@@ -148,13 +150,13 @@ function parseURL (url) {
  * exmaple: to detect if a custom rule is conflicted with a block rule
  */
 function isSubRule (rule, subRule) {
-  let matches = urlComponentReg.exec(rule)
+  let matches = cutils.urlComponentReg.exec(rule)
   let prtl1 = matches[1]
-  let url1 = matches[2] + matches[3]
+  let url1 = matches[2] + '/' + matches[3]
 
-  matches = urlComponentReg.exec(subRule)
+  matches = cutils.urlComponentReg.exec(subRule)
   let prtl2 = matches[1]
-  let url2 = matches[2] + matches[3]
+  let url2 = matches[2] + '/' + matches[3]
   if (prtl1 !== '*' && prtl1 !== prtl2) {
     return false
   }
@@ -162,30 +164,6 @@ function isSubRule (rule, subRule) {
   url1 = url1.replace(escapeRegExp, '(?:\\$&)').replace(/\*/g, '.*')
   url1 = `^${url1}$`
   return new RegExp(url1).test(url2)
-}
-
-/**
- * convert key-val into an querysting: encode(key)=encode(val)
- * if val is an array, there will be an auto conversion
- * @param  {String} key
- * @param  {String|Array} val
- * @return {String}
- */
-function toQueryString (key, val) {
-  if (Array.isArray(val)) {
-    try {
-      key = decodeURIComponent(key)
-      key = key.replace(/\[\]$/, '') + '[]'
-      key = encodeURIComponent(key).replace('%20', '+')
-    } catch (e) {}
-    return (
-      `${key}` +
-      val.map(el => encodeURIComponent(el).replace('%20', '+')).join(`&${key}=`)
-    )
-  } else {
-    val = encodeURIComponent(val).replace('%20', '+')
-    return `${key}=${val}`
-  }
 }
 
 // get keywords list(array) in route object
@@ -209,7 +187,7 @@ function testURLRuleValid (url, hasNamedParams, isMathRule) {
   if (!url) throw new Error('ruleIsEmpty')
 
   // should be a valid url format
-  const matches = urlComponentReg.exec(url)
+  const matches = cutils.urlComponentReg.exec(url)
   if (!matches) throw new Error('invalidURLFormat')
   const [, protocol, host, path] = matches
   // protocol is valid
@@ -273,7 +251,7 @@ function isRouterValid (route) {
   }
   testURLRuleValid(route)
   // should be a valid url format
-  const matches = urlComponentReg.exec(route)
+  const matches = cutils.urlComponentReg.exec(route)
 
   // query string without prefix ?
   const qs = matches[5]
@@ -453,74 +431,6 @@ function hasUndefinedWord (router, url) {
 }
 
 /**
- * get a key-value object from the url which match the pattern
- * @param  {Object} r   {reg: ..., params: ''} from getRouter
- * @param  {String} url a real url that match that pattern
- * @return {Object}
- */
-function getUrlValues (r, url) {
-  let k, matches, v
-  let res = {}
-  try {
-    matches = new RegExp(r.reg).exec(url)
-  } catch (e) {
-    matches = ''
-  }
-  if (!matches) {
-    return null
-  }
-  // get path values
-  for (k = 0; k < r.params.length; k++) {
-    v = r.params[k]
-    res[v] = matches[k + 1] || ''
-  }
-
-  // get query string values
-  if (r.hasQs) {
-    let qsParams = cutils.parseQs(cutils.getQs(url))
-
-    for (k of Object.keys(r.qsParams || {})) {
-      v = r.qsParams[k]
-      res[v] = qsParams[k] || ''
-    }
-  }
-
-  urlComponentReg.exec(url)
-  // keep protocol
-  res.p = RegExp.$1
-  // keep host
-  res.h = RegExp.$2
-  // main domain
-  res.m = res.h
-    .split('.')
-    .slice(-2)
-    .join('.')
-  // path, without the prefix /
-  res.r = RegExp.$3
-  // query string without question mark
-  res.q = RegExp.$5
-  // the whole url
-  res.u = url
-  return res
-}
-
-// fill a custom url redirect rule with data
-function fillPattern (pattern, data) {
-  pattern = pattern.replace(/([\w%+[\]]+)=\{(\w+)\}/g, function ($0, $1, $2) {
-    const val = data[$2] != null ? data[$2] : ''
-    return toQueryString($1, val)
-  })
-
-  const url = pattern.replace(/\{(\w+)\}/g, function ($0, $1) {
-    const val = data[$1] != null ? data[$1] : ''
-    // encodeURI instead of encodeURIComponent
-    return encodeURI(val)
-  })
-  // final url may not be a valid url
-  return url.replace(/\?$/, '')
-}
-
-/**
  * debounce
  * @param  {Function} fn      [description]
  * @param  {Object}   context [description]
@@ -550,12 +460,10 @@ export default {
   isPath,
   isURL,
   isSubRule,
-  fillPattern,
   testURLRuleValid,
   debounce,
   isRouterValid,
   getRouter,
-  getUrlValues,
   isValidReg,
   hasUndefinedWord,
   isKwdsUniq,
