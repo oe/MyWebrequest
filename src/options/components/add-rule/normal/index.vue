@@ -8,10 +8,9 @@
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover>
   <el-form label-position="top" ref="ruleForm">
-    <el-form-item label="Math this url" :error="errorMsg">
+    <el-form-item size="small" label="Math this url" :error="errorMsg">
       <el-col :span="10">
         <el-input
-          size="small"
           v-model="host"
           @input="onFormChange"
           @paste.native="onPaste"

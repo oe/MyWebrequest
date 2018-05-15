@@ -28,8 +28,14 @@ export default {
         const parts = utils.getURLParts(url)
         if (!parts) return
         this.protocol = parts[1]
-        this.host = parts[2]
-        this.pathname = (parts[3] || '') + (parts[4] || '')
+        const host = parts[2]
+        const pathname = (parts[3] || '') + (parts[4] || '')
+        if (this.$options.name === 'custom') {
+          this.url = host + '/' + pathname
+        } else {
+          this.host = host
+          this.pathname = pathname
+        }
         e.preventDefault()
       } catch (e) {
         // statements

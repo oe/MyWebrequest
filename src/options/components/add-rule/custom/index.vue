@@ -1,10 +1,8 @@
 <template>
-<div class="rule-form-custom">
-  <div class="form-field">
-    <label>{{$t('matchLbl')}}</label>
+<el-form label-position="left">
+  <el-form-item size="small" :label="$t('matchLbl')">
     <el-input
       v-model="url"
-      size="small"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       placeholder="choose protocol" >
@@ -13,28 +11,24 @@
         <el-option label="http://" value="http"></el-option>
         <el-option label="https://" value="https"></el-option>
       </el-select>
-      <el-button slot="append" @click="onAddRule">{{$t('addRuleTitle')}}</el-button>
     </el-input>
-  </div>
+  </el-form-item>
   
-  <div class="form-field">
-    <label>Redirect url to</label>
+  <el-form-item size="small" label="Redirect url to">
     <el-input
-      size="small"
       v-model="redirectUrl"
       placeholder="choose protocol" >
     </el-input>
-  </div>
+  </el-form-item>
 
-  <div class="form-field">
-    <label>Test your rule</label>
+  <el-form-item size="small" label="Test your rule">
     <el-input
-      size="small"
       v-model="testUrl"
       placeholder="choose protocol" >
+      <el-button slot="append" @click="onAddRule">{{$t('addRuleTitle')}}</el-button>
     </el-input>
-  </div>
-</div>
+  </el-form-item>
+</el-form>
 </template>
 
 <script>
@@ -43,6 +37,7 @@ import locales from './locales.json'
 const lang = mergeLang(locales)
 
 export default {
+  name: 'custom',
   locales: lang,
   mixins: [mixin],
   data () {
