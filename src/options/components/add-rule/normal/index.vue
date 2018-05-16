@@ -7,17 +7,17 @@
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover>
-  <el-form label-position="top" ref="ruleForm">
-    <el-form-item size="small" label="Math this url" :error="errorMsg">
+  <el-form label-position="top" :model="form" ref="ruleForm">
+    <el-form-item size="small" :label="$t('matchLbl')" :error="errorMsg">
       <el-col :span="10">
         <el-input
-          v-model="host"
+          v-model="form.host"
           @input="onFormChange"
           @paste.native="onPaste"
           @keyup.native.enter="onAddRule"
           v-popover:urlPopover
           placeholder="host, required, paste a url here" >
-          <el-select v-model="protocol" slot="prepend" :disabled="disableProtocol">
+          <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
             <el-option label="*://" value="*"></el-option>
             <el-option label="http://" value="http"></el-option>
             <el-option label="https://" value="https"></el-option>
@@ -28,12 +28,12 @@
       <el-col :span="13">
         <el-input
           size="small"
-          v-model="pathname"
+          v-model="form.pathname"
           @input="onFormChange"
           @paste.native="onPaste"
           @keyup.native.enter="onAddRule"
           placeholder="pathname and querystring, optional" >
-          <el-button slot="append" @click="onAddRule">Add rule</el-button>
+          <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
         </el-input>
       </el-col>
     </el-form-item>
@@ -43,15 +43,22 @@
 
 <script>
 import utils from '@/options/components/utils'
-import mixin from '../common-mixin'
+import { mapState } from 'vuex'
+import mixin, { mergeLang } from '../common-mixin'
+// import locales from './locales.json'
+const lang = mergeLang({})
+
 export default {
+  locales: lang,
   mixins: [mixin],
   data () {
     return {
       disableProtocol: false,
-      protocol: '*',
-      host: '',
-      pathname: '',
+      form: {
+        protocol: '*',
+        host: '',
+        pathname: ''
+      },
       // 错误信息
       errorMsg: '',
       etid: 0,
@@ -61,14 +68,23 @@ export default {
   created () {
     this.updateModule()
   },
+  mounted () {
+    window.ff = this.$refs.ruleForm
+  },
+  computed: {
+    ...mapState({
+      module: state => state.module
+    })
+  },
   methods: {
     onAddRule () {
       try {
-        const url = this.validateRule(this.protocol, this.host, this.pathname)
+        const url = this.validateRule(this.form.protocol, this.form.host, this.form.pathname)
         this.addRule(url)
+        this.resetForm()
       } catch (e) {
         this.showInputError('Same rule has already added')
-        console.log(e)
+        console.error('failed', e)
       }
     },
     onFormChange () {
@@ -89,7 +105,7 @@ export default {
       }, 1000)
     },
     updateModule () {
-      const isHsts = this.$route.path.slice(1).toLowerCase() === 'hsts'
+      const isHsts = this.module === 'hsts'
       this.disableProtocol = isHsts
       this.protocol = isHsts ? 'http' : '*'
     },

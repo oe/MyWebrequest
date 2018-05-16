@@ -27,14 +27,14 @@ export default {
         utils.testURLRuleValid(url)
         const parts = utils.getURLParts(url)
         if (!parts) return
-        this.protocol = parts[1]
+        this.form.protocol = parts[1]
         const host = parts[2]
         const pathname = (parts[3] || '') + (parts[4] || '')
         if (this.$options.name === 'custom') {
-          this.url = host + '/' + pathname
+          this.form.url = host + '/' + pathname
         } else {
-          this.host = host
-          this.pathname = pathname
+          this.form.host = host
+          this.form.pathname = pathname
         }
         e.preventDefault()
       } catch (e) {
@@ -43,6 +43,9 @@ export default {
       }
     },
     onAddRule () {},
+    resetForm () {
+      this.$refs.ruleForm.resetFields()
+    },
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
       return cutils.findInArr(this.rules, itm => itm.url === url)

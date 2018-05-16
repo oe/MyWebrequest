@@ -1,37 +1,45 @@
 <template>
-<el-form label-position="left">
+<el-form ref="ruleForm" :model="form" label-position="left" label-width="106px">
   <el-form-item size="small" :label="$t('matchLbl')">
     <el-input
-      v-model="url"
+      v-model="form.url"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       placeholder="choose protocol" >
-      <el-select v-model="protocol" slot="prepend" placeholder="">
+      <el-select v-model="form.protocol" slot="prepend" placeholder="">
         <el-option label="*://" value="*"></el-option>
         <el-option label="http://" value="http"></el-option>
         <el-option label="https://" value="https"></el-option>
       </el-select>
     </el-input>
   </el-form-item>
-  
+
   <el-form-item size="small" label="Redirect url to">
     <el-input
-      v-model="redirectUrl"
+      v-model="form.redirectUrl"
       placeholder="choose protocol" >
     </el-input>
   </el-form-item>
 
   <el-form-item size="small" label="Test your rule">
     <el-input
-      v-model="testUrl"
+      v-model="form.testUrl"
       placeholder="choose protocol" >
-      <el-button slot="append" @click="onAddRule">{{$t('addRuleTitle')}}</el-button>
+      <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
+    </el-input>
+  </el-form-item>
+  <el-form-item size="small" label="Test Result">
+    <el-input
+      v-model="form.testResult"
+      placeholder="choose protocol" >
+      <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
     </el-input>
   </el-form-item>
 </el-form>
 </template>
 
 <script>
+import utils from '@/options/components/utils'
 import mixin, { mergeLang } from '../common-mixin'
 import locales from './locales.json'
 const lang = mergeLang(locales)
@@ -42,10 +50,25 @@ export default {
   mixins: [mixin],
   data () {
     return {
-      url: '',
-      protocol: '*',
-      redirectUrl: '',
-      testUrl: ''
+      form: {
+        url: '',
+        protocol: '*',
+        redirectUrl: '',
+        testUrl: '',
+        testResult: ''
+      }
+    }
+  },
+  methods: {
+    onTestRule () {
+
+    },
+    onAddRule () {
+
+    },
+    getRouter () {
+      const matchUrl = this.form.protocol + '://' + this.form.url
+      return utils.getRouter(matchUrl, this.form.redirectUrl)
     }
   }
 }

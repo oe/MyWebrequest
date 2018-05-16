@@ -1,6 +1,6 @@
 {
   "en": {
-    "matchLbl": "Match this url",
+    "testRule": "Test Rule",
     "block": "Block",
     "hsts": "Hsts",
     "hotlink": "Hotlink",
@@ -11,7 +11,7 @@
     "help": "Help"
   },
   "zh-cn": {
-    "matchLbl": "匹配下面的规则",
+    "testRule": "测试规则",
     "block": "Block",
     "hsts": "Hsts",
     "hotlink": "Hotlink",

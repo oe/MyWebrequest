@@ -1,8 +1,10 @@
 {
   "en": {
-    "addRuleTitle": "Add rule"
+    "matchLbl": "Match this url",
+    "addRuleBtn": "Add rule"
   },
   "zh-cn": {
-    "addRuleTitle": "添加规则"
+    "matchLbl": "匹配下面的规则",
+    "addRuleBtn": "添加规则"
   }
 }
