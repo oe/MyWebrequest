@@ -8,7 +8,7 @@
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover>
   <el-form label-position="top" :model="form" ref="ruleForm">
-    <el-form-item size="small" :label="$t('matchLbl')" :error="errorMsg">
+    <el-form-item size="small" :prop="form.host" :label="$t('matchLbl')" :error="errorMsg">
       <el-col :span="10">
         <el-input
           v-model="form.host"
@@ -43,7 +43,6 @@
 
 <script>
 import utils from '@/options/components/utils'
-import { mapState } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
 // import locales from './locales.json'
 const lang = mergeLang({})
@@ -72,9 +71,6 @@ export default {
     window.ff = this.$refs.ruleForm
   },
   computed: {
-    ...mapState({
-      module: state => state.module
-    })
   },
   methods: {
     onAddRule () {

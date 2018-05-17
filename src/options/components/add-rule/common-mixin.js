@@ -22,15 +22,16 @@ export default {
     onPaste (e) {
       let url = e.clipboardData.getData('text/plain')
       try {
+        const isCustom = this.$options.name === 'custom'
         // remove hash
         url = url.replace(/#.*$/, '')
-        utils.testURLRuleValid(url)
+        utils.testURLRuleValid(url, isCustom)
         const parts = utils.getURLParts(url)
         if (!parts) return
         this.form.protocol = parts[1]
         const host = parts[2]
         const pathname = (parts[3] || '') + (parts[4] || '')
-        if (this.$options.name === 'custom') {
+        if (isCustom) {
           this.form.url = host + '/' + pathname
         } else {
           this.form.host = host
@@ -44,7 +45,11 @@ export default {
     },
     onAddRule () {},
     resetForm () {
-      this.$refs.ruleForm.resetFields()
+      Object.keys(this.form).forEach(key => {
+        let val = ''
+        if (key === 'protocol') val = this.module === 'hsts' ? 'http' : '*'
+        this.form[key] = val
+      })
     },
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
@@ -53,6 +58,7 @@ export default {
   },
   computed: {
     ...mapState({
+      module: state => state.module,
       rules: state => state.rules
     })
   }

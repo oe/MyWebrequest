@@ -32,6 +32,7 @@ export default {
         delete cur.createdAt
         delete cur.updatedAt
         acc[cur.url] = cur
+        return acc
       }, {})
     } else {
       return result.map(itm => itm.url)

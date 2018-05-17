@@ -5,7 +5,7 @@ import i18n from './i18n'
 
 export default {
   // reg to match [protocol, host, path, query]
-  urlComponentReg: /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/,
+  urlComponentReg: /^([^:]+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/,
   RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'gsearch', 'cors'],
   // parse querystring to object
   parseQs: qs.parse,
@@ -96,7 +96,7 @@ export default {
     // get wildcard vars
     if (r.hasWildcard) {
       // remove the first * in path and the following
-      let reg = r.matchUrl.replace(/(?<=(\w\/))([^*]+)(\*.*)$/, '$2')
+      let reg = r.matchUrl.replace(/(?<=(\w\/[^*?]*))(\*.*)$/, '')
       reg = '^' + reg.replace(/\{[^}]+\}/g, '.+').replace(/\*/g, '.*')
       /* eslint no-new: "off" */
       res.__wildcard = url.replace(new RegExp(reg), '')
@@ -106,11 +106,14 @@ export default {
 
   // fill a custom url redirect rule with data
   fillPattern (pattern, data) {
-    pattern = pattern.replace(/([\w%+[\]]+)=\{(\w+)\}/g, ($0, $1, $2) => {
-      const val = data[$2] != null ? data[$2] : ''
-      return this.toQueryString($1, val)
-    })
-    let url = pattern.replace(/\{(\w+)\}/g, function ($0, $1) {
+    pattern = pattern.replace(
+      /(?<=(\?|&))([^=]+)=\{([^}]+)\}/g,
+      ($0, $1, $2) => {
+        const val = data[$2] != null ? data[$2] : ''
+        return this.toQueryString($1, val)
+      }
+    )
+    let url = pattern.replace(/\{([^}]+)\}/g, function ($0, $1) {
       const val = data[$1] != null ? data[$1] : ''
       // encodeURI instead of encodeURIComponent
       return encodeURI(val)

@@ -13,8 +13,8 @@ import router from './router'
 Vue.use(VueI18n)
 Vue.use(ElementUI)
 
-// Vue.config.lang = i18n.lang
-Vue.config.lang = 'en'
+Vue.config.lang = i18n.lang
+// Vue.config.lang = 'zen'
 
 // translate text out of vue app
 document.documentElement.innerHTML = i18n.internationalize(

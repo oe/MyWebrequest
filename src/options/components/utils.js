@@ -178,18 +178,21 @@ function getKwdsInRoute (router) {
  * redirect rule valid
  * @param  {String}  url
  * @param  {Boolean} hasNamedParams true for custom rule
- * @param  {Boolean} isMathRule     true for custom match rule
+ * @param  {Boolean} isRedirect     true for custom redirect rule
  * @return {Boolean}
  */
-function testURLRuleValid (url, hasNamedParams, isMathRule) {
+function testURLRuleValid (url, hasNamedParams, isRedirect) {
   console.log('test url', url)
   // url is empty
   if (!url) throw new Error('ruleIsEmpty')
+  if (!/\w\//.test(url)) {
+    url += '/'
+  }
 
   // should be a valid url format
   const matches = cutils.urlComponentReg.exec(url)
   if (!matches) throw new Error('invalidURLFormat')
-  const [, protocol, host, path] = matches
+  const [, protocol, host, path, qs] = matches
   // protocol is valid
   // const protocol = matches[1]
   if (!isProtocol(protocol)) throw new Error('invalidProtocol')
@@ -199,7 +202,7 @@ function testURLRuleValid (url, hasNamedParams, isMathRule) {
   //    {xxx}.com is invalid
   //    *.com  is invalid
   if (
-    !(hasNamedParams && !isMathRule) &&
+    !(hasNamedParams && isRedirect) &&
     !/(?<=(^|\.))[-\w]+\.\w+$/.test(host)
   ) {
     throw new Error('subdomainNotSpecified')
@@ -208,14 +211,25 @@ function testURLRuleValid (url, hasNamedParams, isMathRule) {
   // remove param placeholder and check the url
   let normalized = url
   if (hasNamedParams) {
+    // Test for named params in querystring
+    if (qs && !isRedirect) {
+      // {*named}, not allowed
+      if (/\{\*[^}]+\}/.test(qs)) throw new Error('noStarNamedInQs')
+      // ?{named} or &{named}, not allowd
+      if (/[?&]\{[^}]+\}/.test(qs)) throw new Error('noNamedForKeyInQs')
+      // {named} should followed by & or eof
+      if (/\{[^}]+\}(?!&|$)/.test(qs)) {
+        throw new Error('noNamedForPartialValInQs')
+      }
+    }
     // should has no continues params in custom match rule
     //    {a}{b}.google.com is invalid
-    if (isMathRule && /(\{[-\w*]+\}){2,}/.test(normalized)) {
+    if (!isRedirect && /(\{[^}]+\}){2,}/.test(normalized)) {
       throw new Error('noContinuesNamedParams')
     }
 
     // {*named} should only used in the end of the path
-    if (!isMathRule && /(\{\*[^}]+\}).+$/.test(path)) {
+    if (!isRedirect && /(\{\*[^}]+\}).+$/.test(path)) {
       throw new Error('starParamsNotAtEnd')
     }
     // replace named params to xxx
@@ -235,50 +249,15 @@ function testURLRuleValid (url, hasNamedParams, isMathRule) {
   return true
 }
 
-/**
- * is custom route string valid
- * return false if invalid
- * validate string like {abc}.user.com/{hous}/d.html?hah
- * @param  {String}  route
- * @return {Boolean}
- */
-function isRouterValid (route) {
-  // if the route doesnt has path and query string
-  // like http://g.cn
-  // then add a / in the end
-  if (!/\w\//.test(route)) {
-    route += '/'
-  }
-  testURLRuleValid(route)
-  // should be a valid url format
-  const matches = cutils.urlComponentReg.exec(route)
-
-  // query string without prefix ?
-  const qs = matches[5]
-
-  // Test for named params in querystring
-  // /\{\*\w+\}/  for {*named}, not allowed
-  // /[?&]\{\w+\}/ or ?{named} or &{named}, not allowd
-  // /\{\w+\}(?!&|$)/ should followed by & or eof
-  if (
-    qs &&
-    (/\{\*[^}]+\}/.test(qs) ||
-      /[?&]\{[^}]+\}/.test(qs) ||
-      /\{[^}]+\}(?!&|$)/.test(qs))
-  ) {
-    return false
-  }
-  return true
-}
-
 // // http://www.bing.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // // http://www.bing.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // optionalParam = /\((.*?)\)/g
 const namedParam = /\{(\(\?)?([^}]+)\}/g
 const splatParam = /\{\*([^}]+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
-const escapeRegExp = /[-[\]+?.,\\^$|#\s]/g
-const queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
+const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
+// loose restrict for qs, value could be empty
+const queryStrReg = /([^=]+)=\{([^?]*)\}/g
 /**
  * convert a url pattern to a regexp
  * @param  {String} route url match pattern
@@ -296,12 +275,10 @@ const queryStrReg = /([\w_+%@!.,*?|~/]+)=\{(\w+)\}/g
 function getRouter (route, redirectUrl) {
   // remove hash
   route = route.replace(/(#[^#]*)?$/, '')
-  if (!isRouterValid(route)) {
-    throw new Error('route is invalid')
-  }
-  if (!isURL(redirectUrl.replace(/(\*|\{[^}]+\})/g, 'abc'))) {
-    throw new Error('redirectUrl is invalid')
-  }
+  testURLRuleValid(route, true)
+
+  testURLRuleValid(redirectUrl, true, true)
+
   let result = {
     matchUrl: route,
     redirectUrl
@@ -313,7 +290,7 @@ function getRouter (route, redirectUrl) {
   if (!/\w\//.test(route)) {
     route += '/'
   }
-  let protocol = route.match(/^([\w*]+):\/\//)
+  let protocol = route.match(/^([^:]+):\/\//)
 
   protocol = protocol ? protocol[1] : '*'
   let url = protocol + '://'
@@ -331,9 +308,9 @@ function getRouter (route, redirectUrl) {
     //   goos.{sub}.abc.com => *.abc.com
     //   goos{sub}.abc.com => *.abc.com
     //   {sub}.abc.com => *.abc.com
-    .replace(/^(\.|\{\w+\}|\w+)*\{\w+\}/, '*')
+    .replace(/^(\.|\{[^}]+\}|[\w-]+)*\{[^}]+\}/, '*')
     // replace named holder with * in path
-    .replace(/\{\*?\w+\}.*$/, '*')
+    .replace(/\{\*?[^}]+\}.*$/, '*')
   // add a asterisk to disable strict match
   result.url = url.replace(/\*+/, '') + '*'
 
@@ -342,13 +319,20 @@ function getRouter (route, redirectUrl) {
   if (parts.length > 2) {
     return result
   }
+  // get pathname & remove named params
+  const pathname = parts[0].replace(/{[^}]}/g, 'xx').replace(/$[^/]+\//, '')
+  result.hasWildcard = /\*/.test(pathname)
+
   result.hasQs = parts.length === 2 && !!parts[1]
   let params = []
 
   // hand named params in path
-  let part = parts[0]
+  const part = parts[0]
     .replace(escapeRegExp, '\\$&')
-    // .replace optionalParam, '(?:$1)?'
+    .replace(splatParam, function (match, $1) {
+      params.push($1)
+      return '([^?]*)'
+    })
     .replace(namedParam, function (match, $1, $2) {
       params.push($2)
       if ($1) {
@@ -357,12 +341,8 @@ function getRouter (route, redirectUrl) {
         return '([^/?]+)'
       }
     })
-    .replace(splatParam, function (match, $1) {
-      params.push($1)
-      return '([^?]*)'
-    })
-  let reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?`
-  result.reg = reg
+  console.warn('getrouter part', part)
+  result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?`
   result.params = params
 
   // hand named params in query string
@@ -412,7 +392,7 @@ function isKwdsUniq (router) {
 // %name mean encodeURIComponent name
 // =name mean decodeURIComponent name
 function getRedirectParamList (url) {
-  let matches = url.match(/\{(\w+)\}/g) || []
+  let matches = url.match(/\{([^}]+)\}/g) || []
   return matches.map(v => v.slice(1, -1))
 }
 
@@ -462,7 +442,6 @@ export default {
   isSubRule,
   testURLRuleValid,
   debounce,
-  isRouterValid,
   getRouter,
   isValidReg,
   hasUndefinedWord,

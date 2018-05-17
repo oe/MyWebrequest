@@ -4,7 +4,6 @@
     <small >{{rules.length}} {{$t('ruleUnit')}}, {{activeCount}} {{$t('ruleUnit')}} {{$t('ruleIsActive')}}</small></div>
   <el-table
     :data="rules"
-    stripe
     ref="tbl"
     :empty-text="$t('noRules')"
     row-key="id"

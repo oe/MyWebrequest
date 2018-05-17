@@ -365,7 +365,10 @@ function getRule (type) {
     console.warn('cant find rules of', type)
     return
   }
-  rule.urls.push(...collection.get4Bg(type))
+  let urls = collection.get4Bg(type)
+  console.warn('urls from get4bg', urls)
+  if (type === 'custom') urls = Object.keys(urls)
+  rule.urls.push(...urls)
   console.warn(`all rules of ${type}`, rule.urls)
   // return rule of has urls
   return rule.urls.length && rule
