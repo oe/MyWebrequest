@@ -2,11 +2,6 @@ import clonedeep from 'lodash.clonedeep'
 import utils from '@/common/utils'
 import collection from '@/common/collection'
 
-const gsearchRuleBasic = [
-  '*://www.google.com/url*',
-  '*://www.google.com.hk/url*'
-]
-
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
 const requestCache = {}
@@ -32,9 +27,6 @@ const FEATURE_RULES = {
   },
   custom: {
     urls: []
-  },
-  gsearch: {
-    urls: gsearchRuleBasic
   }
 }
 
@@ -104,15 +96,6 @@ function removeHeaders (headers, names) {
 
 // handlers for every feature
 const onRequests = {
-  gsearch: {
-    fn (details) {
-      const qs = formatQstr(details.url).formatedData
-      const url = (qs && qs.url) || details.url
-      return { redirectUrl: url }
-    },
-    permit: ['blocking'],
-    on: 'onBeforeRequest'
-  },
   custom: {
     // cache data for frequently usage
     cache: null,
@@ -121,7 +104,6 @@ const onRequests = {
       if (!onRequests.custom.cache) {
         onRequests.custom.cache = collection.getRouter4Custom()
       }
-      debugger
       const rules = onRequests.custom.cache
       for (k in rules) {
         if (!rules.hasOwnProperty(k)) continue

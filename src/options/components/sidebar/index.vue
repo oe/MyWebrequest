@@ -16,10 +16,8 @@
 </template>
 
 <script>
-import locales from './locales.json'
 
 export default {
-  locales,
   data () {
     return {
       sidebarItems: [
@@ -30,7 +28,6 @@ export default {
         'cors',
         'log',
         'qrcode',
-        'utility',
         'settings',
         'help'
       ]

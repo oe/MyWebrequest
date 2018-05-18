@@ -1,8 +1,6 @@
 <template>
 <div>
-  <div class="setting-title">
-    {{ catTitle }} <small v-html="$t(module+'Desc')"></small>
-  </div>
+  <titlebar></titlebar>
   <el-checkbox
     v-model="isEnabled"
     :disabled="disabled"
@@ -50,9 +48,6 @@ export default {
       ruleCount: 'ruleCount',
       disabled: 'hasNoEnabledRule'
     }),
-    catTitle () {
-      return this.module.charAt(0).toUpperCase() + this.module.slice(1)
-    },
     formType () {
       return this.module === 'custom' ? 'CustomForm' : 'NormalForm'
     }

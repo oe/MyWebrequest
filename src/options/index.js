@@ -9,6 +9,7 @@ import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 import App from './main'
 import router from './router'
+import titlebar from './components/titlebar'
 
 Vue.use(VueI18n)
 Vue.use(ElementUI)
@@ -30,6 +31,8 @@ for (var key in locales) {
     Vue.locale(key, locales[key])
   }
 }
+
+Vue.component('titlebar', titlebar)
 
 /* eslint-disable no-new */
 new Vue({

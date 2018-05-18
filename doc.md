@@ -17,10 +17,12 @@
     url: '*://www.baidu.com/s*',
     // whether need to parse query string
     hasQs: true,
-    // whether need to deal with wildcard params
-    hasWildcard: false,
+    // whether need to deal with wildcard param
+    hasWdCd: true,
+    // regexp to get wildcard param's value
+    wdCdReg: '^http:\\/\\/www\\.baidu\\.com'
     // regex to match the rule
-    reg: '^\\w+:\\/\\/www\\.baidu\\.com/s(?:\\?(.*))?',
+    reg: '^\\w+:\\/\\/www\\.baidu\\.com\\/s(?:\\?(.*))?',
     // path or domain params in rule which wrapped by `{` and `}`
     params: [],
     // query string params

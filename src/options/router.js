@@ -4,6 +4,8 @@ import VueRouter from 'vue-router'
 // import custom from './pages/custom'
 import union from './pages/union'
 import help from './pages/help'
+import qrcode from './pages/qrcode'
+import settings from './pages/settings'
 
 Vue.use(VueRouter)
 
@@ -16,6 +18,8 @@ export default new VueRouter({
     { path: '/hotlink', component: union },
     { path: '/log', component: union },
     { path: '/cors', component: union },
+    { path: '/qrcode', component: qrcode },
+    { path: '/settings', component: settings },
     { path: '/help', component: help }
   ]
 })
