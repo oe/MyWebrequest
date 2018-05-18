@@ -63,7 +63,7 @@ export default {
   methods: {
     onTestRule () {
       try {
-        const router = this.getRouter()
+        const router = cutils.preprocessRouter(this.getRouter())
         this.form.testResult = cutils.getTargetUrl(router, this.form.testUrl)
       } catch (e) {
         console.error(e)

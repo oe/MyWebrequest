@@ -29,6 +29,16 @@ export default {
   isUrlRuleType (type) {
     return this.inArray(this.RULE_TYPES, type)
   },
+  // preprocess a router when use
+  preprocessRouter (router) {
+    delete router.createdAt
+    delete router.updatedAt
+    router.reg = RegExp(router.reg)
+    if (router.hasWdCd && router.wdCdReg) {
+      router.wdCdReg = RegExp(router.wdCdReg)
+    }
+    return router
+  },
   /**
    * get target url
    * @param  {Object} router   url pattern to match a url
@@ -54,7 +64,7 @@ export default {
     let k, matches, v
     let res = {}
     try {
-      matches = new RegExp(r.reg).exec(url)
+      matches = r.reg.exec(url)
     } catch (e) {
       matches = ''
     }
@@ -94,12 +104,8 @@ export default {
     // the whole url
     res.u = url
     // get wildcard vars
-    if (r.hasWildcard) {
-      // remove the first * in path and the following
-      let reg = r.matchUrl.replace(/(?<=(\w\/[^*?]*))(\*.*)$/, '')
-      reg = '^' + reg.replace(/\{[^}]+\}/g, '.+').replace(/\*/g, '.*')
-      /* eslint no-new: "off" */
-      res.__wildcard = url.replace(new RegExp(reg), '')
+    if (r.hasWdCd && r.wdCdReg) {
+      res.__wildcard = url.replace(r.wdCdReg, '')
     }
     return res
   },

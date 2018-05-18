@@ -20,22 +20,25 @@ export default {
     const onoff = this.get('onoff')
     return onoff[type]
   },
-  // get rules for background
-  get4Bg (cat) {
+  getRouter4Custom () {
+    // ignore disabled
+    const result = this.get('custom').filter(itm => itm.enabled)
+    return result.reduce((acc, cur) => {
+      try {
+        cur = utils.preprocessRouter(cur)
+        acc[cur.url] = cur
+      } catch (e) {
+        console.error('custom rule invalid', cur, e)
+      }
+      return acc
+    }, {})
+  },
+  // get rules/config for background
+  getData4Bg (cat) {
     let result = this.get(cat)
     if (!utils.isUrlRuleType(cat)) return result
     // ignore disabled
     result = result.filter(itm => itm.enabled)
-    // for custom rules
-    if (cat === 'custom') {
-      return result.reduce((acc, cur) => {
-        delete cur.createdAt
-        delete cur.updatedAt
-        acc[cur.url] = cur
-        return acc
-      }, {})
-    } else {
-      return result.map(itm => itm.url)
-    }
+    return result.map(itm => itm.url)
   }
 }

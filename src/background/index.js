@@ -10,6 +10,7 @@ const gsearchRuleBasic = [
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
 const requestCache = {}
+// let customRouterCache = null
 
 const logger = window.console
 
@@ -113,9 +114,15 @@ const onRequests = {
     on: 'onBeforeRequest'
   },
   custom: {
+    // cache data for frequently usage
+    cache: null,
     fn (details) {
       let k, rule, url
-      const rules = collection.get4Bg('custom')
+      if (!onRequests.custom.cache) {
+        onRequests.custom.cache = collection.getRouter4Custom()
+      }
+      debugger
+      const rules = onRequests.custom.cache
       for (k in rules) {
         if (!rules.hasOwnProperty(k)) continue
         rule = rules[k]
@@ -349,6 +356,7 @@ function toggleRule (type, rule, isOn) {
     })
   }
   const action = isOn ? 'addListener' : 'removeListener'
+  if (!isOn && requestCfg.cache) requestCfg.cache = null
   chrome.webRequest[requestCfg.on][action](
     requestCfg.fn,
     rule,
@@ -365,9 +373,7 @@ function getRule (type) {
     console.warn('cant find rules of', type)
     return
   }
-  let urls = collection.get4Bg(type)
-  console.warn('urls from get4bg', urls)
-  if (type === 'custom') urls = Object.keys(urls)
+  let urls = collection.getData4Bg(type)
   rule.urls.push(...urls)
   console.warn(`all rules of ${type}`, rule.urls)
   // return rule of has urls
@@ -390,7 +396,7 @@ function updateExtIcon (iconStyle) {
 
 function init () {
   console.warn('init all settings')
-  const onoff = collection.get4Bg('onoff')
+  const onoff = collection.getData4Bg('onoff')
   let len = RULE_TYPES.length
   let type
   console.warn('init', onoff, RULE_TYPES)

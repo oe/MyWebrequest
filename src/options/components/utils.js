@@ -163,7 +163,7 @@ function isSubRule (rule, subRule) {
 
   url1 = url1.replace(escapeRegExp, '(?:\\$&)').replace(/\*/g, '.*')
   url1 = `^${url1}$`
-  return new RegExp(url1).test(url2)
+  return RegExp(url1).test(url2)
 }
 
 // get keywords list(array) in route object
@@ -299,10 +299,10 @@ function getRouter (route, redirectUrl) {
     protocol = '\\w+'
   }
   // remove protocol
-  route = route.replace(/^([\w*]+):\/\//, '')
+  const routeWithoutPrtcl = route.replace(/^([\w*]+):\/\//, '')
 
   // replace query string with *
-  url += route
+  url += routeWithoutPrtcl
     .replace(/\?.*$/, '*')
     // replace named holder with * in host
     //   goos.{sub}.abc.com => *.abc.com
@@ -312,16 +312,22 @@ function getRouter (route, redirectUrl) {
     // replace named holder with * in path
     .replace(/\{\*?[^}]+\}.*$/, '*')
   // add a asterisk to disable strict match
-  result.url = url.replace(/\*+/, '') + '*'
+  result.url = url.replace(/\*+/, '*').replace(/\*$/, '') + '*'
 
-  let parts = route.split('?')
+  let parts = routeWithoutPrtcl.split('?')
   // route contains more than one ?
   if (parts.length > 2) {
     return result
   }
   // get pathname & remove named params
   const pathname = parts[0].replace(/{[^}]}/g, 'xx').replace(/$[^/]+\//, '')
-  result.hasWildcard = /\*/.test(pathname)
+  // has wildcard param
+  result.hasWdCd = /\*/.test(pathname)
+  if (result.hasWdCd) {
+    // remove the first * in path and the following
+    const reg = route.replace(/(?<=(\w\/[^*?]*))(\*.*)$/, '')
+    result.wdCdReg = '^' + reg.replace(/\{[^}]+\}/g, '.+').replace(/\*/g, '.*')
+  }
 
   result.hasQs = parts.length === 2 && !!parts[1]
   let params = []
