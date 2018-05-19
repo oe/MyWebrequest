@@ -5,7 +5,7 @@ import i18n from './i18n'
 
 export default {
   // reg to match [protocol, host, path, query]
-  urlComponentReg: /^([^:]+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/,
+  urlComponentReg: /^([^:]+):\/\/([^/]+)(\/[^?]*)(\?(.*))?$/,
   RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'cors'],
   // parse querystring to object
   parseQs: qs.parse,

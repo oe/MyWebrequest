@@ -67,9 +67,9 @@ export default {
       if (this.ruleID) {
         const rule = this.getRuleByID(this.ruleID)
         if (rule) {
-          const matchs = rule.matchUrl.match(/^([^:]+):\/\/(.+)$/)
+          const matchs = utils.getURLParts(rule.matchUrl)
           this.form.protocol = matchs[1]
-          this.form.url = matchs[2]
+          this.form.url = matchs[2] + matchs[3] + (matchs[4] || '')
           this.form.redirectUrl = rule.redirectUrl
         }
       }

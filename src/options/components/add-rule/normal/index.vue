@@ -105,7 +105,8 @@ export default {
           if (parts) {
             this.form.protocol = parts[1]
             this.form.host = parts[2]
-            this.form.pathname = parts[3]
+            // remove leading / in pathname
+            this.form.pathname = parts[3].replace(/^\//, '') + (parts[4] || '')
           }
         }
       }
