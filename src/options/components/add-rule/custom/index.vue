@@ -5,6 +5,7 @@
       v-model="form.url"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
+      ref="firstInput"
       placeholder="choose protocol" >
       <el-select v-model="form.protocol" slot="prepend" placeholder="">
         <el-option label="*://" value="*"></el-option>

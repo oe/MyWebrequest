@@ -11,7 +11,7 @@
   </el-checkbox>
   
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
-  <component :is="formType"></component>
+  <component :is="formType" ref="form"></component>
   <rule-list :type="module" ref="list"></rule-list>
 </div>
 </template>
@@ -60,6 +60,13 @@ export default {
     },
     updateModule () {
       this.isEnabled = !!collection.get('onoff')[this.module]
+      this.$nextTick(() => {
+        try {
+          this.$refs.form.$refs.firstInput.focus()
+        } catch (e) {
+          console.error('Failed focus on first input of union page', e)
+        }
+      })
     }
   },
   watch: {

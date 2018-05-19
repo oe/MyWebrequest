@@ -4,7 +4,7 @@
   <el-row>
     <el-col :span="16">
       <el-tabs tab-position="left" class="qrcode-tabs" @tab-click="onTabClick">
-        <el-tab-pane :label="$t('typeText')">
+        <el-tab-pane :label="$t('typeText')" ref="firstTab">
           <el-form size="small" :model="text">
             <el-form-item>
               <el-input type="textarea" autofocus resize="none" :rows="12" v-model="text.content" :placeholder="$t('textPlhd')"></el-input>
@@ -88,17 +88,23 @@ export default {
   },
   mounted () {
     this.updateQRCode('https://app.evecalm.com/')
+    this.$nextTick(() => {
+      this.focusTabsFirstInput(this.$refs.firstTab)
+    })
   },
   methods: {
     onTabClick (tab) {
       this.$nextTick(() => {
-        try {
-          // tab -> form -> form-item -> input -> focus()
-          tab.$children[0].$children[0].$children[0].focus()
-        } catch (e) {
-          console.warn('Failed to focus the first input', e)
-        }
+        this.focusTabsFirstInput(tab)
       })
+    },
+    focusTabsFirstInput (tab) {
+      try {
+        // tab -> form -> form-item -> input -> focus()
+        tab.$children[0].$children[0].$children[0].focus()
+      } catch (e) {
+        console.warn('Failed to focus the first input', e)
+      }
     },
     updateQRCode (text) {
       this.qrError = ''

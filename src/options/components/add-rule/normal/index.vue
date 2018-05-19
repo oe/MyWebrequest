@@ -1,5 +1,35 @@
 <template>
-<div class="rule-form-normal">
+<el-form label-position="top" :model="form" ref="ruleForm">
+  <el-form-item size="small" :prop="form.host" :label="$t('matchLbl')" :error="errorMsg">
+    <el-col :span="10">
+      <el-input
+        v-model="form.host"
+        @input="onFormChange"
+        @paste.native="onPaste"
+        @keyup.native.enter="onAddRule"
+        ref="firstInput"
+        v-popover:urlPopover
+        placeholder="host, required, paste a url here" >
+        <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
+          <el-option label="*://" value="*"></el-option>
+          <el-option label="http://" value="http"></el-option>
+          <el-option label="https://" value="https"></el-option>
+        </el-select>
+      </el-input>
+    </el-col>
+    <el-col :span="1" class="path-sep">/</el-col>
+    <el-col :span="13">
+      <el-input
+        size="small"
+        v-model="form.pathname"
+        @input="onFormChange"
+        @paste.native="onPaste"
+        @keyup.native.enter="onAddRule"
+        placeholder="pathname and querystring, optional" >
+        <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+      </el-input>
+    </el-col>
+  </el-form-item>
   <el-popover
     ref="urlPopover"
     placement="bottom"
@@ -7,38 +37,7 @@
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover>
-  <el-form label-position="top" :model="form" ref="ruleForm">
-    <el-form-item size="small" :prop="form.host" :label="$t('matchLbl')" :error="errorMsg">
-      <el-col :span="10">
-        <el-input
-          v-model="form.host"
-          @input="onFormChange"
-          @paste.native="onPaste"
-          @keyup.native.enter="onAddRule"
-          v-popover:urlPopover
-          placeholder="host, required, paste a url here" >
-          <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
-            <el-option label="*://" value="*"></el-option>
-            <el-option label="http://" value="http"></el-option>
-            <el-option label="https://" value="https"></el-option>
-          </el-select>
-        </el-input>
-      </el-col>
-      <el-col :span="1" class="path-sep">/</el-col>
-      <el-col :span="13">
-        <el-input
-          size="small"
-          v-model="form.pathname"
-          @input="onFormChange"
-          @paste.native="onPaste"
-          @keyup.native.enter="onAddRule"
-          placeholder="pathname and querystring, optional" >
-          <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-        </el-input>
-      </el-col>
-    </el-form-item>
-  </el-form>
-</div>
+</el-form>
 </template>
 
 <script>
