@@ -42,11 +42,11 @@ function isProtocol (protocol) {
   return protocols.indexOf(protocol) !== -1
 }
 
-// reg to match [protocol, host, path, query]
 // const urlComponentReg = /^(\*|\w+):\/\/([^/]+)\/([^?]*)(\?(.*))?$/
 
 /**
  * parse url by reg
+ *  match [, protocol, host, path, query]
  *   difference from parseURL: (url) may be invalid url but a valid rule
  * @param  {String} url string
  * @return {Array}

@@ -1,6 +1,6 @@
 <template>
 <el-form label-position="top" :model="form" ref="ruleForm">
-  <el-form-item size="small" :prop="form.host" :label="$t('matchLbl')" :error="errorMsg">
+  <el-form-item size="small" :label="$t('matchLbl')" :error="errorMsg">
     <el-col :span="10">
       <el-input
         v-model="form.host"
@@ -63,9 +63,6 @@ export default {
       isHiding: false
     }
   },
-  created () {
-    this.updateModule()
-  },
   mounted () {
     window.ff = this.$refs.ruleForm
   },
@@ -74,7 +71,7 @@ export default {
       try {
         const url = this.validateRule(this.form.protocol, this.form.host, this.form.pathname)
         this.addRule(url)
-        this.resetForm()
+        this.clearForm()
       } catch (e) {
         this.showInputError('Same rule has already added')
         console.error('failed', e)
@@ -97,10 +94,22 @@ export default {
         this.isHiding = false
       }, 1000)
     },
-    updateModule () {
+    resetForm () {
+      this.clearForm()
       const isHsts = this.module === 'hsts'
       this.disableProtocol = isHsts
-      this.protocol = isHsts ? 'http' : '*'
+      if (this.ruleID) {
+        const rule = this.getRuleByID(this.ruleID)
+        if (rule) {
+          const parts = utils.getURLParts(rule.url)
+          if (parts) {
+            this.form.protocol = parts[1]
+            this.form.host = parts[2]
+            this.form.pathname = parts[3]
+          }
+        }
+      }
+      if (isHsts) this.form.protocol = 'http'
     },
     validateRule (protocol, host, path) {
       path = path.trim() || '*'
@@ -123,11 +132,6 @@ export default {
         }
       })
       return url
-    }
-  },
-  watch: {
-    $route () {
-      this.updateModule()
     }
   }
 }

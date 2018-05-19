@@ -90,7 +90,6 @@ export default {
     focusFormFirstInput (formName) {
       setTimeout(() => {
         try {
-          console.log('refs', this.$refs)
           this.$refs[formName].$refs.firstInput.focus()
         } catch (e) {
           console.error('Failed focus on first input of union page', e)

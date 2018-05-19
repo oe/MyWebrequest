@@ -23,6 +23,9 @@ export default {
       default: ''
     }
   },
+  created () {
+    this.resetForm()
+  },
   methods: {
     ...mapActions(['addRule']),
     onPaste (e) {
@@ -50,7 +53,7 @@ export default {
       }
     },
     onAddRule () {},
-    resetForm () {
+    clearForm () {
       Object.keys(this.form).forEach(key => {
         let val = ''
         if (key === 'protocol') val = this.module === 'hsts' ? 'http' : '*'
@@ -60,6 +63,9 @@ export default {
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
       return cutils.findInArr(this.rules, itm => itm.url === url)
+    },
+    getRuleByID (id) {
+      return this.rules.find(rule => rule.id === id)
     }
   },
   computed: {
@@ -67,5 +73,10 @@ export default {
       module: state => state.module,
       rules: state => state.rules
     })
+  },
+  watch: {
+    $route () {
+      this.resetForm()
+    }
   }
 }

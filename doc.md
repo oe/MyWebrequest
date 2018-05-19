@@ -7,6 +7,7 @@
 [
   // rule url match pattern
   {
+    id: 'xxxx',
     // rule is enabled or not
     enabled: true,
     // original match url
@@ -38,6 +39,7 @@
 ### Normal rule
 ```js
 [{
+    id: 'xxxx',
     // rule is active or not
     enabled: true,
     // original match url pattern

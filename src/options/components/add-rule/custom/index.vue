@@ -1,6 +1,6 @@
 <template>
 <el-form ref="ruleForm" :model="form" label-position="left" label-width="106px">
-  <el-form-item size="small" :prop="form.url" :label="$t('matchLbl')">
+  <el-form-item size="small" :label="$t('matchLbl')">
     <el-input
       v-model="form.url"
       @paste.native="onPaste"
@@ -15,21 +15,21 @@
     </el-input>
   </el-form-item>
 
-  <el-form-item size="small" :prop="form.redirectUrl" label="Redirect url to">
+  <el-form-item size="small" label="Redirect url to">
     <el-input
       v-model="form.redirectUrl"
       placeholder="choose protocol" >
     </el-input>
   </el-form-item>
 
-  <el-form-item size="small" :prop="form.testUrl" label="Test your rule">
+  <el-form-item size="small" label="Test your rule">
     <el-input
       v-model="form.testUrl"
       placeholder="choose protocol" >
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
-  <el-form-item size="small" :prop="form.testResult" label="Test Result">
+  <el-form-item size="small" label="Test Result">
     <el-input
       v-model="form.testResult"
       placeholder="choose protocol" >
@@ -53,8 +53,8 @@ export default {
   data () {
     return {
       form: {
-        url: '',
         protocol: '*',
+        url: '',
         redirectUrl: '',
         testUrl: '',
         testResult: ''
@@ -62,6 +62,18 @@ export default {
     }
   },
   methods: {
+    resetForm () {
+      this.clearForm()
+      if (this.ruleID) {
+        const rule = this.getRuleByID(this.ruleID)
+        if (rule) {
+          const matchs = rule.matchUrl.match(/^([^:]+):\/\/(.+)$/)
+          this.form.protocol = matchs[1]
+          this.form.url = matchs[2]
+          this.form.redirectUrl = rule.redirectUrl
+        }
+      }
+    },
     onTestRule () {
       try {
         const router = cutils.preprocessRouter(this.getRouter())
@@ -74,7 +86,7 @@ export default {
       try {
         const router = this.getRouter()
         this.addRule(router)
-        this.resetForm()
+        this.clearForm()
       } catch (e) {
         console.error(e)
       }
