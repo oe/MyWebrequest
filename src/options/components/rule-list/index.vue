@@ -28,7 +28,7 @@
       cell-class-name="rule-cell"
       show-overflow-tooltip>
       <template slot-scope="scope">
-        <div v-if="type === 'custom'" class="cs-cell">
+        <div v-if="module === 'custom'" class="cs-cell">
           <div>{{scope.row.matchUrl}}</div>
           <div>{{scope.row.redirectUrl}}</div>
         </div>
@@ -56,18 +56,11 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
-// import utils from '@/options/components/utils'
+import { mapGetters, mapActions, mapState } from 'vuex'
 import locales from './locales.json'
 
 export default {
   locales,
-  props: {
-    type: {
-      type: String,
-      required: true
-    }
-  },
   mounted () {
     window.tbl = this.$refs.tbl
   },
@@ -86,10 +79,16 @@ export default {
       this.removeRules(scope.row.id)
     },
     onEditItem (scope) {
-
+      this.$router.push({
+        path: `/${this.module}/edit`,
+        query: { id: scope.row.id }
+      })
     }
   },
   computed: {
+    ...mapState({
+      module: state => state.module
+    }),
     ...mapGetters({
       rules: 'sortedRules'
     }),

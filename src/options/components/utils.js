@@ -24,6 +24,10 @@ function guid () {
   )
 }
 
+// get module name from route path
+function getModuleName (path) {
+  return path.replace(/(^\/|(?<=[^/])\/.*$)/g, '')
+}
 /**
  * is string a supported protocol
  * @param  {String}  protocol
@@ -439,6 +443,7 @@ function debounce (fn, wait) {
 
 export default {
   guid,
+  getModuleName,
   getURLParts,
   isProtocol,
   isIP,

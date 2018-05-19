@@ -17,6 +17,12 @@ export function mergeLang (lang = {}) {
 }
 
 export default {
+  props: {
+    ruleID: {
+      type: String,
+      default: ''
+    }
+  },
   methods: {
     ...mapActions(['addRule']),
     onPaste (e) {

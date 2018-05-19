@@ -33,7 +33,7 @@
     <el-input
       v-model="form.testResult"
       placeholder="choose protocol" >
-      <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+      <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
     </el-input>
   </el-form-item>
 </el-form>

@@ -26,17 +26,17 @@
         @paste.native="onPaste"
         @keyup.native.enter="onAddRule"
         placeholder="pathname and querystring, optional" >
-        <el-button slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+        <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
       </el-input>
     </el-col>
   </el-form-item>
-  <el-popover
+<!--   <el-popover
     ref="urlPopover"
     placement="bottom"
     title="标题"
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
-  </el-popover>
+  </el-popover> -->
 </el-form>
 </template>
 
@@ -68,8 +68,6 @@ export default {
   },
   mounted () {
     window.ff = this.$refs.ruleForm
-  },
-  computed: {
   },
   methods: {
     onAddRule () {

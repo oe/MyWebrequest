@@ -10,6 +10,7 @@
 <script>
 import { mapActions } from 'vuex'
 import sidebar from './components/sidebar'
+import utils from './components/utils'
 
 export default {
   components: {
@@ -20,9 +21,11 @@ export default {
   },
   methods: {
     ...mapActions(['changeModule']),
-    changeRoute (router) {
+    changeRoute (route) {
       this.changeModule({
-        module: router.path.replace('/', '')
+        moduleMethod: route.params[0] || '',
+        query: route.query,
+        module: utils.getModuleName(route.path)
       })
     }
   },
