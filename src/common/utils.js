@@ -179,21 +179,5 @@ export default {
         return Object.keys(o).map(k => o[k])
       }
     }
-  })(),
-  findInArr: (function () {
-    if (Array.prototype.find) {
-      return function (arr, fn) {
-        return arr.find(fn)
-      }
-    } else {
-      return function (arr, fn) {
-        const len = arr.length
-        let i = 0
-        while (i < len) {
-          if (fn(arr[i], i, arr)) return arr[i]
-          ++i
-        }
-      }
-    }
   })()
 }

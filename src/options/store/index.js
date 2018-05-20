@@ -42,7 +42,7 @@ const mutations = {
   toggleRule (state, id) {
     const rules = state.rules
     if (!Array.isArray(rules)) return
-    const rule = cutils.findInArr(rules, el => el.id === id)
+    const rule = rules.find(el => el.id === id)
     if (!rule) return
     rule.enabled = !rule.enabled
   },
@@ -51,7 +51,6 @@ const mutations = {
     if (typeof rule === 'string') {
       rule = { url: rule }
     }
-
     rule = Object.assign(
       {
         id: utils.guid(),
@@ -61,7 +60,12 @@ const mutations = {
       },
       rule
     )
-    state.rules.push(rule)
+    const existRule = state.rules.find(r => r.id === rule.id)
+    if (existRule) {
+      Object.assign(existRule, rule)
+    } else {
+      state.rules.push(rule)
+    }
   },
   removeRules (state, ids) {
     const rules = state.rules && state.rules.length && state.rules

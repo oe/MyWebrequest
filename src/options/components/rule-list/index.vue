@@ -79,7 +79,7 @@ export default {
       this.removeRules(scope.row.id)
     },
     onEditItem (scope) {
-      this.$router.push({
+      this.$router.replace({
         path: `/${this.module}/edit`,
         query: { id: scope.row.id }
       })

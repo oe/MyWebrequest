@@ -20,9 +20,7 @@
     "default_popup": "popup/index.html"
   },
   "background": {
-    "scripts": [
-      "background/index.js"
-    ]
+    "page": "background/index.html"
   },
   "permissions": [
     "*://*/*",

@@ -156,11 +156,11 @@ function parseURL (url) {
 function isSubRule (rule, subRule) {
   let matches = cutils.urlComponentReg.exec(rule)
   let prtl1 = matches[1]
-  let url1 = matches[2] + '/' + matches[3]
+  let url1 = matches[2] + matches[3]
 
   matches = cutils.urlComponentReg.exec(subRule)
   let prtl2 = matches[1]
-  let url2 = matches[2] + '/' + matches[3]
+  let url2 = matches[2] + matches[3]
   if (prtl1 !== '*' && prtl1 !== prtl2) {
     return false
   }
@@ -193,10 +193,20 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
     url += '/'
   }
 
+  // should contains no special chars(:?/) in param name
+  //  if got these chars, the following getURLParts won't work
+  if (hasNamedParams) {
+    if (/\{.*[:?/].*\}/.test(url)) throw new Error('noSpecialCharInName')
+  }
   // should be a valid url format
-  const matches = cutils.urlComponentReg.exec(url)
+  const matches = getURLParts(url)
   if (!matches) throw new Error('invalidURLFormat')
   const [, protocol, host, path, qs] = matches
+  // match rule should contains no host port
+  //  chrome general match all ports
+  if (!(hasNamedParams && isRedirect)) {
+    if (/:\d+$/.test(host)) throw new Error('notPortInMatchrule')
+  }
   // protocol is valid
   // const protocol = matches[1]
   if (!isProtocol(protocol)) throw new Error('invalidProtocol')
@@ -207,7 +217,12 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
   //    *.com  is invalid
   if (
     !(hasNamedParams && isRedirect) &&
-    !/(?<=(^|\.))[-\w]+\.\w+$/.test(host)
+    // match for *.xxx.xxx and xxx.xxx
+    !(
+      /(?<=(^|\.))[-\w]+\.\w+$/.test(host) ||
+      // match for xxx like localhost
+      /^[-\w]+$/.test(host)
+    )
   ) {
     throw new Error('subdomainNotSpecified')
   }
@@ -243,7 +258,6 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
   if (/\*{2,}/.test(normalized)) throw new Error('noContinuesStars')
   // replace * to xxx
   normalized = normalized.replace(/^\*/, 'http').replace(/\*/g, 'xxx')
-  console.log('test normalized', normalized)
   // not a valid rule
   if (!isURL(normalized)) throw new Error('notAValidURL')
   // no params found in redirect url
@@ -351,7 +365,6 @@ function getRouter (route, redirectUrl) {
         return '([^/?]+)'
       }
     })
-  console.warn('getrouter part', part)
   result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?`
   result.params = params
 

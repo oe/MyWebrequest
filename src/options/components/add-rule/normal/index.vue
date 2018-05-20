@@ -68,13 +68,25 @@ export default {
   },
   methods: {
     onAddRule () {
+      return this.addARule()
+    },
+    onUpdateRule () {
+      return this.addARule(this.ruleID)
+    },
+    addARule (ruleID) {
       try {
-        const url = this.validateRule(this.form.protocol, this.form.host, this.form.pathname)
+        let url = this.validateRule(this.form, ruleID)
+        if (ruleID) {
+          const rule = this.getRuleByID(this.ruleID)
+          url = Object.assign({}, rule, {url, updatedAt: Date.now()})
+        }
         this.addRule(url)
         this.clearForm()
+        return true
       } catch (e) {
         this.showInputError('Same rule has already added')
         console.error('failed', e)
+        return false
       }
     },
     onFormChange () {
@@ -112,15 +124,25 @@ export default {
       }
       if (isHsts) this.form.protocol = 'http'
     },
-    validateRule (protocol, host, path) {
-      path = path.trim() || '*'
-      host = host.trim()
+    /**
+     * validate form data
+     *   if not pass this validate, an error will be throwed
+     * @param  {Object} data     rule components
+     * @param  {String|Null} ignoreID if passed, ignore this id when check duplicated rules (for updating an existing rule)
+     * @return {String}          validated rule
+     */
+    validateRule (data, ignoreID) {
+      const protocol = data.protocol
+      const host = data.host.trim()
+      const path = data.pathname.trim() || '*'
       if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
       if (!host) throw new Error('emptyHost')
       const url = `${protocol}://${host}/${path}`
       utils.testURLRuleValid(url)
       if (this.isRuleExist(url)) throw new Error('ruleExists')
+      // test for duplicated match rule
       this.rules.some((rule) => {
+        if (ignoreID && rule.id === ignoreID) return false
         let err
         if (utils.isSubRule(rule.url, url)) {
           err = new Error('ruleBeIncluded')

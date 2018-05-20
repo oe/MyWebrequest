@@ -1,24 +1,33 @@
 import utils from './utils'
 
 export default {
-  get (cat) {
+  get (cat, key) {
     const defVal = utils.isUrlRuleType(cat) ? [] : {}
-    return JSON.parse(localStorage.getItem(cat)) || defVal
+    const result = JSON.parse(localStorage.getItem(cat)) || defVal
+    return typeof key === 'undefined' ? result : result[key]
   },
-  save (key, data) {
-    localStorage.setItem(key, JSON.stringify(data))
+  save (cat, key, val) {
+    let data = key
+    if (arguments.length === 3) {
+      data = this.get(cat)
+      data[key] = val
+    }
+    localStorage.setItem(cat, JSON.stringify(data))
   },
   getKey (key) {
     return localStorage.getItem(key)
   },
   setOnoff (type, val) {
-    const onoff = this.get('onoff')
-    onoff[type] = !!val
-    this.save('onoff', onoff)
+    this.save('onoff', type, !!val)
   },
   getOnoff (type) {
-    const onoff = this.get('onoff')
-    return onoff[type]
+    return this.get('onoff', type)
+  },
+  getConfig (type) {
+    return this.get('config', type)
+  },
+  setConfig (type, val) {
+    this.save('config', type, val)
   },
   getRouter4Custom () {
     // ignore disabled
@@ -29,6 +38,16 @@ export default {
         acc[cur.url] = cur
       } catch (e) {
         console.error('custom rule invalid', cur, e)
+      }
+      return acc
+    }, {})
+  },
+  getExtensionData () {
+    return Object.keys(localStorage).reduce((acc, key) => {
+      try {
+        acc[key] = JSON.parse(localStorage.getItem(key))
+      } catch (e) {
+        acc[key] = localStorage.getItem(key)
       }
       return acc
     }, {})

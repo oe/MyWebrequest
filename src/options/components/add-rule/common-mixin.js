@@ -1,6 +1,5 @@
 // import VueI18n from 'vue-i18n'
 import utils from '@/options/components/utils'
-import cutils from '@/common/utils'
 import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
 
@@ -62,7 +61,7 @@ export default {
     },
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
-      return cutils.findInArr(this.rules, itm => itm.url === url)
+      return this.rules.find(itm => itm.url === url)
     },
     getRuleByID (id) {
       return this.rules.find(rule => rule.id === id)

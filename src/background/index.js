@@ -407,7 +407,8 @@ function init () {
     toggleRule(type, rule, true)
   }
   collection.save('onoff', onoff)
-  updateExtIcon(collection.getKey('iconStyle'))
+  const config = collection.get('config')
+  updateExtIcon(config.iconStyle)
 }
 
 init()

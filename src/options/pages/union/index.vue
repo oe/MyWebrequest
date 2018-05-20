@@ -13,12 +13,16 @@
   <div class="item-title">{{ $t('addRuleTitle') }}</div>
   <component :is="formType" ref="form"></component>
   <rule-list ref="list"></rule-list>
-  <el-dialog title="Edit this rule" :visible.sync="showEditDialog" @close="onDlgClose">
+  <el-dialog
+    custom-class="rule-dialog"
+    title="Edit this rule"
+    :visible.sync="showEditDialog"
+    @close="onDlgClose">
     <component ref="dlgForm" :is="formType" :ruleID="ruleID"></component>
     <div slot="footer" class="dialog-footer">
       <el-button size="small" @click="showEditDialog=false">Cancel</el-button>
-      <el-button size="small" type="primary" @click="showEditDialog=false">Update</el-button>
-      <el-button size="small" type="primary" @click="showEditDialog=false">Save as a new Rule</el-button>
+      <el-button size="small" type="primary" @click="onUpdateRule">Update</el-button>
+      <el-button size="small" type="primary" @click="onSaveANewRule">Save as a new Rule</el-button>
       </div>
   </el-dialog>
 </div>
@@ -67,6 +71,26 @@ export default {
     // restore router
     onDlgClose () {
       this.$router.replace({path: '/' + this.module})
+    },
+    onUpdateRule () {
+      if (this.$refs.dlgForm.onUpdateRule()) {
+        this.showEditDialog = false
+        this.$message({
+          showClose: true,
+          message: 'Rule has been updated',
+          type: 'success'
+        })
+      }
+    },
+    onSaveANewRule () {
+      if (this.$refs.dlgForm.onAddRule()) {
+        this.showEditDialog = false
+        this.$message({
+          showClose: true,
+          message: 'A new rule has been added',
+          type: 'success'
+        })
+      }
     },
     onFeatureSatusChange () {
       const onoff = collection.get('onoff')
@@ -121,4 +145,10 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
+.rule-dialog {
+  .el-dialog__body {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
 </style>

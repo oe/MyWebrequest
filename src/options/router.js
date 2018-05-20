@@ -7,6 +7,7 @@ import qrcode from './pages/qrcode'
 import settings from './pages/settings'
 
 Vue.use(VueRouter)
+// pages use union-component to show
 const UNION_PAGES = ['block', 'custom', 'hsts', 'hotlink', 'log', 'cors']
 
 export default new VueRouter({

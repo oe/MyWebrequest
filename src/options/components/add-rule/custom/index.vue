@@ -83,12 +83,46 @@ export default {
       }
     },
     onAddRule () {
+      return this.addARule()
+    },
+    onUpdateRule () {
+      return this.addARule(this.ruleID)
+    },
+    /**
+     * add/update a rule
+     * @param {String} ruleID specified ruleID to update, add one if ignored
+     */
+    addARule (ruleID) {
       try {
-        const router = this.getRouter()
+        let router = this.getRouter()
+        const url = router.url
+        // test for duplicated match rule
+        this.rules.some((rule) => {
+          if (ruleID && rule.id === ruleID) return false
+          let err
+          if (utils.isSubRule(rule.url, url)) {
+            err = new Error('ruleBeIncluded')
+          } else if (utils.isSubRule(url, rule.url)) {
+            err = new Error('ruleIncludOthers')
+          }
+          if (err) {
+            err.rule = rule
+            throw err
+          }
+        })
+
+        if (ruleID) {
+          const rule = this.getRuleByID(ruleID)
+          router = Object.assign({}, rule, router, {
+            updatedAt: Date.now()
+          })
+        }
         this.addRule(router)
         this.clearForm()
+        return true
       } catch (e) {
         console.error(e)
+        return false
       }
     },
     getRouter () {
