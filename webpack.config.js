@@ -41,7 +41,8 @@ const config = {
     // your entry file file (entry.ts or entry.js)
     'background/index': ['./src/background/index.js'],
     'popup/index': ['./src/popup/index.js'],
-    'options/index': ['./src/options/index.js']
+    'options/index': ['./src/options/index.js'],
+    'content-scripts/qr': ['./src/content-scripts/qr.js']
   },
   notHotReload: [],
   mode: process.env.NODE_ENV,

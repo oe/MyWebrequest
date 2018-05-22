@@ -1,6 +1,7 @@
 import clonedeep from 'lodash.clonedeep'
 import utils from '@/common/utils'
 import collection from '@/common/collection'
+import './contextmenu'
 
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
