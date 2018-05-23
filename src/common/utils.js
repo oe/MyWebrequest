@@ -113,7 +113,7 @@ export default {
   // fill a custom url redirect rule with data
   fillPattern (pattern, data) {
     pattern = pattern.replace(
-      /(?<=(\?|&))([^=]+)=\{([^}]+)\}/g,
+      /(?<=[?|&])([^=]+)=\{([^}]+)\}/g,
       ($0, $1, $2) => {
         const val = data[$2] != null ? data[$2] : ''
         return this.toQueryString($1, val)

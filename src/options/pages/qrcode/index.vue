@@ -106,17 +106,15 @@ export default {
         console.warn('Failed to focus the first input', e)
       }
     },
-    updateQRCode (text) {
+    async updateQRCode (text) {
       this.qrError = ''
-      qrcode.makeQRCode(text, (err, url) => {
-        if (err) {
-          this.qrError = 'genQrFailed'
-          this.errorMsg = err.message
-          console.warn('Failed to generate QRcode', err)
-        } else {
-          this.$refs.qr.src = url
-        }
-      })
+      try {
+        this.$refs.qr.src = await qrcode.makeQRCode(text)
+      } catch (e) {
+        this.qrError = 'genQrFailed'
+        this.errorMsg = e.message
+        console.warn('Failed to generate QRcode', e)
+      }
     },
     validate (obj) {
       const content = Object.keys(obj).map((key) => obj[key]).join('').trim()

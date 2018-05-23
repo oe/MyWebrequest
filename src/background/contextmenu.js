@@ -1,19 +1,40 @@
-function createMenu () {
+// add context menu
+function addMenu () {
+  console.warn('add menu')
+  // for selected text
   chrome.contextMenus.create({
-    id: 'selection',
+    id: 'text',
     title: 'Get QRCode of Selected Text',
     type: 'normal',
-    contexts: ['selection']
+    contexts: ['selection'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
   })
 
+  // for a tag
   chrome.contextMenus.create({
     id: 'link',
     title: 'Get QRCode of Link',
     type: 'normal',
-    contexts: ['link']
+    contexts: ['link'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
+  })
+
+  // for image, video, audio
+  chrome.contextMenus.create({
+    id: 'media',
+    title: 'Get QRCode of Media',
+    type: 'normal',
+    contexts: ['image', 'video', 'audio'],
+    documentUrlPatterns: ['http://*/*', 'https://*/*']
   })
 
   chrome.contextMenus.onClicked.addListener(onMenuClick)
+}
+
+// remove all context menu
+function removeMenu () {
+  console.warn('remove menu')
+  chrome.contextMenus.removeAll()
 }
 
 function onMenuClick (info, tab) {
@@ -21,10 +42,19 @@ function onMenuClick (info, tab) {
     time: Date.now(),
     type: info.menuItemId
   }
-  if (info.menuItemId === 'selection') {
-    data.content = info.selectionText
-  } else if (info.menuItemId === 'link') {
-    data.content = info.linkUrl
+  switch (info.menuItemId) {
+    case 'media':
+      data.content = info.srcUrl
+      break
+    case 'text':
+      data.content = info.selectionText
+      break
+    case 'link':
+      data.content = info.linkUrl
+      break
+    default:
+      console.warn('not support menu item', info)
+      return
   }
   if (!data.content) return
   chrome.storage.local.set({ 'qr-popup': data })
@@ -34,4 +64,7 @@ function onMenuClick (info, tab) {
   })
 }
 
-createMenu()
+export default {
+  addMenu,
+  removeMenu
+}

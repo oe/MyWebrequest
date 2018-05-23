@@ -12,6 +12,8 @@
         </span>Grey</el-radio>      
     </div>
   </el-radio-group>
+  <div class="item-title">Show QR ContextMenu</div>
+  <el-checkbox v-model="showQrMenu">Enable ContextMenu</el-checkbox>
   <div class="item-title">Data Backup / Restore</div>
   <div class="backup-restore">
     <div class="actions">
@@ -34,12 +36,15 @@ import { mapState } from 'vuex'
 export default {
   data () {
     return {
-      iconStyle: 'colored'
+      iconStyle: 'colored',
+      showQrMenu: false
     }
   },
   created () {
     window.sss = this
-    this.iconStyle = collection.getConfig('iconStyle') || 'colored'
+    const config = collection.get('config')
+    this.iconStyle = config.iconStyle || 'colored'
+    this.showQrMenu = config.showQrMenu || false
   },
   computed: {
     ...mapState({
@@ -74,6 +79,9 @@ export default {
     iconStyle (val, olval) {
       console.warn('val&olval', val, olval)
       collection.setConfig('iconStyle', val)
+    },
+    showQrMenu (val) {
+      collection.setConfig('showQrMenu', val)
     }
   }
 }

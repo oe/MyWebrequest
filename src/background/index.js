@@ -1,7 +1,7 @@
 import clonedeep from 'lodash.clonedeep'
 import utils from '@/common/utils'
 import collection from '@/common/collection'
-import './contextmenu'
+import menu from './contextmenu'
 
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
@@ -410,6 +410,9 @@ function init () {
   collection.save('onoff', onoff)
   const config = collection.get('config')
   updateExtIcon(config.iconStyle)
+  if (config.showQrMenu) {
+    menu.addMenu()
+  }
 }
 
 init()
@@ -431,6 +434,9 @@ window.addEventListener('storage', function (event) {
   if (type === 'config') {
     if (newData.iconStyle !== oldData.iconStyle) {
       updateExtIcon(newData.iconStyle)
+    }
+    if (newData.showQrMenu !== oldData.showQrMenu) {
+      newData.showQrMenu ? menu.addMenu() : menu.removeMenu()
     }
     return
   }

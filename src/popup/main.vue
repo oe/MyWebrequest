@@ -73,15 +73,13 @@ export default {
     onMakeBtnClick () {
       this.getCode(this.text)
     },
-    getCode (text) {
+    async getCode (text) {
       this.isEdit = false
-      qrcode.makeQRCode(text, (err, url) => {
-        if (err) {
-          console.log('err', err)
-        } else {
-          this.$refs.qr.src = url
-        }
-      })
+      try {
+        this.$refs.qr.src = await qrcode.makeQRCode(text)
+      } catch (e) {
+        console.log('err', e)
+      }
     }
   },
   watch: {
@@ -100,10 +98,9 @@ export default {
 @import '~@/common/base';
 @import '~@/common/widgets';
 
-html, body {
+.popup {
   width: 260px;
 }
-
 .title-wrapper {
   color: #555;
   padding: 4px;
