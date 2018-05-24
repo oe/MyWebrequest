@@ -10,7 +10,7 @@
         <textarea v-model="text" @keydown="onEnter" ref="textarea"></textarea>
         <div class="text-footer">
           <span class="error-tip" :hidden="!isToolong">{{ $t('textToolong') }}</span>
-          <div class="letter-counter">{{text.trim().length}}/{{ maxLength }}</div>
+          <div class="letter-counter">{{text.trim().length}}</div>
         </div>
       </div>
       <div class="action-btn">
@@ -20,14 +20,12 @@
         <a href="/options/index.html#qrcode" target="_blank">{{ $t('moreLink') }}</a>
       </div>
     </div>
-    <div class="qrcode" v-show="!isEdit" @dblclick="onEdit">
-      <img ref="qr">
-    </div>
+    <qr-img v-show="!isEdit" :text="text" @dblclick.native="onEdit"></qr-img>
   </div>
 </div>
 </template>
 <script>
-import qrcode from '@/common/qrcode'
+import qrImg from '@/options/components/qr-img'
 import locales from './locales.json'
 
 export default {
@@ -38,9 +36,11 @@ export default {
       isEdit: false,
       isToolong: false,
       isCustomText: false,
-      isMAC: qrcode.isMAC,
-      maxLength: qrcode.MAX_TEXT_LENGTH
+      isMAC: navigator.userAgent.indexOf('Macintosh') > -1
     }
+  },
+  components: {
+    qrImg
   },
   mounted () {
     chrome.tabs.query({
@@ -75,20 +75,7 @@ export default {
     },
     async getCode (text) {
       this.isEdit = false
-      try {
-        this.$refs.qr.src = await qrcode.makeQRCode(text)
-      } catch (e) {
-        console.log('err', e)
-      }
-    }
-  },
-  watch: {
-    text (val) {
-      if (val.trim().length > this.maxLength) {
-        this.isToolong = true
-      } else {
-        this.isToolong = false
-      }
+      this.text = text
     }
   }
 }

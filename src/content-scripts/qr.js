@@ -10,7 +10,7 @@ const styleText = `
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 102400;
+  z-index: 9999999;
   background-color: rgba(0,0,0,.6);
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
 }
@@ -56,6 +56,7 @@ const styleText = `
   cursor: pointer;
   color: #046af5;
   transition: all .3s;
+  text-decoration: none;
 }
 .mwr-qr-footer .mwr-qr-copy:hover,
 .mwr-qr-footer .mwr-qr-open:hover {

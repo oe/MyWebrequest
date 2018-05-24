@@ -46,20 +46,15 @@
       </el-tabs>
     </el-col>
     <el-col :span="8">
-      <div class="qrcode-wrapper">
-        <img ref="qr" class="qrcode-img">
-        <div class="qrcode-error" v-if="qrError">
-          {{$t(qrError, [errorMsg])}}
-        </div>
-      </div>
+      <qr-img :text="qrText"></qr-img>
     </el-col>
   </el-row>
 </div>
 </template>
 
 <script>
-import qrcode from '@/common/qrcode'
 import utils from '@/options/components/utils'
+import qrImg from '@/options/components/qr-img'
 import locales from './locales.json'
 
 export default {
@@ -67,8 +62,7 @@ export default {
   data () {
     return {
       labelWidth: '90px',
-      qrError: '',
-      errorMsg: '',
+      qrText: '',
       text: {
         content: ''
       },
@@ -85,6 +79,9 @@ export default {
         content: ''
       }
     }
+  },
+  components: {
+    qrImg
   },
   mounted () {
     this.updateQRCode('https://app.evecalm.com/')
@@ -107,35 +104,17 @@ export default {
       }
     },
     async updateQRCode (text) {
-      this.qrError = ''
-      try {
-        this.$refs.qr.src = await qrcode.makeQRCode(text)
-      } catch (e) {
-        this.qrError = 'genQrFailed'
-        this.errorMsg = e.message
-        console.warn('Failed to generate QRcode', e)
-      }
-    },
-    validate (obj) {
-      const content = Object.keys(obj).map((key) => obj[key]).join('').trim()
-      if (!content) {
-        this.qrError = 'noTextContent'
-        return false
-      }
-      return true
+      this.qrText = text
     },
     getTextQR: utils.debounce(function () {
-      if (!this.validate(this.text)) return
       this.updateQRCode(this.text.content.trim())
     }),
     getVcardQR: utils.debounce(function () {
       const vcard = this.vcard
-      if (!this.validate(this.vcard)) return
       const content = Object.keys(vcard).map((key) => `${key}:${vcard[key]}`).join(';')
       this.updateQRCode(content)
     }),
     getMsgQR: utils.debounce(function () {
-      if (!this.validate(this.msg)) return
       const content = `smsto:${this.msg.tel.trim()}:${this.msg.content.trim()}`
       this.updateQRCode(content)
     })

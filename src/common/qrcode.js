@@ -2,7 +2,6 @@ import qrcode from 'qrcode'
 
 export default {
   MAX_TEXT_LENGTH: 300,
-  isMAC: navigator.userAgent.indexOf('Macintosh') > -1,
   svg2png (svgStr, size) {
     const canvas = document.createElement('canvas')
     canvas.width = size
