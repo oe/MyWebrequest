@@ -20,7 +20,7 @@
         <a href="/options/index.html#qrcode" target="_blank">{{ $t('moreLink') }}</a>
       </div>
     </div>
-    <qr-img v-show="!isEdit" :text="text" @dblclick.native="onEdit"></qr-img>
+    <qr-img v-show="!isEdit" :text="text" :size="240" @dblclick.native="onEdit"></qr-img>
   </div>
 </div>
 </template>
@@ -101,10 +101,6 @@ export default {
     color: #999;
     font-size: 0.8em;
   }
-}
-
-.code-wrapper {
-  margin: 4px;
 }
 
 .text-container {

@@ -1,6 +1,6 @@
 <template>
 <div class="qrcode-wrapper">
-  <img ref="qr" class="qrcode-img">
+  <img ref="qr" class="qrcode-img" :style="sizeStyle">
   <div class="qrcode-error" v-if="qrError">
     {{$t(qrError, [errorMsg])}}
   </div>
@@ -24,6 +24,15 @@ export default {
       type: String, // String, Number, Boolean, Function, Object, Array
       required: true,
       default: ''
+    },
+    size: {
+      type: Number,
+      default: 200
+    }
+  },
+  computed: {
+    sizeStyle () {
+      return `width: ${this.size}px;height: ${this.size}px;`
     }
   },
   methods: {
@@ -53,19 +62,13 @@ export default {
 
 <style lang="scss">
 .qrcode-wrapper {
-  width: 220px;
-  height: 220px;
+  padding: 10px;
   text-align: center;
   margin: 0 auto;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  .qrcode-img {
-    width: 200px;
-    height: 200px;
-  }
 
   .qrcode-error {
     position: absolute;
