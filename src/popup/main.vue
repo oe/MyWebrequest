@@ -6,15 +6,9 @@
   </div>
   <div class="code-wrapper">
     <div class="text-container" v-show="isEdit">
-      <div class="textarea">
-        <textarea v-model="text" @keydown="onEnter" ref="textarea"></textarea>
-        <div class="text-footer">
-          <span class="error-tip" :hidden="!isToolong">{{ $t('textToolong') }}</span>
-          <div class="letter-counter">{{text.trim().length}}</div>
-        </div>
-      </div>
+      <textarea v-model="text" @keydown="onEnter" ref="textarea"></textarea>
       <div class="action-btn">
-        <button type="button" :disabled="isToolong" @click="onMakeBtnClick">
+        <button type="button" @click="onMakeBtnClick">
           {{ $t(isMAC ? 'qrMakeMacBtn': 'qrMakeBtn')}}
         </button>
         <a href="/options/index.html#qrcode" target="_blank">{{ $t('moreLink') }}</a>
@@ -34,7 +28,6 @@ export default {
     return {
       text: '',
       isEdit: false,
-      isToolong: false,
       isCustomText: false,
       isMAC: navigator.userAgent.indexOf('Macintosh') > -1
     }
@@ -42,14 +35,20 @@ export default {
   components: {
     qrImg
   },
+  created () {
+    document.body.style.opacity = 0
+    document.body.style.transition = 'opacity ease-out .3s'
+    requestAnimationFrame(() => {
+      document.body.style.opacity = 1
+    })
+  },
   mounted () {
     chrome.tabs.query({
       active: true,
       lastFocusedWindow: true
     }, (tabs) => {
       const content = tabs[0].url
-      this.text = content
-      this.getCode(content)
+      this.getCode(content, true)
     })
   },
   methods: {
@@ -60,7 +59,7 @@ export default {
       })
     },
     onEnter (e) {
-      if (!this.isToolong && (e.metaKey || e.ctrlKey) && e.keyCode === 13) {
+      if ((e.metaKey || e.ctrlKey) && e.keyCode === 13) {
         const t = this.text.trim()
         console.log('e', e, t)
         if (t.length) {
@@ -73,9 +72,23 @@ export default {
     onMakeBtnClick () {
       this.getCode(this.text)
     },
-    async getCode (text) {
+    /**
+     * get qrcode
+     * @param  {String} text  qr text
+     * @param  {Boolean} delay set true when use onload
+     *                          with a delay to fixed the bug:
+     *                          chrome resize popup page incorrectly
+     * ref: https://bugs.chromium.org/p/chromium/issues/detail?id=428044
+     */
+    getCode (text, delay) {
       this.isEdit = false
-      this.text = text
+      if (delay) {
+        setTimeout(() => {
+          this.text = text
+        }, 50)
+      } else {
+        this.text = text
+      }
     }
   }
 }
@@ -83,10 +96,14 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
-@import '~@/common/widgets';
-
+$popup-width: 260px;
+html, body {
+  width: $popup-width;
+  height: 312px;
+  overflow: hidden;
+}
 .popup {
-  width: 260px;
+  width: $popup-width;
 }
 .title-wrapper {
   color: #555;
@@ -108,66 +125,48 @@ export default {
   margin: 8px auto 0;
   position: relative;
 
-  .textarea {
-    position: relative;
+  textarea {
     width: 100%;
-    height: 210px;
-    border:1px solid #66afe9;
-    outline: 0;
-    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(102, 175, 233, 0.6);
+    height: 220px;
     border-radius: 4px;
+    padding: 8px;
+    resize: none;
+    font-size: 14px;
+    border-radius: 4px;
+    @include hyphens;
+    border:1px solid #dcdfe6;
 
-    textarea {
-      position: absolute;
-      width: 100%;
-      left: 0;
-      top: 0;
-      bottom: 20px;
-      border: none;
-      border-radius: 4px;
-      padding: 8px;
-      resize: none;
-      font-size: 14px;
-      @include hyphens;
-
-      &:focus {
-        outline: none;
-      }
-    }
-
-
-    .text-footer {
-      position: absolute;
-      height: 20px;
-      left: 4px;
-      right: 4px;
-      bottom: 0;
-      font-size: 12px;
-
-      .letter-counter {
-        position: absolute;
-        right: 0;
-        bottom: 0;
-      }
-
-      .error-tip {
-        color: red;
-      }
+    &:focus {
+      border-color: #409eff;
+      outline: none;
     }
   }
 
   .action-btn {
     text-align: center;
-    padding-top: 4px;
     font-size: 14px;
   }
+  
+  button {
+    -webkit-appearance: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    outline: none;
+    &:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
 
+    &:active {
+      color: #3a8ee6;
+      border-color: #3a8ee6;
+    }
+  }
 }
-.qrcode {
-  position: relative;
-  @include size($qr-size);
-  margin: 0 auto;
-
-  img { width: 100%; height: 100%; }
+.qrcode-wrapper {
+  width: $popup-width;
+  height: $popup-width;
 }
 </style>

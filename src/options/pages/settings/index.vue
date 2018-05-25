@@ -2,17 +2,17 @@
 <div>
   <titlebar></titlebar>
   <div class="item-title">Extension icon style</div>
-  <el-radio-group size="mini" v-model="iconStyle" class="icon-style-group">
-    <div class="icon-colored">
-      <el-radio label="colored" border >
+  <el-radio-group size="mini" v-model="iconStyle" @click.native="onIconStyleClick" class="icon-style-group">
+    <div class="icon-colored js-icon">
+      <el-radio label="colored" border>
         Colored</el-radio>      
     </div>
-    <div class="icon-grey">
+    <div class="icon-grey js-icon">
       <el-radio label="grey" border>
         </span>Grey</el-radio>      
     </div>
   </el-radio-group>
-  <div class="item-title">Show QR ContextMenu</div>
+  <div class="item-title">Show QR Contextmenu</div>
   <el-checkbox v-model="showQrMenu">Enable ContextMenu</el-checkbox>
   <div class="item-title">Data Backup / Restore</div>
   <div class="backup-restore">
@@ -52,6 +52,11 @@ export default {
     })
   },
   methods: {
+    onIconStyleClick (e) {
+      const target = e.target
+      if (!target.classList.contains('js-icon')) return
+      target.children[0].click()
+    },
     onBackData () {
       const date = new Date()
       let fileName = 'MyWebrequest-' + date.toLocaleDateString() + '.json'
@@ -77,7 +82,6 @@ export default {
   },
   watch: {
     iconStyle (val, olval) {
-      console.warn('val&olval', val, olval)
       collection.setConfig('iconStyle', val)
     },
     showQrMenu (val) {

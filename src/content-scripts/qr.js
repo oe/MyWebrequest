@@ -1,6 +1,7 @@
 import qrcode from '@/common/qrcode'
 const styleText = `
 .mwr-qr-mask {
+  all: unset;
   opacity: 0;
   display: none;
   align-items: center;
@@ -27,7 +28,7 @@ const styleText = `
   opacity: 1;
   transition: opacity .3s;
 }
-.mwr-qr-mask[is-text] .mwr-qr-open {
+.mwr-qr-mask[is-text] [copy] {
   display: none;
 }
 .mwr-qr-mask .mwr-qr-wrapper {
@@ -43,28 +44,35 @@ const styleText = `
   width: 260px;
   height: 260px;
   display: block;
-  margin: 10px auto 0;
+  margin: 0 auto;
+}
+.mwr-qr-wrapper .mwr-qr-header {
+  line-height: 2;
+  font-size: 18px;
+  text-align: center;
+  color: #333;
 }
 .mwr-qr-wrapper .mwr-qr-footer {
   line-height: 1.7;
   font-size: 15px;
+  text-align: center;
   display: flex;
   justify-content: space-around;
 }
-.mwr-qr-footer .mwr-qr-copy,
-.mwr-qr-footer .mwr-qr-open {
+.mwr-qr-wrapper .mwr-action-btn {
+  all: unset;
   cursor: pointer;
   color: #046af5;
   transition: all .3s;
   text-decoration: none;
 }
-.mwr-qr-footer .mwr-qr-copy:hover,
-.mwr-qr-footer .mwr-qr-open:hover {
+.mwr-qr-wrapper .mwr-action-btn:hover {
   color: rgba(100, 149, 237, .8);
 }
 `
 const domHtml = `
   <div class="mwr-qr-wrapper">
+    <div class="mwr-qr-header">QR Code</div>
     <img class="mwr-qr-img">
     <div class="mwr-qr-footer">
     </div>
@@ -73,20 +81,23 @@ const domHtml = `
 let maskDom
 function updateQR () {
   console.log('updateQR')
-  chrome.storage.local.get('qr-popup', result => {
-    let data = result['qr-popup']
+  chrome.storage.local.get('qr-menu', result => {
+    let data = result['qr-menu']
     maskDom[data.type === 'text' ? 'setAttribute' : 'removeAttribute'](
       'is-text',
       ''
     )
     const footer = maskDom.querySelector('.mwr-qr-footer')
     footer.innerHTML = `
-    <span class="mwr-qr-copy" title=${JSON.stringify(
+    <span class="mwr-action-btn" copy title=${JSON.stringify(
     data.content
-  )}>Copy selected</span>
-    <a class="mwr-qr-open" target="_blank" href="${encodeURI(
+  )}>Copy content</span>
+    <a class="mwr-action-btn" target="_blank" href="${encodeURI(
     data.content
   )}">Open url</a>
+    <a class="mwr-action-btn" href="${chrome.runtime.getURL(
+    'options/index.html#/qrcode'
+  )}" target="_blank">More...</a>
     `
     qrcode.makeQRCode(data.content, 280).then(
       imgStr => {
@@ -122,7 +133,7 @@ function onClickMask (e) {
   const target = e.target
   if (target === maskDom) {
     maskDom.classList.remove('mwr-qr-mask-show')
-  } else if (target.classList.contains('mwr-qr-copy')) {
+  } else if (target.hasAttribute('copy')) {
     copyText(target.title)
   }
 }

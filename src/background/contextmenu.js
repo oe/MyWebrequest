@@ -57,8 +57,8 @@ function onMenuClick (info, tab) {
       return
   }
   if (!data.content) return
-  chrome.storage.local.set({ 'qr-popup': data })
-  console.log('qr-popup', data)
+  chrome.storage.local.set({ 'qr-menu': data })
+  console.log('qr-menu', data)
   chrome.tabs.executeScript(tab.id, {
     file: '/content-scripts/qr.js'
   })
