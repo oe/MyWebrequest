@@ -25,5 +25,8 @@
   },
   "cs_more_btn": {
     "message": "更多..."
+  },
+  "cs_gen_qr_failed": {
+    "message": "二维码生成失败, 可能内容过多导致, 请缩短内容后再试"
   }
 }

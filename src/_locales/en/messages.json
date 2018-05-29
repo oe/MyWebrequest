@@ -25,5 +25,8 @@
   },
   "cs_more_btn": {
     "message": "More..."
+  },
+  "cs_gen_qr_failed": {
+    "message": "Failed to genrate QRCode, maybe caused by too much content, please try to shorten them"
   }
 }

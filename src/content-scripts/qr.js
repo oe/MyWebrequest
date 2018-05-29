@@ -40,11 +40,29 @@ const styleText = `
   background-color: whitesmoke;
   box-shadow: 0 0 0 -4px #ccc;
 }
-.mwr-qr-wrapper .mwr-qr-img {
+.mwr-qr-wrapper .mwr-qr-content {
   width: 260px;
   height: 260px;
-  display: block;
+  display: flex;
   margin: 0 auto;
+  background: #fff;
+  align-items: center;
+}
+.mwr-qr-wrapper .mwr-qr-img {
+  width: 100%;
+  height: 100%;
+}
+.mwr-qr-mask .mwr-qr-error {
+  display: none;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+.mwr-qr-mask.mwr-qr-failed .mwr-qr-error {
+  display: block;
+}
+.mwr-qr-mask.mwr-qr-failed .mwr-qr-img {
+  display: none;
 }
 .mwr-qr-wrapper .mwr-qr-header {
   line-height: 2;
@@ -73,7 +91,12 @@ const styleText = `
 const domHtml = `
   <div class="mwr-qr-wrapper">
     <div class="mwr-qr-header">QR Code</div>
-    <img class="mwr-qr-img">
+    <div class="mwr-qr-content">
+      <img class="mwr-qr-img">
+      <div class="mwr-qr-error">${chrome.i18n.getMessage(
+    'cs_gen_qr_failed'
+  )}</div>
+    </div>
     <div class="mwr-qr-footer">
     </div>
   </div>
@@ -89,9 +112,9 @@ function updateQR () {
     )
     const footer = maskDom.querySelector('.mwr-qr-footer')
     footer.innerHTML = `
-    <span class="mwr-action-btn js-copy" title=${JSON.stringify(
-    data.content
-  )}>${chrome.i18n.getMessage('cs_copy_btn')}</span>
+    <span class="mwr-action-btn js-copy">${chrome.i18n.getMessage(
+    'cs_copy_btn'
+  )}</span>
     <a class="mwr-action-btn js-open-url" target="_blank" href="${encodeURI(
     data.content
   )}">${chrome.i18n.getMessage('cs_open_btn')}</a>
@@ -99,13 +122,17 @@ function updateQR () {
     'options/index.html#/qrcode'
   )}" target="_blank">${chrome.i18n.getMessage('cs_more_btn')}</a>
     `
+    footer.querySelector('.js-copy').setAttribute('title', data.content)
     qrcode.makeQRCode(data.content, 280).then(
       imgStr => {
         maskDom.querySelector('img').setAttribute('src', imgStr)
         maskDom.classList.add('mwr-qr-mask-show')
+        maskDom.classList.remove('mwr-qr-failed')
       },
       e => {
-        console.warn(e, e.message)
+        maskDom.classList.add('mwr-qr-mask-show')
+        maskDom.classList.add('mwr-qr-failed')
+        console.warn('Failed to generate QRCode', e)
       }
     )
   })
