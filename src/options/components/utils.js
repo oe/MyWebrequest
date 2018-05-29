@@ -453,6 +453,7 @@ function debounce (fn, wait) {
 }
 
 export default {
+  RESERVED_HOLDERS,
   guid,
   getModuleName,
   getURLParts,

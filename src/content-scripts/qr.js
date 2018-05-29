@@ -103,7 +103,6 @@ const domHtml = `
 `
 let maskDom
 function updateQR () {
-  console.log('updateQR')
   chrome.storage.local.get('qr-menu', result => {
     let data = result['qr-menu']
     maskDom[data.type === 'text' ? 'setAttribute' : 'removeAttribute'](
@@ -180,7 +179,7 @@ function copyText (text, target) {
       target.removeAttribute('is-copied')
     }, 1000)
   } catch (e) {
-    console.log('failed to copy text', e)
+    console.warn('failed to copy text', e)
   } finally {
     maskDom.removeChild(ta)
   }

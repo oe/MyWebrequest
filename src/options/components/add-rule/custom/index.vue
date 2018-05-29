@@ -18,24 +18,24 @@
   </el-form-item>
 
   <el-form-item size="small" label="Redirect url to" prop="redirectUrl">
-    <el-input
-      autocorrect="off"
-      spellcheck="false"
-      v-model="form.redirectUrl"
-      placeholder="choose protocol" >
-    </el-input>
-  </el-form-item>
-  <el-form-item size="small" label="Redirect url to" prop="redirectUrl">
     <el-autocomplete
       autocorrect="off"
       spellcheck="false"
       class="inline-input"
+      ref="redirectInput"
       v-model="form.redirectUrl"
       :fetch-suggestions="querySearch"
-      placeholder="请输入内容"
+      placeholder="choose protocol"
+      :debounce="0"
       :trigger-on-focus="false"
+      @keyup.native="onRedirectKeyup"
       @select="handleSelect"
-    ></el-autocomplete>
+    >
+      <template slot-scope="{ item }">
+        <div class="val">{{ item.value }}</div>
+        <div class="desc" v-if="item.label">{{ item.label }}</div>
+      </template>
+    </el-autocomplete>
   </el-form-item>
 
   <el-form-item size="small" label="Test your rule" prop="testUrl">
@@ -72,6 +72,8 @@ export default {
   mixins: [mixin],
   data () {
     return {
+      redirectInput: null,
+      selectionStart: 0,
       form: {
         protocol: '*',
         url: '',
@@ -80,6 +82,9 @@ export default {
         testResult: ''
       }
     }
+  },
+  mounted () {
+    this.redirectInput = this.$refs.redirectInput.$el.querySelector('input')
   },
   methods: {
     resetForm () {
@@ -93,6 +98,10 @@ export default {
           this.form.redirectUrl = rule.redirectUrl
         }
       }
+    },
+    onRedirectKeyup () {
+      // trigger redirecturl autosuggestion
+      this.$refs.redirectInput.debouncedGetData(this.form.redirectUrl)
     },
     onTestRule () {
       try {
@@ -109,14 +118,36 @@ export default {
       return this.addARule(this.ruleID)
     },
     handleSelect (item, oldVal) {
-      this.form.redirectUrl = oldVal + item.value + '}'
+      const needCloseBracket = oldVal.length === this.selectionStart
+      let str = oldVal.slice(0, this.selectionStart).replace(/(?<={)([^{}]*)$/, '')
+      str += item.value
+      if (needCloseBracket) str += '}'
+      // move text cursor position
+      const curPos = str.length + 1
+      setTimeout(() => {
+        this.redirectInput.setSelectionRange(curPos, curPos)
+      }, 20)
+      str += oldVal.slice(this.selectionStart)
+      this.form.redirectUrl = str
       return false
     },
     querySearch (words, cb) {
-      let result = []
-      if (words.slice(-1) !== '{') return cb(result)
-      result = [{value: 'aaaa'}, {value: 'bbbb'}]
-      cb(result)
+      const result = []
+      this.selectionStart = this.redirectInput.selectionStart
+      if (this.selectionStart !== words.length && words[this.selectionStart] !== '}') return cb(result)
+      // no match {
+      if (!/(?<={)([^{}]*)$/.test(words.slice(0, this.selectionStart))) return cb(result)
+      const searchWords = RegExp.$1
+      cb(this.getUrlParams(searchWords))
+    },
+    getUrlParams (kwd) {
+      const result = utils.RESERVED_HOLDERS.map((k) => {
+        return {
+          value: k,
+          label: this.$t('param_' + k)
+        }
+      })
+      return result
     },
     /**
      * add/update a rule
@@ -166,5 +197,13 @@ export default {
 <style lang="scss">
 .el-form-item__content .el-autocomplete {
   width: 100%;
+}
+.el-autocomplete-suggestion li {
+  display: flex;
+
+  .desc {
+    color: #aaa;
+    margin-left: 20px;
+  }
 }
 </style>
