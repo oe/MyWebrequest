@@ -1,0 +1,341 @@
+{
+  "appName":  {
+    "message": "My Webrequest"
+  },
+  "iconTitle": {
+    "message": "获取当前页面的二维码"
+  },
+  "appDesc": {
+    "message": "管理你浏览器的web请求"
+  },
+  "bg_logison": {
+    "message": "Log功能已经开启"
+  },
+  "bg_logon_tip": {
+    "message": "如果你不再需要监控请求,那就把它关掉吧."
+  },
+  "qr_make_btn": {
+    "message": "GO!(Ctrl+Enter)"
+  },
+  "qr_make_mac_btn": {
+    "message": "GO!(⌘+Enter)"
+  },
+  "pop_more_link": {
+    "message": "更多..."
+  },
+  "pop_text_toolong": {
+    "message": "文字太长"
+  },
+  "pop_google_down": {
+    "message": "抱歉,貌似你现在访问不了谷歌."
+  },
+  "opt_dlg_title": {
+    "message": "提示"
+  },
+  "optPgTitle": {
+    "message": "选项"
+  },
+  "opt_ena_lbl": {
+    "message": "启用该功能"
+  },
+  "opt_ena_lbltip": {
+    "message": "添加一条规则才能启用"
+  },
+  "opt_delete_text": {
+    "message": "删除"
+  },
+  "opt_rule_unit": {
+    "message": "条"
+  },
+  "opt_no_rules": {
+    "message": "你还没有添加任何规则"
+  },
+  "opt_deldlg_title": {
+    "message": "确认删除所选规则吗?"
+  },
+  "opt_deldlg_content": {
+    "message": "你已经选择了xx条规则, 确定删掉它们吗?"
+  },
+  "opt_addrule_lbl": {
+    "message": "添加规则"
+  },
+  "opt_mngrule_lbl": {
+    "message": "管理规则"
+  },
+  "opt_protocol_lbl": {
+    "message": "协议"
+  },
+  "opt_host_lbl": {
+    "message": "域名(或者IP地址)"
+  },
+  "opt_ph_host": {
+    "message": "必填, 可直接粘贴链接至此"
+  },
+  "opt_path_lbl": {
+    "message": "路径和query字符串"
+  },
+  "opt_ph_path": {
+    "message": "选填"
+  },
+  "opt_addrule_btn": {
+    "message": "添加"
+  },
+  "opt_th_rule": {
+    "message": "规则"
+  },
+  "opt_test_btn": {
+    "message": "测试链接"
+  },
+  "opt_test_result": {
+    "message": "测试结果"
+  },
+  "opt_test_rule": {
+    "message": "测试规则, 检验所写规则是否如期工作"
+  },
+  "opt_redirect_to": {
+    "message": "将匹配的链接跳转至"
+  },
+  "opt_custom_ptn": {
+    "message": "匹配下面的URL"
+  },
+  "opt_addcsrule_btn": {
+    "message": "好了, 添加"
+  },
+  "opt_ph_testurl": {
+    "message": "在此处粘贴真实链接地址来测试上述规则"
+  },
+  "opt_ph_newurl": {
+    "message": "用于生成新链接地址的模板, 如 http://abc.us/m/{sub}/{newsid}"
+  },
+  "opt_ph_urlmatch": {
+    "message": "用于匹配链接地址的规则, 如 {sub}.abc.com/news/{newsid}.html"
+  },
+  "opt_custom_desc": {
+    "message": "自定义你的链接跳往何处"
+  },
+  "opt_path_rule_tip": {
+    "message": "路径应遵守以下规则(请省略路径开头的<strong>/</strong>):<ul><li>可以指定确切的路径,如<code>path</code>,<code>path?num=1</code></li><li>你可以使用通配符<code>*</code>来模糊匹配路径,如:<ul><li><code>*</code>(即任意路径,包括空)</li><li><code>path*</code>(所有以path开头的路径)</li><li><code>path*.jsp</code>(以path开头并以.jsp结尾的路径)</li><li><code>*kwd*</code>(任何包含kwd的路径)</li><li><code>path?*</code>(所有提交到path的query请求)</li><li><code>path?num=*</code>(所有提交path的query请求,且num是第一个请求参数，注意path?ps=23&amp;num=23不会被匹配)</li></ul></li></ul>"
+  },
+  "opt_host_rule_tip": {
+    "message": "域名应遵守以下规则:<ul><li>可以指定确切的域名,如<code>www.abc.com</code></li><li>也可以使用IP地址,如<code>8.8.8.8</code></li><li>你可以使用通配符<code>*</code>来匹配任意子域名,但只能在二级及之上的域名中使用.如<code>*.abc.com</code>和<code>*.api.abc.com</code>是允许的,而诸如<code>*.com</code>和<code>*.net</code>则是非法的.</li></ul>"
+  },
+  "opt_custom_matchrule_tip": {
+    "message": "匹配URL应遵守以下规则:<ul><li>URL必须指定二级域名, 规则 {fld}.com 是不允许的</li><li><li>可以使用 <code>{kwd}</code> 的方式来命名你所关注的URL部分,你可以在跳转规则中使用他们,如{name}.abc.com</li>可以使用 <code>{*kwd}</code> 的方式来匹配路径中末尾的部分,query字符串不会被匹配</li><li>你也可以用 <code>{kwd}</code> 的方式来命名query字符串中你所关注的值.</li><li>扩展已经预定义了以下的名字,你自定义的名字不能和下面的重复:</li><ul><li><code>u</code> 代表URL本身</li><li><code>p</code> 代表协议, 如http,https</li><li><code>h</code> 代表URL中的域名,如g.cn,uk.abc.com</li><li><code>m</code> 代表URL中的一级域名,对于g.cn/search则代表g.cn,对于uk.abc.com/news/则代表abc.com</li><li><code>r</code> 代表URL中的路径(不包含开头的<strong>/</strong>),如search,news/998.html</li><li><code>q</code> 代表URL中的query字符串(不包含开头的的<strong>?</strong>),如newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_redirectrule_tip": {
+    "message": "跳转URL应遵守以下规则:<ul><li>URL的协议不能省略,可以使用http,https,或者预定义的{p}</li><li>可以使用在匹配URL中定义的名字</li><li>也可以使用扩展预定义的:</li><ul><li><code>u</code>代表URL本身</li><li><code>p</code>代表协议,如http,https</li><li><code>h</code>代表URL中的主机名(域名),如g.cn,uk.abc.com</li><li><code>m</code>代表URL中的一级域名,对于g.cn/search*则代表g.cn,对于uk.abc.com/news/*则代表abc.com</li><li><code>r</code>代表URL中的路径(不包含开头的<strong>/</strong>),如search,news/998.html</li><li><code>q</code>代表URL中的query字符串(不包含开头的的<strong>?</strong>),如newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_demotip": {
+    "message": "自定义URL是新增的特性, 为演示这个特性, 我增加了一个规则来演示: 这个规则可以在你搜索百度时自动跳转到谷歌的搜索结果页面. 你可以开启这个特性, 然后在百度上(http://www.baidu.com)搜索任意内容即可见效果, 请保证你可以正常访问谷歌，否则你看到的会是一个不存在的页面:)"
+  },
+  "opt_hotlink_desc": {
+    "message": "帮你轻松的访问盗链图"
+  },
+  "opt_block_desc": {
+    "message": "屏蔽你讨厌的网站"
+  },
+  "opt_hsts_desc": {
+    "message": "强制使用HTTPS来打开某些网站"
+  },
+  "opt_refer_desc": {
+    "message": "帮助你浏览有盗链防护的图片"
+  },
+  "opt_log_desc": {
+    "message": "审查网络请求<a class='help-icon' href=\"#help/help-log\"></a>"
+  },
+  "opt_errtip_protocol": {
+    "message": "协议错误. 不会想干坏事吧? 刷新本页面就好了."
+  },
+  "opt_errtip_host": {
+    "message": "域名格式错误. 请在<a href=\"#help\">帮助页面</a>查看相关信息."
+  },
+  "opt_errtip_path": {
+    "message": "路径格式错误. 请在<a href=\"#help\">帮助页面</a>查看相关信息."
+  },
+  "opt_errtip_duplicate": {
+    "message": "该规则和下面的重复,换别的试试?<br>"
+  },
+  "opt_errtip_nochose": {
+    "message": "你还啥也没选咧,选一个呗!"
+  },
+  "opt_errtip_invalid_matchrule": {
+    "message": "匹配规则格式错误"
+  },
+  "opt_errtip_invalid_resvervedkwd": {
+    "message": "规则中有预定义的名字"
+  },
+  "opt_errtip_invalid_duplicatedkwd": {
+    "message": "规则中有重复生命的名字"
+  },
+  "opt_errtip_invalid_undefinedkwd": {
+    "message": "跳转规则中有未定义的名字"
+  },
+  "opt_errtip_invalid_redirectrule": {
+    "message": "跳转规则格式错误"
+  },
+  "opt_errtip_urlneedtest": {
+    "message": "你得输入(粘贴)一个链接来测试规则"
+  },
+  "opt_errtip_urlinvliad": {
+    "message": "链接格式错误"
+  },
+  "opt_errtip_csconflictedblock": {
+    "message": "匹配规则和block规则冲突(也就是说会导致当前规则无法生效)"
+  },
+  "opt_qrcode_desc": {
+    "message": "生成二维码"
+  },
+  "opt_qr_tips": {
+    "message": "1. 别输入太多文字,否则低配手机无法识别.<br> 2. 你可以右击二维码来保存并和自己的朋友分享."
+  },
+  "opt_qrtab_text": {
+    "message": "文本"
+  },
+  "opt_qrtab_vcard": {
+    "message": "名片"
+  },
+  "opt_qrtab_message": {
+    "message": "短信"
+  },
+  "opt_ph_qrtext": {
+    "message": "文本 / 网址 / 电子邮箱 / 手机号码 (多余的空格会被移除)"
+  },
+  "opt_qrct_vname": {
+    "message": "姓名"
+  },
+  "opt_qrct_vphone": {
+    "message": "电话"
+  },
+  "opt_qrct_vmail": {
+    "message": "电子邮箱"
+  },
+  "opt_qrct_vurl": {
+    "message": "主页"
+  },
+  "opt_qrct_vaddr": {
+    "message": "住址"
+  },
+  "opt_qrct_vmemo": {
+    "message": "备注"
+  },
+  "opt_qrct_mto": {
+    "message": "收信人"
+  },
+  "opt_qrct_mmessage": {
+    "message": "信息"
+  },
+  "opt_qrtip_ovfl": {
+    "message": "文字太长, 缩短些吧"
+  },
+  "opt_qrtip_notext": {
+    "message": "额,先填个空吧"
+  },
+  "opt_errtip_qrcode": {
+    "message": "无法访问二维码服务"
+  },
+  "opt_errtip_gcontent": {
+    "message": "My webrequest使用谷歌的API来生成二维码.<br>请检查你的网络连接是否正常,如果依旧无法生成二维码,看看帮助页吧."
+  },
+  "opt_ph_message": {
+    "message": "多余的空格会被移除"
+  },
+  "opt_ph_vname": {
+    "message": "如 天行者"
+  },
+  "opt_ph_vtel": {
+    "message": "如 18800000000"
+  },
+  "opt_ph_vmail": {
+    "message": "如 sir@sample.com"
+  },
+  "opt_ph_vurl": {
+    "message": "如 http://www.evecalm.com"
+  },
+  "opt_ph_vaddr": {
+    "message": "如 火星路10号"
+  },
+  "opt_ph_vnote": {
+    "message": "如 程序猿一只"
+  },
+  "opt_errtip_rulelong": {
+    "message": "规则太长,精简些吧."
+  },
+  "opt_errdlg_title": {
+    "message": "小心啊!"
+  },
+  "opt_errdlg_cstar": {
+    "message": "当前规则可能会匹配任意联网请求并严重影响浏览器的正常使用. <br>你坚持要添加吗? 豁出去的话,点OK就好了."
+  },
+  "opt_errdlg_cqr": {
+    "message": "当前规则可能导致二维码功能无法正常使用.<br>仍然想添加吗?点OK仍旧添加."
+  },
+  "opt_errdlg_cstarqr": {
+    "message": "当前规则可能会匹配任意联网请求,二维码功能将无法正常使用,并会严重影响浏览器的正常使用.<br>你还是想添加吗? 想悲剧就点OK吧."
+  },
+  "opt_extsettings_desc": {
+    "message": "扩展设置"
+  },
+  "opt_extstg_icon": {
+    "message": "浏览器图标设置"
+  },
+  "opt_extstg_icon_colored": {
+    "message": "彩色"
+  },
+  "opt_extstg_icon_grey": {
+    "message": "灰色"
+  },
+  "opt_extstg_data": {
+    "message": "扩展数据的备份及恢复"
+  },
+  "opt_extstg_bkp": {
+    "message": "备份"
+  },
+  "opt_extstg_rstr": {
+    "message": "恢复"
+  },
+  "opt_restore_confirmtip": {
+    "message": "继续操作将会覆盖当前所有已有的设置"
+  },
+  "opt_restore_lbl": {
+    "message": "恢复数据时, 配置文件必须是json格式的, 而且文件后缀名也必须是<strong>json</strong>"
+  },
+  "opt_restore_readfail": {
+    "message": "读取配置文件失败"
+  },
+  "opt_restore_formarterr": {
+    "message": "配置文件格式错误"
+  },
+  "opt_restore_success": {
+    "message": "恢复成功啦!"
+  },
+  "opt_help_desc": {
+    "message": "使用须知"
+  },
+  "opt_help_content": {
+    "message": "\n  <h2>关于扩展</h2> <p>本扩展是<a target=\"_blank\" href=\"http://evecalm.com/\">我</a>的业余作品, 最初做这个扩展只是想有个工具能监控某个流氓脚本在整个浏览器的数据请求, Chrome 自带的开发者工具只能审查某个特定的页签的数据请求，无法满足我的要求, 于是就有了这个扩展(Log功能就可以干这个). 为了增加实用性，又增加了 <strong>Block(屏蔽网站)</strong> <strong>HTTPS(强制加密链接)</strong> <strong>Hotlinking(浏览盗链图)</strong> <strong>QRCode(二维码)</strong> 的功能, 后来又在用户的建议下，磨磨蹭蹭的开发了杀手级功能 <strong>Custom(自定义URL)</strong>. 本扩展<a target=\"_blank\" href=\"https://github.com/evecalm/MyWebrequest\">已开源</a>, 在使用中如有任何问题，欢迎<a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20Feedback\">发送邮件</a>反馈. </p> <h2>基础知识</h2> <p>在使用之前你对 <strong>URL</strong> 得有一些基本概念，URL是用来定位一个资源，比如一个网页，一张图片，一个文件，本扩展中所有规则均是为了匹配某些URL. URL由 <strong>协议</strong> <strong>主机名(域名或IP)</strong> <strong>路径</strong> 及 <strong>查询字符串(query字符串)</strong> 组成，你可以在<a href=\"http://www.baike.com/wiki/URL\">互动百科</a>或者<a href=\"https://zh.wikipedia.org/wiki/%E7%BB%9F%E4%B8%80%E8%B5%84%E6%BA%90%E5%AE%9A%E4%BD%8D%E7%AC%A6\">维基百科</a>上查看详细描述，下面简单介绍下. </p> <p><strong>协议</strong>: 如 <code>http</code> <code>https</code> <code>ftp</code>等，在URL中一般是用<code>://</code>或者 <code>:</code>和URL等其他部分分隔</p> <p><strong>主机名</strong>: 即服务器地址, 可以是域名(如 <code>abc.com</code>)， 也可以是IP地址(如<code>8.8.8.8</code>). 域名中, <code>.com</code> <code>.net</code> <code>.uk</code> 是顶级域名, 而 <code>google.com</code> 是二级域名，<code>google.co.uk</code> 则是三级域名. 所有的匹配规则必须指定二级域名, 避免过于宽泛的匹配规则影响你正常使用浏览器，也就是说，规则 <code>*.com</code> 是无法添加的，<code>*.google.com</code>和<code>google.com</code> 则是OK的. <strong>关于端口的问题</strong>, 主机名是可以指定端口号的，但Chrome中规则无需指定主机名的端口的，Chrome会匹配该主机名下的所有端口.</p> <p><strong>路径</strong>: 即从URL第一个<code>/</code>开始，一直到<code>?</code>之前(若无<code>？</code>则一直到末尾)的部分. 如针对<code>http://www.hailoverman.com/flowstate?ref=producthunt</code> 其路径就是<code>/flowstate</code>; 针对 <code>https://google.com/</code>则是<code>/</code></p> <p><strong>查询字符串(query字符串)</strong>: 即URL中从<code>?</code>开始一直到末尾的部分, 每组参数用<code>&amp;</code>分开, 参数内部的参数名称和值用<code>＝</code>分开. 如针对<code>http://www.hailoverman.com/flowstate?ref=producthunt</code> 其查询字符串就是<code>?ref=producthunt</code>. 一个URL不一定都有查询字符串, 所以针对 <code>https://www.google.com/</code>则是空. </p> <h2 id=\"help-custom\">Custom 自定义URL</h2> <p>浏览网页的时候，你也许会遇到这样的情况：某个网站无法正常访问， 但是它的镜像站则没问题，所以你每次从其他地方访问这个网站时，都得修改下URL才能看到你想要浏览的内容；打开某些页面时URL会跳转很多次才到进入你真正要浏览的页面，跳转很慢，而且有可能在某次跳转过程中出错，导致无法进入目标页面，你很郁闷，无所适从. 使用本特性，一切都可以自动完成. </p> <p>这个功能需要你声明两个规则: <strong>匹配规则</strong> 和 <strong>跳转规则</strong>.</p> <h3>匹配规则</h3> <p>用于告诉扩展你要处理的URL长啥样, 你还可以在规则中使用 <code>{kwd}</code> 或者 <code>{*kwd}</code> 的方式命名变量来代表这部分的内容，在后续的跳转规则中可以使用它们来组装目标URL. <code>{kwd}</code>匹配的内容中不能包含<code>/</code>，也就是在用于匹配路径中的内容时，它只能匹配两个<code>/</code>之间的内容; <code>{*kwd}</code>只能用于匹配路径中的内容，它会一直匹配到路径的末尾，在规则中只能使用一次. 下面举例说明. </p> <ul> <li>规则 <code>*://{sub}.abc.com/{cat}</code> 用于匹配协议为https或者http且二级域名为 <code>abc.com</code> 的URL，并定义了一个变量 <code>sub</code> 来获取<code>abc.com</code>的子域名名称，<code>cat</code> 来获取路径中的第一个目录名. 所以, 针对URL <code>http://www.abc.com/news/ax82e3-20140917.html</code>, sub 为 <em>www</em>, cat 为 <em>news</em>.</li> <li>规则 <code>http://www.abc.com/news/{id}-{date}.html</code>和 规则<code>http://www.abc.com/news/{*rest}</code>都可以匹配 <code>http://www.abc.com/news/</code>下的所有页面，其中变量提取的信息并不相同. 如对于URL<code>http://www.abc.com/news/ax82e3-20140917.html</code> , id 为 <em>ax82e3</em>, date 为 <em>20140917</em>, 而 rest 为 <em>ax82e3-20140917.html</em></li> <li>通常查询字符串中也会又些有用的信息，你也可以用<code>{kwd}</code>的方式来提取它. 查询字符串中会有多个信息，而且它们的顺序可能不固定，但是你想要提取的信息可能只是其中部分, 声明规则时你只需要为你关注的部分定义变量名即可. 如规则<code>https://www.google.com.hk/search?q={kwd}</code>可以提取在Google搜索时搜索的关键字. </li> </ul> <h4>预定义的变量</h4> <p>扩展还预定义了一些变量方便你在跳转规则中使用，你定义的变量名不能和它们重复. </p> <ul> <li><code>u</code> 代表URL本身</li> <li><code>p</code> 代表协议, 如 http,https</li> <li><code>h</code> 代表URL中的域名,如 <em>g.cn</em>, <em>uk.abc.com</em></li> <li><code>m</code> 代表URL中的二级域名,对于g.cn/search 则代表 <em>g.cn</em> ,对于uk.abc.com/news/则代表 <em>abc.com</em></li> <li><code>r</code> 代表URL中的路径(不包含开头的 <strong>/</strong> ),如 <em>search,news/998.html</em></li> <li><code>q</code> 代表URL中的query字符串(不包含开头的的 <strong>?</strong> ),如<em>newwindow=1&amp;safe=2</em></li> </ul> <h3>跳转规则</h3> <p>跳转规则是告诉扩展目标URL长啥样, 如何去组装或得到它. 在跳转规则可以使用你自己定义的或者扩展预定义的变量, 采用 <code>{kwd}</code> 的形式使用(如果在匹配规则中用 <code>{*kwd}</code> 来定义，使用时也一样采用 <code>{kwd}</code> 形式), 你无需关心这些变量的值是否需要转译(URLencode), 扩展会自动处理. 匹配规则和跳转规则都添加后，你需要用一个实际的URL来测试你的规则，最终得到的目标URL必须是一个合法的URL，否则将无法添加. </p> <p>下面举几个例子:</p> <ul> <li><p>从百度搜索结果跳转到Google搜索结果 </p> <p>匹配规则: <code>https://www.baidu.com/s?wd={kwd}</code></p> <p>跳转规则: <code>https://www.google.com.hk/search?q={kwd}</code></p></li> <li><p>停止Google搜索结果的跳转，直接进入目标页面 </p> <p>匹配规则: <code>https://www.google.com/url?url={url}</code></p> <p>跳转规则: <code>{url}</code></p></li> <li><p>访问离自己较近的PHP镜像网站以提升访问速度 </p> <p>匹配规则: <code>http://php.net/manual/{*rest}</code></p> <p>跳转规则: <code>http://nl1.php.net/manual/{rest}?{q}</code></p></li> </ul> <h2>Block 屏蔽网址</h2> <p>你可以添加规则来屏蔽某些网站, 屏蔽某一类请求,屏蔽某张特定的图片、脚本.当然你也可以用来屏蔽广告, 大多广告都是通过脚本文件来加载的,你只需要屏蔽脚本文件的地址或者其所在域就好了, 但是不推荐你这么做,本扩展不是主攻屏蔽广告,你可以使用adblock, 不过我更推荐用修改hosts文件的方式来屏蔽广告.</p> <h2>HTTPS 强制加密链接</h2> <p>如果某个网站支持HTTPS,你可以将它的域添加到规则中,就可以强制使用HTTPS请求, 提升安全性. 比如将 <code>*.wordpress.com</code> 加入到规则中,你就可以在中国浏览wordpress.com上的博客了,包括图片. 当然你也可以只为特定的请求添加规则.</p> <h2>Hotlinking 浏览盗链图</h2> <p>有时候浏览论坛时会发现贴图上写着”图片来自xxx“(比如来自QQ空间),而看不到原图.这是站长的防盗链措施, 一来保护版权,二来减轻服务器负担, 这无可厚非的,责任主要在于发帖者, 但这却给浏览者带来不便. 当遇到有盗链保护而无法正常浏览的图片时, 右击图片选择复制图片地址, 这样你就得到了图片的地址了, 将图片的域名添加到规则即可, 清空路径部分, 只需要域名哦.</p> <h2 id=\"help-log\">Log 审查浏览器请求头</h2> <p>这个功能是为开发人员准备的. 当你添加完规则后即可在扩展的背景页面查看到网络请求的请求头(header)以及内容(body). 查看方法如下图所示.</p> <img src=\"/img/log.png\"> <p>小提示，你可以点右上角点的 <em>...</em> -&gt; <em>Setting</em> -&gt; <em>General面板</em> -&gt; <em>Console</em> -&gt; <em> 选中 Show timestamps </em> 这样你就可以直观的看到每条请求的发送时间了.</p> <h2>QRCode 二维码</h2> <p>浏览网站时, 点击地址栏右侧的浅蓝色地球图标就可以获得当前网页地址的二维码. 双击二维码图片还可以编辑内容, 然后再生成新的二维码. 用你的手机上的二维码扫描软件就可以轻松的从电脑同步数据啦, 免去了在手机上输入不方便的烦恼. 注意在生成二维码时, 不要输入太多文字(汉字建议在150字以内,英文则在300字以内), 否则生成的二维码纹路复杂, 低配置的手机无法识别.</p>\n"
+  },
+  "opt_utility_desc": {
+    "message": "其他实用工具"
+  },
+  "opt_ena_google_lbl": {
+    "message": "移除谷歌搜索结果重定向, 提升搜索结果打开的速度及成功率"
+  },
+  "opt_ena_gstatic_lbl": {
+    "message": "加快使用Google CDN网站的访问速度(将对Google CDN的请求重定向至<a href='http://libs.useso.com/' target='_blank'>360的镜像cdn</a>)"
+  },
+  "gsearch_rule_detail": {
+    "message": "默认情况下, <code>google.com</code> and <code>google.com.hk</code>已经被添加到列表里了. <br> 你也可以 <a class=\"js-add-favor-gsearch\">添加/编辑你最喜欢的谷歌搜索域名</a>.<br><span id=\"custom-favor-gsearch-wrapper\">你已将<code id=\"custom-favor-gsearch\"></code> 添加为你最喜欢的谷歌搜索域名.</span>"
+  },
+  "input_dlg_title": {
+    "message": "添加你最喜欢的Google域名"
+  },
+  "input_dlg_hint": {
+    "message": "你也可以填写IP地址. 如果留空, 之前填写的域名会被移除."
+  },
+  "input_dlg_inputph": {
+    "message": "举个栗子 http://www.google.co.uk"
+  },
+  "want_new_feature": {
+    "message": "<strong>如果你想到本扩展还可以做其他事, 那就赶紧<a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request\">联系我吧!</a></strong>"
+  }
+}

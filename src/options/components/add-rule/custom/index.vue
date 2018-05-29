@@ -1,13 +1,15 @@
 <template>
 <el-form ref="ruleForm" :model="form" label-position="left" label-width="106px">
-  <el-form-item size="small" :label="$t('matchLbl')">
+  <el-form-item size="small" :label="$t('matchLbl')" prop="url">
     <el-input
       v-model="form.url"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       ref="firstInput"
+      autocorrect="off"
+      spellcheck="false"
       placeholder="choose protocol" >
-      <el-select v-model="form.protocol" slot="prepend" placeholder="">
+      <el-select v-model="form.protocol" slot="prepend">
         <el-option label="*://" value="*"></el-option>
         <el-option label="http://" value="http"></el-option>
         <el-option label="https://" value="https"></el-option>
@@ -15,15 +17,31 @@
     </el-input>
   </el-form-item>
 
-  <el-form-item size="small" label="Redirect url to">
+  <el-form-item size="small" label="Redirect url to" prop="redirectUrl">
     <el-input
+      autocorrect="off"
+      spellcheck="false"
       v-model="form.redirectUrl"
       placeholder="choose protocol" >
     </el-input>
   </el-form-item>
+  <el-form-item size="small" label="Redirect url to" prop="redirectUrl">
+    <el-autocomplete
+      autocorrect="off"
+      spellcheck="false"
+      class="inline-input"
+      v-model="form.redirectUrl"
+      :fetch-suggestions="querySearch"
+      placeholder="请输入内容"
+      :trigger-on-focus="false"
+      @select="handleSelect"
+    ></el-autocomplete>
+  </el-form-item>
 
-  <el-form-item size="small" label="Test your rule">
+  <el-form-item size="small" label="Test your rule" prop="testUrl">
     <el-input
+      autocorrect="off"
+      spellcheck="false"
       v-model="form.testUrl"
       placeholder="choose protocol" >
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
@@ -31,6 +49,8 @@
   </el-form-item>
   <el-form-item size="small" label="Test Result">
     <el-input
+      autocorrect="off"
+      spellcheck="false"
       v-model="form.testResult"
       placeholder="choose protocol" >
       <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
@@ -88,6 +108,16 @@ export default {
     onUpdateRule () {
       return this.addARule(this.ruleID)
     },
+    handleSelect (item, oldVal) {
+      this.form.redirectUrl = oldVal + item.value + '}'
+      return false
+    },
+    querySearch (words, cb) {
+      let result = []
+      if (words.slice(-1) !== '{') return cb(result)
+      result = [{value: 'aaaa'}, {value: 'bbbb'}]
+      cb(result)
+    },
     /**
      * add/update a rule
      * @param {String} ruleID specified ruleID to update, add one if ignored
@@ -134,4 +164,7 @@ export default {
 </script>
 
 <style lang="scss">
+.el-form-item__content .el-autocomplete {
+  width: 100%;
+}
 </style>

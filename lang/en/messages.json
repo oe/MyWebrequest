@@ -1,0 +1,338 @@
+{
+  "appName":  {
+    "message": "My Webrequest"
+  },
+  "iconTitle": {
+  	"message": "Get current page's QRCode"
+  },
+  "appDesc": {
+  	"message": "Control your browser's web request."
+  },
+  "bg_logison": {
+    "message": "Log function is enabled"
+  },
+  "bg_logon_tip": {
+    "message": "If U no long need inspecting webrequest, just disable it."
+  },
+  "qr_make_btn": {
+  	"message": "GO!(Ctrl+Enter)"
+  },
+  "qr_make_mac_btn": {
+    "message": "GO!(⌘+Enter)"
+  },
+  "pop_more_link": {
+  	"message": "more..."
+  },
+  "pop_text_toolong": {
+    "message": "Too much words"
+  },
+  "pop_google_down": {
+    "message": "Sorry, but I can't access Google api."
+  },
+  "opt_dlg_title": {
+    "message": "Message"
+  },
+  "optPgTitle": {
+    "message": "Options"
+  },
+  "opt_ena_lbl": {
+    "message": "Enable this feature"
+  },
+  "opt_ena_lbltip": {
+    "message": "add a rule to enable"
+  },
+  "opt_delete_text": {
+    "message": "delete"
+  },
+  "opt_rule_unit": {
+    "message": "rule(s)"
+  },
+  "opt_no_rules": {
+    "message": "You haven't added any rules yet."
+  },
+  "opt_deldlg_title": {
+    "message": "Are you sure to delete?"
+  },
+  "opt_deldlg_content": {
+    "message": "You've chosed xx rule(s), are you sure to delete them all?"
+  },
+  "opt_addrule_lbl": {
+    "message": "Add rule"
+  },
+  "opt_mngrule_lbl": {
+    "message": "Manage rules"
+  },
+  "opt_protocol_lbl": {
+    "message": "Protocol"
+  },
+  "opt_host_lbl": {
+    "message": "Domain(or IP Addr)"
+  },
+  "opt_ph_host": {
+    "message": "required, just paste a url here"
+  },
+  "opt_path_lbl": {
+    "message": "Path and Query string"
+  },
+  "opt_ph_path": {
+    "message": "optional"
+  },
+  "opt_addrule_btn": {
+    "message": "Add rule"
+  },
+  "opt_th_rule": {
+    "message": "Rule"
+  },
+  "opt_test_btn": {
+    "message": "Test URL"
+  },
+  "opt_test_result": {
+    "message": "Test result"
+  },
+  "opt_test_rule": {
+    "message": "Test your rule"
+  },
+  "opt_redirect_to": {
+    "message": "Redirect this url to"
+  },
+  "opt_custom_ptn": {
+    "message": "Match this url"
+  },
+  "opt_addcsrule_btn": {
+    "message": "OK, Add It"
+  },
+  "opt_ph_testurl": {
+    "message": "paste a real url to test your rule"
+  },
+  "opt_ph_newurl": {
+    "message": "a url template to generate the new url, like http://abc.us/m/{sub}/{newsid}"
+  },
+  "opt_ph_urlmatch": {
+    "message": "a url pattern to match, like {sub}.abc.com/news/{newsid}.html"
+  },
+  "opt_path_rule_tip": {
+    "message": "The path should obey the following rules(please ommit the prefix <strong>/</strong>):<ul><li>you give a specific path, like<code>path</code>,<code>path?num=1</code></li><li>wildcard<code>*</code> is also available, like <ul><li><code>*</code>(aka any path, including empty path)</li><li><code>path*</code>(all path start with <strong>path</strong>)</li><li><code>path*.jsp</code>(start with <strong>path</strong> and end with <strong>.jsp</strong>)</li><li><code>*kwd*</code>(path contains <strong>kwd</strong>)</li><li><code>path?*</code>(all query request to <strong>path</strong>)</li><li><code>path?num=*</code>(all query request to <strong>path</strong>, and <strong>num</strong> is the first query parameter, NOTICE: <strong>path?ps=23&amp;num=23</strong> won't be matched)</li></ul></li></ul>"
+  },
+  "opt_host_rule_tip": {
+    "message": "The domain should obey the following rules:<ul><li>you give a specific domain, like<code>www.abc.com</code></li><li>IP address is ok too, like<code>8.8.8.8</code></li><li>wildcard <code>*</code> can be used to match any subdomains, but only available in domains under second-level domain. so <code>*.abc.com</code> and <code>*.api.abc.com</code> are valid. but <code>*.com</code> and <code>*.net</code>are invalid.</li></ul>"
+  },
+  "opt_custom_matchrule_tip": {
+    "message": "The match-url should obey the following rules:<ul><li>A URL must specify its second-level domain, <strong>{fld}.com</strong> is invalid</li><li><code>{kwd}</code>can be used to name the url part that you'd like to focus, and you can use them in redirect-url. like {name}.abc.com</li><li><code>{*kwd}</code>can be used to match anything in the end of the path,query string won't be matched.</li><li><code>{kwd}</code> can also be used to name the values in query string.</li><li>the extension has predefined several names, you should not defined them again:</li><ul><li><code>u</code>means URL itself</li><li><code>p</code>represents protocol, like http,https</li><li><code>h</code>means URL's domain, like g.cn, uk.abc.com</li><li><code>m</code>means second-level domain, for <strong>g.cn/search</strong> it's g.cn. and for <strong>uk.abc.com/news/</strong>, it's abc.com</li><li><code>r</code>means path(without prefix<strong>/</strong>), like <strong>search</strong>, <strong>news/998.html</strong></li><li><code>q</code>means query string(without prefix<strong>?</strong>), like newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_redirectrule_tip": {
+    "message": "The redirect-url should obey the following rules:<ul><li>the URL's should has its protocol, you can use http,https, and the predefined {p}</li><li>names defined in match-url can be used, bracket them with <strong>{}</strong></li><li>and so is the predefined names:</li><ul><li><code>u</code>means URL itself</li><li><code>p</code>represents protocol, like http,https</li><li><code>h</code>means URL's domain, like g.cn, uk.abc.com</li><li><code>m</code>means second-level domain, for <strong>g.cn/search*</strong> it's g.cn. and for <strong>uk.abc.com/news/*</strong>, it's abc.com</li><li><code>r</code>means path(without prefix<strong>/</strong>), like <strong>search</strong>, <strong>news/998.html</strong></li><li><code>q</code>means query string(without prefix<strong>?</strong>), like newwindow=1&amp;safe=2</li></ul></ul>"
+  },
+  "opt_custom_demotip": {
+    "message": "Custom URL is a new feature, I just added a rule to demonstrate it: this rule can redirect your page to Google search results when searching via Baidu automatically. To see how it works, you may enable this feature, then searching on Baidu(http://www.baidu.com) with any keywords and you will see something magic. Please make sure you can get access to Google, or you may be in China:)"
+  },
+  "opt_hotlink_desc": {
+    "message": "Enable the accessibility of those hotlinking images"
+  },
+  "opt_block_desc": {
+    "message": "Block website that U don't like"
+  },
+  "opt_hsts_desc": {
+    "message": "Force HTTPS connection to some website"
+  },
+  "opt_refer_desc": {
+    "message": "Help U access anti-hotlinking pictures"
+  },
+  "opt_log_desc": {
+    "message": "Help U inspecting the webrequests<a class='help-icon' href=\"#help/help-log\"></a>"
+  },
+  "opt_errtip_protocol": {
+    "message": "The protocol is invalid. Are U trying to do something? Just reload this page."
+  },
+  "opt_errtip_host": {
+    "message": "The domain is invalid. Get more info in <a href=\"#help\">Help</a>"
+  },
+  "opt_errtip_path": {
+    "message": "The path is invalid. Get more info in <a href=\"#help\">Help</a>"
+  },
+  "opt_errtip_duplicate": {
+    "message": "This rule is duplicated with the rule below.<br>"
+  },
+  "opt_errtip_nochose": {
+    "message": "You have not choose anything."
+  },
+  "opt_errtip_invalid_matchrule": {
+    "message": "Match-rule is invalid"
+  },
+  "opt_errtip_invalid_resvervedkwd": {
+    "message": "Predefined keywords found in the rule"
+  },
+  "opt_errtip_invalid_duplicatedkwd": {
+    "message": "Duplicated keywords found in the rule"
+  },
+  "opt_errtip_invalid_undefinedkwd": {
+    "message": "Undefined keywords found in the redirect-url"
+  },
+  "opt_errtip_invalid_redirectrule": {
+    "message": "Redirect-url is invalid"
+  },
+  "opt_errtip_urlneedtest": {
+    "message": "You need type(or paste) a url to test your rule"
+  },
+  "opt_errtip_urlinvliad": {
+    "message": "Url is invalid"
+  },
+  "opt_errtip_csconflictedblock": {
+    "message": "Your match rule is in conflict with the block rule(aka your rule won't work)"
+  },
+  "opt_qrcode_desc": {
+    "message": "Generate QR Code."
+  },
+  "opt_qr_tips": {
+    "message": "1. Don't type too much or your scanner will not recognize it.<br> 2. You can right click the QR Code then save it as a image & share it with your friends."
+  },
+  "opt_qrtab_text": {
+    "message": "Text"
+  },
+  "opt_qrtab_vcard": {
+    "message": "Vcard"
+  },
+  "opt_qrtab_message": {
+    "message": "Message"
+  },
+  "opt_ph_qrtext": {
+    "message": "text / url / email address / phone number (Extra spaces will be removed)"
+  },
+  "opt_qrct_vname": {
+    "message": "Name"
+  },
+  "opt_qrct_vphone": {
+    "message": "Phone"
+  },
+  "opt_qrct_vmail": {
+    "message": "Email"
+  },
+  "opt_qrct_vurl": {
+    "message": "Home Page"
+  },
+  "opt_qrct_vaddr": {
+    "message": "Address"
+  },
+  "opt_qrct_vmemo": {
+    "message": "Memo"
+  },
+  "opt_qrct_mto": {
+    "message": "To"
+  },
+  "opt_qrct_mmessage": {
+    "message": "Message"
+  },
+  "opt_qrtip_ovfl": {
+    "message": "Too many words, shorten them"
+  },
+  "opt_qrtip_notext": {
+    "message": "Do not leave everything empty"
+  },
+  "opt_errtip_qrcode": {
+    "message": "Can't access QRCode service"
+  },
+  "opt_errtip_gcontent": {
+    "message": "My webrequest is using Google api to generate QR Code.<br>Please check your network."
+  },
+  "opt_ph_message": {
+    "message": "Extra spaces will be removed."
+  },
+  "opt_ph_vname": {
+    "message": "e.g. John Smith"
+  },
+  "opt_ph_vtel": {
+    "message": "e.g. 18800000000"
+  },
+  "opt_ph_vmail": {
+    "message": "e.g. sir@sample.com"
+  },
+  "opt_ph_vurl": {
+    "message": "e.g. http://www.evecalm.com"
+  },
+  "opt_ph_vaddr": {
+    "message": "e.g. 10 Fifth Avenue, 888th floor. New York"
+  },
+  "opt_ph_vnote": {
+    "message": "e.g. The guy in blue T-shirt"
+  },
+  "opt_errtip_rulelong": {
+    "message": "Rule is too long, just make it simple."
+  },
+  "opt_errdlg_title": {
+    "message": "Watch out!"
+  },
+  "opt_errdlg_cstar": {
+    "message": "This rule may match every request & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
+  },
+  "opt_errdlg_cqr": {
+    "message": "This rule may disable QR Code function.<br>Are U sure to add this? Click OK to add it anyway."
+  },
+  "opt_errdlg_cstarqr": {
+    "message": "This rule may match every request, disable QR Code function & seriously affect browser's function. <br>Are U sure to add this? Click OK to add it anyway."
+  },
+  "opt_extsettings_desc": {
+    "message": "Extension settings"
+  },
+  "opt_extstg_icon": {
+    "message": "Browser icon style"
+  },
+  "opt_extstg_icon_colored": {
+    "message": "Colored"
+  },
+  "opt_extstg_icon_grey": {
+    "message": "Grey"
+  },
+  "opt_extstg_data": {
+    "message": "Data Backup / Restore"
+  },
+  "opt_extstg_bkp": {
+    "message": "Backup"
+  },
+  "opt_extstg_rstr": {
+    "message": "Restore"
+  },
+  "opt_restore_confirmtip": {
+    "message": "This will override all settings you have"
+  },
+  "opt_restore_lbl": {
+    "message": "When restoring, the config file should be in json format and file name with <strong>json</strong> extension"
+  },
+  "opt_restore_readfail": {
+    "message": "Failed to read the file content"
+  },
+  "opt_restore_formarterr": {
+    "message": "The config file's format is invalid"
+  },
+  "opt_restore_success": {
+    "message": "Restore success!"
+  },
+  "opt_help_desc": {
+    "message": "There is something U need to know before using"
+  },
+  "opt_help_content": {
+    "message": "<h2>About the Extension</h2> <p>This extension is <a target=\"_blank\" href=\"http://evecalm.com/\">my</a> amateur work. At the very beginning, I just need a tool can monitor some rogue script's requests in browser. Chrome's devtools can only inspect specific Tab's requests which doesn't meet my requirements, so there is this extension (Log function can do this). In order to increase its availability, I added features <strong>Block (block sites)</strong>, <strong>HTTPS (force https connection)</strong>, <strong>hotlinking (view hotlinking images)</strong> and <strong>QRCode ( two-dimensional code)</strong>. And later with the user's feedback, the killer feature <strong>custom (custom URL)</strong> was added. This extension is <a target=\"_blank\" href=\"https://github.com/evecalm/MyWebrequest\">open source</a>. If you have any questions in use, please <a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20Feedback\">send me an e-mail feedback</a>.</p> <h2>Basics</h2> <p>Before using, you need to know some basic concepts of URL, URL is used to locate a resource, such as a Web page, a picture, a document. All rules used in this extension are to match some certain URLs. A URL contains four parts: <strong>protocol</strong>, <strong>host name ( domain name or IP)</strong>, <strong>path</strong> and <strong>optional query string</strong>. You can get the detailed description via <a href=\"https://en.wikipedia.org/wiki/Uniform_Resource_Locator\">Wikipedia</a>. I will show you the brief introduction.</p> <p><strong> Protocol</strong>: <code>http</code> <code>https</code> <code>ftp</code> etc. always separate from other parts by <code>://</code> or <code>:</code> </p> <p><strong>Host name</strong>: aka server address, it could be a domain name(such as abc.com), or an IP address (such as 8.8.8.8). Domain name <strong>.com</strong> <strong>.net</strong> <strong>.uk</strong> are top-level domain name, <strong>google.com</strong> is a second-level domain , and <strong>google.co.uk</strong> is a third-level domain. All matching rules must specify the second-level domain, to avoid overly broad rules affect your normal use of the browser, which means that the rules like <strong> *.com </strong> can not be added, but <code>*.google.com</code> and <code>google.com</code> are ok. <strong>About port</strong>: the host name can specify a port number, but Chrome does not need it, Chrome will match all ports of the host name. </p> <p><strong>Path</strong>: From the first <code>/</code>, to the first <code>?</code> (if no <code>?</code> then until the end). for <code>http://www.hailoverman.com/flowstate?ref=producthunt</code>, its path is <code>/flowstate</code>; for <code>https: //google.com/</code> is <code>/</code></p> <p><strong>Query string</strong>: started with a <code>?</code> until the end. each set of parameters separated by a <code>&amp;</code>, a parameter's name and value separated by <code>=</code>. For <code>http://www.hailoverman.com/flowstate?ref =producthunt</code>, the query string is<code>?ref=producthunt</code>. As query string is optional, URL <code>https://www.google.com/</code>'s query string is empty.</p> <h2 id=\"help-custom\">Custom URL</h2> <p>When surfing the Web, you may encounter such a situation: when a website is inaccessible, but its mirror sites is available, so each time you access this site from other sites, you have to modify the URL to view the content; some URL will redirect many times before reaching the real site, redirecting is slow, and once error, you'll never get the target page. With this feature, everything can be done automatically.</p> <p>This feature requires you declare two rules: <strong>matching-rule</strong> and <strong>redirecting-rule</strong>.</p> <h3>Matching-rule</h3> <p>To tell the extension which rule need to be transformed.</p> <p>You can also use <code>{kwd}</code> or <code>{*kwd}</code> in a rule to name the sections you care, you can use them in the redirecting-rule to assemble the target URL. <code>{kwd}</code> can not match content that contains <code>/</code>, that is, when match the contents in path, it only only gets string between <code>/</code>; <code>{*kwd}</code> can only be used to match the contents of the path, it will match to the end of the path, and can be used only once. Here are some examples:</p> <ul> <li>The rule <code>*://{sub}.abc.com/{cat}</code> can match URLs with protocol <code>https</code> or <code>http</code> and its second-level domain is <code>abc.com</code>. The variable <code>sub</code> can capture <code>abc.com</code>'s subdomain，<code>cat</code> can get the first folder name in path. So , for URL <code>http://www.abc.com/news/ax82e3-20140917.html</code>, sub is <em>www</em>, cat is <em>news</em>.</li> <li>The rule <code>http://www.abc.com/news/{id}-{date}.html</code> and rule <code>http://www.abc.com/news/{*rest}</code> both can match all pages under <code>http://www.abc.com/news/</code>, but the value of the variables are different. For example, for URL <code>http://www.abc.com/news/ax82e3-20140917.html</code> , id is <em>ax82e3</em>, date is <em>20140917</em>, and rest is <em>ax82e3-20140917.html</em></li> <li> Typically the query string also contains some useful information, you can also use <code>{kwd}</code> to extract. The order of the parameters in query string is not fixed, you just need to claim what you need in the rule. For example, rule <code>https://www.google.com.hk/search?q={kwd}</code> can extract the keyword searched in Google.</li> </ul> <h4>Predefined variables</h4> <p>The extension has predefined several variables, you should not defined them again:</p> <ul> <li><code>u</code> means URL itself</li> <li><code>p</code> represents protocol, like http,https</li> <li><code>h</code> means URL's domain, like g.cn, uk.abc.com</li> <li><code>m</code> means second-level domain, for <strong>g.cn/search</strong> it's g.cn. and for <strong>uk.abc.com/news/</strong>, it's abc.com</li> <li><code>r</code> means path(without prefix <strong>/</strong> ), like <strong>search</strong>, <strong>news/998.html</strong></li> <li><code>q</code> means query string(without prefix <strong>?</strong> ), like <strong>newwindow=1&amp;safe=2</strong></li> </ul> <h3>redirecting-rule</h3> <p>To tell extension how to build the target URL. You can use your own custom or predefined variables in the redirecting-rule, use with the form <code>{kwd}</code> (no matter whether it's defined in <code>{*kwd}</code> or not), you do not need concerned about translation(URLencode) of the value of these variables, the extension will do it automatically. After both rules are added, you need to test them with a real URL, the test result, aka target URL, must be a valid URL, otherwise it will not be added.</p> <p>Here are some examples:</p> <ul> <li><p>redirect Baidu search to Google search </p> <p>matching-rule: <code>https://www.baidu.com/s?wd={kwd}</code></p> <p>redirecting-rule: <code>https://www.google.com.hk/search?q={kwd}</code></p></li> <li><p>Stop Google search results from redirecting</p> <p>matching-rule: <code>https://www.google.com/url?url={url}</code></p> <p>redirecting-rule: <code>{url}</code></p></li> <li><p>visit the nearest mirror site of PHP to improve your access speed </p> <p>matching-rule: <code>http://php.net/manual/{*rest}</code></p> <p>redirecting-rule: <code>http://nl1.php.net/manual/{rest}?{q}</code></p></li> </ul> <h2>Block</h2> <p>You can add patterns to block certain websites, specific images or scripts. Of course, it can be used to block ads, but I do not recommend doing this, this extension does not aim at blocking ads, you can install Adblock to do this.</p> <h2>HTTPS</h2> <p>If a website supports HTTPS, you can add its domain as a rule, then all requests to this site will go through HTTPS. For example, wordpress.com supports HTTPS, then after adding <code>*.wordpress.com</code> as a rule, all blogs including blogs' pictures on wordpress.com will be connected via HTTPS.</p> <h2>Hotlinking</h2> <p>You may have seen many fake pictures because of anti-hotlinking. For now, just right click the picture and click <strong>copy image URL</strong>, then paste it into the domain input box (clear the path input box so this rule will apply to all pictures under this domain). After this, you can see the original pictures.</p> <h2 id=\"help-log\">Log</h2> <p>Inspect network requests' details including request header (header) and content (body). See the figure below.</p> <img src=\"/img/log.png\"> <p>Tips，by following these steps <em>...</em> -&gt; <em>Setting</em> -&gt; <em>General panel</em> -&gt; <em>Console</em> -&gt; <em> check Show timestamps</em>, you can see the request-time easily</p> <h2>QRCode</h2> <p>When surfing the internet, you can click the blue earth icon on the right side of the location bar, then a QR code of the web page's URL will be generated. And you can double click the QR code, edit the content and get a new QR code. After this, use your mobile app to scan them! It's an easy way to share messages from PC to phone.</p>"
+  },
+  "opt_utility_desc": {
+    "message": "Other useful tools"
+  },
+  "opt_ena_google_lbl": {
+    "message": "Stop Google search results from redirecting"
+  },
+  "opt_ena_gstatic_lbl": {
+    "message": "Speed up website using Google CDN(by redirecting request Google CDN to <a href='http://libs.useso.com/' target='_blank'>360safe's cdn</a>, for Chinese only)"
+  },
+  "gsearch_rule_detail": {
+    "message": "by default, <code>google.com</code> and <code>google.com.hk</code> are added to the list. <br> You can also <a class=\"js-add-favor-gsearch\">add/edit your preferred google domain(or ip)</a>.<br><span id=\"custom-favor-gsearch-wrapper\">You've added <code id=\"custom-favor-gsearch\"></code> as your preferred Google domain.</span>"
+  },
+  "input_dlg_title": {
+    "message": "Add your preferred Google domain"
+  },
+  "input_dlg_hint": {
+    "message": "This also can be ip addr. If empty, previous domain will be removed."
+  },
+  "input_dlg_inputph": {
+    "message": "such as http://www.google.co.uk"
+  },
+  "want_new_feature": {
+    "message": "<strong>Considering another awesome feature could be done with this extension? JUST <a href=\"mailto:evecalm@live.com?subject=My%20Webrequest%20new%20feature%20request\">TELL ME NOW!</a></strong>"
+  }
+}

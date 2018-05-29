@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 import {
+  Autocomplete,
   Select,
   Option,
   Checkbox,
@@ -28,6 +29,7 @@ import store from './store'
 import App from './main'
 import router from './router'
 import titlebar from './components/titlebar'
+import fixes from './fixes'
 
 elLocale.use(enLocale)
 Vue.use(VueI18n)
@@ -41,6 +43,7 @@ document.documentElement.innerHTML = i18n.internationalize(
 )
 
 const components = [
+  Autocomplete,
   Select,
   Option,
   Checkbox,
@@ -60,6 +63,7 @@ const components = [
   TableColumn,
   Switch
 ]
+fixes.fixAutocomplete(Autocomplete)
 components.forEach(c => Vue.use(c))
 
 // register custom locale

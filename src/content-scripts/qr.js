@@ -28,7 +28,7 @@ const styleText = `
   opacity: 1;
   transition: opacity .3s;
 }
-.mwr-qr-mask[is-text] [copy] {
+.mwr-qr-mask[is-text] .js-open-url {
   display: none;
 }
 .mwr-qr-mask .mwr-qr-wrapper {
@@ -89,15 +89,15 @@ function updateQR () {
     )
     const footer = maskDom.querySelector('.mwr-qr-footer')
     footer.innerHTML = `
-    <span class="mwr-action-btn" copy title=${JSON.stringify(
+    <span class="mwr-action-btn js-copy" title=${JSON.stringify(
     data.content
-  )}>Copy content</span>
-    <a class="mwr-action-btn" target="_blank" href="${encodeURI(
+  )}>${chrome.i18n.getMessage('cs_copy_btn')}</span>
+    <a class="mwr-action-btn js-open-url" target="_blank" href="${encodeURI(
     data.content
-  )}">Open url</a>
+  )}">${chrome.i18n.getMessage('cs_open_btn')}</a>
     <a class="mwr-action-btn" href="${chrome.runtime.getURL(
     'options/index.html#/qrcode'
-  )}" target="_blank">More...</a>
+  )}" target="_blank">${chrome.i18n.getMessage('cs_more_btn')}</a>
     `
     qrcode.makeQRCode(data.content, 280).then(
       imgStr => {
@@ -105,14 +105,13 @@ function updateQR () {
         maskDom.classList.add('mwr-qr-mask-show')
       },
       e => {
-        console.log(e)
+        console.warn(e, e.message)
       }
     )
   })
 }
 
 function init () {
-  console.log('init scripts')
   if (window.updateQR) {
     return window.updateQR()
   }
@@ -123,7 +122,6 @@ function init () {
   maskDom = document.createElement('div')
   maskDom.classList.add('mwr-qr-mask')
   maskDom.innerHTML = domHtml
-  console.log('init dom')
   maskDom.addEventListener('click', onClickMask)
   document.body.appendChild(maskDom)
   window.updateQR()
@@ -133,18 +131,27 @@ function onClickMask (e) {
   const target = e.target
   if (target === maskDom) {
     maskDom.classList.remove('mwr-qr-mask-show')
-  } else if (target.hasAttribute('copy')) {
-    copyText(target.title)
+  } else if (
+    target.classList.contains('js-copy') &&
+    !target.hasAttribute('is-copied')
+  ) {
+    copyText(target.title, target)
   }
 }
 
-function copyText (text) {
+function copyText (text, target) {
   const ta = document.createElement('textarea')
   ta.textContent = text
   maskDom.appendChild(ta)
   ta.select()
   try {
     document.execCommand('copy')
+    target.innerText = chrome.i18n.getMessage('cs_copied_btn')
+    target.setAttribute('is-copied', '')
+    setTimeout(() => {
+      target.innerText = chrome.i18n.getMessage('cs_copy_btn')
+      target.removeAttribute('is-copied')
+    }, 1000)
   } catch (e) {
     console.log('failed to copy text', e)
   } finally {

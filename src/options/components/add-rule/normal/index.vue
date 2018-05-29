@@ -1,33 +1,42 @@
 <template>
 <el-form label-position="top" :model="form" ref="ruleForm">
-  <el-form-item size="small" :label="$t('matchLbl')" :error="errorMsg">
+  <el-form-item :label="$t('matchLbl')" :error="errorMsg">
     <el-col :span="10">
-      <el-input
-        v-model="form.host"
-        @input="onFormChange"
-        @paste.native="onPaste"
-        @keyup.native.enter="onAddRule"
-        ref="firstInput"
-        v-popover:urlPopover
-        placeholder="host, required, paste a url here" >
-        <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
-          <el-option label="*://" value="*"></el-option>
-          <el-option label="http://" value="http"></el-option>
-          <el-option label="https://" value="https"></el-option>
-        </el-select>
-      </el-input>
+      <el-form-item prop="host" required>
+        <el-input
+          size="small"
+          v-model="form.host"
+          @input="onFormChange"
+          @paste.native="onPaste"
+          @keyup.native.enter="onAddRule"
+          ref="firstInput"
+          autocorrect="off"
+          spellcheck="false"
+          v-popover:urlPopover
+          placeholder="host, required, paste a url here" >
+          <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
+            <el-option label="*://" value="*"></el-option>
+            <el-option label="http://" value="http"></el-option>
+            <el-option label="https://" value="https"></el-option>
+          </el-select>
+        </el-input>
+      </el-form-item>
     </el-col>
     <el-col :span="1" class="path-sep">/</el-col>
     <el-col :span="13">
-      <el-input
-        size="small"
-        v-model="form.pathname"
-        @input="onFormChange"
-        @paste.native="onPaste"
-        @keyup.native.enter="onAddRule"
-        placeholder="pathname and querystring, optional" >
-        <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-      </el-input>
+      <el-form-item prop="pathname" required>
+        <el-input
+          size="small"
+          autocorrect="off"
+          spellcheck="false"
+          v-model="form.pathname"
+          @input="onFormChange"
+          @paste.native="onPaste"
+          @keyup.native.enter="onAddRule"
+          placeholder="pathname and querystring, optional" >
+          <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+        </el-input>
+      </el-form-item>
     </el-col>
   </el-form-item>
 <!--   <el-popover
@@ -67,8 +76,10 @@ export default {
     window.ff = this.$refs.ruleForm
   },
   methods: {
-    onAddRule () {
-      return this.addARule()
+    async onAddRule () {
+      const isValid = await this.$refs.ruleForm.validate()
+      console.warn('isValid', isValid)
+      if (isValid) this.addARule()
     },
     onUpdateRule () {
       return this.addARule(this.ruleID)
@@ -161,7 +172,12 @@ export default {
 </script>
 
 <style lang="scss">
+.el-form--label-top .el-form-item__label {
+  padding-bottom: 0;
+}
+
 .path-sep {
+  line-height: 32px;
   text-align: center;
 }
 </style>

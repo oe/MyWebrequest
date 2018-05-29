@@ -40,10 +40,12 @@ export default {
         const host = parts[2]
         const pathname = (parts[3] || '') + (parts[4] || '')
         if (isCustom) {
-          this.form.url = host + '/' + pathname
+          this.form.url = host + (pathname || '')
+          // if test url is empty and url is valid url, use url as test url
+          if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
         } else {
           this.form.host = host
-          this.form.pathname = pathname
+          this.form.pathname = pathname.replace(/^\//, '')
         }
         e.preventDefault()
       } catch (e) {
@@ -53,11 +55,8 @@ export default {
     },
     onAddRule () {},
     clearForm () {
-      Object.keys(this.form).forEach(key => {
-        let val = ''
-        if (key === 'protocol') val = this.module === 'hsts' ? 'http' : '*'
-        this.form[key] = val
-      })
+      if (this.$refs.ruleForm) this.$refs.ruleForm.resetFields()
+      this.form.protocol = this.module === 'hsts' ? 'http' : '*'
     },
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
