@@ -137,10 +137,17 @@ export default {
       if (this.selectionStart !== words.length && words[this.selectionStart] !== '}') return cb(result)
       // no match {
       if (!/(?<={)([^{}]*)$/.test(words.slice(0, this.selectionStart))) return cb(result)
-      const searchWords = RegExp.$1
+      const searchWords = RegExp.$1.trim()
       cb(this.getUrlParams(searchWords))
     },
     getUrlParams (kwd) {
+      let result = this.getAllAvailableParams()
+      if (kwd) {
+        result = result.filter((itm) => itm.value.includes(kwd))
+      }
+      return result
+    },
+    getAllAvailableParams () {
       const result = utils.RESERVED_HOLDERS.map((k) => {
         return {
           value: k,

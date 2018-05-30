@@ -14,6 +14,9 @@
   "bg_logon_tip": {
     "message": "如果你不再需要监控请求,那就把它关掉吧."
   },
+  "optPgTitle": {
+    "message": "选项"
+  },
   "cs_copy_btn": {
     "message": "复制内容"
   },

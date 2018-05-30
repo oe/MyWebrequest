@@ -1,8 +1,8 @@
 <template>
-<el-form label-position="top" :model="form" ref="ruleForm">
+<el-form label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
   <el-form-item :label="$t('matchLbl')" :error="errorMsg">
     <el-col :span="10">
-      <el-form-item prop="host" required>
+      <el-form-item prop="host">
         <el-input
           size="small"
           v-model="form.host"
@@ -24,7 +24,7 @@
     </el-col>
     <el-col :span="1" class="path-sep">/</el-col>
     <el-col :span="13">
-      <el-form-item prop="pathname" required>
+      <el-form-item prop="pathname">
         <el-input
           size="small"
           autocorrect="off"
@@ -66,6 +66,10 @@ export default {
         host: '',
         pathname: ''
       },
+      validateRules: {
+        host: {validator: this.validateHost, trigger: 'blur'},
+        pathname: {validator: this.validatePathname, trigger: 'blur'}
+      },
       // 错误信息
       errorMsg: '',
       etid: 0,
@@ -76,6 +80,16 @@ export default {
     window.ff = this.$refs.ruleForm
   },
   methods: {
+    validateHost (rule, value, cb) {
+      value = value.trim()
+      if (!value) {
+        return cb(new Error(this.$t('qrMakeMacBtn')))
+      }
+      cb()
+    },
+    validatePathname (rule, value, cb) {
+      cb()
+    },
     async onAddRule () {
       const isValid = await this.$refs.ruleForm.validate()
       console.warn('isValid', isValid)
