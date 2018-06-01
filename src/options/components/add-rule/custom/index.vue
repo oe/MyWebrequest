@@ -202,6 +202,9 @@ export default {
 </script>
 
 <style lang="scss">
+.el-form-item__content>.el-input {
+  width: 100%;
+}
 .el-form-item__content .el-autocomplete {
   width: 100%;
 }

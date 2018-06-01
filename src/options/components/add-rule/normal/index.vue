@@ -1,43 +1,25 @@
 <template>
 <el-form label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
-  <el-form-item :label="$t('matchLbl')" :error="errorMsg">
-    <el-col :span="10">
-      <el-form-item prop="host">
-        <el-input
-          size="small"
-          v-model="form.host"
-          @input="onFormChange"
-          @paste.native="onPaste"
-          @keyup.native.enter="onAddRule"
-          ref="firstInput"
-          autocorrect="off"
-          spellcheck="false"
-          v-popover:urlPopover
-          placeholder="host, required, paste a url here" >
-          <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
-            <el-option label="*://" value="*"></el-option>
-            <el-option label="http://" value="http"></el-option>
-            <el-option label="https://" value="https"></el-option>
-          </el-select>
-        </el-input>
-      </el-form-item>
-    </el-col>
-    <el-col :span="1" class="path-sep">/</el-col>
-    <el-col :span="13">
-      <el-form-item prop="pathname">
-        <el-input
-          size="small"
-          autocorrect="off"
-          spellcheck="false"
-          v-model="form.pathname"
-          @input="onFormChange"
-          @paste.native="onPaste"
-          @keyup.native.enter="onAddRule"
-          placeholder="pathname and querystring, optional" >
-          <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-        </el-input>
-      </el-form-item>
-    </el-col>
+  <el-form-item :label="$t('matchLbl')" :error="errorMsg" prop="url">
+    <el-input
+      size="small"
+      v-model="form.url"
+      @input="onFormChange"
+      @paste.native="onPaste"
+      @keyup.native.enter="onAddRule"
+      ref="firstInput"
+      autocorrect="off"
+      spellcheck="false"
+      v-popover:urlPopover
+      placeholder="url, required, paste a url here" >
+      <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
+        <el-option label="*://" value="*"></el-option>
+        <el-option label="http://" value="http"></el-option>
+        <el-option label="https://" value="https"></el-option>
+      </el-select>
+      <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+
+    </el-input>
   </el-form-item>
 <!--   <el-popover
     ref="urlPopover"
@@ -63,16 +45,17 @@ export default {
       disableProtocol: false,
       form: {
         protocol: '*',
-        host: '',
-        pathname: ''
+        url: ''
       },
       validateRules: {
-        host: {validator: this.validateHost, trigger: 'blur'},
-        pathname: {validator: this.validatePathname, trigger: 'blur'}
+        // by default, validator wont trigger on input blur
+        url: {validator: this.validateURL, trigger: 'none'}
       },
       // 错误信息
       errorMsg: '',
       etid: 0,
+      // set to true before update a rule in dialog
+      isUpdate: false,
       isHiding: false
     }
   },
@@ -80,23 +63,26 @@ export default {
     window.ff = this.$refs.ruleForm
   },
   methods: {
-    validateHost (rule, value, cb) {
-      value = value.trim()
-      if (!value) {
-        return cb(new Error(this.$t('qrMakeMacBtn')))
+    validateURL (rule, value, cb) {
+      try {
+        this.validateRule(this.form, this.isUpdate && this.ruleID)
+        cb()
+      } catch (e) {
+        console.log(e)
+        // return cb(new Error(this.$t('qrMakeMacBtn')))
+        return cb(e)
       }
-      cb()
-    },
-    validatePathname (rule, value, cb) {
-      cb()
     },
     async onAddRule () {
+      this.isUpdate = false
       const isValid = await this.$refs.ruleForm.validate()
       console.warn('isValid', isValid)
       if (isValid) this.addARule()
     },
-    onUpdateRule () {
-      return this.addARule(this.ruleID)
+    async onUpdateRule () {
+      this.isUpdate = true
+      const isValid = await this.$refs.ruleForm.validate()
+      if (isValid) this.addARule(this.ruleID)
     },
     addARule (ruleID) {
       try {
@@ -141,9 +127,7 @@ export default {
           const parts = utils.getURLParts(rule.url)
           if (parts) {
             this.form.protocol = parts[1]
-            this.form.host = parts[2]
-            // remove leading / in pathname
-            this.form.pathname = parts[3].replace(/^\//, '') + (parts[4] || '')
+            this.form.url = parts[2] + parts[3] + (parts[4] || '')
           }
         }
       }
@@ -158,13 +142,12 @@ export default {
      */
     validateRule (data, ignoreID) {
       const protocol = data.protocol
-      const host = data.host.trim()
-      const path = data.pathname.trim() || '*'
+      let url = data.url.trim()
       if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
-      if (!host) throw new Error('emptyHost')
-      const url = `${protocol}://${host}/${path}`
+      if (!url) throw new Error('emptyUrl')
+      url = protocol + '://' + url
       utils.testURLRuleValid(url)
-      if (this.isRuleExist(url)) throw new Error('ruleExists')
+      if (!ignoreID && this.isRuleExist(url)) throw new Error('ruleExists')
       // test for duplicated match rule
       this.rules.some((rule) => {
         if (ignoreID && rule.id === ignoreID) return false
@@ -180,6 +163,14 @@ export default {
         }
       })
       return url
+    }
+  },
+  watch: {
+    'form.url': function (newVal) {
+      // if form.url is the same with original after change, then
+      //    prevent validate on blur, or else
+      this.validateRules.url.trigger =
+        this.originalForm.url === newVal ? 'none' : 'blur'
     }
   }
 }

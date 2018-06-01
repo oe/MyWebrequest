@@ -4,6 +4,7 @@ import {
   Autocomplete,
   Select,
   Option,
+  Message,
   Checkbox,
   Dialog,
   Button,
@@ -48,6 +49,7 @@ const components = [
   Option,
   Checkbox,
   Dialog,
+  // Message,
   Button,
   RadioGroup,
   Radio,
@@ -72,6 +74,7 @@ for (var key in locales) {
     Vue.locale(key, locales[key])
   }
 }
+Vue.prototype.$message = Message
 
 Vue.component('titlebar', titlebar)
 

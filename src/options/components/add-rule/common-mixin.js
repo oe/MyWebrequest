@@ -16,6 +16,11 @@ export function mergeLang (lang = {}) {
 }
 
 export default {
+  data () {
+    return {
+      originalForm: {}
+    }
+  },
   props: {
     ruleID: {
       type: String,
@@ -24,6 +29,7 @@ export default {
   },
   created () {
     this.resetForm()
+    this.originalForm = Object.assign({}, this.form)
   },
   methods: {
     ...mapActions(['addRule']),
