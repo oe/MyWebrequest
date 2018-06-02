@@ -1,10 +1,15 @@
 <template>
-<el-form label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
-  <el-form-item :label="$t('matchLbl')" :error="errorMsg" prop="url">
+<el-form  label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
+  <el-form-item class="form-item-url" prop="url">
+    <template slot="label">
+      <div slot="label">
+        {{$t('matchLbl')}}
+      </div>
+      <el-checkbox v-model="needTest">I'd like to test my rule</el-checkbox>      
+    </template>
     <el-input
       size="small"
       v-model="form.url"
-      @input="onFormChange"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       ref="firstInput"
@@ -45,17 +50,18 @@ export default {
       disableProtocol: false,
       form: {
         protocol: '*',
-        url: ''
+        url: '',
+        testUrl: ''
       },
       validateRules: {
         // by default, validator wont trigger on input blur
         url: {validator: this.validateURL, trigger: 'none'}
       },
-      // 错误信息
-      errorMsg: '',
+      needTest: false,
       etid: 0,
       // set to true before update a rule in dialog
-      isUpdate: false,
+      //   and will skip duplicated rule check
+      isUpdate: true,
       isHiding: false
     }
   },
@@ -76,13 +82,14 @@ export default {
     async onAddRule () {
       this.isUpdate = false
       const isValid = await this.$refs.ruleForm.validate()
+      this.isUpdate = true
       console.warn('isValid', isValid)
-      if (isValid) this.addARule()
+      if (isValid) return this.addARule()
     },
     async onUpdateRule () {
       this.isUpdate = true
       const isValid = await this.$refs.ruleForm.validate()
-      if (isValid) this.addARule(this.ruleID)
+      if (isValid) return this.addARule(this.ruleID)
     },
     addARule (ruleID) {
       try {
@@ -99,23 +106,6 @@ export default {
         console.error('failed', e)
         return false
       }
-    },
-    onFormChange () {
-      this.hideInputError()
-    },
-    showInputError (msg) {
-      clearTimeout(this.etid)
-      this.isHiding = false
-      this.errorMsg = msg
-    },
-    hideInputError () {
-      if (this.isHiding || !this.errorMsg) return
-      console.log('on change')
-      this.isHiding = true
-      this.etid = setTimeout(() => {
-        this.errorMsg = ''
-        this.isHiding = false
-      }, 1000)
     },
     resetForm () {
       this.clearForm()
@@ -166,11 +156,20 @@ export default {
     }
   },
   watch: {
-    'form.url': function (newVal) {
-      // if form.url is the same with original after change, then
-      //    prevent validate on blur, or else
-      this.validateRules.url.trigger =
-        this.originalForm.url === newVal ? 'none' : 'blur'
+    form: {
+      handler (newVal) {
+        const original = this.originalForm
+        const isRuleChanged = newVal.protocol !== original.protocol ||
+          newVal.url !== original.url
+        console.log('form.url change', this.originalForm, newVal)
+        const trigger = isRuleChanged ? 'change' : 'none'
+        console.log('trigger', trigger)
+        // if form.url is the same with original after change, then
+        //    prevent validate on blur, or else
+        this.validateRules.url.trigger = trigger
+        if (trigger === 'none') this.$refs.ruleForm.clearValidate()
+      },
+      deep: true
     }
   }
 }
@@ -181,6 +180,12 @@ export default {
   padding-bottom: 0;
 }
 
+.form-item-url .el-form-item__label {
+  display: flex;
+  justify-content: space-between;
+
+  .el-checkbox { font-weight: normal; }
+}
 .path-sep {
   line-height: 32px;
   text-align: center;

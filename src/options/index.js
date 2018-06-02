@@ -49,7 +49,6 @@ const components = [
   Option,
   Checkbox,
   Dialog,
-  // Message,
   Button,
   RadioGroup,
   Radio,

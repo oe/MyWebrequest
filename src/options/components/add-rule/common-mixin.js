@@ -28,8 +28,7 @@ export default {
     }
   },
   created () {
-    this.resetForm()
-    this.originalForm = Object.assign({}, this.form)
+    this.resetRuleForm()
   },
   methods: {
     ...mapActions(['addRule']),
@@ -45,14 +44,9 @@ export default {
         this.form.protocol = parts[1]
         const host = parts[2]
         const pathname = (parts[3] || '') + (parts[4] || '')
-        if (isCustom) {
-          this.form.url = host + (pathname || '')
-          // if test url is empty and url is valid url, use url as test url
-          if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
-        } else {
-          this.form.host = host
-          this.form.pathname = pathname.replace(/^\//, '')
-        }
+        this.form.url = host + (pathname || '')
+        // if test url is empty and url is valid url, use url as test url
+        if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
         e.preventDefault()
       } catch (e) {
         // statements
@@ -60,6 +54,10 @@ export default {
       }
     },
     onAddRule () {},
+    resetRuleForm () {
+      this.resetForm()
+      this.originalForm = Object.assign({}, this.form)
+    },
     clearForm () {
       if (this.$refs.ruleForm) this.$refs.ruleForm.resetFields()
       this.form.protocol = this.module === 'hsts' ? 'http' : '*'
@@ -80,7 +78,7 @@ export default {
   },
   watch: {
     $route () {
-      this.resetForm()
+      this.resetRuleForm()
     }
   }
 }

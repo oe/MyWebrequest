@@ -187,9 +187,6 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
   console.log('test url', url)
   // url is empty
   if (!url) throw new Error('ruleIsEmpty')
-  if (!/\w\//.test(url)) {
-    url += '/'
-  }
 
   // should contains no special chars(:?/) in param name
   //  if got these chars, the following getURLParts won't work

@@ -72,8 +72,9 @@ export default {
     onDlgClose () {
       this.$router.replace({path: '/' + this.module})
     },
-    onUpdateRule () {
-      if (this.$refs.dlgForm.onUpdateRule()) {
+    async onUpdateRule () {
+      const isSuccess = await this.$refs.dlgForm.onUpdateRule()
+      if (isSuccess) {
         this.showEditDialog = false
         this.$message({
           showClose: true,
@@ -82,8 +83,9 @@ export default {
         })
       }
     },
-    onSaveANewRule () {
-      if (this.$refs.dlgForm.onAddRule()) {
+    async onSaveANewRule () {
+      const isSuccess = await this.$refs.dlgForm.onAddRule()
+      if (isSuccess) {
         this.showEditDialog = false
         this.$message({
           showClose: true,

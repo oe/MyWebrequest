@@ -47,14 +47,11 @@
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
-  <el-form-item size="small" label="Test Result">
-    <el-input
-      autocorrect="off"
-      spellcheck="false"
-      v-model="form.testResult"
-      placeholder="choose protocol" >
-      <el-button v-if="!ruleID" slot="append" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-    </el-input>
+  <el-form-item size="small" label="Test Result" class="form-item-testresult">
+    <div class="url-result">
+      <a :href="form.testResult" target="_blank">{{form.testResult}}</a>
+    </div>
+    <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
   </el-form-item>
 </el-form>
 </template>
@@ -207,6 +204,15 @@ export default {
 }
 .el-form-item__content .el-autocomplete {
   width: 100%;
+}
+.url-result {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  /* autoprefixer: ignore next */
+  -webkit-box-orient: vertical;
 }
 .el-autocomplete-suggestion li {
   display: flex;

@@ -118,6 +118,7 @@ const config = {
     ]
   },
   plugins: [
+    // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
     new CleanWebpackPlugin(['dist', 'ext.zip']),
     // copy custom static assets
     new CopyWebpackPlugin(
@@ -148,7 +149,15 @@ const config = {
     new ExtractTextPlugin({
       filename: '[name].css'
     }),
-    new OptimizeCSSPlugin()
+    new OptimizeCSSPlugin({
+      cssProcessorOptions: {
+        // prevent autoprefix removing prefixes
+        // ref https://github.com/ben-eb/cssnano/issues/357
+        autoprefixer: {
+          remove: false
+        }
+      }
+    })
   ],
   resolve: {
     extensions: ['.js', '.vue', '.json'],
