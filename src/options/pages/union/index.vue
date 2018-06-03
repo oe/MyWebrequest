@@ -21,6 +21,7 @@
     <component ref="dlgForm" :is="formType" :ruleID="ruleID"></component>
     <div slot="footer" class="dialog-footer">
       <el-button size="small" @click="showEditDialog=false">Cancel</el-button>
+      <el-button size="small" type="primary" @click="onResetDlg">Reset</el-button>
       <el-button size="small" type="primary" @click="onUpdateRule">Update</el-button>
       <el-button size="small" type="primary" @click="onSaveANewRule">Save as a new Rule</el-button>
       </div>
@@ -82,6 +83,9 @@ export default {
           type: 'success'
         })
       }
+    },
+    onResetDlg () {
+      this.$refs.dlgForm.resetRuleForm()
     },
     async onSaveANewRule () {
       const isSuccess = await this.$refs.dlgForm.onAddRule()

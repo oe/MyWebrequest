@@ -1,6 +1,5 @@
 {
   "en": {
-    "testRule": "Test Rule",
     "param_p": "protocol(without ://)",
     "param_h": "host(including port)",
     "param_m": "top level domain(without port)",
@@ -10,7 +9,6 @@
     "param_start": "everything after the first star in path"
   },
   "zh-cn": {
-    "testRule": "测试规则",
     "param_p": "协议(不包含 ://)",
     "param_h": "域名(包括端口)",
     "param_m": "主域名(不包括端口)",

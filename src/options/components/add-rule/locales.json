@@ -1,10 +1,12 @@
 {
   "en": {
     "matchLbl": "Match this url",
+    "testRule": "Test Rule",
     "addRuleBtn": "Add rule"
   },
   "zh-cn": {
     "matchLbl": "匹配下面的规则",
+    "testRule": "测试规则",
     "addRuleBtn": "添加规则"
   }
 }

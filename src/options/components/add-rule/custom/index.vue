@@ -47,18 +47,18 @@
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
-  <el-form-item size="small" label="Test Result" class="form-item-testresult">
-    <div class="url-result">
-      <a :href="form.testResult" target="_blank">{{form.testResult}}</a>
-    </div>
-    <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-  </el-form-item>
+  <TestResult
+    :url="form.testResult"
+    :show-add-btn="!ruleID"
+    @add-click="onAddRule"
+    ></TestResult>
 </el-form>
 </template>
 
 <script>
 import utils from '@/options/components/utils'
 import cutils from '@/common/utils'
+import TestResult from '@/options/components/test-result'
 import mixin, { mergeLang } from '../common-mixin'
 import locales from './locales.json'
 const lang = mergeLang(locales)
@@ -83,6 +83,7 @@ export default {
   mounted () {
     this.redirectInput = this.$refs.redirectInput.$el.querySelector('input')
   },
+  components: {TestResult},
   methods: {
     resetForm () {
       this.clearForm()
@@ -205,15 +206,7 @@ export default {
 .el-form-item__content .el-autocomplete {
   width: 100%;
 }
-.url-result {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.2;
-  /* autoprefixer: ignore next */
-  -webkit-box-orient: vertical;
-}
+
 .el-autocomplete-suggestion li {
   display: flex;
 

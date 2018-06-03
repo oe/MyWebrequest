@@ -449,6 +449,13 @@ function debounce (fn, wait) {
   }
 }
 
+function isURLMatchPattern (url, pattern) {
+  let reg = pattern.replace(escapeRegExp, '\\$&').replace('*', '.*')
+  reg = RegExp(reg)
+  console.warn(reg)
+  return reg.test(url)
+}
+
 export default {
   RESERVED_HOLDERS,
   guid,
@@ -461,6 +468,7 @@ export default {
   isURL,
   isSubRule,
   testURLRuleValid,
+  isURLMatchPattern,
   debounce,
   getRouter,
   isValidReg,
