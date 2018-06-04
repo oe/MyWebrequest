@@ -56,11 +56,11 @@ export default {
     onAddRule () {},
     resetRuleForm () {
       this.resetForm()
-      this.$refs.ruleForm.resetValidate()
+      this.$refs.ruleForm && this.$refs.ruleForm.clearValidate()
       this.originalForm = Object.assign({}, this.form)
     },
     clearForm () {
-      if (this.$refs.ruleForm) this.$refs.ruleForm.resetFields()
+      this.$refs.ruleForm && this.$refs.ruleForm.resetFields()
       this.form.protocol = this.module === 'hsts' ? 'http' : '*'
     },
     isRuleExist (rule) {

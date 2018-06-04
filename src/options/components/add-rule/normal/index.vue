@@ -43,18 +43,23 @@
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
   </el-popover> -->
-  <TestResult
-    v-show="needTest"
-    :url="form.testResult"
-    :show-add-btn="!ruleID"
-    @add-click="onAddRule"
-    ></TestResult>
+  <el-form-item v-show="needTest" size="small" prop="testResult" label="Test Result" class="form-item-testresult">
+    <div class="url-result">
+      <template v-if="form.testResult">
+        <a :href="form.testResult" target="_blank">{{form.testResult}}</a>
+      </template>
+      <template v-else>
+        Please test your rule before add, you can add your rule after passed test
+      </template>
+    </div>
+    <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+  </el-form-item>
 </el-form>
 </template>
 
 <script>
 import utils from '@/options/components/utils'
-import TestResult from '@/options/components/test-result'
+// import TestResult from '@/options/components/test-result'
 import mixin, { mergeLang } from '../common-mixin'
 // import locales from './locales.json'
 const lang = mergeLang({})
@@ -74,7 +79,8 @@ export default {
       validateRules: {
         // by default, validator wont trigger on input blur
         url: {validator: this.validateURL, trigger: 'none'},
-        testUrl: {validator: this.validateTestURL, trigger: 'none'}
+        testUrl: {validator: this.validateTestURL, trigger: 'none'},
+        testResult: {validator: this.validateTestResult, trigger: 'none'}
       },
       needTest: false,
       etid: 0,
@@ -87,7 +93,7 @@ export default {
   mounted () {
     window.ff = this
   },
-  components: {TestResult},
+  // components: {TestResult},
   methods: {
     validateURL (rule, value, cb) {
       try {
@@ -105,13 +111,24 @@ export default {
       if (!this.needTest || utils.isURL(value)) return cb()
       cb(new Error('invalidURL'))
     },
-    async onTestRule () {
-      this.isUpdate = true
-      const isValid = this.$refs.ruleForm.validate()
-      if (!isValid) return
+    validateTestResult (rule, value, cb) {
+      if (!this.needTest) cb()
+      // this.isUpdate = true
+      // const isValid = this.$refs.ruleForm.validate()
+      // if (!isValid) return
       const pattern = this.form.protocol + '://' + this.form.url
       const isMatch = utils.isURLMatchPattern(this.form.testUrl, pattern)
-      console.log('isMatch', isMatch)
+      isMatch ? cb() : cb(new Error('notMatch'))
+      // console.log('isMatch', isMatch)
+    },
+    async onTestRule () {
+      this.$refs.ruleForm.validate()
+      // this.isUpdate = true
+      // const isValid = this.$refs.ruleForm.validate()
+      // if (!isValid) return
+      // const pattern = this.form.protocol + '://' + this.form.url
+      // const isMatch = utils.isURLMatchPattern(this.form.testUrl, pattern)
+      // console.log('isMatch', isMatch)
     },
     async onAddRule () {
       this.isUpdate = false
@@ -220,8 +237,16 @@ export default {
 
   .el-checkbox { font-weight: normal; }
 }
-.path-sep {
-  line-height: 32px;
-  text-align: center;
+
+.url-result {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+  word-break: break-all;
+  padding: 0 4px;
+  -webkit-line-clamp: 2;
+  -webkit-box-pack: center;
+  -webkit-box-orient: vertical;
 }
 </style>
