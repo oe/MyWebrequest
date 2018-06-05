@@ -452,7 +452,6 @@ function debounce (fn, wait) {
 function isURLMatchPattern (url, pattern) {
   let reg = pattern.replace(escapeRegExp, '\\$&').replace('*', '.*')
   reg = RegExp(reg)
-  console.warn(reg)
   return reg.test(url)
 }
 

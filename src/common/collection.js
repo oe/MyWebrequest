@@ -1,37 +1,62 @@
 import utils from './utils'
 
+function storeGet (key) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get(key, resp => {
+      console.warn('get key', key, resp, chrome.runtime.lastError)
+      if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
+      key ? resolve(resp[key]) : resolve(resp)
+    })
+  })
+}
+
+function storeSet (key, val) {
+  return new Promise((resolve, reject) => {
+    chrome.storage.local.get({ [key]: val }, () => {
+      console.warn('set key', key, val, chrome.runtime.lastError)
+      if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
+      resolve()
+    })
+  })
+}
+
 export default {
-  get (cat, key) {
+  async get (cat, key) {
     const defVal = utils.isUrlRuleType(cat) ? [] : {}
-    const result = JSON.parse(localStorage.getItem(cat)) || defVal
+    let result = await storeGet(cat)
+    result = result || defVal
     return typeof key === 'undefined' ? result : result[key]
   },
-  save (cat, key, val) {
+  async save (cat, key, val) {
     let data = key
     if (arguments.length === 3) {
       data = this.get(cat)
       data[key] = val
     }
-    localStorage.setItem(cat, JSON.stringify(data))
+    await storeSet(cat, data)
   },
-  getKey (key) {
-    return localStorage.getItem(key)
+  async getKey (key) {
+    const result = await storeGet(key)
+    return result
   },
-  setOnoff (type, val) {
-    this.save('onoff', type, !!val)
+  async setOnoff (type, val) {
+    await this.save('onoff', type, !!val)
   },
-  getOnoff (type) {
-    return this.get('onoff', type)
+  async getOnoff (type) {
+    const result = await this.get('onoff', type)
+    return result
   },
-  getConfig (type) {
-    return this.get('config', type)
+  async getConfig (type) {
+    const result = this.get('config', type)
+    return result
   },
-  setConfig (type, val) {
-    this.save('config', type, val)
+  async setConfig (type, val) {
+    await this.save('config', type, val)
   },
-  getRouter4Custom () {
+  async getRouter4Custom () {
     // ignore disabled
-    const result = this.get('custom').filter(itm => itm.enabled)
+    let result = await this.get('custom')
+    result = result.filter(itm => itm.enabled)
     return result.reduce((acc, cur) => {
       try {
         cur = utils.preprocessRouter(cur)
@@ -42,19 +67,13 @@ export default {
       return acc
     }, {})
   },
-  getExtensionData () {
-    return Object.keys(localStorage).reduce((acc, key) => {
-      try {
-        acc[key] = JSON.parse(localStorage.getItem(key))
-      } catch (e) {
-        acc[key] = localStorage.getItem(key)
-      }
-      return acc
-    }, {})
+  async getExtensionData () {
+    const result = await storeGet(null)
+    return result
   },
   // get rules/config for background
-  getData4Bg (cat) {
-    let result = this.get(cat)
+  async getData4Bg (cat) {
+    let result = await this.get(cat)
     if (!utils.isUrlRuleType(cat)) return result
     // ignore disabled
     result = result.filter(itm => itm.enabled)

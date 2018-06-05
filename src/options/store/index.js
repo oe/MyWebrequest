@@ -9,7 +9,7 @@ Vue.use(Vuex)
 const state = {
   module: '',
   sortedBy: '',
-  rules: null
+  rules: []
 }
 
 const getters = {
@@ -33,8 +33,8 @@ const mutations = {
   changeModule (state, module) {
     state.module = module
   },
-  updateRules (state, module) {
-    state.rules = collection.get(module)
+  updateRules (state, rules) {
+    state.rules = rules
   },
   saveRules (state) {
     collection.save(state.module, state.rules)
@@ -78,9 +78,10 @@ const mutations = {
 }
 
 const actions = {
-  changeModule (ctx, payload) {
+  async changeModule (ctx, payload) {
     ctx.commit('changeModule', payload.module)
-    ctx.commit('updateRules', payload.module)
+    const rules = await collection.get(payload.module)
+    ctx.commit('updateRules', rules)
   },
   addRule (ctx, payload) {
     ctx.commit('addRule', payload)

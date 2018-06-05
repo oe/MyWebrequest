@@ -84,7 +84,6 @@ export default {
     form: {
       handler (newVal) {
         const original = this.originalForm
-        console.log('originalForm', original)
         // all changed values
         const diffs = Object.keys(newVal).filter(k => {
           return newVal[k] !== original[k]
@@ -96,7 +95,7 @@ export default {
           if (k === 'trigger') return
           const trigger = diffs.includes(k) ? 'blur' : 'none'
           validateRules[k].trigger = trigger
-          console.log('trigger for', k, trigger)
+          // console.log('trigger for', k, trigger)
           if (trigger === 'none') {
             const field = this.$refs.ruleForm.fields.find(vm => {
               return vm.prop === k

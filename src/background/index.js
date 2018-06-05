@@ -102,9 +102,6 @@ const onRequests = {
     cache: null,
     fn (details) {
       let k, rule, url
-      if (!onRequests.custom.cache) {
-        onRequests.custom.cache = collection.getRouter4Custom()
-      }
       const rules = onRequests.custom.cache
       for (k in rules) {
         if (!rules.hasOwnProperty(k)) continue
@@ -330,13 +327,18 @@ const pushNotification = (function () {
 })()
 
 // toggle rule on or off
-function toggleRule (type, rule, isOn) {
+async function toggleRule (type, rule, isOn) {
   const requestCfg = onRequests[type]
   if (!requestCfg) return
-  if (requestCfg.deps) {
-    requestCfg.deps.forEach(type => {
-      toggleRule(type, rule, isOn)
-    })
+  if (requestCfg.deps && requestCfg.deps.length) {
+    const deps = requestCfg.deps
+    for (let i = 0; i < deps.length; i++) {
+      await toggleRule(deps[i], rule, isOn)
+    }
+  }
+  // update custom rule cache
+  if (type === 'custom') {
+    onRequests.custom.cache = isOn ? await collection.getRouter4Custom() : {}
   }
   const action = isOn ? 'addListener' : 'removeListener'
   if (!isOn && requestCfg.cache) requestCfg.cache = null
@@ -348,7 +350,7 @@ function toggleRule (type, rule, isOn) {
 }
 
 // get rule object by rule type
-function getRule (type) {
+async function getRule (type) {
   console.warn('get rule type', type)
   // clone Depp to avoid urls duplication
   const rule = clonedeep(FEATURE_RULES[type])
@@ -356,7 +358,7 @@ function getRule (type) {
     console.warn('cant find rules of', type)
     return
   }
-  let urls = collection.getData4Bg(type)
+  let urls = await collection.getData4Bg(type)
   rule.urls.push(...urls)
   console.warn(`all rules of ${type}`, rule.urls)
   // return rule of has urls
@@ -377,9 +379,9 @@ function updateExtIcon (iconStyle) {
   })
 }
 
-function init () {
+async function init () {
   console.warn('init all settings')
-  const onoff = collection.getData4Bg('onoff')
+  const onoff = await collection.getData4Bg('onoff')
   let len = RULE_TYPES.length
   let type
   console.warn('init', onoff, RULE_TYPES)
@@ -389,7 +391,7 @@ function init () {
       onoff[type] = false
       continue
     }
-    const rule = getRule(type)
+    const rule = await getRule(type)
     if (!rule) {
       onoff[type] = false
       continue
@@ -405,10 +407,10 @@ function init () {
         }
       )
     }
-    toggleRule(type, rule, true)
+    await toggleRule(type, rule, true)
   }
-  collection.save('onoff', onoff)
-  const config = collection.get('config')
+  await collection.save('onoff', onoff)
+  const config = await collection.get('config')
   updateExtIcon(config.iconStyle)
   if (config.showQrMenu) {
     menu.addMenu()
@@ -417,54 +419,62 @@ function init () {
 
 init()
 
-window.addEventListener('storage', function (event) {
-  console.log('storage event fired %o', event)
-  const type = event.key
-  let newData, oldData
+async function handleKeyChange (key, newVal, oldVal) {
   try {
-    newData = JSON.parse(event.newValue || '[]')
-    oldData = JSON.parse(event.oldValue || '[]')
+    if (key === 'config') {
+      if (newVal.iconStyle !== oldVal.iconStyle) {
+        updateExtIcon(newVal.iconStyle)
+      }
+      if (newVal.showQrMenu !== oldVal.showQrMenu) {
+        newVal.showQrMenu ? menu.addMenu() : menu.removeMenu()
+      }
+      return
+    }
+    if (key === 'onoff') {
+      let len = RULE_TYPES.length
+      while (len--) {
+        const k = RULE_TYPES[len]
+        if (newVal[k] === oldVal[k]) continue
+        const rule = await getRule(k)
+        console.log('onoff change, feature: %s turned %s', k, newVal[k])
+        if (!rule) {
+          console.log('disable feature because %s has no rule', k)
+          await collection.setOnoff(k, false)
+          return
+        }
+        await toggleRule(k, rule, newVal[k])
+      }
+      return
+    }
+    const isEnabled = await collection.getOnoff(key)
+    if (!isEnabled) return
+    const rule = await getRule(key)
+    await toggleRule(key, rule, false)
+    // if no rule, just turn off
+    if (!rule) {
+      await collection.setOnoff(key, false)
+      return
+    }
+    await toggleRule(key, rule, true)
   } catch (error) {
     logger.warn(
-      'values(' + newData + '/' + oldData + ') of ' + type + ' is invalid',
+      'values(' + newVal + '/' + oldVal + ') of ' + key + ' is invalid',
       error
     )
-    return
   }
-  if (type === 'config') {
-    if (newData.iconStyle !== oldData.iconStyle) {
-      updateExtIcon(newData.iconStyle)
-    }
-    if (newData.showQrMenu !== oldData.showQrMenu) {
-      newData.showQrMenu ? menu.addMenu() : menu.removeMenu()
-    }
-    return
-  }
-  if (type === 'onoff') {
-    let len = RULE_TYPES.length
-    while (len--) {
-      let k = RULE_TYPES[len]
-      if (newData[k] === oldData[k]) continue
-      const rule = getRule(k)
-      console.log('onoff change, feature: %s turned %s', k, newData[k])
-      if (!rule) {
-        console.log('disable feature because %s has no rule', k)
-        collection.setOnoff(k, false)
-        return
-      }
-      toggleRule(k, rule, newData[k])
-    }
-    return
-  }
-  if (!collection.getOnoff(type)) return
-  const rule = getRule(type)
-  toggleRule(type, rule, false)
-  // if no rule, just turn off
-  if (!rule) {
-    collection.setOnoff(type, false)
-    return
-  }
-  toggleRule(type, rule, true)
+}
 
+chrome.storage.onChanged.addListener(async function (changes, area) {
+  console.log('onchange', changes, area)
+  // ignore none sync area change
+  if (area !== 'local') return
+  const { newValue = {}, oldValue = {} } = changes
+  let keys = [...Object.keys(newValue), ...Object.keys(oldValue)]
+  keys = keys.filter((k, i) => keys.indexOf(k) === i)
+  console.log('onchange', changes, area)
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i]
+    await handleKeyChange(key, newValue[key] || {}, oldValue[key] || {})
+  }
   chrome.webRequest.handlerBehaviorChanged()
 })

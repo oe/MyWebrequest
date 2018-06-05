@@ -98,17 +98,18 @@ export default {
         })
       }
     },
-    onFeatureSatusChange () {
-      const onoff = collection.get('onoff')
+    async onFeatureSatusChange () {
+      const onoff = await collection.get('onoff')
       onoff[this.module] = this.isEnabled
-      collection.save('onoff', onoff)
+      await collection.save('onoff', onoff)
     },
-    updateModule () {
+    async updateModule () {
       const routerParams = {
         method: this.$route.params[0],
         query: this.$route.query
       }
-      this.isEnabled = !!collection.get('onoff')[this.module]
+      const isOn = await collection.get('onoff', this.module)
+      this.isEnabled = !!isOn
       if (routerParams.method === 'edit' && routerParams.query.id) {
         this.showEditDialog = true
         this.ruleID = routerParams.query.id

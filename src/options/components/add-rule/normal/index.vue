@@ -45,12 +45,15 @@
   </el-popover> -->
   <el-form-item v-show="needTest" size="small" prop="testResult" label="Test Result" class="form-item-testresult">
     <div class="url-result">
-      <template v-if="form.testResult">
-        <a :href="form.testResult" target="_blank">{{form.testResult}}</a>
-      </template>
-      <template v-else>
+      <span class="success-tip">
+        Test passed
+      </span>
+      <span class="failed-tip">
+        Failed to test
+      </span>
+      <span class="normal-tip">
         Please test your rule before add, you can add your rule after passed test
-      </template>
+      </span>
     </div>
     <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
   </el-form-item>
@@ -238,15 +241,42 @@ export default {
   .el-checkbox { font-weight: normal; }
 }
 
-.url-result {
-  display: -webkit-box;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.2;
-  word-break: break-all;
-  padding: 0 4px;
-  -webkit-line-clamp: 2;
-  -webkit-box-pack: center;
-  -webkit-box-orient: vertical;
+.form-item-testresult {
+  .url-result {
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+    word-break: break-all;
+    padding: 0 4px;
+    -webkit-line-clamp: 2;
+    -webkit-box-pack: center;
+    -webkit-box-orient: vertical;
+  }
+  
+  .normal-tip {
+    color: #aaa;
+    font-style: italic;
+  }
+
+  .success-tip,
+  .failed-tip {
+    display: none;
+  }
+
+  &.is-success {
+    .success-tip { color: #67c23a; display: inline-block; }
+    .normal-tip { display: none; }
+  }
+
+  &.is-error {
+    .failed-tip { color: #f56c6c; display: inline-block; }
+    .normal-tip { display: none; }
+  }
+
+  .el-form-item__error {
+    display: none;
+  }
 }
+
 </style>

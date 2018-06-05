@@ -40,9 +40,9 @@ export default {
       showQrMenu: false
     }
   },
-  created () {
+  async created () {
     window.sss = this
-    const config = collection.get('config')
+    const config = await collection.get('config')
     this.iconStyle = config.iconStyle || 'colored'
     this.showQrMenu = config.showQrMenu || false
   },
@@ -57,10 +57,11 @@ export default {
       if (!target.classList.contains('js-icon')) return
       target.children[0].click()
     },
-    onBackData () {
+    async onBackData () {
       const date = new Date()
       let fileName = 'MyWebrequest-' + date.toLocaleDateString() + '.json'
-      this.save2File(collection.getExtensionData(), fileName)
+      const extData = await collection.getExtensionData()
+      this.save2File(extData, fileName)
     },
     onRestoreData (e) {
       const files = e.target.files
