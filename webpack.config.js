@@ -4,6 +4,7 @@ const WebpackDevServer = require('webpack-dev-server')
 const CleanWebpackPlugin = require('clean-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
@@ -19,6 +20,7 @@ const manifest = require(manifestSrcPath)
 
 const serverPort = 3031
 // var PrepackWebpackPlugin = require('prepack-webpack-plugin').default;
+const PAGES = ['background/index', 'popup/index', 'options/index']
 
 // auto increaseVersion of manifest.json
 function increaseVersion (pkg) {
@@ -68,6 +70,7 @@ const config = {
         test: /\.vue$/,
         loader: 'vue-loader',
         options: {
+          extractCSS: process.env.NODE_ENV === 'production',
           loaders: {
             css: ExtractTextPlugin.extract({
               use: 'css-loader',
@@ -118,6 +121,19 @@ const config = {
     ]
   },
   plugins: [
+    ...PAGES.map(pn => {
+      return new HtmlWebpackPlugin({
+        filename: pn + '.html',
+        chunks: [pn],
+        template: path.resolve(__dirname, './src/index.ejs'),
+        pageTitle: manifest.name,
+        minify: {
+          collapseWhitespace: true,
+          removeAttributeQuotes: true,
+          removeComments: true
+        }
+      })
+    }),
     // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
     new CleanWebpackPlugin(['dist', 'ext.zip']),
     // copy custom static assets
@@ -126,11 +142,6 @@ const config = {
         {
           from: path.resolve(__dirname, 'src/static/'),
           to: path.resolve(__dirname, 'dist/static/')
-        },
-        {
-          context: path.resolve(__dirname, 'src/'),
-          from: '**/index.html',
-          to: path.resolve(__dirname, 'dist')
         },
         {
           from: path.resolve(__dirname, 'src/_locales/'),
