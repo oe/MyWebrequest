@@ -467,14 +467,13 @@ async function handleKeyChange (key, newVal, oldVal) {
 chrome.storage.onChanged.addListener(async function (changes, area) {
   console.log('onchange', changes, area)
   // ignore none sync area change
-  if (area !== 'local') return
-  const { newValue = {}, oldValue = {} } = changes
-  let keys = [...Object.keys(newValue), ...Object.keys(oldValue)]
-  keys = keys.filter((k, i) => keys.indexOf(k) === i)
+  if (area !== 'sync') return
+  let keys = Object.keys(changes)
   console.log('onchange', changes, area)
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
-    await handleKeyChange(key, newValue[key] || {}, oldValue[key] || {})
+    const change = changes[key]
+    await handleKeyChange(key, change.newValue || {}, change.oldValue || {})
   }
   chrome.webRequest.handlerBehaviorChanged()
 })

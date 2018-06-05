@@ -2,7 +2,7 @@ import utils from './utils'
 
 function storeGet (key) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get(key, resp => {
+    chrome.storage.sync.get(key, resp => {
       console.warn('get key', key, resp, chrome.runtime.lastError)
       if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
       key ? resolve(resp[key]) : resolve(resp)
@@ -12,7 +12,8 @@ function storeGet (key) {
 
 function storeSet (key, val) {
   return new Promise((resolve, reject) => {
-    chrome.storage.local.get({ [key]: val }, () => {
+    // if (typeof val === 'object') val = JSON.parse(JSON.stringify(val))
+    chrome.storage.sync.set({ [key]: val }, () => {
       console.warn('set key', key, val, chrome.runtime.lastError)
       if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
       resolve()
