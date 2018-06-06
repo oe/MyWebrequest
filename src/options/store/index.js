@@ -4,6 +4,8 @@ import collection from '@/common/collection'
 import cutils from '@/common/utils'
 import utils from '@/options/components/utils'
 
+const RULE_CAT_NEED_TEST = 'ruleCatNeedTest'
+
 Vue.use(Vuex)
 
 const state = {
@@ -98,6 +100,29 @@ const actions = {
     if (!Array.isArray(urls)) urls = [urls]
     ctx.commit('removeRules', urls)
     ctx.commit('saveRules')
+  },
+  // enable/disable
+  async toggleRuleTest (ctx, payload) {
+    let list = await collection.getConfig(RULE_CAT_NEED_TEST)
+    list = list || []
+    if (list.includes(payload.module)) {
+      if (!payload.isOn) {
+        const idx = list.indexOf(payload.module)
+        list.splice(idx, 1)
+        await collection.setConfig(RULE_CAT_NEED_TEST, list)
+      }
+      return
+    }
+    if (payload.isOn) {
+      list.push(payload.module)
+      await collection.setConfig(RULE_CAT_NEED_TEST, list)
+    }
+  },
+  // is rule need test
+  async isRuleNeedTest (ctx, payload) {
+    let list = await collection.getConfig(RULE_CAT_NEED_TEST)
+    list = list || []
+    return list.includes(payload.module)
   }
 }
 

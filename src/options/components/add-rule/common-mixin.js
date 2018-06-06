@@ -18,7 +18,10 @@ export function mergeLang (lang = {}) {
 export default {
   data () {
     return {
-      originalForm: {}
+      originalForm: {},
+      // set to true before update a rule in dialog
+      //   and will skip duplicated rule check
+      isUpdate: true
     }
   },
   props: {
@@ -31,7 +34,7 @@ export default {
     this.resetRuleForm()
   },
   methods: {
-    ...mapActions(['addRule']),
+    ...mapActions(['addRule', 'isRuleNeedTest']),
     onPaste (e) {
       let url = e.clipboardData.getData('text/plain')
       try {
@@ -54,10 +57,13 @@ export default {
       }
     },
     onAddRule () {},
-    resetRuleForm () {
+    async resetRuleForm () {
       this.resetForm()
       this.$refs.ruleForm && this.$refs.ruleForm.clearValidate()
       this.originalForm = Object.assign({}, this.form)
+      if (this.module !== 'custom') {
+        this.needTest = await this.isRuleNeedTest({ module: this.module })
+      }
     },
     clearForm () {
       this.$refs.ruleForm && this.$refs.ruleForm.resetFields()
@@ -66,6 +72,21 @@ export default {
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
       return this.rules.find(itm => itm.url === url)
+    },
+    isRuleIntersect (url, ignoreID) {
+      this.rules.some(rule => {
+        if (ignoreID && rule.id === ignoreID) return false
+        let err
+        if (utils.isSubRule(rule.url, url)) {
+          err = new Error('ruleBeIncluded')
+        } else if (utils.isSubRule(url, rule.url)) {
+          err = new Error('ruleIncludOthers')
+        }
+        if (err) {
+          err.rule = rule
+          throw err
+        }
+      })
     },
     getRuleByID (id) {
       return this.rules.find(rule => rule.id === id)

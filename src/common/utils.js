@@ -33,9 +33,11 @@ export default {
   preprocessRouter (router) {
     delete router.createdAt
     delete router.updatedAt
-    router.reg = RegExp(router.reg)
-    if (router.hasWdCd && router.wdCdReg) {
-      router.wdCdReg = RegExp(router.wdCdReg)
+    if (!router.noParams) {
+      router.reg = RegExp(router.reg)
+      if (router.hasWdCd && router.wdCdReg) {
+        router.wdCdReg = RegExp(router.wdCdReg)
+      }
     }
     return router
   },
@@ -47,6 +49,9 @@ export default {
    */
   getTargetUrl (router, url) {
     console.log('getTargetUrl, router: %o, url: %s', router, url)
+    // if no params in redirect url, then use redirect url as result
+    if (router.noParams) return router.redirectUrl
+
     let params = this.getUrlValues(router, url)
     console.log('params in url: %o', params)
     if (!params) {

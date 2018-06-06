@@ -85,13 +85,61 @@ export default {
         testUrl: '',
         testResult: ''
       },
-      validateRules: {}
+      validateRules: {
+        url: {validator: this.validateURL, trigger: 'none'},
+        redirectUrl: {validator: this.validateRedirectURL, trigger: 'none'},
+        testUrl: {validator: this.validateTestURL, trigger: 'none'},
+        testResult: {validator: this.validateTestResult, trigger: 'none'}
+      }
     }
   },
   mounted () {
     this.redirectInput = this.$refs.redirectInput.$el.querySelector('input')
   },
   methods: {
+    validateURL (rule, value, cb) {
+      try {
+        console.log('validateURL', value)
+        let {url, protocol} = this.form
+        url = url.trim()
+        if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
+        if (!url) throw new Error('emptyUrl')
+        const matchUrl = protocol + '://' + url
+        const ruleUrl = utils.getRouter(matchUrl).url
+        const ignoreID = this.isUpdate && this.ruleID
+        if (!ignoreID && this.isRuleExist(ruleUrl)) throw new Error('ruleExists')
+        this.isRuleIntersect(ruleUrl, ignoreID)
+        cb()
+      } catch (e) {
+        console.log(e)
+        // return cb(new Error(this.$t('qrMakeMacBtn')))
+        return cb(e)
+      }
+    },
+    validateRedirectURL (rule, value, cb) {
+      try {
+        utils.testURLRuleValid(value)
+      } catch (e) {
+        cb(e)
+      }
+    },
+    validateTestURL (rule, value, cb) {
+      console.log('validateTestURL', value)
+      if (utils.isURL(value)) return cb()
+      cb(new Error('invalidURL'))
+    },
+    validateTestResult (rule, value, cb) {
+      let router
+      try {
+        router = cutils.preprocessRouter(this.getRouter())
+      } catch (e) {
+        return cb(new Error('ruleInvalid'))
+      }
+      const result = cutils.getTargetUrl(router, this.form.testUrl)
+      if (!result) return cb(new Error('testUrlNotMatch'))
+      this.form.testResult = result
+      cb()
+    },
     resetForm () {
       this.clearForm()
       if (this.ruleID) {

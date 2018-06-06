@@ -295,12 +295,18 @@ function getRouter (route, redirectUrl) {
   // remove hash
   route = route.replace(/(#[^#]*)?$/, '')
   testURLRuleValid(route, true)
+  let noParams = false
 
-  testURLRuleValid(redirectUrl, true, true)
+  // if redirectUrl is undefined, skip check
+  if (typeof redirectUrl !== 'undefined') {
+    testURLRuleValid(redirectUrl, true, true)
+    noParams = isRedirectHasNoParams(redirectUrl)
+  }
 
   let result = {
     matchUrl: route,
-    redirectUrl
+    redirectUrl,
+    noParams
   }
 
   // if the route doesnt has path and query string
@@ -319,10 +325,10 @@ function getRouter (route, redirectUrl) {
   }
   // remove protocol
   const routeWithoutPrtcl = route.replace(/^([\w*]+):\/\//, '')
-
   // replace query string with *
   url += routeWithoutPrtcl
-    .replace(/\?.*$/, '*')
+    // url with querystring would only match url has querystring
+    .replace(/\?.*$/, '?*')
     // replace named holder with * in host
     //   goos.{sub}.abc.com => *.abc.com
     //   goos{sub}.abc.com => *.abc.com
@@ -332,6 +338,7 @@ function getRouter (route, redirectUrl) {
     .replace(/\{\*?[^}]+\}.*$/, '*')
   // add a asterisk to disable strict match
   result.url = url.replace(/\*+/, '*').replace(/\*$/, '') + '*'
+  if (noParams) return result
 
   let parts = routeWithoutPrtcl.split('?')
   // route contains more than one ?
@@ -385,7 +392,16 @@ function getRouter (route, redirectUrl) {
   return result
 }
 
-// have reserved word in url pattern
+/**
+ * whether redirecturl has no params
+ * @param  {String}  redirectUrl
+ * @return {Boolean}
+ */
+function isRedirectHasNoParams (redirectUrl) {
+  return !namedParam.test(redirectUrl) || /\*/.test(redirectUrl)
+}
+
+// have reserved word in match url pattern
 // return a reserved words list that has been miss used.
 function hasReservedWord (router) {
   const params = getKwdsInRoute(router)

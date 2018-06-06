@@ -62,7 +62,7 @@
 
 <script>
 import utils from '@/options/components/utils'
-// import TestResult from '@/options/components/test-result'
+import { mapActions } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
 // import locales from './locales.json'
 const lang = mergeLang({})
@@ -87,9 +87,6 @@ export default {
       },
       needTest: false,
       etid: 0,
-      // set to true before update a rule in dialog
-      //   and will skip duplicated rule check
-      isUpdate: true,
       isHiding: false
     }
   },
@@ -98,6 +95,7 @@ export default {
   },
   // components: {TestResult},
   methods: {
+    ...mapActions(['toggleRuleTest']),
     validateURL (rule, value, cb) {
       try {
         console.log('validateURL', value)
@@ -193,38 +191,14 @@ export default {
       utils.testURLRuleValid(url)
       if (!ignoreID && this.isRuleExist(url)) throw new Error('ruleExists')
       // test for duplicated match rule
-      this.rules.some((rule) => {
-        if (ignoreID && rule.id === ignoreID) return false
-        let err
-        if (utils.isSubRule(rule.url, url)) {
-          err = new Error('ruleBeIncluded')
-        } else if (utils.isSubRule(url, rule.url)) {
-          err = new Error('ruleIncludOthers')
-        }
-        if (err) {
-          err.rule = rule
-          throw err
-        }
-      })
+      this.isRuleIntersect(url, ignoreID)
       return url
     }
   },
   watch: {
-    // form: {
-    //   handler (newVal) {
-    //     const original = this.originalForm
-    //     const isRuleChanged = newVal.protocol !== original.protocol ||
-    //       newVal.url !== original.url
-    //     console.log('form.url change', this.originalForm, newVal)
-    //     const trigger = isRuleChanged ? 'change' : 'none'
-    //     console.log('trigger', trigger)
-    //     // if form.url is the same with original after change, then
-    //     //    prevent validate on blur, or else
-    //     this.validateRules.url.trigger = trigger
-    //     if (trigger === 'none') this.$refs.ruleForm.clearValidate()
-    //   },
-    //   deep: true
-    // }
+    needTest (newVal) {
+      this.toggleRuleTest({module: this.module, isOn: newVal})
+    }
   }
 }
 </script>
