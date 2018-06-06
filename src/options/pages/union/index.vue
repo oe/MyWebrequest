@@ -53,8 +53,8 @@ export default {
     CustomForm,
     NormalForm
   },
-  created () {
-    this.updateModule()
+  async created () {
+    await this.updateModule()
   },
   computed: {
     ...mapState({
@@ -132,8 +132,8 @@ export default {
     disabled (val) {
       this.isEnabled = false
     },
-    $route (val, oldVal) {
-      this.updateModule()
+    async $route (val, oldVal) {
+      await this.updateModule()
       // if module if the same
       if (utils.getModuleName(val.path) === utils.getModuleName(oldVal.path)) return
       this.$el.classList.add('slide-enter')

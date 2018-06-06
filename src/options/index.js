@@ -30,6 +30,7 @@ import store from './store'
 import App from './main'
 import router from './router'
 import titlebar from './components/titlebar'
+import './styles/atom-one-light.css'
 import fixes from './fixes'
 
 elLocale.use(enLocale)

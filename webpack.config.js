@@ -104,6 +104,14 @@ const config = {
         })
       },
       {
+        // preprocess markdown file
+        test: /\.md$/,
+        loader: 'vue-markdown-loader',
+        options: {
+          wrapper: 'article'
+        }
+      },
+      {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
         // loader: 'file-loader'
         loader: 'file-loader',
@@ -183,6 +191,7 @@ const config = {
 if (process.env.NODE_ENV === 'production') {
   delete config.notHotReload
   config.optimization = {
+    sideEffects: false,
     minimizer: [
       // we specify a custom UglifyJsPlugin here to get source maps in production
       new UglifyJsPlugin({
@@ -192,8 +201,7 @@ if (process.env.NODE_ENV === 'production') {
           compress: false,
           ecma: 6,
           mangle: true
-        },
-        sourceMap: true
+        }
       })
     ]
   }

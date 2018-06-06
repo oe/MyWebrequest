@@ -79,9 +79,12 @@ const mutations = {
 
 const actions = {
   async changeModule (ctx, payload) {
-    ctx.commit('changeModule', payload.module)
-    const rules = await collection.get(payload.module)
-    ctx.commit('updateRules', rules)
+    const mdl = payload.module
+    // ctx.commit('updateRules', defaultVal)
+    ctx.commit('changeModule', mdl)
+    if (!cutils.RULE_TYPES.includes(mdl)) return
+    const rules = await collection.get(mdl)
+    ctx.commit('updateRules', rules || [])
   },
   addRule (ctx, payload) {
     ctx.commit('addRule', payload)

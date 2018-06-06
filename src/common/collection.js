@@ -31,7 +31,7 @@ export default {
   async save (cat, key, val) {
     let data = key
     if (arguments.length === 3) {
-      data = this.get(cat)
+      data = await this.get(cat)
       data[key] = val
     }
     await storeSet(cat, data)
@@ -48,7 +48,7 @@ export default {
     return result
   },
   async getConfig (type) {
-    const result = this.get('config', type)
+    const result = await this.get('config', type)
     return result
   },
   async setConfig (type, val) {
