@@ -98,7 +98,7 @@ export default {
       .slice(-2)
       .join('.')
     // path, without the prefix /
-    res.r = RegExp.$3
+    res.r = RegExp.$3.replace(/^\//, '')
     // query string without question mark
     res.q = RegExp.$5
     // the whole url

@@ -105,11 +105,11 @@ function isPath (path, withoutQS) {
 function isURL (url) {
   try {
     const u = new URL(url)
-    // some invalid http url has empty host, & contains no special chars
+
     return (
-      u.host &&
-      isProtocol(u.protocol.replace(/:$/, '')) &&
-      encodeURI(url) === url
+      u.host && // some invalid http url has empty host
+      isProtocol(u.protocol.replace(/:$/, '')) && // with valid host
+      u.href === url // contains no special chars
     )
   } catch (e) {
     return false
@@ -179,39 +179,43 @@ function getKwdsInRoute (router) {
 /**
  * redirect rule valid
  * @param  {String}  url
- * @param  {Boolean} hasNamedParams true for custom rule
+ * @param  {Boolean} isCusRule      true for custom rule
  * @param  {Boolean} isRedirect     true for custom redirect rule
  * @return {Boolean}
  */
-function testURLRuleValid (url, hasNamedParams, isRedirect) {
+function testURLRuleValid (url, isCusRule, isRedirect) {
   console.log('test url', url)
   // url is empty
   if (!url) throw new Error('ruleIsEmpty')
 
   // should contains no special chars(:?/) in param name
   //  if got these chars, the following getURLParts won't work
-  if (hasNamedParams) {
+  if (isCusRule) {
     if (/\{.*[:?/].*\}/.test(url)) throw new Error('noSpecialCharInName')
   }
   // should be a valid url format
-  const matches = getURLParts(url)
-  if (!matches) throw new Error('invalidURLFormat')
+  let matches = getURLParts(url)
+  // redirect rule could be a invalid url format
+  if (!matches && !isRedirect) throw new Error('invalidURLFormat')
+  matches = matches || []
   const [, protocol, host, path, qs] = matches
   // match rule should contains no host port
   //  chrome general match all ports
-  if (!(hasNamedParams && isRedirect)) {
+  if (!(isCusRule && isRedirect)) {
     if (/:\d+$/.test(host)) throw new Error('notPortInMatchrule')
   }
   // protocol is valid
-  // const protocol = matches[1]
-  if (!isProtocol(protocol)) throw new Error('invalidProtocol')
+  //  if isRedirect and protocol is undefiend then pass check
+  if (!(!protocol && isRedirect) && !isProtocol(protocol)) {
+    throw new Error('invalidProtocol')
+  }
 
   // subdomain must be specified (except custom redirect rule)
   //    abc.{xxx} is invalid
   //    {xxx}.com is invalid
   //    *.com  is invalid
   if (
-    !(hasNamedParams && isRedirect) &&
+    !(isCusRule && isRedirect) &&
     // match for *.xxx.xxx and xxx.xxx
     !(
       /(?<=(^|\.))[-\w]+\.\w+$/.test(host) ||
@@ -224,9 +228,9 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
 
   // remove param placeholder and check the url
   let normalized = url
-  if (hasNamedParams) {
+  if (isCusRule && !isRedirect) {
     // Test for named params in querystring
-    if (qs && !isRedirect) {
+    if (qs) {
       // {*named}, not allowed
       if (/\{\*[^}]+\}/.test(qs)) throw new Error('noStarNamedInQs')
       // ?{named} or &{named}, not allowd
@@ -238,19 +242,21 @@ function testURLRuleValid (url, hasNamedParams, isRedirect) {
     }
     // should has no continues params in custom match rule
     //    {a}{b}.google.com is invalid
-    if (!isRedirect && /(\{[^}]+\}){2,}/.test(normalized)) {
+    if (/(\{[^}]+\}){2,}/.test(normalized)) {
       throw new Error('noContinuesNamedParams')
     }
 
     // {*named} should only used in the end of the path
-    if (!isRedirect && /(\{\*[^}]+\}).+$/.test(path)) {
+    if (/(\{\*[^}]+\}).+$/.test(path)) {
       throw new Error('starParamsNotAtEnd')
     }
-    // replace named params to xxx
-    normalized = url.replace(/\{[^}]+\}/g, 'abc')
   }
+  // replace named params to xxx
+  if (isCusRule) normalized = url.replace(/\{[^}]+\}/g, 'abc')
   // no continuous *s
   if (/\*{2,}/.test(normalized)) throw new Error('noContinuesStars')
+  // redirect rule could be a invalid url format
+  if (isRedirect) return true
   // replace * to xxx
   normalized = normalized.replace(/^\*/, 'http').replace(/\*/g, 'xxx')
   // not a valid rule

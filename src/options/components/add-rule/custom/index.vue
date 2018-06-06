@@ -47,18 +47,25 @@
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
-  <TestResult
-    :url="form.testResult"
-    :show-add-btn="!ruleID"
-    @add-click="onAddRule"
-    ></TestResult>
+  <el-form-item size="small" prop="testResult" label="Test Result" class="form-item-testresult">
+    <div class="url-result">
+      <a class="success-tip" :href="form.testResult" target="_blank">{{form.testResult}}</a>
+      <span class="failed-tip">
+        Failed to test
+      </span>
+      <span class="normal-tip">
+        Please test your rule before add, you can add your rule after passed test
+      </span>
+    </div>
+    <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+  </el-form-item>
+
 </el-form>
 </template>
 
 <script>
 import utils from '@/options/components/utils'
 import cutils from '@/common/utils'
-import TestResult from '@/options/components/test-result'
 import mixin, { mergeLang } from '../common-mixin'
 import locales from './locales.json'
 const lang = mergeLang(locales)
@@ -77,13 +84,13 @@ export default {
         redirectUrl: '',
         testUrl: '',
         testResult: ''
-      }
+      },
+      validateRules: {}
     }
   },
   mounted () {
     this.redirectInput = this.$refs.redirectInput.$el.querySelector('input')
   },
-  components: {TestResult},
   methods: {
     resetForm () {
       this.clearForm()

@@ -3,7 +3,7 @@
     "param_p": "protocol(without ://)",
     "param_h": "host(including port)",
     "param_m": "top level domain(without port)",
-    "param_r": "pathname",
+    "param_r": "pathname(without leading \"/\")",
     "param_q": "querystring",
     "param_u": "url itself",
     "param_start": "everything after the first star in path"
@@ -12,7 +12,7 @@
     "param_p": "协议(不包含 ://)",
     "param_h": "域名(包括端口)",
     "param_m": "主域名(不包括端口)",
-    "param_r": "路径",
+    "param_r": "路径(不包括首位的 \"/\")",
     "param_q": "查询字符串",
     "param_u": "链接本身",
     "param_start": "路径中*后边的部分"
