@@ -170,10 +170,7 @@ function isSubRule (rule, subRule) {
 
 // get keywords list(array) in route object
 function getKwdsInRoute (router) {
-  return RESERVED_HOLDERS.concat(
-    router.params,
-    cutils.getObjVals(router.qsParams)
-  )
+  return [].concat(router.params, cutils.getObjVals(router.qsParams))
 }
 
 /**
@@ -185,6 +182,7 @@ function getKwdsInRoute (router) {
  */
 function testURLRuleValid (url, isCusRule, isRedirect) {
   console.log('test url', url)
+  url = url.trim()
   // url is empty
   if (!url) throw new Error('ruleIsEmpty')
 
@@ -401,6 +399,34 @@ function isRedirectHasNoParams (redirectUrl) {
   return !namedParam.test(redirectUrl) || /\*/.test(redirectUrl)
 }
 
+function isRedirectURLValid (redirectURL, matchURL) {
+  // if redirectURL has No params, then it shuld be a valid url
+  if (isRedirectHasNoParams(redirectURL)) {
+    if (!isURL(redirectURL)) throw new Error('redirectURLNotValidURL')
+    return
+  }
+  let params = []
+  testURLRuleValid(redirectURL, true, true)
+  try {
+    testURLRuleValid(matchURL, true)
+    const router = getRouter(matchURL)
+    params = getKwdsInRoute(router)
+  } catch (e) {
+    console.warn('matchURL is valid', e)
+  }
+  params = params.concat(RESERVED_HOLDERS)
+  const sample = getRedirectParamList(redirectURL)
+  const duplicated = sample.filter(k => {
+    return params.indexOf(k) === -1
+  })
+  if (duplicated.length) {
+    const e = new Error('hasUndefinedParamsInRedirectURL')
+    e.params = duplicated.join(',')
+    throw e
+  }
+  return true
+}
+
 // have reserved word in match url pattern
 // return a reserved words list that has been miss used.
 function hasReservedWord (router) {
@@ -412,7 +438,12 @@ function hasReservedWord (router) {
   })
   // remove duplicated names
   res = res.filter((v, k) => k === res.indexOf(v))
-  return res.length ? res : false
+  if (res.length) {
+    const e = new Error('hasReservedKwd')
+    e.params = res.join(',')
+    throw e
+  }
+  return true
 }
 
 /**
@@ -425,7 +456,13 @@ function hasReservedWord (router) {
 function isKwdsUniq (router) {
   const params = getKwdsInRoute(router)
   // has duplicated
-  return params.some((v, k) => k !== params.indexOf(v))
+  const duplicated = params.filter((v, k) => k !== params.indexOf(v))
+  if (duplicated.length) {
+    const e = new Error('hasDuplicatedKwd')
+    e.params = duplicated.join(',')
+    throw e
+  }
+  return true
 }
 
 // get a list from redirect to url, eg. http://{sub}.github.com/{name}/{protol}
@@ -434,20 +471,6 @@ function isKwdsUniq (router) {
 function getRedirectParamList (url) {
   let matches = url.match(/\{([^}]+)\}/g) || []
   return matches.map(v => v.slice(1, -1))
-}
-
-/**
- * return undefined if no undefined word, or a list contains undefined words
- * @param  {Object}  router a defined word list
- * @param  {String}  url   a url pattern that use words in refer
- * @return {Array|undefined}
- */
-function hasUndefinedWord (router, url) {
-  const params = getKwdsInRoute(router)
-  const sample = getRedirectParamList(url)
-  return sample.some(k => {
-    return params.indexOf(k) === -1
-  })
 }
 
 /**
@@ -490,10 +513,10 @@ export default {
   isSubRule,
   testURLRuleValid,
   isURLMatchPattern,
+  isRedirectURLValid,
   debounce,
   getRouter,
   isValidReg,
-  hasUndefinedWord,
   isKwdsUniq,
   hasReservedWord,
   parseURL

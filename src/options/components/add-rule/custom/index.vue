@@ -1,5 +1,5 @@
 <template>
-<el-form ref="ruleForm" :model="form" label-position="left" label-width="106px">
+<el-form ref="ruleForm" :model="form" :rules="validateRules" label-position="left" label-width="106px">
   <el-form-item size="small" :label="$t('matchLbl')" prop="url">
     <el-input
       v-model="form.url"
@@ -51,7 +51,7 @@
     <div class="url-result">
       <a class="success-tip" :href="form.testResult" target="_blank">{{form.testResult}}</a>
       <span class="failed-tip">
-        Failed to test
+        Rule not match
       </span>
       <span class="normal-tip">
         Please test your rule before add, you can add your rule after passed test
@@ -105,10 +105,12 @@ export default {
         if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
         if (!url) throw new Error('emptyUrl')
         const matchUrl = protocol + '://' + url
-        const ruleUrl = utils.getRouter(matchUrl).url
+        const router = utils.getRouter(matchUrl)
         const ignoreID = this.isUpdate && this.ruleID
-        if (!ignoreID && this.isRuleExist(ruleUrl)) throw new Error('ruleExists')
-        this.isRuleIntersect(ruleUrl, ignoreID)
+        if (!ignoreID && this.isRuleExist(router.url)) throw new Error('ruleExists')
+        this.isRuleIntersect(router.url, ignoreID)
+        utils.hasReservedWord(router)
+        utils.isKwdsUniq(router)
         cb()
       } catch (e) {
         console.log(e)
@@ -118,7 +120,9 @@ export default {
     },
     validateRedirectURL (rule, value, cb) {
       try {
-        utils.testURLRuleValid(value)
+        const matchURL = this.form.protocol + '://' + this.form.url
+        utils.isRedirectURLValid(value, matchURL)
+        return cb()
       } catch (e) {
         cb(e)
       }
@@ -135,7 +139,10 @@ export default {
       } catch (e) {
         return cb(new Error('ruleInvalid'))
       }
-      const result = cutils.getTargetUrl(router, this.form.testUrl)
+      let result = utils.isURLMatchPattern(router.url, this.form.testUrl)
+      if (result) {
+        result = cutils.getTargetUrl(router, this.form.testUrl)
+      }
       if (!result) return cb(new Error('testUrlNotMatch'))
       this.form.testResult = result
       cb()
@@ -157,18 +164,20 @@ export default {
       this.$refs.redirectInput.debouncedGetData(this.form.redirectUrl)
     },
     onTestRule () {
-      try {
-        const router = cutils.preprocessRouter(this.getRouter())
-        this.form.testResult = cutils.getTargetUrl(router, this.form.testUrl)
-      } catch (e) {
-        console.error(e)
-      }
+      this.$refs.ruleForm.validate()
     },
-    onAddRule () {
-      return this.addARule()
+    async onAddRule () {
+      this.isUpdate = false
+      const isValid = await this.$refs.ruleForm.validate()
+      this.isUpdate = true
+      if (!isValid) return
+      this.addARule()
     },
-    onUpdateRule () {
-      return this.addARule(this.ruleID)
+    async onUpdateRule () {
+      this.isUpdate = true
+      const isValid = await this.$refs.ruleForm.validate()
+      if (!isValid) return
+      this.addARule(this.ruleID)
     },
     handleSelect (item, oldVal) {
       const needCloseBracket = oldVal.length === this.selectionStart
@@ -213,38 +222,17 @@ export default {
      * add/update a rule
      * @param {String} ruleID specified ruleID to update, add one if ignored
      */
-    addARule (ruleID) {
-      try {
-        let router = this.getRouter()
-        const url = router.url
-        // test for duplicated match rule
-        this.rules.some((rule) => {
-          if (ruleID && rule.id === ruleID) return false
-          let err
-          if (utils.isSubRule(rule.url, url)) {
-            err = new Error('ruleBeIncluded')
-          } else if (utils.isSubRule(url, rule.url)) {
-            err = new Error('ruleIncludOthers')
-          }
-          if (err) {
-            err.rule = rule
-            throw err
-          }
+    async addARule (ruleID) {
+      let router = this.getRouter()
+      if (ruleID) {
+        const rule = this.getRuleByID(ruleID)
+        router = Object.assign({}, rule, router, {
+          updatedAt: Date.now()
         })
-
-        if (ruleID) {
-          const rule = this.getRuleByID(ruleID)
-          router = Object.assign({}, rule, router, {
-            updatedAt: Date.now()
-          })
-        }
-        this.addRule(router)
-        this.clearForm()
-        return true
-      } catch (e) {
-        console.error(e)
-        return false
       }
+      this.addRule(router)
+      this.clearForm()
+      return true
     },
     getRouter () {
       const matchUrl = this.form.protocol + '://' + this.form.url
