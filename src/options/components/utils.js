@@ -386,6 +386,12 @@ function getRouter (route, redirectUrl) {
   }
   result.qsParams = params
   result.hasQs = !!Object.keys(params).length
+  if (result.hasQs) {
+    // url must has querystring
+    result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.+))$`
+  } else {
+    result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?$`
+  }
 
   return result
 }

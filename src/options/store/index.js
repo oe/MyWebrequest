@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import collection from '@/common/collection'
 import cutils from '@/common/utils'
-import utils from '@/options/components/utils'
 
 const RULE_CAT_NEED_TEST = 'ruleCatNeedTest'
 
@@ -55,7 +54,7 @@ const mutations = {
     }
     rule = Object.assign(
       {
-        id: utils.guid(),
+        id: cutils.guid(),
         createdAt: now,
         updatedAt: now,
         enabled: true

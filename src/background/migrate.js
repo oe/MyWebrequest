@@ -1,46 +1,96 @@
 import collection from '@/common/collection'
+import utils from '@/common/utils'
 
 // data version
-const ver = '1.0'
+const VER = '1.0'
+const VER_KEY = 'version'
 
-const version = {
-  key: 'data-version',
-  get () {
-    return localStorage.getItem(version.key) || ''
-  },
-  set (ver) {
-    localStorage.setItem(version.key, ver)
-  }
+async function needToUpdate () {
+  const version = await collection.get(VER_KEY)
+  return version !== VER
 }
 
-function migrateTo1 () {
-  // add `active` prop
+async function afterUpdate () {
+  await collection.set(VER_KEY, VER)
+  localStorage.clear()
+}
+
+async function migrateSimpleRules () {
   const simpleRules = ['block', 'hsts', 'hotlink', 'log']
-  simpleRules.forEach(key => {
-    const rules = collection.getRules(key).map(item => {
+  for (let i = 0; i < simpleRules.length; i++) {
+    const key = simpleRules[i]
+    let rules
+    try {
+      rules = JSON.parse(localStorage.getItem(key))
+    } catch (e) {
+      console.warn(`[migrate]failed to parse rules of {key}, skipped`, e)
+    }
+    if (!Array.isArray(rules)) rules = []
+    // no rules
+    if (!rules.length) continue
+    rules = rules.map(item => {
       return {
         url: item,
-        active: true
+        id: utils.guid(),
+        enabled: true,
+        createdAt: 0,
+        updatedAt: 0
       }
     })
-    collection.save(key, rules)
-  })
-
-  // transfrom custom rules to array, and add `active` prop
-  const custom = 'custom'
-  let rules = collection.getRules(custom)
-  if (!Array.isArray(rules)) {
-    rules = Object.keys(rules).map(key => {
-      rules[key].active = true
-      return rules[key]
-    })
-    collection.save(custom, rules)
+    await collection.save(key, rules)
   }
 }
 
-export default function migrate () {
-  const curVer = version.get()
-  if (ver === curVer) return
-  migrateTo1()
-  version.set(ver)
+async function migrateCustomRules () {
+  let rules
+  try {
+    rules = JSON.parse(localStorage.getItem('custom'))
+  } catch (e) {
+    console.warn(`[migrate]failed to parse custom rules`, e)
+  }
+  if (!rules || typeof rules !== 'object') {
+    console.warn('[migrate]custom rules is invalid, skipped')
+    return
+  }
+  const keys = Object.keys(rules)
+  // no rules
+  if (!keys.length) return
+  const ruleArr = keys.map(key => rules[key])
+  console.log('rulesArr...', ruleArr)
+}
+
+async function migrateOthers () {
+  const otherKeys = ['config', 'onoff']
+  for (let i = 0; i < otherKeys.length; i++) {
+    const key = otherKeys[i]
+    let config
+    try {
+      config = JSON.parse(localStorage.getItem(key))
+    } catch (e) {
+      console.warn(`[migrate]failed to parse settings of ${key}`, e)
+    }
+    if (!config || typeof config !== 'object') {
+      console.warn('[migrate]custom rules is invalid, skipped')
+      continue
+    }
+    await collection.save(key, config)
+  }
+}
+
+async function migrate () {
+  await migrateSimpleRules()
+  // transfrom custom rules to array, and add `active` prop
+  await migrateCustomRules()
+  await migrateOthers()
+}
+
+export default async function () {
+  try {
+    const needUpdate = await needToUpdate()
+    if (!needUpdate) return
+    await migrate()
+    await afterUpdate()
+  } catch (e) {
+    console.error('[migrate]failed to migrate old data from localStorage', e)
+  }
 }

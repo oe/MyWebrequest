@@ -13,6 +13,7 @@
     </div>
   </el-radio-group>
   <div class="item-title">Show QR Contextmenu</div>
+  <img src="/static/images/qr-menu.png">
   <el-checkbox v-model="showQrMenu">Enable ContextMenu</el-checkbox>
   <div class="item-title">Data Backup / Restore</div>
   <div class="backup-restore">
