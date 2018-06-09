@@ -2,6 +2,7 @@ import clonedeep from 'lodash.clonedeep'
 import utils from '@/common/utils'
 import collection from '@/common/collection'
 import menu from './contextmenu'
+import migrate from './migrate'
 
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
@@ -121,7 +122,7 @@ const onRequests = {
   },
   block: {
     fn (details) {
-      console.log('block url: ' + details.url)
+      console.warn('block url: ' + details.url)
       return {
         cancel: true
       }
@@ -380,6 +381,7 @@ function updateExtIcon (iconStyle) {
 }
 
 async function init () {
+  await migrate()
   console.warn('init all settings')
   const onoff = await collection.getData4Bg('onoff')
   let len = RULE_TYPES.length

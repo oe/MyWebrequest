@@ -11,8 +11,8 @@ async function needToUpdate () {
 }
 
 async function afterUpdate () {
-  await collection.set(VER_KEY, VER)
-  localStorage.clear()
+  await collection.save(VER_KEY, VER)
+  // localStorage.clear()
 }
 
 async function migrateSimpleRules () {
@@ -78,16 +78,21 @@ async function migrateOthers () {
 }
 
 async function migrate () {
+  console.warn('[migrate]start to migrate')
   await migrateSimpleRules()
   // transfrom custom rules to array, and add `active` prop
   await migrateCustomRules()
   await migrateOthers()
+  console.warn('[migrate]migrate done')
 }
 
 export default async function () {
   try {
     const needUpdate = await needToUpdate()
-    if (!needUpdate) return
+    if (!needUpdate) {
+      console.info('[migrate] no need to migrate')
+      return
+    }
     await migrate()
     await afterUpdate()
   } catch (e) {

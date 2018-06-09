@@ -90,7 +90,8 @@ export default {
         redirectUrl: {validator: this.validateRedirectURL, trigger: 'none'},
         testUrl: {validator: this.validateTestURL, trigger: 'none'},
         testResult: {validator: this.validateTestResult, trigger: 'none'}
-      }
+      },
+      parms: []
     }
   },
   mounted () {
@@ -139,7 +140,7 @@ export default {
       } catch (e) {
         return cb(new Error('ruleInvalid'))
       }
-      let result = utils.isURLMatchPattern(router.url, this.form.testUrl)
+      let result = utils.isURLMatchPattern(this.form.testUrl, router.url)
       if (result) {
         result = cutils.getTargetUrl(router, this.form.testUrl)
       }
