@@ -181,23 +181,34 @@ export default {
       this.addARule(this.ruleID)
     },
     handleSelect (item, oldVal) {
-      const needCloseBracket = oldVal.length === this.selectionStart
+      const needCloseBracket = oldVal.length === this.selectionStart || oldVal[this.selectionStart] !== '}'
       let str = oldVal.slice(0, this.selectionStart).replace(/(?<={)([^{}]*)$/, '')
-      str += item.value
-      if (needCloseBracket) str += '}'
       // move text cursor position
-      const curPos = str.length + 1
+      let curPos
+      if (item.value === '*') {
+        str = str.slice(0, -1) + item.value + ''
+        curPos = str.length
+        // no need of bracket, then remove the close }
+        str += oldVal.slice(this.selectionStart + (needCloseBracket ? 0 : 1))
+      } else {
+        str += item.value
+        if (needCloseBracket) str += '}'
+        curPos = str.length + (needCloseBracket ? 0 : 1)
+        str += oldVal.slice(this.selectionStart)
+      }
+      this.form.redirectUrl = str
+      // const curPos = str.length + 1
       setTimeout(() => {
         this.redirectInput.setSelectionRange(curPos, curPos)
       }, 20)
-      str += oldVal.slice(this.selectionStart)
-      this.form.redirectUrl = str
       return false
     },
     querySearch (words, cb) {
       const result = []
       this.selectionStart = this.redirectInput.selectionStart
-      if (this.selectionStart !== words.length && words[this.selectionStart] !== '}') return cb(result)
+      // cursor position not at the end of string, or not in front of any alphanumeric
+      const letterAfterCursor = words[this.selectionStart]
+      if (this.selectionStart !== words.length && /\w/.test(letterAfterCursor)) return cb(result)
       // no match {
       if (!/(?<={)([^{}]*)$/.test(words.slice(0, this.selectionStart))) return cb(result)
       const searchWords = RegExp.$1.trim()
@@ -211,12 +222,35 @@ export default {
       return result
     },
     getAllAvailableParams () {
-      const result = utils.RESERVED_HOLDERS.map((k) => {
+      const matchURL = this.form.protocol + '://' + this.form.url
+      let params = []
+      try {
+        const router = utils.getRouter(matchURL)
+        if (router.params) params = router.params
+        if (router.qsParams) {
+          params.push(...Object.keys(router.qsParams).map(k => router.qsParams[k]))
+        }
+        // remove duplicated & conflict with reserved names
+        params = params.filter((k, i) => {
+          return utils.RESERVED_HOLDERS.indexOf(k) === -1 &&
+            params.indexOf(k) === i
+        })
+        params = params.map((v) => ({value: v}))
+        if (router.hasWdCd) {
+          params.push({
+            value: '*',
+            label: 'anything after the first start in path'
+          })
+        }
+      } catch (e) {
+        console.warn('[autosuggestion] match url is invalid', e)
+      }
+      const result = params.concat(utils.RESERVED_HOLDERS.map((k) => {
         return {
           value: k,
           label: this.$t('param_' + k)
         }
-      })
+      }))
       return result
     },
     /**

@@ -27,6 +27,8 @@
     // path or domain params in rule which wrapped by `{` and `}`
     params: [],
     // query string params
+    // key: orginal querystring key
+    // value: param name
     qsParams: {
       wd: 'kwd'
     },

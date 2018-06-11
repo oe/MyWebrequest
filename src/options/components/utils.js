@@ -189,7 +189,7 @@ function testURLRuleValid (url, isCusRule, isRedirect) {
   // should contains no special chars(:?/) in param name
   //  if got these chars, the following getURLParts won't work
   if (isCusRule) {
-    if (/\{.*[:?/].*\}/.test(url)) throw new Error('noSpecialCharInName')
+    if (/\{[^}]*[:?/][^}]*\}/.test(url)) throw new Error('noSpecialCharInName')
   }
   // should be a valid url format
   let matches = getURLParts(url)
@@ -278,7 +278,8 @@ const queryStrReg = /([^=]+)=\{([^?]*)\}/g
 /**
  * convert a url pattern to a regexp
  * @param  {String} route url match pattern
- * @param  {String} redirectUrl url redirect pattern
+ * @param  {String|Undefined} redirectUrl url redirect pattern
+ *                                  with redirectUrl if undefined
  * @return {Object}
  *                 {
  *                    url: match url, which url will be captured used by chrome
