@@ -38,7 +38,6 @@ const corsRequestRules = [
     name: 'Origin',
     fn (rule, header, details) {
       corsRequestCache[details.requestId].origin = header.value
-      header.value = details.url
     }
   },
   {
@@ -50,7 +49,7 @@ const corsRequestRules = [
   {
     name: 'X-DevTools-Emulate-Network-Conditions-Client-Id',
     fn (rule, header, details) {
-      console.log('remove X-DevTools-Emulate-Network-Conditions-Client-Id')
+      console.log('remove ', rule.name)
       removeHeaders(details.requestHeaders, rule.name)
     }
   },
@@ -66,23 +65,25 @@ const dftAllowHeaders = 'Origin, X-Requested-With, Content-Type, Accept'
 const corsResponseRules = [
   {
     name: 'Access-Control-Allow-Origin',
-    fn (rule, header, details) {
+    getValue (details) {
       const origin = corsRequestCache[details.requestId].origin
       const matches = /(https?:\/\/[^/]+)/.exec(origin)
-      console.log('matches', matches)
       const value = (matches && matches[1]) || '*'
-      console.log('header.value', value)
-      if (header) header.value = value
-      else return value
+      return value
+    },
+    fn (rule, header, details) {
+      header.value = rule.getValue(details)
     }
   },
   {
     name: 'Access-Control-Allow-Headers',
-    fn (rule, header, details) {
+    getValue (details) {
       const cache = corsRequestCache[details.requestId]
       const value = (cache && cache.allowHeaders) || dftAllowHeaders
-      if (header) header.value = value
-      else return value
+      return value
+    },
+    fn (rule, header, details) {
+      header.value = rule.getValue(details)
     }
   },
   {
@@ -99,6 +100,33 @@ const corsResponseRules = [
   }
 ]
 
+function getCorsRuleValue (details, header, rule) {
+  if (rule.value) return rule.value
+  if (rule.getValue) return rule.getValue(details, header, rule)
+}
+
+function handleCorsHeader (details, headers, rules) {
+  rules.forEach(rule => {
+    let found
+    headers.forEach(header => {
+      if (header.name !== rule.name) return
+      found = true
+      if (rule.fn) {
+        rule.fn(rule, header, details)
+      } else {
+        const value = getCorsRuleValue(details, header, rule)
+        if (value) header.value = value
+      }
+    })
+    if (found) return
+    const value = getCorsRuleValue(details, null, rule)
+    if (!value) return
+    headers.push({
+      name: rule.name,
+      value
+    })
+  })
+}
 /**
  * remove headers with names
  * @param  {Array} headers headers
@@ -114,7 +142,7 @@ function removeHeaders (headers, names) {
   }
   let len = headers.length
   while (len--) {
-    if (isInNames(headers[len])) {
+    if (isInNames(headers[len].name)) {
       headers.splice(len, 1)
     }
   }
@@ -181,27 +209,9 @@ const onRequests = {
         header => header.name === 'Origin'
       )
       if (utils.isXDomain(originHeader && originHeader.value, details.url)) {
-        console.log('requestHeaders', details.requestHeaders)
         corsRequestCache[details.requestId] = {}
-        corsRequestRules.forEach(rule => {
-          let found
-          details.requestHeaders.forEach(header => {
-            if (header.name !== rule.name) return
-            found = true
-            if (rule.fn) {
-              rule.fn.call(null, rule, header, details)
-            } else if (rule.value) {
-              header.value = rule.value
-            }
-          })
-          if (found || !rule.value) return
-          details.requestHeaders.push({
-            name: rule.name,
-            value: rule.value
-          })
-        })
+        handleCorsHeader(details, details.requestHeaders, corsRequestRules)
       }
-      console.log('after process requestHeaders', details.requestHeaders)
       return {
         requestHeaders: details.requestHeaders
       }
@@ -212,24 +222,7 @@ const onRequests = {
   cors: {
     fn (details) {
       if (corsRequestCache[details.requestId]) {
-        corsResponseRules.forEach(rule => {
-          let found
-          details.responseHeaders.forEach(header => {
-            if (header.name !== rule.name) return
-            found = true
-            if (rule.fn) {
-              rule.fn.call(null, rule, header, details)
-            } else if (rule.value) {
-              header.value = rule.value
-            }
-          })
-          if (found || (!rule.value && !rule.fn)) return
-          details.responseHeaders.push({
-            name: rule.name,
-            value:
-              rule.value || (rule.fn && rule.fn.call(null, rule, null, details))
-          })
-        })
+        handleCorsHeader(details, details.responseHeaders, corsResponseRules)
         delete corsRequestCache[details.requestId]
       }
       return {
