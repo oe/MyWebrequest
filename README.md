@@ -3,7 +3,6 @@ Control your network connection
 
 Please visit http://app.evecalm.com/MyWebrequest/ for more introduction and installation instructions.
 
-
 ## Building Steps
 ### prepare your environment
 1. install **[nodejs](https://nodejs.org/en/download/)** on your computer
@@ -13,9 +12,10 @@ Please visit http://app.evecalm.com/MyWebrequest/ for more introduction and inst
 run `yarn` in your shell, 
 
 ### dev
-run `yarn run dev` in your shell
-
-then open chrome and navigate to `chrome://extensions/`, click **Load unpacked extension...** and choose `MyWebrequest/dist`
+1. run `yarn run dev` in your shell
+2. then open chrome and navigate to `chrome://extensions/`
+3. turn on `Developer mode` on top right
+4. click **LOAD UNPACKED** and choose directory `MyWebrequest/dist`
 
 ### build
-run `yarn run build` in your shell
+run `yarn run build` in your shell, a file named `ext.zip` of packed extension will be generated.

@@ -37,7 +37,21 @@ const corsRequestRules = [
   {
     name: 'Origin',
     fn (rule, header, details) {
+      corsRequestCache[details.requestId].origin = header.value
       header.value = details.url
+    }
+  },
+  {
+    name: 'Referer',
+    fn (rule, header, details) {
+      header.value = details.url
+    }
+  },
+  {
+    name: 'X-DevTools-Emulate-Network-Conditions-Client-Id',
+    fn (rule, header, details) {
+      console.log('remove X-DevTools-Emulate-Network-Conditions-Client-Id')
+      removeHeaders(details.requestHeaders, rule.name)
     }
   },
   {
@@ -48,17 +62,27 @@ const corsRequestRules = [
   }
 ]
 
+const dftAllowHeaders = 'Origin, X-Requested-With, Content-Type, Accept'
 const corsResponseRules = [
   {
     name: 'Access-Control-Allow-Origin',
-    value: '*'
+    fn (rule, header, details) {
+      const origin = corsRequestCache[details.requestId].origin
+      const matches = /(https?:\/\/[^/]+)/.exec(origin)
+      console.log('matches', matches)
+      const value = (matches && matches[1]) || '*'
+      console.log('header.value', value)
+      if (header) header.value = value
+      else return value
+    }
   },
   {
     name: 'Access-Control-Allow-Headers',
     fn (rule, header, details) {
       const cache = corsRequestCache[details.requestId]
-      if (!cache) return
-      header.value = cache.allowHeaders
+      const value = (cache && cache.allowHeaders) || dftAllowHeaders
+      if (header) header.value = value
+      else return value
     }
   },
   {
@@ -157,6 +181,7 @@ const onRequests = {
         header => header.name === 'Origin'
       )
       if (utils.isXDomain(originHeader && originHeader.value, details.url)) {
+        console.log('requestHeaders', details.requestHeaders)
         corsRequestCache[details.requestId] = {}
         corsRequestRules.forEach(rule => {
           let found
@@ -176,6 +201,7 @@ const onRequests = {
           })
         })
       }
+      console.log('after process requestHeaders', details.requestHeaders)
       return {
         requestHeaders: details.requestHeaders
       }
@@ -197,10 +223,11 @@ const onRequests = {
               header.value = rule.value
             }
           })
-          if (found || !rule.value) return
+          if (found || (!rule.value && !rule.fn)) return
           details.responseHeaders.push({
             name: rule.name,
-            value: rule.value
+            value:
+              rule.value || (rule.fn && rule.fn.call(null, rule, null, details))
           })
         })
         delete corsRequestCache[details.requestId]
