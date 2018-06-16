@@ -1,4 +1,7 @@
 import utils from './utils'
+// data version
+const VER = '1.0'
+const VER_KEY = 'version'
 
 function storeGet (key) {
   return new Promise((resolve, reject) => {
@@ -22,6 +25,13 @@ function storeSet (key, val) {
 }
 
 export default {
+  async isExtUpdate () {
+    let result = await storeGet(VER_KEY)
+    return result !== VER
+  },
+  async setExtUp2Date () {
+    await storeSet(VER_KEY, VER)
+  },
   async get (cat, key) {
     const defVal = utils.isUrlRuleType(cat) ? [] : {}
     let result = await storeGet(cat)

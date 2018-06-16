@@ -2,7 +2,6 @@ import clonedeep from 'lodash.clonedeep'
 import utils from '@/common/utils'
 import collection from '@/common/collection'
 import menu from './contextmenu'
-import migrate from './migrate'
 
 const RULE_TYPES = utils.RULE_TYPES
 let logNum = 0
@@ -305,46 +304,30 @@ function formatHeaders (headers) {
   }, {})
 }
 const pushNotification = (function () {
-  var cbs, fn
-  fn = null
-  if (chrome.notifications) {
-    cbs = {}
-    fn = function (title, content, notifiId, cb) {
-      notifiId = notifiId || ''
-      chrome.notifications.create(
-        notifiId,
-        {
-          type: 'basic',
-          iconUrl: '/static/icons/icon38.png',
-          title: title,
-          message: content
-        },
-        function () {}
-      )
-      if (notifiId && cb instanceof Function) {
-        cbs[notifiId] = cb
-      }
+  const cbs = {}
+  const notify = function (title, content, notifiId, cb) {
+    notifiId = notifiId || ''
+    chrome.notifications.create(
+      notifiId,
+      {
+        type: 'basic',
+        iconUrl: '/static/icons/icon38.png',
+        title: title,
+        message: content
+      },
+      function () {}
+    )
+    if (notifiId && cb instanceof Function) {
+      cbs[notifiId] = cb
     }
-    chrome.notifications.onClicked.addListener(function (nId) {
-      cbs[nId] && cbs[nId]()
-    })
-    chrome.notifications.onClosed.addListener(function (nId) {
-      delete cbs[nId]
-    })
-  } else if (window.webkitNotifications) {
-    fn = function (title, content) {
-      var notifi
-      notifi = webkitNotifications.createNotification(
-        '/static/icons/icon38.png',
-        title,
-        content
-      )
-      return notifi.show()
-    }
-  } else {
-    fn = function () {}
   }
-  return fn
+  chrome.notifications.onClicked.addListener(function (nId) {
+    cbs[nId] && cbs[nId]()
+  })
+  chrome.notifications.onClosed.addListener(function (nId) {
+    delete cbs[nId]
+  })
+  return notify
 })()
 
 // toggle rule on or off
@@ -401,7 +384,6 @@ function updateExtIcon (iconStyle) {
 }
 
 async function init () {
-  await migrate()
   console.warn('init all settings')
   const onoff = await collection.getData4Bg('onoff')
   let len = RULE_TYPES.length
@@ -486,6 +468,7 @@ async function handleKeyChange (key, newVal, oldVal) {
   }
 }
 
+// on ext config updated
 chrome.storage.onChanged.addListener(async function (changes, area) {
   console.log('onchange', changes, area)
   // ignore none sync area change
@@ -498,4 +481,10 @@ chrome.storage.onChanged.addListener(async function (changes, area) {
     await handleKeyChange(key, change.newValue || {}, change.oldValue || {})
   }
   chrome.webRequest.handlerBehaviorChanged()
+})
+
+// on ext updated
+chrome.runtime.onInstalled.addListener(async () => {
+  const isUpdate = await collection.isExtUpdate()
+  if (isUpdate) chrome.runtime.openOptionsPage()
 })

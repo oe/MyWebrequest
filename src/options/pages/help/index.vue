@@ -28,4 +28,16 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
+figure {display: inline-block;}
+.donate {
+  display: flex;
+  text-align: center;
+}
+.donate-item {
+  display: flex;
+  align-items: center;
+}
+.wechat-qr {
+  width: 150px;
+}
 </style>

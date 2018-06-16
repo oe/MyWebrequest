@@ -50,7 +50,7 @@ export default {
   i18n: i18n.internationalize,
 
   isUrlRuleType (type) {
-    return this.inArray(this.RULE_TYPES, type)
+    return this.RULE_TYPES.indexOf(type) !== -1
   },
   // preprocess a router when use
   preprocessRouter (router) {
@@ -183,29 +183,5 @@ export default {
       val = encodeURIComponent(val).replace('%20', '+')
       return `${key}=${val}`
     }
-  },
-
-  inArray: (function () {
-    if (Array.prototype.includes) {
-      return function (arr, val) {
-        return arr.includes(val)
-      }
-    } else {
-      return function (arr, val) {
-        return arr.indexOf(val) !== -1
-      }
-    }
-  })(),
-  getObjVals: (function () {
-    if (Object.values) {
-      return function (o) {
-        return Object.values(o || {})
-      }
-    } else {
-      return function (o) {
-        o = o || {}
-        return Object.keys(o).map(k => o[k])
-      }
-    }
-  })()
+  }
 }

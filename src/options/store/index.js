@@ -73,7 +73,7 @@ const mutations = {
     if (!ids) return
     if (!Array.isArray(ids)) ids = [ids]
     state.rules = rules.filter(r => {
-      return !cutils.inArray(ids, r.id)
+      return ids.indexOf(r.id) === -1
     })
   }
 }

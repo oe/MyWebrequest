@@ -170,7 +170,7 @@ function isSubRule (rule, subRule) {
 
 // get keywords list(array) in route object
 function getKwdsInRoute (router) {
-  return [].concat(router.params, cutils.getObjVals(router.qsParams))
+  return [].concat(router.params, Object.values(router.qsParams))
 }
 
 /**
@@ -503,7 +503,7 @@ function debounce (fn, wait) {
 
 function isURLMatchPattern (url, pattern) {
   let reg = pattern.replace(escapeRegExp, '\\$&').replace('*', '.*')
-  reg = RegExp(reg)
+  reg = RegExp('^' + reg + '$')
   return reg.test(url)
 }
 
