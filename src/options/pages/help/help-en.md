@@ -13,12 +13,12 @@ It tools a lot of my personal time into this project, if you like it, I'm apprec
 
 <a class="donate-item" href="https://www.buymeacoffee.com/evecalm" class="">
     <figure>
-        <img alt="buy me a coffee" src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png">
+        <img alt="buy me a coffee" src="/static/donate/buymeacoffee.jpg">
         <figcaption>Donate with Paypal/Creditcard</figcaption>
     </figure>
 </a>
 <figure>
-    <img class="wechat-qr" src="/static/wechat-donate.jpg" alt="donate with wechat">
+    <img class="wechat-qr" src="/static/donate/wechat-donate.jpg" alt="donate with wechat">
     <figcaption>Donate with Wechat Pay</figcaption>
 </figure>
 </div>
