@@ -10,7 +10,7 @@
 <script>
 import { mapActions } from 'vuex'
 import sidebar from './components/sidebar'
-import utils from './components/utils'
+import utils from './components/helper/utils'
 
 export default {
   components: {
@@ -57,11 +57,11 @@ export default {
   position: fixed;
   top: 0;
   width: $page-wdith;
-  background-color: rgba(255, 255, 255, .8);
+  background-color: rgba(255, 255, 255, 0.8);
   z-index: 220;
 
   small {
-    font-size: .8em;
+    font-size: 0.8em;
     color: $sub-font-color;
   }
 }
@@ -75,7 +75,7 @@ export default {
   @include border-bottom;
 
   > small {
-    font-size: .8em;
+    font-size: 0.8em;
     color: #999;
   }
 
@@ -84,14 +84,15 @@ export default {
   }
 }
 
-.slide-enter-active, .slide-leave-active {
+.slide-enter-active,
+.slide-leave-active {
   transition: transform 300ms, opacity 250ms;
 }
-.slide-enter, .slide-leave-to {
+.slide-enter,
+.slide-leave-to {
   transform: translateX(-200%);
-  opacity: .8;
+  opacity: 0.8;
 }
-
 
 .el-form-item__content {
   &:before,
@@ -107,7 +108,6 @@ export default {
   }
 }
 
-
 .el-select .el-input {
   width: 80px;
 
@@ -119,6 +119,4 @@ export default {
     padding-right: 20px;
   }
 }
-
-
 </style>

@@ -32,7 +32,9 @@ export default {
   RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'cors'],
   // parse querystring to object
   parseQs: qs.parse,
-  // is url1 cross domain of url2
+  /**
+   * is url1 cross domain of url2
+   */
   isXDomain (url1, url2) {
     if (!url1) return false
     // origins not the same
@@ -40,7 +42,10 @@ export default {
       url1.replace(/(?<=(\w))\/.*$/, '') !== url2.replace(/(?<=(\w))\/.*$/, '')
     )
   },
-  // get qs from url, return '' if no querystring found
+
+  /**
+   * get qs from url, return '' if no querystring found
+   */
   getQs (url) {
     // no query string, return ''
     if (!/.+\?/.test(url)) return ''
@@ -49,10 +54,17 @@ export default {
 
   i18n: i18n.internationalize,
 
+  /**
+   * is type a valid rule type
+   * @return {Boolean}      [description]
+   */
   isUrlRuleType (type) {
     return this.RULE_TYPES.indexOf(type) !== -1
   },
-  // preprocess a router when use
+
+  /**
+   * preprocess a router when use
+   */
   preprocessRouter (router) {
     delete router.createdAt
     delete router.updatedAt
@@ -65,7 +77,7 @@ export default {
     return router
   },
   /**
-   * get target url
+   * get target url for custom rule
    * @param  {Object} router   url pattern to match a url
    * @param  {String} url     a real url that match route
    * @return {String}         converted url

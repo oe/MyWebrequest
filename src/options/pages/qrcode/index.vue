@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import utils from '@/options/components/utils'
+import utils from '@/options/components/helper/utils'
 import qrImg from '@/options/components/qr-img'
 import locales from './locales.json'
 
@@ -111,7 +111,9 @@ export default {
     }),
     getVcardQR: utils.debounce(function () {
       const vcard = this.vcard
-      const content = Object.keys(vcard).map((key) => `${key}:${vcard[key]}`).join(';')
+      const content = Object.keys(vcard)
+        .map(key => `${key}:${vcard[key]}`)
+        .join(';')
       this.updateQRCode(content)
     }),
     getMsgQR: utils.debounce(function () {
@@ -178,7 +180,7 @@ export default {
     justify-content: center;
     word-wrap: break-word;
     // word-break: break-all;
-    background-color: rgba(253, 246, 236, .95);
+    background-color: rgba(253, 246, 236, 0.95);
     color: #6d4408;
     font-weight: 300;
   }

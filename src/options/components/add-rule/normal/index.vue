@@ -61,7 +61,8 @@
 </template>
 
 <script>
-import utils from '@/options/components/utils'
+import utils from '@/options/components/helper/utils'
+import validate from '@/options/components/helper/validate'
 import { mapActions } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
 // import locales from './locales.json'
@@ -81,9 +82,9 @@ export default {
       },
       validateRules: {
         // by default, validator wont trigger on input blur
-        url: {validator: this.validateURL, trigger: 'none'},
-        testUrl: {validator: this.validateTestURL, trigger: 'none'},
-        testResult: {validator: this.validateTestResult, trigger: 'none'}
+        url: { validator: this.validateURL, trigger: 'none' },
+        testUrl: { validator: this.validateTestURL, trigger: 'none' },
+        testResult: { validator: this.validateTestResult, trigger: 'none' }
       },
       needTest: false,
       etid: 0,
@@ -109,8 +110,11 @@ export default {
     },
     validateTestURL (rule, value, cb) {
       console.log('validateTestURL', value)
-      if (!this.needTest || utils.isURL(value)) return cb()
-      cb(new Error('invalidURL'))
+      try {
+        if (!this.needTest || validate.checkURL(value)) return cb()
+      } catch (error) {
+        cb(error)
+      }
     },
     validateTestResult (rule, value, cb) {
       if (!this.needTest) cb()
@@ -148,7 +152,7 @@ export default {
         let url = this.validateRule(this.form, ruleID)
         if (ruleID) {
           const rule = this.getRuleByID(this.ruleID)
-          url = Object.assign({}, rule, {url, updatedAt: Date.now()})
+          url = Object.assign({}, rule, { url, updatedAt: Date.now() })
         }
         this.addRule(url)
         this.clearForm()
@@ -197,7 +201,7 @@ export default {
   },
   watch: {
     needTest (newVal) {
-      this.toggleRuleTest({module: this.module, isOn: newVal})
+      this.toggleRuleTest({ module: this.module, isOn: newVal })
     }
   }
 }
@@ -212,7 +216,9 @@ export default {
   display: flex;
   justify-content: space-between;
 
-  .el-checkbox { font-weight: normal; }
+  .el-checkbox {
+    font-weight: normal;
+  }
 }
 
 .form-item-testresult {
@@ -227,7 +233,7 @@ export default {
     -webkit-box-pack: center;
     -webkit-box-orient: vertical;
   }
-  
+
   .normal-tip {
     color: #aaa;
     font-style: italic;
@@ -239,18 +245,27 @@ export default {
   }
 
   &.is-success {
-    .success-tip { color: #67c23a; display: inline-block; }
-    .normal-tip { display: none; }
+    .success-tip {
+      color: #67c23a;
+      display: inline-block;
+    }
+    .normal-tip {
+      display: none;
+    }
   }
 
   &.is-error {
-    .failed-tip { color: #f56c6c; display: inline-block; }
-    .normal-tip { display: none; }
+    .failed-tip {
+      color: #f56c6c;
+      display: inline-block;
+    }
+    .normal-tip {
+      display: none;
+    }
   }
 
   .el-form-item__error {
     display: none;
   }
 }
-
 </style>

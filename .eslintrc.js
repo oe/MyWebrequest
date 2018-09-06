@@ -16,6 +16,7 @@ module.exports = {
   },
   plugins: ['html'],
   rules: {
+    "space-before-function-paren": ["error", "always"],
     // allow paren-less arrow functions
     'arrow-parens': 0,
     'no-control-regex': 'off',

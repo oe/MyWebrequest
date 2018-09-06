@@ -1,5 +1,5 @@
 import collection from '@/common/collection'
-import utils from '@/common/utils'
+import cutils from '@/common/utils'
 
 // data version
 const VER = '1.0'
@@ -31,7 +31,7 @@ async function migrateSimpleRules () {
     rules = rules.map(item => {
       return {
         url: item,
-        id: utils.guid(),
+        id: cutils.guid(),
         enabled: true,
         createdAt: 0,
         updatedAt: 0

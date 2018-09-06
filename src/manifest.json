@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appName__",
-  "version": "0.11.16",
+  "version": "0.11.17",
   "manifest_version": 2,
   "minimum_chrome_version": "28",
   "description": "__MSG_appDesc__",
@@ -26,6 +26,11 @@
   "web_accessible_resources": [
     "options/index.html"
   ],
+  "externally_connectable": {
+    "matches": [
+      "*://localhost/*"
+    ]
+  },
   "permissions": [
     "*://*/*",
     "webRequest",

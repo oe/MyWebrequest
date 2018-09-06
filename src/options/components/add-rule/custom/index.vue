@@ -2,18 +2,18 @@
 <el-form ref="ruleForm" :model="form" :rules="validateRules" label-position="left" label-width="106px">
   <el-form-item size="small" :label="$t('matchLbl')" prop="url">
     <el-input
-      v-model="form.url"
+      v-model="form.matchURL"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       ref="firstInput"
       autocorrect="off"
       spellcheck="false"
       placeholder="choose protocol" >
-      <el-select v-model="form.protocol" slot="prepend">
+      <!-- <el-select v-model="form.protocol" slot="prepend">
         <el-option label="*://" value="*"></el-option>
         <el-option label="http://" value="http"></el-option>
         <el-option label="https://" value="https"></el-option>
-      </el-select>
+      </el-select> -->
     </el-input>
   </el-form-item>
 
@@ -64,7 +64,9 @@
 </template>
 
 <script>
-import utils from '@/options/components/utils'
+import utils from '@/options/components/helper/utils'
+import validate from '@/options/components/helper/validate'
+import cstRule from '@/options/components/helper/custom-rule'
 import cutils from '@/common/utils'
 import mixin, { mergeLang } from '../common-mixin'
 import locales from './locales.json'
@@ -79,17 +81,17 @@ export default {
       redirectInput: null,
       selectionStart: 0,
       form: {
-        protocol: '*',
-        url: '',
-        redirectUrl: '',
-        testUrl: '',
+        protocol: 'https://',
+        matchURL: 'https://itunes.apple.com/us/*',
+        redirectUrl: 'https://itunes.apple.com/cn/*',
+        testUrl: 'https://itunes.apple.com/us/app/wechat/id414478124?mt=8',
         testResult: ''
       },
       validateRules: {
-        url: {validator: this.validateURL, trigger: 'none'},
-        redirectUrl: {validator: this.validateRedirectURL, trigger: 'none'},
-        testUrl: {validator: this.validateTestURL, trigger: 'none'},
-        testResult: {validator: this.validateTestResult, trigger: 'none'}
+        url: { validator: this.validateMatchURL, trigger: 'none' },
+        redirectUrl: { validator: this.validateRedirectURL, trigger: 'none' },
+        testUrl: { validator: this.validateTestURL, trigger: 'none' },
+        testResult: { validator: this.validateTestResult, trigger: 'none' }
       },
       parms: []
     }
@@ -98,20 +100,17 @@ export default {
     this.redirectInput = this.$refs.redirectInput.$el.querySelector('input')
   },
   methods: {
-    validateURL (rule, value, cb) {
+    validateMatchURL (rule, value, cb) {
       try {
-        console.log('validateURL', value)
-        let {url, protocol} = this.form
-        url = url.trim()
-        if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
-        if (!url) throw new Error('emptyUrl')
-        const matchUrl = protocol + '://' + url
-        const router = utils.getRouter(matchUrl)
+        console.log('validateMatchURL', value)
+        const matchURL = this.form.matchURL.trim()
+        validate.checkCustomMatchRule(matchURL)
+        const matchMeta = cstRule.getMatchMeta(matchURL, true)
         const ignoreID = this.isUpdate && this.ruleID
-        if (!ignoreID && this.isRuleExist(router.url)) throw new Error('ruleExists')
-        this.isRuleIntersect(router.url, ignoreID)
-        utils.hasReservedWord(router)
-        utils.isKwdsUniq(router)
+        if (!ignoreID && this.isRuleExist(matchMeta.url)) {
+          throw new Error('ruleExists')
+        }
+        this.isRuleIntersect(matchMeta.url, ignoreID)
         cb()
       } catch (e) {
         console.log(e)
@@ -121,8 +120,7 @@ export default {
     },
     validateRedirectURL (rule, value, cb) {
       try {
-        const matchURL = this.form.protocol + '://' + this.form.url
-        utils.isRedirectURLValid(value, matchURL)
+        validate.checkCustomRedirectRule(value, this.form.matchURL)
         return cb()
       } catch (e) {
         cb(e)
@@ -130,8 +128,12 @@ export default {
     },
     validateTestURL (rule, value, cb) {
       console.log('validateTestURL', value)
-      if (utils.isURL(value)) return cb()
-      cb(new Error('invalidURL'))
+      try {
+        validate.checkURL(value)
+        cb()
+      } catch (error) {
+        cb(error)
+      }
     },
     validateTestResult (rule, value, cb) {
       let router
@@ -140,7 +142,7 @@ export default {
       } catch (e) {
         return cb(new Error('ruleInvalid'))
       }
-      let result = utils.isURLMatchPattern(this.form.testUrl, router.url)
+      let result = validate.isURLMatchPattern(this.form.testUrl, router.url)
       if (result) {
         result = cutils.getTargetUrl(router, this.form.testUrl)
       }
@@ -165,6 +167,7 @@ export default {
       this.$refs.redirectInput.debouncedGetData(this.form.redirectUrl)
     },
     onTestRule () {
+      console.log('teset rule')
       this.$refs.ruleForm.validate()
     },
     async onAddRule () {
@@ -181,8 +184,12 @@ export default {
       this.addARule(this.ruleID)
     },
     handleSelect (item, oldVal) {
-      const needCloseBracket = oldVal.length === this.selectionStart || oldVal[this.selectionStart] !== '}'
-      let str = oldVal.slice(0, this.selectionStart).replace(/(?<={)([^{}]*)$/, '')
+      const needCloseBracket =
+        oldVal.length === this.selectionStart ||
+        oldVal[this.selectionStart] !== '}'
+      let str = oldVal
+        .slice(0, this.selectionStart)
+        .replace(/(?<={)([^{}]*)$/, '')
       // move text cursor position
       let curPos
       if (item.value === '*') {
@@ -208,16 +215,23 @@ export default {
       this.selectionStart = this.redirectInput.selectionStart
       // cursor position not at the end of string, or not in front of any alphanumeric
       const letterAfterCursor = words[this.selectionStart]
-      if (this.selectionStart !== words.length && /\w/.test(letterAfterCursor)) return cb(result)
+      if (
+        this.selectionStart !== words.length &&
+        /\w/.test(letterAfterCursor)
+      ) {
+        return cb(result)
+      }
       // no match {
-      if (!/(?<={)([^{}]*)$/.test(words.slice(0, this.selectionStart))) return cb(result)
+      if (!/(?<={)([^{}]*)$/.test(words.slice(0, this.selectionStart))) {
+        return cb(result)
+      }
       const searchWords = RegExp.$1.trim()
       cb(this.getUrlParams(searchWords))
     },
     getUrlParams (kwd) {
       let result = this.getAllAvailableParams()
       if (kwd) {
-        result = result.filter((itm) => itm.value.includes(kwd))
+        result = result.filter(itm => itm.value.includes(kwd))
       }
       return result
     },
@@ -228,14 +242,17 @@ export default {
         const router = utils.getRouter(matchURL)
         if (router.params) params = router.params
         if (router.qsParams) {
-          params.push(...Object.keys(router.qsParams).map(k => router.qsParams[k]))
+          params.push(
+            ...Object.keys(router.qsParams).map(k => router.qsParams[k])
+          )
         }
         // remove duplicated & conflict with reserved names
         params = params.filter((k, i) => {
-          return utils.RESERVED_HOLDERS.indexOf(k) === -1 &&
-            params.indexOf(k) === i
+          return (
+            utils.RESERVED_HOLDERS.indexOf(k) === -1 && params.indexOf(k) === i
+          )
         })
-        params = params.map((v) => ({value: v}))
+        params = params.map(v => ({ value: v }))
         if (router.hasWdCd) {
           params.push({
             value: '*',
@@ -245,12 +262,14 @@ export default {
       } catch (e) {
         console.warn('[autosuggestion] match url is invalid', e)
       }
-      const result = params.concat(utils.RESERVED_HOLDERS.map((k) => {
-        return {
-          value: k,
-          label: this.$t('param_' + k)
-        }
-      }))
+      const result = params.concat(
+        utils.RESERVED_HOLDERS.map(k => {
+          return {
+            value: k,
+            label: this.$t('param_' + k)
+          }
+        })
+      )
       return result
     },
     /**
@@ -278,7 +297,7 @@ export default {
 </script>
 
 <style lang="scss">
-.el-form-item__content>.el-input {
+.el-form-item__content > .el-input {
   width: 100%;
 }
 .el-form-item__content .el-autocomplete {

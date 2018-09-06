@@ -12,11 +12,13 @@ const handlers = {
   }
 }
 
-async function onExternalMessage (msg, sender, sendResponse) {
+function onExternalMessage (msg, sender, sendResponse) {
+  console.log('onExternalMessage', msg)
   try {
     const { cmd, args } = msg
     if (!handlers[cmd]) throw new Error(`can not find handler for ${cmd}`)
-    const resp = await handlers[cmd](...args)
+    const resp = handlers[cmd](...args)
+    console.log('response from extension', resp)
     sendResponse({
       code: 0,
       data: resp
@@ -30,5 +32,6 @@ async function onExternalMessage (msg, sender, sendResponse) {
   }
   return true
 }
+console.log('hahahah', onExternalMessage)
 // listen message send from webpage
 chrome.runtime.onMessageExternal.addListener(onExternalMessage)

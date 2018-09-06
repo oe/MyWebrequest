@@ -32,7 +32,7 @@
 <script>
 import RuleList from '@/options/components/rule-list'
 import collection from '@/common/collection'
-import utils from '@/options/components/utils'
+import utils from '@/options/components/helper/utils'
 import CustomForm from '@/options/components/add-rule/custom'
 import NormalForm from '@/options/components/add-rule/normal'
 import { mapState, mapGetters } from 'vuex'
@@ -71,7 +71,7 @@ export default {
   methods: {
     // restore router
     onDlgClose () {
-      this.$router.replace({path: '/' + this.module})
+      this.$router.replace({ path: '/' + this.module })
     },
     async onUpdateRule () {
       const isSuccess = await this.$refs.dlgForm.onUpdateRule()
@@ -135,7 +135,9 @@ export default {
     async $route (val, oldVal) {
       await this.updateModule()
       // if module if the same
-      if (utils.getModuleName(val.path) === utils.getModuleName(oldVal.path)) return
+      if (utils.getModuleName(val.path) === utils.getModuleName(oldVal.path)) {
+        return
+      }
       this.$el.classList.add('slide-enter')
 
       setTimeout(() => {

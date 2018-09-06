@@ -1,5 +1,6 @@
 // import VueI18n from 'vue-i18n'
-import utils from '@/options/components/utils'
+import utils from '@/options/components/helper/utils'
+import validate from '@/options/components/helper/validate'
 import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
 
@@ -77,9 +78,9 @@ export default {
       this.rules.some(rule => {
         if (ignoreID && rule.id === ignoreID) return false
         let err
-        if (utils.isSubRule(rule.url, url)) {
+        if (validate.isSubRule(rule.url, url)) {
           err = new Error('ruleBeIncluded')
-        } else if (utils.isSubRule(url, rule.url)) {
+        } else if (validate.isSubRule(url, rule.url)) {
           err = new Error('ruleIncludOthers')
         }
         if (err) {
