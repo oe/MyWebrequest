@@ -16,11 +16,6 @@
       spellcheck="false"
       v-popover:urlPopover
       placeholder="url, required, paste a url here" >
-      <el-select v-model="form.protocol" slot="prepend" :disabled="disableProtocol">
-        <el-option label="*://" value="*"></el-option>
-        <el-option label="http://" value="http"></el-option>
-        <el-option label="https://" value="https"></el-option>
-      </el-select>
       <el-button v-if="!ruleID && !needTest" slot="append" @click="onAddRule">
         {{$t('addRuleBtn')}}
       </el-button>
@@ -75,7 +70,6 @@ export default {
     return {
       disableProtocol: false,
       form: {
-        protocol: '*',
         url: '',
         testUrl: '',
         testResult: ''
@@ -121,8 +115,8 @@ export default {
       // this.isUpdate = true
       // const isValid = this.$refs.ruleForm.validate()
       // if (!isValid) return
-      const pattern = this.form.protocol + '://' + this.form.url
-      const isMatch = utils.isURLMatchPattern(this.form.testUrl, pattern)
+      const pattern = this.form.url.trim()
+      const isMatch = validate.isURLMatchPattern(this.form.testUrl, pattern)
       isMatch ? cb() : cb(new Error('notMatch'))
       // console.log('isMatch', isMatch)
     },
@@ -187,12 +181,8 @@ export default {
      * @return {String}          validated rule
      */
     validateRule (data, ignoreID) {
-      const protocol = data.protocol
       let url = data.url.trim()
-      if (!utils.isProtocol(protocol)) throw new Error('invalidProtocol')
-      if (!url) throw new Error('emptyUrl')
-      url = protocol + '://' + url
-      utils.testURLRuleValid(url)
+      validate.checkChromeRule(url)
       if (!ignoreID && this.isRuleExist(url)) throw new Error('ruleExists')
       // test for duplicated match rule
       this.isRuleIntersect(url, ignoreID)
