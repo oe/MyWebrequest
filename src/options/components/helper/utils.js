@@ -65,8 +65,23 @@ function getRegGroupCount (regStr) {
 // %name mean encodeURIComponent name
 // =name mean decodeURIComponent name
 function getParamsList (url) {
-  let matches = url.match(/\{([^}]+)\}/g) || []
-  return matches.map(v => v.slice(1, -1))
+  const paramReg = /\{([^}]+)\}/g
+  let matches = url.match(paramReg) || []
+  const params = matches.map(v => v.slice(1, -1))
+  // has star arguments
+  if (/\/.*\*/.test(url.replace(paramReg, 'xx'))) {
+    params.push('*')
+  }
+  return params
+}
+
+function getMatchRuleParams (url, useReg) {
+  if (useReg) {
+    return getRegGroupCount(url)
+      .map(u => '$' + u)
+      .push('$0')
+  }
+  return getParamsList(url)
 }
 
 /**
@@ -95,6 +110,7 @@ export default {
   normalizeRegRule,
   getRegGroupCount,
   getParamsList,
+  getMatchRuleParams,
   createError,
   getModuleName,
   getURLParts,

@@ -5,7 +5,6 @@ import validate from './validate'
 // // http://www.bing.com/{g}-{d}/{*abc}?abc={name}&youse={bcsd}
 // optionalParam = /\((.*?)\)/g
 const namedParam = /\{(\(\?)?([^}]+)\}/g
-const splatParam = /\{\*([^}]+)\}/g
 // escapeRegExp  = /[\-{}\[\]+?.,\\\^$|#\s]/g
 const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
 // loose restrict for qs, value could be empty
@@ -103,10 +102,6 @@ function getMatchMetaFromStr (route, noParamsInRedirect) {
   // hand named params in path
   const part = (host + pathname)
     .replace(escapeRegExp, '\\$&')
-    .replace(splatParam, function (match, $1) {
-      params.push($1)
-      return '([^?]*)'
-    })
     .replace(namedParam, function (match, $1, $2) {
       params.push($2)
       if ($1) {
@@ -115,6 +110,7 @@ function getMatchMetaFromStr (route, noParamsInRedirect) {
         return '([^/?]+)'
       }
     })
+    .replace('*', '.*')
   result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?`
   result.params = params
 

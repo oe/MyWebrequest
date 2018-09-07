@@ -137,7 +137,7 @@ function checkReg (reg) {
  * @param  {boolean}  useReg
  */
 function checkParamFormat (url, useReg) {
-  const reg = useReg ? /^(\$\d|[a-z])$/ : /^[a-z\d_-]$/i
+  const reg = useReg ? /^(\$\d|[a-z])+$/i : /^[a-z\d_-]+$/i
   url.replace(/\{([^}]*)\}/g, ($0, $1) => {
     if (!reg.test($1)) {
       throw utils.createError('invalid-char-paramnames', $1)
@@ -189,20 +189,25 @@ function checkCustomMatchStrRule (url) {
     throw utils.createError('no-continuous-param', RegExp.$1)
   }
   const qs = cmpts[3]
-  // ?{named} or &{named}, not allowd
-  if (/[?&](\{[^}]+\})/.test(qs)) {
-    throw utils.createError('no-param-for-qskey', RegExp.$1)
-  }
-  // {named} should followed by & or eof
-  if (/(\{[^}]+\})(?!&|$)/.test(qs)) {
-    throw utils.createError('qs-param-shouldbe-val', RegExp.$1)
-  }
-  // {named} should followed =, aka `={named}` is valid
-  if (/[^=](\{[^}]+\})/.test(qs)) {
-    throw utils.createError('qs-param-shouldbe-val', RegExp.$1)
+  if (qs) {
+    // ?{named} or &{named}, not allowd
+    if (/[?&](\{[^}]+\})/.test(qs)) {
+      throw utils.createError('no-param-for-qskey', RegExp.$1)
+    }
+    // {named} should followed by & or eof
+    if (/(\{[^}]+\})(?!&|$)/.test(qs)) {
+      throw utils.createError('qs-param-shouldbe-val', RegExp.$1)
+    }
+    // {named} should followed =, aka `={named}` is valid
+    if (/[^=](\{[^}]+\})/.test(qs)) {
+      throw utils.createError('qs-param-shouldbe-val', RegExp.$1)
+    }
   }
   checkCustomMatchParams(url)
   const normalized = url.replace(/\{[^}]+\}/g, 'http')
+  if (/(\?.*\*)/.test(normalized)) {
+    throw utils.createError('no-star-in-sq', RegExp.$1)
+  }
   checkChromeRule(normalized)
 }
 
@@ -212,7 +217,7 @@ function checkCustomMatchStrRule (url) {
  * @return {Boolean}
  */
 function isRedirectHasNoParams (redirectUrl) {
-  return !/\{[^}]+\}/.test(redirectUrl) || /\*/.test(redirectUrl)
+  return !/\{[^}]+\}/.test(redirectUrl) && !/\*/.test(redirectUrl)
 }
 
 /**
@@ -237,7 +242,7 @@ function checkCustomRedirectRule (redirectURL, matchURL, useReg) {
   checkParamFormat(redirectURL, useReg)
   let mparams = []
   try {
-    mparams = checkCustomMatchRule(matchURL, useReg).params
+    mparams = utils.getMatchRuleParams(matchURL, useReg)
   } catch (error) {
     console.warn(`matchURL (${matchURL}) invalid, will skip follow`, error)
     return
@@ -250,7 +255,9 @@ function checkCustomRedirectRule (redirectURL, matchURL, useReg) {
   }
   const rparams = utils.getParamsList(redirectURL)
   const notFound = rparams.filter(p => mparams.indexOf(p) === -1)
-  throw utils.createError('undefined-params-in-redirect', notFound)
+  if (notFound.length) {
+    throw utils.createError('undefined-params-in-redirect', notFound)
+  }
 }
 
 /**
@@ -286,6 +293,7 @@ export default {
   checkHost,
   checkIP,
   checkChromeRule,
+  checkCustomMatchParams,
   checkCustomMatchRule,
   isRedirectHasNoParams,
   checkCustomRedirectRule,

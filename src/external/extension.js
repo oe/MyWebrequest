@@ -32,6 +32,5 @@ function onExternalMessage (msg, sender, sendResponse) {
   }
   return true
 }
-console.log('hahahah', onExternalMessage)
 // listen message send from webpage
 chrome.runtime.onMessageExternal.addListener(onExternalMessage)

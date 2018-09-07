@@ -17,13 +17,13 @@
     </el-input>
   </el-form-item>
 
-  <el-form-item size="small" label="Redirect url to" prop="redirectUrl">
+  <el-form-item size="small" label="Redirect url to" prop="redirectURL">
     <el-autocomplete
       autocorrect="off"
       spellcheck="false"
       class="inline-input"
       ref="redirectInput"
-      v-model="form.redirectUrl"
+      v-model="form.redirectURL"
       :fetch-suggestions="querySearch"
       placeholder="choose protocol"
       :debounce="0"
@@ -81,15 +81,15 @@ export default {
       redirectInput: null,
       selectionStart: 0,
       form: {
-        protocol: 'https://',
+        useReg: false,
         matchURL: 'https://itunes.apple.com/us/*',
-        redirectUrl: 'https://itunes.apple.com/cn/*',
+        redirectURL: 'https://itunes.apple.com/cn/*',
         testUrl: 'https://itunes.apple.com/us/app/wechat/id414478124?mt=8',
         testResult: ''
       },
       validateRules: {
         url: { validator: this.validateMatchURL, trigger: 'none' },
-        redirectUrl: { validator: this.validateRedirectURL, trigger: 'none' },
+        redirectURL: { validator: this.validateRedirectURL, trigger: 'none' },
         testUrl: { validator: this.validateTestURL, trigger: 'none' },
         testResult: { validator: this.validateTestResult, trigger: 'none' }
       },
@@ -140,7 +140,7 @@ export default {
       try {
         router = cutils.preprocessRouter(this.getRouter())
       } catch (e) {
-        return cb(new Error('ruleInvalid'))
+        return cb(e)
       }
       let result = validate.isURLMatchPattern(this.form.testUrl, router.url)
       if (result) {
@@ -158,13 +158,13 @@ export default {
           const matchs = utils.getURLParts(rule.matchUrl)
           this.form.protocol = matchs[1]
           this.form.url = matchs[2] + matchs[3] + (matchs[4] || '')
-          this.form.redirectUrl = rule.redirectUrl
+          this.form.redirectURL = rule.redirectURL
         }
       }
     },
     onRedirectKeyup () {
-      // trigger redirecturl autosuggestion
-      this.$refs.redirectInput.debouncedGetData(this.form.redirectUrl)
+      // trigger redirectuRL autosuggestion
+      this.$refs.redirectInput.debouncedGetData(this.form.redirectURL)
     },
     onTestRule () {
       console.log('teset rule')
@@ -203,7 +203,7 @@ export default {
         curPos = str.length + (needCloseBracket ? 0 : 1)
         str += oldVal.slice(this.selectionStart)
       }
-      this.form.redirectUrl = str
+      this.form.redirectURL = str
       // const curPos = str.length + 1
       setTimeout(() => {
         this.redirectInput.setSelectionRange(curPos, curPos)
@@ -236,29 +236,18 @@ export default {
       return result
     },
     getAllAvailableParams () {
-      const matchURL = this.form.protocol + '://' + this.form.url
       let params = []
       try {
-        const router = utils.getRouter(matchURL)
-        if (router.params) params = router.params
-        if (router.qsParams) {
-          params.push(
-            ...Object.keys(router.qsParams).map(k => router.qsParams[k])
-          )
-        }
-        // remove duplicated & conflict with reserved names
-        params = params.filter((k, i) => {
-          return (
-            utils.RESERVED_HOLDERS.indexOf(k) === -1 && params.indexOf(k) === i
-          )
-        })
-        params = params.map(v => ({ value: v }))
-        if (router.hasWdCd) {
-          params.push({
-            value: '*',
-            label: 'anything after the first start in path'
+        validate.checkCustomMatchParams(this.form.matchURL)
+        params = utils
+          .getMatchRuleParams(this.form.matchURL, this.form.useReg)
+          .map(v => {
+            const result = { value: v }
+            if (v === '*') {
+              result.label = 'anything after the first star in path'
+            }
+            return result
           })
-        }
       } catch (e) {
         console.warn('[autosuggestion] match url is invalid', e)
       }
@@ -289,8 +278,11 @@ export default {
       return true
     },
     getRouter () {
-      const matchUrl = this.form.protocol + '://' + this.form.url
-      return utils.getRouter(matchUrl, this.form.redirectUrl)
+      try {
+        return cstRule.getRouter(this.form.matchURL, this.form.redirectURL)
+      } catch (error) {
+        console.log(error)
+      }
     }
   }
 }
