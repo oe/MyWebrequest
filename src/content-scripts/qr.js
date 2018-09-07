@@ -1,5 +1,6 @@
 import qrcode from '@/common/qrcode'
-const styleText = `
+const template = `
+<style>
 .mwr-qr-mask {
   all: unset;
   opacity: 0;
@@ -87,20 +88,33 @@ const styleText = `
 .mwr-qr-wrapper .mwr-action-btn:hover {
   color: rgba(100, 149, 237, .8);
 }
-`
-const domHtml = `
-  <div class="mwr-qr-wrapper">
-    <div class="mwr-qr-header">QR Code</div>
-    <div class="mwr-qr-content">
-      <img class="mwr-qr-img">
-      <div class="mwr-qr-error">${chrome.i18n.getMessage(
-    'cs_gen_qr_failed'
-  )}</div>
-    </div>
-    <div class="mwr-qr-footer">
+</style>
+<div class="mwr-qr-mask">
+<div class="mwr-qr-wrapper">
+  <div class="mwr-qr-header">QR Code</div>
+  <div class="mwr-qr-content">
+    <img class="mwr-qr-img">
+    <div class="mwr-qr-error">
+      ${chrome.i18n.getMessage('cs_gen_qr_failed')}
     </div>
   </div>
+  <div class="mwr-qr-footer">
+    <span class="mwr-action-btn js-copy">
+    ${chrome.i18n.getMessage('cs_copy_btn')}
+    </span>
+    <a class="mwr-action-btn js-open-url"
+      target="_blank"
+      href="javascript:;">
+      ${chrome.i18n.getMessage('cs_open_btn')}
+    </a>
+    <a class="mwr-action-btn"
+      href="${chrome.runtime.getURL('options/index.html#/qrcode')}"
+      target="_blank">${chrome.i18n.getMessage('cs_more_btn')}</a>
+  </div>
+</div>
+</div>
 `
+
 let maskDom
 function updateQR () {
   chrome.storage.local.get('qr-menu', result => {
@@ -110,18 +124,10 @@ function updateQR () {
       ''
     )
     const footer = maskDom.querySelector('.mwr-qr-footer')
-    footer.innerHTML = `
-    <span class="mwr-action-btn js-copy">${chrome.i18n.getMessage(
-    'cs_copy_btn'
-  )}</span>
-    <a class="mwr-action-btn js-open-url" target="_blank" href="${encodeURI(
-    data.content
-  )}">${chrome.i18n.getMessage('cs_open_btn')}</a>
-    <a class="mwr-action-btn" href="${chrome.runtime.getURL(
-    'options/index.html#/qrcode'
-  )}" target="_blank">${chrome.i18n.getMessage('cs_more_btn')}</a>
-    `
     footer.querySelector('.js-copy').setAttribute('title', data.content)
+    footer
+      .querySelector('.js-open-url')
+      .setAttribute('href', encodeURI(data.content))
     qrcode.makeQRCode(data.content, 280).then(
       imgStr => {
         maskDom.querySelector('img').setAttribute('src', imgStr)
@@ -142,14 +148,18 @@ function init () {
     return window.updateQR()
   }
   window.updateQR = updateQR
-  const style = document.createElement('style')
-  style.textContent = styleText
-  document.head.appendChild(style)
-  maskDom = document.createElement('div')
-  maskDom.classList.add('mwr-qr-mask')
-  maskDom.innerHTML = domHtml
+  const div = document.createElement('div')
+  div.setAttribute('style', 'all: initial;')
+  document.body.appendChild(div)
+  let shadowRoot
+  if (div.attachShadow) {
+    shadowRoot = div.attachShadow({ mode: 'closed' })
+  } else {
+    shadowRoot = div.createShadowRoot()
+  }
+  shadowRoot.innerHTML = template
+  maskDom = shadowRoot.querySelector('.mwr-qr-mask')
   maskDom.addEventListener('click', onClickMask)
-  document.body.appendChild(maskDom)
   window.updateQR()
 }
 
