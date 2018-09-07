@@ -4,7 +4,7 @@ function addMenu () {
   // for selected text
   chrome.contextMenus.create({
     id: 'text',
-    title: 'Get QRCode of Selected Text',
+    title: chrome.i18n.getMessage('menuTextTitle'),
     type: 'normal',
     contexts: ['selection'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']
@@ -13,7 +13,7 @@ function addMenu () {
   // for a tag
   chrome.contextMenus.create({
     id: 'link',
-    title: 'Get QRCode of Link',
+    title: chrome.i18n.getMessage('menuLinkTitle'),
     type: 'normal',
     contexts: ['link'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']
@@ -22,7 +22,7 @@ function addMenu () {
   // for image, video, audio
   chrome.contextMenus.create({
     id: 'media',
-    title: 'Get QRCode of Media',
+    title: chrome.i18n.getMessage('menuMediaTitle'),
     type: 'normal',
     contexts: ['image', 'video', 'audio'],
     documentUrlPatterns: ['http://*/*', 'https://*/*']

@@ -1,5 +1,5 @@
 {
-  "appName":  {
+  "appName": {
     "message": "My Webrequest"
   },
   "iconTitle": {
@@ -7,6 +7,15 @@
   },
   "appDesc": {
     "message": "管理你浏览器的web请求"
+  },
+  "menuTextTitle": {
+    "message": "获取选中文字的二维码"
+  },
+  "menuLinkTitle": {
+    "message": "获取超链接二维码"
+  },
+  "menuMdiaTitle": {
+    "message": "获取资源链接二维码"
   },
   "bg_logison": {
     "message": "Log功能已经开启"

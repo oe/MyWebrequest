@@ -1,12 +1,21 @@
 {
-  "appName":  {
+  "appName": {
     "message": "My Webrequest"
   },
   "iconTitle": {
-  	"message": "Get current page's QRCode"
+    "message": "Get current page's QRCode"
   },
   "appDesc": {
-  	"message": "Control your browser's web request."
+    "message": "Control your browser's web request."
+  },
+  "menuTextTitle": {
+    "message": "Get QRCode of Selected Text"
+  },
+  "menuLinkTitle": {
+    "message": "Get QRCode of Link"
+  },
+  "menuMdiaTitle": {
+    "message": "Get QRCode of Media"
   },
   "bg_logison": {
     "message": "Log function is enabled"
