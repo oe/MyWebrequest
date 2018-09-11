@@ -283,7 +283,7 @@ function isSubRule (rule, subRule) {
 }
 
 function isURLMatchPattern (url, pattern) {
-  let reg = pattern.replace(escapeRegExp, '\\$&').replace('*', '.*')
+  let reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
   reg = RegExp('^' + reg + '$')
   return reg.test(url)
 }

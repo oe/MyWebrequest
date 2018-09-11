@@ -56,8 +56,8 @@ function normalizeRegRule (regStr) {
  * @param {string} regStr
  */
 function getRegGroupCount (regStr) {
-  // count group count, ignore un-captured
-  const matches = regStr.match(/\((?!\?:)/g)
+  // count group count, ignore un-captured & escaped
+  const matches = regStr.match(/(?<!(\\|\[[^]*))\((?!\?:)/g)
   return (matches && matches.length) || 0
 }
 
@@ -77,8 +77,10 @@ function getParamsList (url) {
 
 function getMatchRuleParams (url, useReg) {
   if (useReg) {
-    return getRegGroupCount(url)
-      .map(u => '$' + u)
+    // RegExp only got properties $0 ~ $9
+    const total = Math.min(9, getRegGroupCount(url))
+    return Array.apply(null, Array(total))
+      .map((u, i) => '$' + (i + 1))
       .push('$0')
   }
   return getParamsList(url)

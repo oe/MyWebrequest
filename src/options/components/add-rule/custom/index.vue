@@ -9,11 +9,7 @@
       autocorrect="off"
       spellcheck="false"
       placeholder="choose protocol" >
-      <!-- <el-select v-model="form.protocol" slot="prepend">
-        <el-option label="*://" value="*"></el-option>
-        <el-option label="http://" value="http"></el-option>
-        <el-option label="https://" value="https"></el-option>
-      </el-select> -->
+      <el-switch v-model="form.useReg" slot="append" active-text="use regexp"></el-switch>
     </el-input>
   </el-form-item>
 

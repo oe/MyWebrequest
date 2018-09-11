@@ -1,6 +1,6 @@
 {
   "name": "__MSG_appName__",
-  "version": "0.11.17",
+  "version": "0.11.18",
   "manifest_version": 2,
   "minimum_chrome_version": "28",
   "description": "__MSG_appDesc__",
