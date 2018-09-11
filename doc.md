@@ -1,7 +1,9 @@
 # My Webrequest Doc
 
 ## Data structure
+
 ### Custom rule
+
 ```js
 // { [rule-url-match-pattern]: [rule-detail] }
 [
@@ -39,8 +41,10 @@
 ```
 
 ### Normal rule
+
 ```js
-[{
+;[
+  {
     id: 'xxxx',
     // rule is active or not
     enabled: true,
@@ -48,5 +52,13 @@
     url: '*://www.baidu.com/s*',
     createdAt: 1509113934778,
     updatedAt: 1509113934778
-}]
+  }
+]
+```
+
+### RegExp Rule Sample
+
+```Regexp
+^http:\/\/www\.baidu\.com\/(\w+)\/$
+^(.+):(\w+)\/\/www\.baidu\.com\/(\w+)\/$
 ```
