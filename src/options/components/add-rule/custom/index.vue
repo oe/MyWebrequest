@@ -98,10 +98,9 @@ export default {
   methods: {
     validateMatchURL (rule, value, cb) {
       try {
-        console.log('validateMatchURL', value)
         const matchURL = this.form.matchURL.trim()
-        validate.checkCustomMatchRule(matchURL)
-        const matchMeta = cstRule.getMatchMeta(matchURL, true)
+        validate.checkCustomMatchRule(matchURL, this.form.useReg)
+        const matchMeta = cstRule.getMatchMeta(matchURL, true, this.form.useReg)
         const ignoreID = this.isUpdate && this.ruleID
         if (!ignoreID && this.isRuleExist(matchMeta.url)) {
           throw new Error('ruleExists')
@@ -116,7 +115,7 @@ export default {
     },
     validateRedirectURL (rule, value, cb) {
       try {
-        validate.checkCustomRedirectRule(value, this.form.matchURL)
+        validate.checkCustomRedirectRule(value, this.form.matchURL, this.form.useReg)
         return cb()
       } catch (e) {
         cb(e)
@@ -275,7 +274,7 @@ export default {
     },
     getRouter () {
       try {
-        return cstRule.getRouter(this.form.matchURL, this.form.redirectURL)
+        return cstRule.getRouter(this.form.matchURL, this.form.redirectURL, this.form.useReg)
       } catch (error) {
         console.log(error)
       }

@@ -93,7 +93,8 @@ function getMatchMetaFromStr (route, noParamsInRedirect) {
   if (result.hasWdCd) {
     // remove the first * in path and the following
     const reg = route.replace(/(?<=(\w\/[^*?]*))(\*.*)$/, '')
-    result.wdCdReg = '^' + reg.replace(/\{[^}]+\}/g, '.+').replace(/\*/g, '.*')
+    result.wdCdReg =
+      '^' + reg.replace(/\{[^}]+\}/g, '[^/?&=]+').replace(/\*/g, '.*')
   }
 
   result.hasQs = !!qs
@@ -136,8 +137,13 @@ function getMatchMetaFromStr (route, noParamsInRedirect) {
 }
 
 function getMatchMetaFromReg (route) {
-  console.log('sss')
-  return {}
+  const result = {
+    params: utils.getMatchRuleParams(route, true),
+    reg: route,
+    url: utils.convertReg2ChromeRule(route)
+  }
+
+  return result
 }
 
 export default {

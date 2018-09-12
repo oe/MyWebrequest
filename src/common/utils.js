@@ -117,6 +117,10 @@ export default {
       res[v] = matches[k + 1] || ''
     }
 
+    if (r.useReg) {
+      res['$0'] = url
+    }
+
     // get query string values
     if (r.hasQs) {
       let qsParams = this.parseQs(this.getQs(url))

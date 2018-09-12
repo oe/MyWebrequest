@@ -188,7 +188,7 @@ function checkCustomMatchStrRule (url) {
   if (/((\{[^}]+\}){2,})/.test(url)) {
     throw utils.createError('no-continuous-param', RegExp.$1)
   }
-  const qs = cmpts[3]
+  const qs = cmpts[4]
   if (qs) {
     // ?{named} or &{named}, not allowd
     if (/[?&](\{[^}]+\})/.test(qs)) {
@@ -228,6 +228,7 @@ function checkCustomMatchRegRule (reg) {
   checkReg(reg)
   if (!/^\^/.test(reg)) throw utils.createError('regrule-should-start-caret')
   if (!/\$$/.test(reg)) throw utils.createError('regrule-should-end-dollar')
+  checkChromeRule(utils.convertReg2ChromeRule(reg))
 }
 
 function checkCustomRedirectRule (redirectURL, matchURL, useReg) {
@@ -253,7 +254,7 @@ function checkCustomRedirectRule (redirectURL, matchURL, useReg) {
       throw utils.createError('star-shouldbe-end-redirect')
     }
   }
-  const rparams = utils.getParamsList(redirectURL)
+  const rparams = utils.getMatchRuleParams(redirectURL, useReg)
   const notFound = rparams.filter(p => mparams.indexOf(p) === -1)
   if (notFound.length) {
     throw utils.createError('undefined-params-in-redirect', notFound)

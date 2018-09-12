@@ -1,5 +1,5 @@
 // import VueI18n from 'vue-i18n'
-import utils from '@/options/components/helper/utils'
+// import utils from '@/options/components/helper/utils'
 import validate from '@/options/components/helper/validate'
 import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
@@ -37,25 +37,26 @@ export default {
   methods: {
     ...mapActions(['addRule', 'isRuleNeedTest']),
     onPaste (e) {
-      let url = e.clipboardData.getData('text/plain')
-      try {
-        const isCustom = this.$options.name === 'custom'
-        // remove hash
-        url = url.replace(/#.*$/, '')
-        utils.testURLRuleValid(url, isCustom)
-        const parts = utils.getURLParts(url)
-        if (!parts) return
-        this.form.protocol = parts[1]
-        const host = parts[2]
-        const pathname = (parts[3] || '') + (parts[4] || '')
-        this.form.url = host + (pathname || '')
-        // if test url is empty and url is valid url, use url as test url
-        if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
-        e.preventDefault()
-      } catch (e) {
-        // statements
-        console.log(e)
-      }
+      console.log(e)
+      // let url = e.clipboardData.getData('text/plain')
+      // try {
+      //   const isCustom = this.$options.name === 'custom'
+      //   // remove hash
+      //   url = url.replace(/#.*$/, '')
+      //   utils.testURLRuleValid(url, isCustom)
+      //   const parts = utils.getURLParts(url)
+      //   if (!parts) return
+      //   this.form.protocol = parts[1]
+      //   const host = parts[2]
+      //   const pathname = (parts[3] || '') + (parts[4] || '')
+      //   this.form.url = host + (pathname || '')
+      //   // if test url is empty and url is valid url, use url as test url
+      //   if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
+      //   e.preventDefault()
+      // } catch (e) {
+      //   // statements
+      //   console.log(e)
+      // }
     },
     onAddRule () {},
     async resetRuleForm () {

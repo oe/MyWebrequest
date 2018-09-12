@@ -45,9 +45,9 @@ function convertReg2ChromeRule (regStr) {
   return (
     rule
       // replace repeated special char to *
-      .replace(/(?<!\\)((\\[swdSWD]|\.)(\*|\+|\?|\{\d+(,(\d+)?)?\})?)/, '\\*')
+      .replace(/(?<!\\)((\\[swdSWD]|\.)(\*|\+|\?|\{\d+(,(\d+)?)?\})?)/g, '\\*')
       // remove /
-      .replace(/\//g, '')
+      .replace(/\\/g, '')
       // replace continuous * to one *
       .replace(/\*+/g, '*')
   )
@@ -129,7 +129,7 @@ function normalizeRegRule (regStr) {
  */
 function getRegGroupCount (regStr) {
   // count group count, ignore un-captured & escaped
-  const matches = regStr.match(/(?<!(\\|\[[^]*))\((?!\?:)/g)
+  const matches = regStr.match(/(?<!(\\|\[[^]*))\((?!\?)/g)
   return (matches && matches.length) || 0
 }
 
@@ -151,9 +151,9 @@ function getMatchRuleParams (url, useReg) {
   if (useReg) {
     // RegExp only got properties $0 ~ $9
     const total = Math.min(9, getRegGroupCount(url))
-    return Array.apply(null, Array(total))
-      .map((u, i) => '$' + (i + 1))
-      .push('$0')
+    const params = Array.apply(null, Array(total)).map((u, i) => '$' + (i + 1))
+    params.push('$0')
+    return params
   }
   return getParamsList(url)
 }
