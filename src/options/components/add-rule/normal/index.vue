@@ -8,7 +8,7 @@
       <el-checkbox v-model="needTest">I'd like to test my rule</el-checkbox>      
     </template>
     <el-input
-      v-model="form.url"
+      v-model="form.matchURL"
       @paste.native="onPaste"
       @keyup.native.enter="onAddRule"
       ref="firstInput"
@@ -16,6 +16,7 @@
       spellcheck="false"
       v-popover:urlPopover
       placeholder="url, required, paste a url here" >
+      <template slot="prepend" v-if="module==='hsts'">http://</template>
       <el-button v-if="!ruleID && !needTest" slot="append" @click="onAddRule">
         {{$t('addRuleBtn')}}
       </el-button>
@@ -26,7 +27,7 @@
     <el-input
       autocorrect="off"
       spellcheck="false"
-      v-model="form.testUrl"
+      v-model="form.testURL"
       placeholder="choose protocol" >
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
@@ -56,7 +57,6 @@
 </template>
 
 <script>
-import utils from '@/options/components/helper/utils'
 import validate from '@/options/components/helper/validate'
 import { mapActions } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
@@ -70,14 +70,14 @@ export default {
     return {
       disableProtocol: false,
       form: {
-        url: '',
-        testUrl: '',
+        matchURL: '',
+        testURL: '',
         testResult: ''
       },
       validateRules: {
         // by default, validator wont trigger on input blur
-        url: { validator: this.validateURL, trigger: 'none' },
-        testUrl: { validator: this.validateTestURL, trigger: 'none' },
+        matchURL: { validator: this.validateURL, trigger: 'none' },
+        testURL: { validator: this.validateTestURL, trigger: 'none' },
         testResult: { validator: this.validateTestResult, trigger: 'none' }
       },
       needTest: false,
@@ -115,19 +115,13 @@ export default {
       // this.isUpdate = true
       // const isValid = this.$refs.ruleForm.validate()
       // if (!isValid) return
-      const pattern = this.form.url.trim()
-      const isMatch = validate.isURLMatchPattern(this.form.testUrl, pattern)
+      const pattern = this.form.matchURL.trim()
+      const isMatch = validate.isURLMatchPattern(this.form.testURL, pattern)
       isMatch ? cb() : cb(new Error('notMatch'))
       // console.log('isMatch', isMatch)
     },
     async onTestRule () {
       this.$refs.ruleForm.validate()
-      // this.isUpdate = true
-      // const isValid = this.$refs.ruleForm.validate()
-      // if (!isValid) return
-      // const pattern = this.form.protocol + '://' + this.form.url
-      // const isMatch = utils.isURLMatchPattern(this.form.testUrl, pattern)
-      // console.log('isMatch', isMatch)
     },
     async onAddRule () {
       this.isUpdate = false
@@ -164,11 +158,7 @@ export default {
       if (this.ruleID) {
         const rule = this.getRuleByID(this.ruleID)
         if (rule) {
-          const parts = utils.getURLParts(rule.url)
-          if (parts) {
-            this.form.protocol = parts[1]
-            this.form.url = parts[2] + parts[3] + (parts[4] || '')
-          }
+          this.form.matchURL = rule.url
         }
       }
       if (isHsts) this.form.protocol = 'http'
@@ -181,7 +171,7 @@ export default {
      * @return {String}          validated rule
      */
     validateRule (data, ignoreID) {
-      let url = data.url.trim()
+      let url = data.matchURL.trim()
       validate.checkChromeRule(url)
       if (!ignoreID && this.isRuleExist(url)) throw new Error('ruleExists')
       // test for duplicated match rule

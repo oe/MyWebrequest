@@ -103,7 +103,7 @@ export default {
         const matchMeta = cstRule.getMatchMeta(matchURL, true, this.form.useReg)
         const ignoreID = this.isUpdate && this.ruleID
         if (!ignoreID && this.isRuleExist(matchMeta.url)) {
-          throw new Error('ruleExists')
+          throw utils.createError('rule-exists')
         }
         this.isRuleIntersect(matchMeta.url, ignoreID)
         cb()

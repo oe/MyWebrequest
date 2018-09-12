@@ -37,26 +37,38 @@ export default {
   methods: {
     ...mapActions(['addRule', 'isRuleNeedTest']),
     onPaste (e) {
-      console.log(e)
-      // let url = e.clipboardData.getData('text/plain')
-      // try {
-      //   const isCustom = this.$options.name === 'custom'
-      //   // remove hash
-      //   url = url.replace(/#.*$/, '')
-      //   utils.testURLRuleValid(url, isCustom)
-      //   const parts = utils.getURLParts(url)
-      //   if (!parts) return
-      //   this.form.protocol = parts[1]
-      //   const host = parts[2]
-      //   const pathname = (parts[3] || '') + (parts[4] || '')
-      //   this.form.url = host + (pathname || '')
-      //   // if test url is empty and url is valid url, use url as test url
-      //   if (!this.form.testUrl && utils.isURL(url)) this.form.testUrl = url
-      //   e.preventDefault()
-      // } catch (e) {
-      //   // statements
-      //   console.log(e)
-      // }
+      let url = e.clipboardData.getData('text/plain')
+      try {
+        const target = e.target
+        const selected = target.value.substring(
+          target.selectionStart,
+          target.selectionEnd
+        )
+        // input has value & selected is equal to the value
+        if (target.value && target.value !== selected) {
+          return
+        }
+        // remove hash
+        url = url.replace(/#.*$/, '')
+        validate.checkURL(url)
+        e.preventDefault()
+
+        let matchURL = url
+        // remove protocol for hsts
+        if (this.module === 'hsts') {
+          matchURL = url.replace(/^\w+:\/\//, '')
+        }
+        this.form.matchURL = matchURL
+        // if has selected text, deselect it
+        if (selected) {
+          target.focus()
+        }
+        // if test url is empty and url is valid url, use url as the test url
+        if (!this.form.testURL) this.form.testURL = url
+      } catch (e) {
+        // statements
+        console.warn('url invalid', e)
+      }
     },
     onAddRule () {},
     async resetRuleForm () {
