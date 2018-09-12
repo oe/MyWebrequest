@@ -78,9 +78,9 @@ export default {
       selectionStart: 0,
       form: {
         useReg: false,
-        matchURL: 'https://itunes.apple.com/us/*',
-        redirectURL: 'https://itunes.apple.com/cn/*',
-        testUrl: 'https://itunes.apple.com/us/app/wechat/id414478124?mt=8',
+        matchURL: '',
+        redirectURL: '',
+        testUrl: '',
         testResult: ''
       },
       validateRules: {
@@ -121,39 +121,34 @@ export default {
         cb(e)
       }
     },
-    validateTestURL (rule, value, cb) {
-      console.log('validateTestURL', value)
-      try {
-        validate.checkURL(value)
-        cb()
-      } catch (error) {
-        cb(error)
-      }
-    },
     validateTestResult (rule, value, cb) {
-      let router
       try {
-        router = cutils.preprocessRouter(this.getRouter())
+        const router = cutils.preprocessRouter(this.getRouter())
+        let result = validate.isURLMatchPattern(this.form.testUrl, router.url)
+        if (!result) throw utils.createError('testurl-not-match-rule')
+        result = cutils.getTargetUrl(router, this.form.testUrl)
+        if (!result) {
+          throw utils.createError('cannt-get-target-url')
+        }
+        try {
+          validate.checkURL(result)
+        } catch (error) {
+          throw utils.createError('target-url-not-valid', result)
+        }
+        this.form.testResult = result
+        cb()
       } catch (e) {
         return cb(e)
       }
-      let result = validate.isURLMatchPattern(this.form.testUrl, router.url)
-      if (result) {
-        result = cutils.getTargetUrl(router, this.form.testUrl)
-      }
-      if (!result) return cb(new Error('testUrlNotMatch'))
-      this.form.testResult = result
-      cb()
     },
     resetForm () {
       this.clearForm()
       if (this.ruleID) {
         const rule = this.getRuleByID(this.ruleID)
+        console.warn('rule', rule)
         if (rule) {
-          const matchs = utils.getURLParts(rule.matchUrl)
-          this.form.protocol = matchs[1]
-          this.form.url = matchs[2] + matchs[3] + (matchs[4] || '')
-          this.form.redirectURL = rule.redirectURL
+          this.form.matchURL = rule.matchUrl
+          this.form.redirectURL = rule.redirectUrl
         }
       }
     },

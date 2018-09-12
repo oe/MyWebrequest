@@ -150,7 +150,8 @@ function init () {
   window.updateQR = updateQR
   const div = document.createElement('div')
   div.setAttribute('style', 'all: initial;')
-  document.body.appendChild(div)
+  // prepend div to avoid html is still loading
+  document.body.insertBefore(div, document.body.firstChild)
   let shadowRoot
   if (div.attachShadow) {
     shadowRoot = div.attachShadow({ mode: 'closed' })

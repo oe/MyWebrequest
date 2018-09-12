@@ -6,7 +6,7 @@ const VER_KEY = 'version'
 function storeGet (key) {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get(key, resp => {
-      console.warn('get key', key, resp, chrome.runtime.lastError)
+      // console.warn('get key', key, resp, chrome.runtime.lastError)
       if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
       key ? resolve(resp[key]) : resolve(resp)
     })

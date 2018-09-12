@@ -1,6 +1,6 @@
 <template>
 <el-form  label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
-  <el-form-item class="form-item-url" prop="url" size="small">
+  <el-form-item class="form-item-url" prop="matchURL" size="small">
     <template slot="label">
       <div slot="label">
         {{$t('matchLbl')}}
@@ -23,7 +23,7 @@
 
     </el-input>
   </el-form-item>
-  <el-form-item v-show="needTest" size="small" label="Test your rule" prop="testUrl">
+  <el-form-item v-show="needTest" size="small" label="Test your rule" prop="testURL">
     <el-input
       autocorrect="off"
       spellcheck="false"
@@ -58,9 +58,9 @@
 
 <script>
 import validate from '@/options/components/helper/validate'
+import utils from '@/options/components/helper/utils'
 import { mapActions } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
-// import locales from './locales.json'
 const lang = mergeLang({})
 
 export default {
@@ -97,30 +97,24 @@ export default {
         this.validateRule(this.form, this.isUpdate && this.ruleID)
         cb()
       } catch (e) {
-        console.log(e)
-        // return cb(new Error(this.$t('qrMakeMacBtn')))
         return cb(e)
-      }
-    },
-    validateTestURL (rule, value, cb) {
-      console.log('validateTestURL', value)
-      try {
-        if (!this.needTest || validate.checkURL(value)) return cb()
-      } catch (error) {
-        cb(error)
       }
     },
     validateTestResult (rule, value, cb) {
       if (!this.needTest) cb()
-      // this.isUpdate = true
-      // const isValid = this.$refs.ruleForm.validate()
-      // if (!isValid) return
-      const pattern = this.form.matchURL.trim()
-      const isMatch = validate.isURLMatchPattern(this.form.testURL, pattern)
-      isMatch ? cb() : cb(new Error('notMatch'))
-      // console.log('isMatch', isMatch)
+      try {
+        this.validateRule(this.form, this.isUpdate && this.ruleID)
+        this.checkTestURL(this.form.testURL)
+        const pattern = this.form.matchURL.trim()
+        const isMatch = validate.isURLMatchPattern(this.form.testURL, pattern)
+        if (!isMatch) throw utils.createError('testurl-not-match-rule')
+        cb()
+      } catch (e) {
+        cb(e)
+      }
     },
-    async onTestRule () {
+    onTestRule () {
+      console.log('on test rule')
       this.$refs.ruleForm.validate()
     },
     async onAddRule () {
@@ -146,8 +140,8 @@ export default {
         this.clearForm()
         return true
       } catch (e) {
-        this.showInputError('Same rule has already added')
         console.error('failed', e)
+        this.showInputError('Same rule has already added')
         return false
       }
     },
@@ -172,6 +166,15 @@ export default {
      */
     validateRule (data, ignoreID) {
       let url = data.matchURL.trim()
+      if (!url) {
+        throw utils.createError('rule-empty')
+      }
+      if (this.module === 'hsts') {
+        if (/^(\w+:\/\/)/.test(url)) {
+          throw utils.createError('should-haveno-protocol', RegExp.$1)
+        }
+        url = 'http://' + url
+      }
       validate.checkChromeRule(url)
       if (!ignoreID && this.isRuleExist(url)) throw new Error('ruleExists')
       // test for duplicated match rule

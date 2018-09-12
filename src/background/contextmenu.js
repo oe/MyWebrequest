@@ -60,7 +60,9 @@ function onMenuClick (info, tab) {
   chrome.storage.local.set({ 'qr-menu': data })
   console.log('qr-menu', data)
   chrome.tabs.executeScript(tab.id, {
-    file: '/content-scripts/qr.js'
+    file: '/content-scripts/qr.js',
+    // execute js ASAP, make QR feature available even before page loaded
+    runAt: 'document_start'
   })
 }
 

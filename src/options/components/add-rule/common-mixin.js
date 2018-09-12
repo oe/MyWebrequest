@@ -1,5 +1,5 @@
 // import VueI18n from 'vue-i18n'
-// import utils from '@/options/components/helper/utils'
+import utils from '@/options/components/helper/utils'
 import validate from '@/options/components/helper/validate'
 import { mapActions, mapState } from 'vuex'
 import locales from './locales.json'
@@ -70,7 +70,25 @@ export default {
         console.warn('url invalid', e)
       }
     },
+    checkTestURL (url) {
+      const val = url.trim()
+      if (!val) {
+        throw utils.createError('test-url-empty')
+      }
+      if (typeof this.needTest !== 'boolean' || this.needTest) {
+        validate.checkURL(val)
+      }
+    },
+    validateTestURL (rule, value, cb) {
+      try {
+        this.checkTestURL(value)
+        cb()
+      } catch (error) {
+        cb(error)
+      }
+    },
     onAddRule () {},
+    resetForm () {},
     async resetRuleForm () {
       this.resetForm()
       this.$refs.ruleForm && this.$refs.ruleForm.clearValidate()
@@ -81,7 +99,6 @@ export default {
     },
     clearForm () {
       this.$refs.ruleForm && this.$refs.ruleForm.resetFields()
-      this.form.protocol = this.module === 'hsts' ? 'http' : '*'
     },
     isRuleExist (rule) {
       const url = typeof rule === 'object' ? rule.url : rule
@@ -90,15 +107,10 @@ export default {
     isRuleIntersect (url, ignoreID) {
       this.rules.some(rule => {
         if (ignoreID && rule.id === ignoreID) return false
-        let err
         if (validate.isSubRule(rule.url, url)) {
-          err = new Error('ruleBeIncluded')
+          throw utils.createError('rule-be-included', rule)
         } else if (validate.isSubRule(url, rule.url)) {
-          err = new Error('ruleIncludOthers')
-        }
-        if (err) {
-          err.rule = rule
-          throw err
+          throw utils.createError('rule-include-others', rule)
         }
       })
     },
@@ -123,8 +135,6 @@ export default {
         const diffs = Object.keys(newVal).filter(k => {
           return newVal[k] !== original[k]
         })
-        if (diffs.includes('protocol')) diffs.push('url')
-
         const validateRules = this.validateRules
         Object.keys(validateRules).forEach(k => {
           if (k === 'trigger') return

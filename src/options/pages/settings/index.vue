@@ -1,20 +1,22 @@
 <template>
-<div>
+<div class="page-settings">
   <titlebar></titlebar>
   <div class="item-title">Extension icon style</div>
-  <el-radio-group size="mini" v-model="iconStyle" @click.native="onIconStyleClick" class="icon-style-group">
+  <el-radio-group size="mini" v-model="iconStyle" @click.native="onIconStyleClick">
     <div class="icon-colored js-icon">
       <el-radio label="colored" border>
         Colored</el-radio>      
     </div>
     <div class="icon-grey js-icon">
       <el-radio label="grey" border>
-        </span>Grey</el-radio>      
+        Grey</el-radio>      
     </div>
   </el-radio-group>
   <div class="item-title">Show QR Contextmenu</div>
-  <img src="/static/images/qr-menu.png">
-  <el-checkbox v-model="showQrMenu">Enable ContextMenu</el-checkbox>
+  <div class="icon-qrmenu js-icon" @click="onIconStyleClick">
+    <el-checkbox v-model="showQrMenu" border size="mini">
+      Enable ContextMenu</el-checkbox>
+  </div>
   <div class="item-title">Data Backup / Restore</div>
   <div class="backup-restore">
     <div class="actions">
@@ -95,11 +97,23 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
-.icon-style-group {
-  .el-radio {
-    border-radius: 1em;
+.page-settings {
+  .el-radio,
+  .el-checkbox {
+    border-radius: 1em !important;
+    background-color: #fff;
+    position: relative;
+    top: 100%;
+    transform: translateY(-50%);
   }
-  .icon-grey, .icon-colored {
+
+  // .el-checkbox {
+  //   padding: 6px;
+  //   height: auto;
+  // }
+  .icon-grey,
+  .icon-colored,
+  .icon-qrmenu {
     display: inline-block;
     position: relative;
     width: 150px;
@@ -110,13 +124,6 @@ export default {
     margin-right: 20px;
     background-repeat: no-repeat;
     background-size: 100%;
-
-    .el-radio {
-      background-color: #fff;
-      position: relative;
-      top: 100%;
-      transform: translateY(-50%);
-    }
   }
   .icon-colored {
     background-image: url(/static/images/colored-icon-samp.png);
@@ -124,12 +131,16 @@ export default {
   .icon-grey {
     background-image: url(/static/images/grey-icon-samp.png);
   }
-}
-
-.backup-restore {
-  a {
-    text-decoration: underline;
-    cursor: pointer;
+  .icon-qrmenu {
+    width: 300px;
+    height: 200px;
+    background-image: url(/static/images/qr-menu.png);
+  }
+  .backup-restore {
+    a {
+      text-decoration: underline;
+      cursor: pointer;
+    }
   }
 }
 </style>
