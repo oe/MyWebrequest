@@ -111,7 +111,7 @@ function getMatchMetaFromStr (route, noParamsInRedirect) {
         return '([^/?]+)'
       }
     })
-    .replace('*', '.*')
+    .replace(/\*/g, '.*')
   result.reg = `^${protocol}:\\/\\/${part}(?:\\?(.*))?`
   result.params = params
 
