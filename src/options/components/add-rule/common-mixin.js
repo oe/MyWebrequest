@@ -71,11 +71,11 @@ export default {
       }
     },
     checkTestURL (url) {
-      const val = url.trim()
-      if (!val) {
-        throw utils.createError('test-url-empty')
-      }
-      if (typeof this.needTest !== 'boolean' || this.needTest) {
+      if (typeof this.needTest === 'undefined' || this.needTest) {
+        const val = url.trim()
+        if (!val) {
+          throw utils.createError('test-url-empty')
+        }
         validate.checkURL(val)
       }
     },
@@ -150,6 +150,10 @@ export default {
         })
       },
       deep: true
+    },
+    ruleID (newVal, oldVal) {
+      // update rule form when ruleID changed
+      if (oldVal) this.resetRuleForm()
     }
   }
 }

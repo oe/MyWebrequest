@@ -19,17 +19,22 @@ function checkProtocol (protocol) {
  * @param  {String}  url
  */
 function checkURL (url) {
-  const u = new URL(url)
-  // some invalid http url has empty host // with valid host
-  u.host && checkProtocol(u.protocol.replace(/:$/, ''))
-  let wurl = url
-  if (u.pathname === '/') {
-    // if url is http://evecalm.com then pathname should be '/'
-    //  added / to support this condition
-    wurl = url.replace(/\/$/, '') + '/'
-  }
-  // contains no special chars
-  if (u.href !== wurl) {
+  try {
+    const u = new URL(url)
+    // some invalid http url has empty host // with valid host
+    u.host && checkProtocol(u.protocol.replace(/:$/, ''))
+    let wurl = url
+    if (u.pathname === '/') {
+      // if url is http://evecalm.com then pathname should be '/'
+      //  added / to support this condition
+      wurl = url.replace(/\/$/, '') + '/'
+    }
+    // contains no special chars
+    if (u.href !== wurl) {
+      throw new Error(`${u.href} not match with ${wurl}`)
+    }
+  } catch (e) {
+    console.log(e)
     throw utils.createError('invalid-url', url)
   }
 }

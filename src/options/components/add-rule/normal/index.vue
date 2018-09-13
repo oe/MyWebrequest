@@ -93,7 +93,6 @@ export default {
     ...mapActions(['toggleRuleTest']),
     validateURL (rule, value, cb) {
       try {
-        console.log('validateURL', value)
         this.validateRule(this.form, this.isUpdate && this.ruleID)
         cb()
       } catch (e) {
@@ -101,7 +100,7 @@ export default {
       }
     },
     validateTestResult (rule, value, cb) {
-      if (!this.needTest) cb()
+      if (!this.needTest) return cb()
       try {
         this.validateRule(this.form, this.isUpdate && this.ruleID)
         this.checkTestURL(this.form.testURL)

@@ -145,10 +145,10 @@ export default {
       this.clearForm()
       if (this.ruleID) {
         const rule = this.getRuleByID(this.ruleID)
-        console.warn('rule', rule)
         if (rule) {
           this.form.matchURL = rule.matchUrl
           this.form.redirectURL = rule.redirectUrl
+          this.form.useReg = !!rule.useReg
         }
       }
     },
