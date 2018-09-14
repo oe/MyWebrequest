@@ -24,7 +24,7 @@
     "qrcodeDesc": "Generate QRcode",
     "settingsDesc": "Extension settings",
     "helpDesc": "Something maybe useful for you",
-    "logDesc": "Help U inspecting the webrequests<a class='help-icon' href=\"#help/help-log\"></a>",
+    "logDesc": "Help U inspecting the webrequests",
     "tip-tag-name": "{tag}-en"
   },
   "zh-cn": {

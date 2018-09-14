@@ -15,7 +15,7 @@
       autocorrect="off"
       spellcheck="false"
       v-popover:urlPopover
-      placeholder="url, required, paste a url here" >
+      :placeholder="$t('match-rule-ph')" >
       <template slot="prepend" v-if="module==='hsts'">http://</template>
       <el-button v-if="!ruleID && !needTest" slot="append" @click="onAddRule">
         {{$t('addRuleBtn')}}
@@ -28,7 +28,7 @@
       autocorrect="off"
       spellcheck="false"
       v-model="form.testURL"
-      placeholder="choose protocol" >
+      :placeholder="$t('test-url-ph')" >
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
@@ -61,7 +61,8 @@ import validate from '@/options/components/helper/validate'
 import utils from '@/options/components/helper/utils'
 import { mapActions } from 'vuex'
 import mixin, { mergeLang } from '../common-mixin'
-const lang = mergeLang({})
+import locales from './locales.json'
+const lang = mergeLang(locales)
 
 export default {
   locales: lang,
@@ -205,7 +206,7 @@ export default {
     display: -webkit-box;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 32px;
     word-break: break-all;
     padding: 0 4px;
     -webkit-line-clamp: 2;

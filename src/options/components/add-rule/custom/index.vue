@@ -8,7 +8,7 @@
       ref="firstInput"
       autocorrect="off"
       spellcheck="false"
-      placeholder="choose protocol" >
+      :placeholder="form.useReg ? $t('reg-match-rule-ph') : $t('nor-match-rule-ph')" >
       <el-switch v-model="form.useReg" slot="append" active-text="use regexp"></el-switch>
     </el-input>
   </el-form-item>
@@ -21,7 +21,7 @@
       ref="redirectInput"
       v-model="form.redirectURL"
       :fetch-suggestions="querySearch"
-      placeholder="choose protocol"
+      :placeholder="form.useReg ? $t('reg-redirect-rule-ph') : $t('nor-redirect-rule-ph')"
       :debounce="0"
       :trigger-on-focus="false"
       @keyup.native="onRedirectKeyup"
@@ -39,7 +39,7 @@
       autocorrect="off"
       spellcheck="false"
       v-model="form.testUrl"
-      placeholder="choose protocol" >
+      :placeholder="$t('test-url-ph')" >
       <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
     </el-input>
   </el-form-item>
@@ -157,7 +157,6 @@ export default {
       this.$refs.redirectInput.debouncedGetData(this.form.redirectURL)
     },
     onTestRule () {
-      console.log('teset rule')
       this.$refs.ruleForm.validate()
     },
     async onAddRule () {
@@ -245,7 +244,7 @@ export default {
         utils.RESERVED_HOLDERS.map(k => {
           return {
             value: k,
-            label: this.$t('param_' + k)
+            label: this.$t('param-' + k)
           }
         })
       )
@@ -268,11 +267,11 @@ export default {
       return true
     },
     getRouter () {
-      try {
-        return cstRule.getRouter(this.form.matchURL, this.form.redirectURL, this.form.useReg)
-      } catch (error) {
-        console.log(error)
-      }
+      return cstRule.getRouter(
+        this.form.matchURL,
+        this.form.redirectURL.trim(),
+        this.form.useReg
+      )
     }
   }
 }

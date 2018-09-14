@@ -221,23 +221,22 @@ function checkCustomMatchStrRule (url) {
 }
 
 /**
- * whether redirecturl has no params
- * @param  {String}  redirectUrl
- * @return {Boolean}
- */
-function isRedirectHasNoParams (redirectUrl) {
-  return !/\{[^}]+\}/.test(redirectUrl) && !/\*/.test(redirectUrl)
-}
-
-/**
  * is custom match rule (regexp rule)
  * @param  {String}  reg
  */
 function checkCustomMatchRegRule (reg) {
   checkReg(reg)
   if (!/^\^/.test(reg)) throw utils.createError('regrule-should-start-caret')
-  if (!/\$$/.test(reg)) throw utils.createError('regrule-should-end-dollar')
   checkChromeRule(utils.convertReg2ChromeRule(reg))
+}
+
+/**
+ * whether redirecturl has no params
+ * @param  {String}  redirectUrl
+ * @return {Boolean}
+ */
+function isRedirectHasNoParams (redirectUrl) {
+  return !/\{[^}]+\}/.test(redirectUrl) && !/\*/.test(redirectUrl)
 }
 
 function checkCustomRedirectRule (redirectURL, matchURL, useReg) {

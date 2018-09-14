@@ -26,7 +26,9 @@ const queryStrReg = /([^=]+)=\{([^?]*)\}/g
  *                 }
  */
 function getRouter (matchUrl, redirectUrl, useReg) {
-  let route = matchUrl
+  matchUrl = matchUrl.trim()
+  redirectUrl = redirectUrl.trim()
+  let route = matchUrl.trim()
   // remove hash
   if (!useReg) route = matchUrl.replace(/(#[^#]*)?$/, '')
   validate.checkCustomMatchRule(route, useReg)

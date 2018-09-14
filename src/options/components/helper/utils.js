@@ -108,7 +108,7 @@ function replaceRegGroup (regStr, replaceStr) {
 }
 
 /**
- * trim reg rule & add ^& if not exists
+ * trim reg rule & add ^ if not exists
  * @param  {string} reg
  * @return {string}
  */
@@ -116,9 +116,6 @@ function normalizeRegRule (regStr) {
   regStr = regStr.trim()
   if (!/^\^/.test(regStr)) {
     regStr = '^' + regStr
-  }
-  if (!/\$$/.test(regStr)) {
-    regStr += '$'
   }
   return regStr
 }

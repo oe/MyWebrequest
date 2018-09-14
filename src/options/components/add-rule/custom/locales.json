@@ -1,20 +1,28 @@
 {
   "en": {
-    "param_p": "protocol(without ://)",
-    "param_h": "host(including port)",
-    "param_m": "top level domain(without port)",
-    "param_r": "pathname(without leading \"/\")",
-    "param_q": "querystring",
-    "param_u": "url itself",
-    "param_start": "everything after the first star in path"
+    "reg-match-rule-ph": "use a regexp as match rule, e.g. ^http:\\/\\/.*\\/.abc\\.com\\/(\\\\w+)\\/.*",
+    "nor-match-rule-ph": "use a normal template as match rule, e.g. *://*.abc.com/{cat}/*",
+    "nor-redirect-rule-ph": "template string, can use param names defined in match rule above, e.g. https://{*.abc.com}/{cat}/*",
+    "reg-redirect-rule-ph": "template string, can use regexp group match in above regexp, e.g. https://abc.com/{$1}/*",
+    "param-p": "protocol(without ://)",
+    "param-h": "host(including port)",
+    "param-m": "top level domain(without port)",
+    "param-r": "pathname(without leading \"/\")",
+    "param-q": "querystring",
+    "param-u": "url itself",
+    "param-start": "everything after the first star in path"
   },
   "zh-cn": {
-    "param_p": "协议(不包含 ://)",
-    "param_h": "域名(包括端口)",
-    "param_m": "主域名(不包括端口)",
-    "param_r": "路径(不包括首位的 \"/\")",
-    "param_q": "查询字符串",
-    "param_u": "链接本身",
-    "param_start": "路径中*后边的部分"
+    "reg-match-rule-ph": "使用正在表达式作为匹配规则, 例如 ^http:\\/\\/.*\\/.abc\\.com\\/(\\\\w+)\\/.*",
+    "nor-match-rule-ph": "使用普通字符串模板作为匹配规则, 例如 *://*.abc.com/{cat}/*",
+    "nor-redirect-rule-ph": "模板字符串, 可以使用上述规则定义的参数, 例如 https://{*.abc.com}/{cat}/*",
+    "reg-redirect-rule-ph": "模板字符串, 可以使用上述正则匹配的分组作为参数, 例如 https://abc.com/{$1}/*",
+    "param-p": "协议(不包含 ://)",
+    "param-h": "域名(包括端口)",
+    "param-m": "主域名(不包括端口)",
+    "param-r": "路径(不包括首位的 \"/\")",
+    "param-q": "查询字符串",
+    "param-u": "链接本身",
+    "param-start": "路径中*后边的部分"
   }
 }
