@@ -57,6 +57,7 @@ const mutations = {
         id: cutils.guid(),
         createdAt: now,
         updatedAt: now,
+        valid: true,
         enabled: true
       },
       rule

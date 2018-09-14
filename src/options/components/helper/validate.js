@@ -86,6 +86,10 @@ function checkChromeRule (url) {
   const cmpts = isValidUrlFormat(url)
   checkProtocol(cmpts[1])
   const host = cmpts[2]
+  // top level domain should be alphabet letters
+  if (/[^.\d]/.test(host) && /\.?(\d+)$/.test(host)) {
+    throw utils.createError('toplevel-shouldbe-alphabet-inhost', RegExp.$1)
+  }
   // if host contains star *
   if (/\*/.test(host)) {
     // star should be the first char in host

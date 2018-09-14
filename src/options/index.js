@@ -75,6 +75,9 @@ for (var key in locales) {
   }
 }
 Vue.prototype.$message = Message
+Vue.prototype.$getTipTagName = function (tag) {
+  return this.$t('tip-tag-name', {tag})
+}
 
 Vue.component('titlebar', titlebar)
 

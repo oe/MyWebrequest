@@ -1,19 +1,6 @@
 import collection from '@/common/collection'
 import cutils from '@/common/utils'
-
-// data version
-const VER = '1.0'
-const VER_KEY = 'version'
-
-async function needToUpdate () {
-  const version = await collection.get(VER_KEY)
-  return version !== VER
-}
-
-async function afterUpdate () {
-  await collection.save(VER_KEY, VER)
-  // localStorage.clear()
-}
+import validate from './validate'
 
 async function migrateSimpleRules () {
   const simpleRules = ['block', 'hsts', 'hotlink', 'log']
@@ -29,10 +16,18 @@ async function migrateSimpleRules () {
     // no rules
     if (!rules.length) continue
     rules = rules.map(item => {
+      let valid = false
+      try {
+        validate.checkChromeRule()
+        valid = true
+      } catch(e) {
+        console.log(`${key} rule ${item} is invalid`, e)
+      }
       return {
         url: item,
+        valid,
         id: cutils.guid(),
-        enabled: true,
+        enabled: valid && true,
         createdAt: 0,
         updatedAt: 0
       }
@@ -88,13 +83,13 @@ async function migrate () {
 
 export default async function () {
   try {
-    const needUpdate = await needToUpdate()
-    if (!needUpdate) {
+    const isUp2data = await collection.isExtUpdate()
+    if (isUp2data) {
       console.info('[migrate] no need to migrate')
       return
     }
     await migrate()
-    await afterUpdate()
+    await collection.setExtUp2Date()
   } catch (e) {
     console.error('[migrate]failed to migrate old data from localStorage', e)
   }

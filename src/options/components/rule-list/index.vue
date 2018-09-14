@@ -19,6 +19,7 @@
       width="80">
       <template slot-scope="scope">
         <el-switch
+          :disabled="!scope.row.valid"
           v-model="scope.row.enabled"
           @click.native.capture="onToggleRule($event, scope)"></el-switch>
       </template>
@@ -35,7 +36,7 @@
         <template v-else>{{ scope.row.url}}</template>
       </template>
     </el-table-column>
-    <el-table-column 
+    <el-table-column                                                                
       :label="$t('actions')"
       align="center"
       width="120">
@@ -43,7 +44,7 @@
         <el-button
           size="mini"
           @click="onEditItem(scope)"
-          type="text">{{$t('edit')}}</el-button>
+          type="text">{{$t(scope.row.valid ? 'edit' : 'fix')}}</el-button>
 
         <el-button
           size="mini"
@@ -72,6 +73,7 @@ export default {
       this.removeSelectedRows(ids)
     },
     onToggleRule (e, scope) {
+      if (!scope.row.valid) return
       e.preventDefault()
       this.toggleRule(scope.row.id)
     },

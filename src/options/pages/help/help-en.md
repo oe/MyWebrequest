@@ -11,7 +11,7 @@ If you are a developer familiar with frontend technology, you may check out [ext
 It tools a lot of my personal time into this project, if you like it, I'm appreciated if you make some donate.
 <div class="donate">
 
-<a class="donate-item" href="https://www.buymeacoffee.com/evecalm" class="">
+<a class="donate-item" href="https://www.buymeacoffee.com/evecalm" target="_blank">
     <figure>
         <img alt="buy me a coffee" src="/static/donate/buymeacoffee.jpg">
         <figcaption>Donate with Paypal/Creditcard</figcaption>

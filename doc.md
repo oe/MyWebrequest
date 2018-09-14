@@ -12,6 +12,8 @@
     id: 'xxxx',
     // rule is enabled or not
     enabled: true,
+    // if this rule is valid from migration
+    valid: true,
     // original match url
     matchUrl: '*://www.baidu.com/s?wd={kwd}',
     // original redirect url
@@ -48,6 +50,8 @@
     id: 'xxxx',
     // rule is active or not
     enabled: true,
+    // if this rule is valid from migration
+    valid: true,
     // original match url pattern
     url: '*://www.baidu.com/s*',
     createdAt: 1509113934778,

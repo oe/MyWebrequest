@@ -27,7 +27,7 @@ function storeSet (key, val) {
 export default {
   async isExtUpdate () {
     let result = await storeGet(VER_KEY)
-    return result !== VER
+    return result === VER
   },
   async setExtUp2Date () {
     await storeSet(VER_KEY, VER)
@@ -67,7 +67,7 @@ export default {
   async getRouter4Custom () {
     // ignore disabled
     let result = await this.get('custom')
-    result = result.filter(itm => itm.enabled)
+    result = result.filter(itm => itm.enabled && itm.valid)
     return result.reduce((acc, cur) => {
       try {
         cur = utils.preprocessRouter(cur)
@@ -87,7 +87,7 @@ export default {
     let result = await this.get(cat)
     if (!utils.isUrlRuleType(cat)) return result
     // ignore disabled
-    result = result.filter(itm => itm.enabled)
+    result = result.filter(itm => itm.enabled && itm.valid)
     return result.map(itm => itm.url)
   }
 }

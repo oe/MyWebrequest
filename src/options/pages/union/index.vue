@@ -1,6 +1,14 @@
 <template>
 <div>
-  <titlebar></titlebar>
+  <titlebar>
+    <el-popover
+      v-if="helpTipTag"
+      width="400"
+      placement="top">
+      <component :is="helpTipTag" />
+      <a class="el-icon-info" slot="reference" ></a>
+    </el-popover>
+  </titlebar>
   <el-checkbox
     v-model="isEnabled"
     :disabled="disabled"
@@ -36,7 +44,9 @@ import utils from '@/options/components/helper/utils'
 import CustomForm from '@/options/components/add-rule/custom'
 import NormalForm from '@/options/components/add-rule/normal'
 import { mapState, mapGetters } from 'vuex'
+import Helps from './help-tips/'
 import locales from './locales.json'
+
 export default {
   locales,
   data () {
@@ -51,7 +61,8 @@ export default {
   components: {
     RuleList,
     CustomForm,
-    NormalForm
+    NormalForm,
+    ...Helps
   },
   async created () {
     await this.updateModule()
@@ -66,6 +77,10 @@ export default {
     }),
     formType () {
       return this.module === 'custom' ? 'CustomForm' : 'NormalForm'
+    },
+    helpTipTag () {
+      const tagName = this.module.charAt(0).toUpperCase() + this.module.slice(1) + 'Help'
+      return Helps[tagName] && tagName
     }
   },
   methods: {
@@ -154,6 +169,12 @@ export default {
 
 <style lang="scss">
 @import '~@/common/base';
+.el-popover__reference {
+  font-size: 16px;
+  text-decoration: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
 .rule-dialog {
   .el-dialog__body {
     padding-top: 0;

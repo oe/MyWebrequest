@@ -85,9 +85,6 @@ export default {
       isHiding: false
     }
   },
-  mounted () {
-    window.ff = this
-  },
   // components: {TestResult},
   methods: {
     ...mapActions(['toggleRuleTest']),
@@ -140,7 +137,7 @@ export default {
         return true
       } catch (e) {
         console.error('failed', e)
-        this.showInputError('Same rule has already added')
+        // this.showInputError('Same rule has already added')
         return false
       }
     },

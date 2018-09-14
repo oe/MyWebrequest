@@ -8,6 +8,7 @@
     "rule": "Rule",
     "actions": "Actions",
     "edit": "Edit",
+    "fix": "Fix",
     "delete": "Delete"
   },
   "zh-cn": {
@@ -19,6 +20,7 @@
     "rule": "规则",
     "actions": "操作",
     "edit": "编辑",
+    "fix": "修正",
     "delete": "删除"
   }
 }
