@@ -1,5 +1,13 @@
+// urls protocols starts with http, https, file & ftp
+//    protocols chrome, chrome-extension and so on wont match
+const ALL_URL_PTTRNS = [
+  '*://*/*',
+  'file://*/*',
+  'ftp://*/*'
+]
+
 // add context menu
-function addMenu () {
+function add (menuItems) {
   console.warn('add menu')
   // for selected text
   chrome.contextMenus.create({
@@ -7,7 +15,8 @@ function addMenu () {
     title: chrome.i18n.getMessage('menuTextTitle'),
     type: 'normal',
     contexts: ['selection'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
+    documentUrlPatterns: ALL_URL_PTTRNS
+    // documentUrlPatterns: ['http://*/*', 'https://*/*']
   })
 
   // for a tag
@@ -16,7 +25,8 @@ function addMenu () {
     title: chrome.i18n.getMessage('menuLinkTitle'),
     type: 'normal',
     contexts: ['link'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
+    documentUrlPatterns: ALL_URL_PTTRNS
+    // documentUrlPatterns: ['http://*/*', 'https://*/*']
   })
 
   // for image, video, audio
@@ -25,16 +35,26 @@ function addMenu () {
     title: chrome.i18n.getMessage('menuMediaTitle'),
     type: 'normal',
     contexts: ['image', 'video', 'audio'],
-    documentUrlPatterns: ['http://*/*', 'https://*/*']
+    documentUrlPatterns: ALL_URL_PTTRNS
+    // documentUrlPatterns: ['http://*/*', 'https://*/*']
   })
 
   chrome.contextMenus.onClicked.addListener(onMenuClick)
 }
 
 // remove all context menu
-function removeMenu () {
+function removeAll () {
   console.warn('remove menu')
   chrome.contextMenus.removeAll()
+}
+
+function remove (ids) {
+  if (!Array.isArray(ids)) ids = [ids]
+  ids.forEach(id => chrome.contextMenus.remove(id))
+}
+
+function update (id, newConfig) {
+  chrome.contextMenus.remove(id)
 }
 
 function onMenuClick (info, tab) {
@@ -67,6 +87,8 @@ function onMenuClick (info, tab) {
 }
 
 export default {
-  addMenu,
-  removeMenu
+  add,
+  remove,
+  update,
+  removeAll
 }

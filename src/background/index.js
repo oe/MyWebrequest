@@ -418,7 +418,7 @@ async function init () {
   const config = await collection.get('config')
   updateExtIcon(config.iconStyle)
   if (config.showQrMenu) {
-    menu.addMenu()
+    menu.add()
   }
 }
 
@@ -431,7 +431,7 @@ async function handleKeyChange (key, newVal, oldVal) {
         updateExtIcon(newVal.iconStyle)
       }
       if (newVal.showQrMenu !== oldVal.showQrMenu) {
-        newVal.showQrMenu ? menu.addMenu() : menu.removeMenu()
+        newVal.showQrMenu ? menu.add() : menu.removeAll()
       }
       return
     }

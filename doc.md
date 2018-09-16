@@ -4,65 +4,102 @@
 
 ### Custom rule
 
-```js
-// { [rule-url-match-pattern]: [rule-detail] }
-[
-  // rule url match pattern
-  {
-    id: 'xxxx',
+```ts
+interface ICustomRule {
+    id: string
     // rule is enabled or not
-    enabled: true,
+    enabled: boolean
     // if this rule is valid from migration
-    valid: true,
+    valid: boolean
+    // is match url is a regexp
+    useReg: boolean
     // original match url
-    matchUrl: '*://www.baidu.com/s?wd={kwd}',
+    // '*://www.baidu.com/s?wd={kwd}'
+    matchUrl: string
     // original redirect url
-    redirectUrl: 'https://www.google.com.hk/search?q={kwd}',
+    // 'https://www.google.com.hk/search?q={kwd}'
+    redirectUrl: string
     // match pattern for chrome
-    url: '*://www.baidu.com/s*',
+    // '*://www.baidu.com/s*',
+    url: string
     // whether need to parse query string
-    hasQs: true,
+    hasQs: boolean
     // whether need to deal with wildcard param
-    hasWdCd: true,
+    hasWdCd: boolean
     // regexp to get wildcard param's value
-    wdCdReg: '^http:\\/\\/www\\.baidu\\.com'
+    // '^http:\\/\\/www\\.baidu\\.com'
+    wdCdReg: string
     // regex to match the rule
-    reg: '^\\w+:\\/\\/www\\.baidu\\.com\\/s(?:\\?(.*))?',
+    // '^\\w+:\\/\\/www\\.baidu\\.com\\/s(?:\\?(.*))?'
+    reg: string
     // path or domain params in rule which wrapped by `{` and `}`
-    params: [],
+    params: string[]
     // query string params
     // key: orginal querystring key
     // value: param name
     qsParams: {
-      wd: 'kwd'
+      [k: string]: string
     },
-    createdAt: 1509113934778,
-    updatedAt: 1509113934778
-  }
-]
+    createdAt: number
+    updatedAt: number
+    
+}
 ```
 
 ### Normal rule
 
-```js
-;[
-  {
-    id: 'xxxx',
+```ts
+interface INormalRule {
+    id: string
     // rule is active or not
-    enabled: true,
+    enabled: boolean
     // if this rule is valid from migration
-    valid: true,
+    valid: boolean
     // original match url pattern
-    url: '*://www.baidu.com/s*',
-    createdAt: 1509113934778,
-    updatedAt: 1509113934778
-  }
-]
+    // '*://www.baidu.com/s*',
+    url: string
+    createdAt: number
+    updatedAt: number
+}
 ```
 
-### RegExp Rule Sample
+### Contextmenu Rule
 
-```Regexp
-^http:\/\/www\.baidu\.com\/(\w+)\/$
-^(.+):(\w+)\/\/www\.baidu\.com\/(\w+)\/$
+```ts
+enum EContextType {
+    "page",
+    "selection",
+    "link",
+    "image",
+    "video",
+    "audio"
+}
+
+enum EMenuAction {
+    // convert content to markdown
+    "convert2markdown",
+    // get qrcode of the content
+    "genQrcode",
+    // open the an assembled schema
+    "openScheme"
+}
+
+interface IMenuRule {
+    // menu id
+    id: string
+    // menu title
+    title: string
+    // menu context
+    contexts: EContextType[]
+    // only show menu when document url match following patterns
+    documentUrlPatterns?: string[]
+    // only show menu when media(audio/video/img) src or
+    //     anchor href match the following patterns
+    targetUrlPatterns?: string[]
+    // action of when click the menu item
+    action: EMenuAction
+    // content assembled pattern
+    //     `${selectedText}`
+    content: string
+}
 ```
