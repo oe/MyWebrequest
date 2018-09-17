@@ -1,9 +1,16 @@
 import qs from 'qs'
 import i18n from './i18n'
 
+const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
+
 // const arrType = ['block', 'hsts', 'hotlink', 'log', 'custom']
 
 export default {
+  isURLMatchPattern (url, pattern) {
+    let reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
+    reg = RegExp('^' + reg + '$')
+    return reg.test(url)
+  },
   // get a UUID
   guid () {
     function s4 () {
