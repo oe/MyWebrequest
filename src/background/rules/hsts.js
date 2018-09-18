@@ -1,9 +1,5 @@
 // import utils from '@/common/utils'
-import common from './common'
-
-const defaultRules = {
-  urls: []
-}
+import RuleProcessor from './common'
 
 const webrequests = [
   {
@@ -17,13 +13,6 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('hsts', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  webrequests,
-  defaultRules
-}
+export default new RuleProcessor('hsts', {
+  webrequests
+})

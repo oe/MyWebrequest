@@ -1,14 +1,10 @@
 import utils from '@/common/utils'
 import clonedeep from 'lodash.clonedeep'
-import common from './common'
+import RuleProcessor from './common'
 
 const logger = window.console
 
 let logNum = 0
-
-const defaultRules = {
-  urls: []
-}
 
 const requestCache = {}
 
@@ -79,20 +75,11 @@ const webrequests = [
       )
       delete requestCache[rid]
     },
-    // dependence requests
-    deps: ['logBody'],
     permit: ['requestHeaders'],
     on: 'onSendHeaders'
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('log', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  webrequests,
-  defaultRules
-}
+export default new RuleProcessor('log', {
+  webrequests
+})

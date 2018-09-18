@@ -35,27 +35,6 @@ const pushNotification = (function () {
   return notify
 })()
 
-// toggle rule on or off
-async function toggleRule (type, rule, isOn) {
-  const ruleConfig = appRules[type]
-  if (!ruleConfig) return
-  if (ruleConfig.webrequests && ruleConfig.webrequests.length) {
-    if (ruleConfig.updateConfig) await ruleConfig.updateConfig(isOn)
-
-    const len = ruleConfig.webrequests.length
-    for (let i = 0; i < len; i++) {
-      const requestConfig = ruleConfig.webrequests[i]
-      const action = isOn ? 'addListener' : 'removeListener'
-      // if (!isOn && requestConfig.cache) requestConfig.cache = null
-      chrome.webRequest[requestConfig.on][action](
-        requestConfig.fn,
-        rule,
-        requestConfig.permit
-      )
-    }
-  }
-}
-
 // update extension ico near location bar
 function updateExtIcon (iconStyle) {
   if (iconStyle !== 'grey') iconStyle = ''
@@ -73,35 +52,19 @@ function updateExtIcon (iconStyle) {
 async function init () {
   console.warn('init all settings')
   const onoff = await collection.getData4Bg('onoff')
-  let len = RULE_TYPES.length
-  let type
   console.warn('init', onoff, RULE_TYPES)
-  while (len--) {
-    type = RULE_TYPES[len]
-    if (!onoff[type]) {
-      onoff[type] = false
-      continue
-    }
-    const ruleConfig = appRules[type]
-    const rule = await ruleConfig.getRule()
-    if (!rule) {
-      onoff[type] = false
-      continue
-    }
-
-    if (type === 'log') {
-      pushNotification(
-        utils.i18n('bg_logison'),
-        utils.i18n('bg_logon_tip'),
-        'log-enabled-hint',
-        function () {
-          window.open('/options/index.html#/log')
-        }
-      )
-    }
-    await toggleRule(type, rule, true)
+  handleKeyChange('onoff', onoff)
+  const isLogOn = await collection.getOnoff('log')
+  if (isLogOn) {
+    pushNotification(
+      utils.i18n('bg_logison'),
+      utils.i18n('bg_logon_tip'),
+      'log-enabled-hint',
+      function () {
+        window.open('/options/index.html#/log')
+      }
+    )
   }
-  await collection.save('onoff', onoff)
   const config = await collection.get('config')
   updateExtIcon(config.iconStyle)
   if (config.showQrMenu) {
@@ -113,41 +76,46 @@ init()
 
 async function handleKeyChange (key, newVal, oldVal) {
   try {
-    if (key === 'config') {
-      if (newVal.iconStyle !== oldVal.iconStyle) {
-        updateExtIcon(newVal.iconStyle)
-      }
-      if (newVal.showQrMenu !== oldVal.showQrMenu) {
-        newVal.showQrMenu ? menu.add() : menu.removeAll()
-      }
-      return
-    }
-    if (key === 'onoff') {
-      let len = RULE_TYPES.length
-      while (len--) {
-        const k = RULE_TYPES[len]
-        if (newVal[k] === oldVal[k]) continue
-        const rule = await appRules[k].getRule()
-        console.log('onoff change, feature: %s turned %s', k, newVal[k])
-        if (!rule) {
-          console.log('disable feature because %s has no rule', k)
-          await collection.setOnoff(k, false)
-          return
+    switch (key) {
+      case 'config':
+        newVal = newVal || {}
+        oldVal = oldVal || {}
+        if (newVal.iconStyle !== oldVal.iconStyle) {
+          updateExtIcon(newVal.iconStyle)
         }
-        await toggleRule(k, rule, newVal[k])
-      }
-      return
+        if (newVal.showQrMenu !== oldVal.showQrMenu) {
+          newVal.showQrMenu ? menu.add() : menu.removeAll()
+        }
+        break
+      case 'onoff':
+        newVal = newVal || {}
+        oldVal = oldVal || {}
+        let len = RULE_TYPES.length
+        while (len--) {
+          const k = RULE_TYPES[len]
+          if (newVal[k] === oldVal[k]) continue
+          const rule = await appRules[k].getRule()
+          console.log('onoff change, feature: %s turned %s', k, newVal[k])
+          if (!rule) {
+            console.log('disable feature because %s has no rule', k)
+            await collection.setOnoff(k, false)
+            return
+          }
+          if (appRules[k]) {
+            await appRules[k].toggle(newVal[k])
+          }
+        }
+        break
+      default:
+        // const isEnabled = await collection.getOnoff(key)
+        if (!appRules[key]) return
+        await appRules[key].onChange(newVal, oldVal)
+      // if no rule, just turn off
+      // if (enabled === false) {
+      //   await collection.setOnoff(key, false)
+      //   return
+      // }
     }
-    const isEnabled = await collection.getOnoff(key)
-    if (!isEnabled) return
-    const rule = await appRules[key].getRule()
-    await toggleRule(key, rule, false)
-    // if no rule, just turn off
-    if (!rule) {
-      await collection.setOnoff(key, false)
-      return
-    }
-    await toggleRule(key, rule, true)
   } catch (error) {
     logger.warn(
       'values(' + newVal + '/' + oldVal + ') of ' + key + ' is invalid',
@@ -166,9 +134,8 @@ chrome.storage.onChanged.addListener(async function (changes, area) {
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i]
     const change = changes[key]
-    await handleKeyChange(key, change.newValue || {}, change.oldValue || {})
+    await handleKeyChange(key, change.newValue, change.oldValue)
   }
-  chrome.webRequest.handlerBehaviorChanged()
 })
 
 // on ext updated

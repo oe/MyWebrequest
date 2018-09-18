@@ -1,10 +1,7 @@
 import utils from '@/common/utils'
 import collection from '@/common/collection'
-import common from './common'
+import RuleProcessor from './common'
 
-const defaultRules = {
-  urls: []
-}
 // cache data for frequently usage
 let cachedRules = {}
 
@@ -40,14 +37,11 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('custom', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  updateCache,
+export default new RuleProcessor('custom', {
   webrequests,
-  defaultRules
-}
+  async toggle (isOn) {
+    const rule = await this._getRule()
+    this._toggleWebRequest(rule, isOn)
+    await updateCache(isOn)
+  }
+})

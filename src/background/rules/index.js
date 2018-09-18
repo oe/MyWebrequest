@@ -4,7 +4,8 @@ import hsts from './hsts'
 import block from './block'
 import hotlink from './hotlink'
 import log from './log'
-// import ua from './ua'
+import ua from './ua'
+import contextmenu from './contextmenu'
 
 export default {
   custom,
@@ -12,5 +13,7 @@ export default {
   hsts,
   block,
   hotlink,
-  log
+  log,
+  ua,
+  contextmenu
 }

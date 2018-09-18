@@ -1,8 +1,4 @@
-import common from './common'
-
-const defaultRules = {
-  urls: []
-}
+import RuleProcessor from './common'
 
 const webrequests = [
   {
@@ -17,13 +13,6 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('block', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  webrequests,
-  defaultRules
-}
+export default new RuleProcessor('block', {
+  webrequests
+})

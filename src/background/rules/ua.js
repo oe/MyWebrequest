@@ -1,28 +1,25 @@
 import utils from '@/common/utils'
-import collection from '@/common/collection'
-import common from './common'
+// import collection from '@/common/collection'
+import RuleProcessor, { removeHeaders } from './common'
 
-const defaultRules = {
-  urls: []
-}
 // cache data for frequently usage
 let cachedRules = {}
 
 // update cache
-async function updateCache (isOn) {
-  if (isOn) {
-    cachedRules = await collection.getRouter4Custom()
-  } else {
-    cachedRules = {}
-  }
-}
+// async function updateCache (isOn) {
+//   if (isOn) {
+//     cachedRules = await collection.getRouter4Custom()
+//   } else {
+//     cachedRules = {}
+//   }
+// }
 
 const webrequests = [
   {
     fn (details) {
       let found = false
       // remove referer
-      utils.removeHeaders(details.requestHeaders, 'User-Agent')
+      removeHeaders(details.requestHeaders, 'User-Agent')
       for (const k in cachedRules) {
         if (
           cachedRules.hasOwnProperty(k) &&
@@ -52,14 +49,6 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('ua', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  updateCache,
-  webrequests,
-  defaultRules
-}
+export default new RuleProcessor('log', {
+  webrequests
+})

@@ -1,16 +1,12 @@
-import utils from '@/common/utils'
-import common from './common'
-
-const defaultRules = {
-  urls: []
-}
+// import utils from '@/common/utils'
+import RuleProcessor, { removeHeaders } from './common'
 
 const webrequests = [
   {
     fn (details) {
       const headers = details.requestHeaders
       // remove referer
-      utils.removeHeaders(headers, 'Referer')
+      removeHeaders(headers, 'Referer')
       return {
         requestHeaders: headers
       }
@@ -20,13 +16,6 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('hotlink', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  webrequests,
-  defaultRules
-}
+export default new RuleProcessor('hotlink', {
+  webrequests
+})

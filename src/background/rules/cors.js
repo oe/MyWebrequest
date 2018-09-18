@@ -1,9 +1,6 @@
 import utils from '@/common/utils'
-import common from './common'
+import RuleProcessor, { removeHeaders } from './common'
 
-const defaultRules = {
-  urls: []
-}
 const corsRequestCache = {}
 const corsRequestRules = [
   {
@@ -22,7 +19,7 @@ const corsRequestRules = [
     name: 'X-DevTools-Emulate-Network-Conditions-Client-Id',
     fn (rule, header, details) {
       console.log('remove ', rule.name)
-      utils.removeHeaders(details.requestHeaders, rule.name)
+      removeHeaders(details.requestHeaders, rule.name)
     }
   },
   {
@@ -132,13 +129,6 @@ const webrequests = [
   }
 ]
 
-async function getRule () {
-  const rule = await common.getRule('cors', defaultRules)
-  return rule
-}
-
-export default {
-  getRule,
-  defaultRules,
+export default new RuleProcessor('cors', {
   webrequests
-}
+})
