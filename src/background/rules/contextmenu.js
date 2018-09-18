@@ -1,11 +1,15 @@
-import RuleProcessor from './common'
+import collection from '@/common/collection'
+import RuleProcessor, { isRuleEnabled } from './common'
+import TurndownService from 'turndown'
+
+let turndownService = new TurndownService()
 
 let cachedRules = []
 
 const ALL_URL_PTTRNS = ['*://*/*', 'file://*/*', 'ftp://*/*']
 
 const menuActions = {
-  qrcode (content, tab) {
+  genQrcode (content, tab) {
     const data = { content }
     chrome.storage.local.set({ 'qr-menu': data })
     console.log('qr-menu', data)
@@ -14,13 +18,51 @@ const menuActions = {
       // execute js ASAP, make QR feature available even before page loaded
       runAt: 'document_start'
     })
+  },
+  openScheme (content) {
+    chrome.tabs.create({ url: content }, () => {
+      if (chrome.runtime.lastError) {
+        console.warn(
+          `[menu-openScheme] failed to open ${content}`,
+          chrome.runtime.lastError
+        )
+      }
+    })
+  },
+  convert2md (content) {
+    if (!turndownService) {
+      turndownService = new TurndownService()
+    }
+    const markdown = turndownService.turndown(content)
+    copyText(markdown)
+    // TODO: copied
+    console.log('copied success')
   }
 }
 
-function updateCache (isOn) {
-  cachedRules = isOn ? {} : []
-  console.log('cachedRules', cachedRules)
+function copyText (content) {
+  document.oncopy = function (event) {
+    event.clipboardData.setData('plain/text', content)
+    event.preventDefault()
+  }
+  document.execCommand('copy', false, null)
 }
+
+// update cache
+async function updateCache (isOn) {
+  if (isOn) {
+    // ignore disabled
+    let result = await collection.get('contextmenu')
+    cachedRules = result.filter(isRuleEnabled).map(item => ({
+      id: item.id,
+      action: item.action,
+      content: item.content
+    }))
+  } else {
+    cachedRules = []
+  }
+}
+
 // remove all context menu
 function removeAll () {
   console.warn('remove menu')
@@ -52,7 +94,7 @@ function normalizeMenuConfig (item, withoutID) {
     contexts: item.contexts,
     documentUrlPatterns
   }
-  if (!withoutID) config.id = item.id
+  if (withoutID !== true) config.id = item.id
   return config
 }
 
@@ -81,7 +123,7 @@ function compareMenu (v1, v2) {
 // calc diff of new & old menuitems
 function diff (newVal, oldVal) {
   const nv = getMenuitemsDiggest(newVal)
-  const ov = getMenuitemsDiggest(newVal)
+  const ov = getMenuitemsDiggest(oldVal)
   let i = 0
   let j = 0
   const result = {
@@ -142,10 +184,16 @@ function onChange (newVal, oldVal) {
   result.updated.forEach(updateMenu)
 }
 
+async function getRule () {
+  let result = await collection.get('contextmenu')
+  // ignore disabled
+  return result.filter(isRuleEnabled).map(normalizeMenuConfig)
+}
+
 function toggle (isOn) {
   chrome.contextMenus.onClicked.removeListener(onMenuClick)
   if (isOn) {
-    const menuItems = []
+    const menuItems = getRule()
     menuItems.forEach(addMenu)
     chrome.contextMenus.onClicked.addListener(onMenuClick)
   } else {
@@ -155,34 +203,43 @@ function toggle (isOn) {
   this.enabled = isOn
 }
 
+function getParams (tab, info) {
+  return {
+    pageUrl: tab.url,
+    pageTitle: tab.title,
+    favIconUrl: tab.favIconUrl,
+    selectedText: info.selectedText,
+    linkUrl: info.linkUrl,
+    srcUrl: info.srcUrl,
+    selectedLink: info.linkUrl || info.srcUrl,
+    // should get by injected js
+    selectedHtml: info.selectedHtml,
+    pageText: info.pageText,
+    pageHtml: info.pageHtml
+  }
+}
+
+function getContent (contentPattern, tab, info) {
+  if (!/\{\w+\}/.test(contentPattern)) return contentPattern
+  const params = getParams(tab, info)
+  return contentPattern.replace(/\{(\w+)\}/g, ($0, $1) => {
+    return params[$1] || 0
+  })
+}
+
 function onMenuClick (info, tab) {
-  const data = {
-    time: Date.now(),
-    type: info.menuItemId
+  const matched = cachedRules.find(item => item.id === info.menuItemId)
+  if (!matched) {
+    console.warn('[menu-onMenuClick] can not find rule for', info)
+    return
   }
-  switch (info.menuItemId) {
-    case 'media':
-      data.content = info.srcUrl
-      break
-    case 'text':
-      data.content = info.selectionText
-      break
-    case 'link':
-      data.content = info.linkUrl
-      break
-    default:
-      console.warn('not support menu item', info)
-      return
+  const menuAction = menuActions[matched.action]
+  if (!menuAction) {
+    console.warn('[menu-onMenuClick] can not find menuAction for', matched)
+    return
   }
-  if (!data.content) return
-  menuActions.qrcode(data.content)
-  // chrome.storage.local.set({ 'qr-menu': data })
-  // console.log('qr-menu', data)
-  // chrome.tabs.executeScript(tab.id, {
-  //   file: '/content-scripts/qr.js',
-  //   // execute js ASAP, make QR feature available even before page loaded
-  //   runAt: 'document_start'
-  // })
+  const content = getContent(matched.content, info, tab)
+  menuAction(content, tab, info)
 }
 
 export default new RuleProcessor(

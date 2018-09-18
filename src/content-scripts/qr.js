@@ -115,11 +115,22 @@ const template = `
 </div>
 `
 
+function isURL (url) {
+  try {
+    /* eslint no-new: "off" */
+    new URL(url)
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
 let maskDom
 function updateQR () {
   chrome.storage.local.get('qr-menu', result => {
     let data = result['qr-menu']
-    maskDom[data.type === 'text' ? 'setAttribute' : 'removeAttribute'](
+
+    maskDom[isURL(data.content) ? 'setAttribute' : 'removeAttribute'](
       'is-text',
       ''
     )

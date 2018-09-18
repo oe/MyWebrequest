@@ -62,6 +62,25 @@ interface INormalRule {
 }
 ```
 
+### Ua rule
+
+```ts
+interface IUaRule {
+  id: string
+  // rule is active or not
+  enabled: boolean
+  // if this rule is valid from migration
+  valid: boolean
+  // original match url pattern
+  // '*://www.baidu.com/s*',
+  url: string
+  // change ua to string
+  ua: string
+  createdAt: number
+  updatedAt: number
+}
+```
+
 ### Contextmenu Rule
 
 ```ts
@@ -76,7 +95,7 @@ enum EContextType {
 
 enum EMenuAction {
   // convert content to markdown
-  'convert2markdown',
+  'convert2md',
   // get qrcode of the content
   'genQrcode',
   // open the an assembled schema
@@ -87,6 +106,7 @@ interface IMenuRule {
   // menu id
   id: string
   enabled: boolean
+  valid: boolean
   // menu title
   title: string
   // menu context

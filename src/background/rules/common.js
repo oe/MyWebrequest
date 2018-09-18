@@ -23,6 +23,14 @@ export function removeHeaders (headers, names) {
   }
 }
 
+/**
+ * is a rule valid
+ * @param {Object} item rule object
+ */
+export function isRuleEnabled (item) {
+  return item.enabled && item.valid
+}
+
 export default class RuleProcessor {
   constructor (name, options, notWebRequest) {
     this.name = name
@@ -35,16 +43,17 @@ export default class RuleProcessor {
     if (options.toggle) this._toggle = options.toggle
     if (options.onChange) this._onChange = options.onChange
   }
-  // get rule object by rule type
+  // get webrequest rule object by rule type
   async _getRule () {
-    console.warn('get rule type', this.name)
     // clone Depp to avoid urls duplication
     const rule = clonedeep(this._defaultRules)
     if (!rule) {
       console.warn('cant find rules of', this.name)
       return
     }
-    let urls = await collection.getData4Bg(this.name)
+    let urls = await collection.get(this.name)
+    // ignore disabled
+    urls = urls.filter(isRuleEnabled).map(itm => itm.url)
     rule.urls.push(...urls)
     console.warn(`all rules of ${this.name}`, rule.urls)
     // return rule of has urls
@@ -57,6 +66,8 @@ export default class RuleProcessor {
       this._toggle(isOn)
     } else if (this.isWebRequest) {
       const rule = await this._getRule()
+      // return false if set to on but no rule available
+      if (isOn && !rule) return false
       this._toggleWebRequest(rule, isOn)
       this.enabled = isOn
     } else {

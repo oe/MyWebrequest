@@ -67,6 +67,7 @@
     "lodash.debounce": "^4.0.8",
     "qrcode": "^0.8.1",
     "qs": "^6.5.1",
+    "turndown": "^5.0.1",
     "vue": ">2.2.6",
     "vue-i18n": "5",
     "vue-router": "^2.5.3",

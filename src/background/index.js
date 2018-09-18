@@ -1,6 +1,6 @@
 import utils from '@/common/utils'
 import collection from '@/common/collection'
-import menu from './contextmenu'
+// import menu from './contextmenu'
 import '../external/extension'
 import appRules from './rules'
 
@@ -51,9 +51,9 @@ function updateExtIcon (iconStyle) {
 
 async function init () {
   console.warn('init all settings')
-  const onoff = await collection.getData4Bg('onoff')
+  const onoff = await collection.get('onoff')
   console.warn('init', onoff, RULE_TYPES)
-  handleKeyChange('onoff', onoff)
+  await handleKeyChange('onoff', onoff)
   const isLogOn = await collection.getOnoff('log')
   if (isLogOn) {
     pushNotification(
@@ -67,9 +67,6 @@ async function init () {
   }
   const config = await collection.get('config')
   updateExtIcon(config.iconStyle)
-  if (config.showQrMenu) {
-    menu.add()
-  }
 }
 
 init()
@@ -83,38 +80,28 @@ async function handleKeyChange (key, newVal, oldVal) {
         if (newVal.iconStyle !== oldVal.iconStyle) {
           updateExtIcon(newVal.iconStyle)
         }
-        if (newVal.showQrMenu !== oldVal.showQrMenu) {
-          newVal.showQrMenu ? menu.add() : menu.removeAll()
-        }
         break
       case 'onoff':
         newVal = newVal || {}
-        oldVal = oldVal || {}
         let len = RULE_TYPES.length
         while (len--) {
           const k = RULE_TYPES[len]
-          if (newVal[k] === oldVal[k]) continue
-          const rule = await appRules[k].getRule()
+          console.log('handler rule', k, newVal, oldVal)
+          // rule is disabled on start
+          if (!oldVal && !newVal[k]) continue
+          // no change
+          if (oldVal && newVal[k] === oldVal[k]) continue
+          const enabled = await appRules[k].toggle(newVal[k])
           console.log('onoff change, feature: %s turned %s', k, newVal[k])
-          if (!rule) {
+          if (newVal[k] && enabled === false) {
             console.log('disable feature because %s has no rule', k)
             await collection.setOnoff(k, false)
-            return
-          }
-          if (appRules[k]) {
-            await appRules[k].toggle(newVal[k])
           }
         }
         break
       default:
-        // const isEnabled = await collection.getOnoff(key)
         if (!appRules[key]) return
         await appRules[key].onChange(newVal, oldVal)
-      // if no rule, just turn off
-      // if (enabled === false) {
-      //   await collection.setOnoff(key, false)
-      //   return
-      // }
     }
   } catch (error) {
     logger.warn(

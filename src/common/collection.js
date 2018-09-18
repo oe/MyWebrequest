@@ -64,30 +64,8 @@ export default {
   async setConfig (type, val) {
     await this.save('config', type, val)
   },
-  async getRouter4Custom () {
-    // ignore disabled
-    let result = await this.get('custom')
-    result = result.filter(itm => itm.enabled && itm.valid)
-    return result.reduce((acc, cur) => {
-      try {
-        cur = utils.preprocessRouter(cur)
-        acc[cur.url] = cur
-      } catch (e) {
-        console.error('custom rule invalid', cur, e)
-      }
-      return acc
-    }, {})
-  },
   async getExtensionData () {
     const result = await storeGet(null)
     return result
-  },
-  // get rules/config for background
-  async getData4Bg (cat) {
-    let result = await this.get(cat)
-    if (!utils.isUrlRuleType(cat)) return result
-    // ignore disabled
-    result = result.filter(itm => itm.enabled && itm.valid)
-    return result.map(itm => itm.url)
   }
 }

@@ -256,6 +256,7 @@ export default {
      */
     async addARule (ruleID) {
       let router = this.getRouter()
+      // update
       if (ruleID) {
         const rule = this.getRuleByID(ruleID)
         router = Object.assign({}, rule, router, {

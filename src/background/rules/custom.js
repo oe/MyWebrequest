@@ -1,36 +1,48 @@
 import utils from '@/common/utils'
 import collection from '@/common/collection'
-import RuleProcessor from './common'
+import RuleProcessor, { isRuleEnabled } from './common'
 
 // cache data for frequently usage
-let cachedRules = {}
+let cachedRules = []
 
 // update cache
 async function updateCache (isOn) {
   if (isOn) {
-    cachedRules = await collection.getRouter4Custom()
+    // ignore disabled
+    let result = await collection.get('custom')
+    result = result.filter(isRuleEnabled)
+    cachedRules = result
+      .map(item => {
+        try {
+          return utils.preprocessRouter(item)
+        } catch (e) {
+          console.error('custom rule invalid', item, e)
+        }
+      })
+      .filter(item => !!item)
   } else {
-    cachedRules = {}
+    cachedRules = []
   }
 }
 
 const webrequests = [
   {
     fn (details) {
-      let k, rule, url
-      const rules = cachedRules
-      for (k in rules) {
-        if (!rules.hasOwnProperty(k)) continue
-        rule = rules[k]
-        console.log('get target Url, rule: %o, url: %s', rule, details.url)
-        url = utils.getTargetUrl(rule, details.url)
-        console.log('then target url is: %s', url)
-        if (url) {
+      const url = details.url
+      let len = cachedRules.length
+      while (len--) {
+        const targetUrl = utils.getTargetUrl(cachedRules[len], details.url)
+        if (targetUrl) {
+          console.log(
+            `${url} target url is ${targetUrl}, with rule`,
+            cachedRules[len]
+          )
           return {
-            redirectUrl: url
+            redirectUrl: targetUrl
           }
         }
       }
+      console.log('can not find targe url for', url)
     },
     permit: ['blocking'],
     on: 'onBeforeRequest'
