@@ -8,33 +8,6 @@ const RULE_TYPES = utils.RULE_TYPES
 
 const logger = window.console
 
-const pushNotification = (function () {
-  const cbs = {}
-  const notify = function (title, content, notifiId, cb) {
-    notifiId = notifiId || ''
-    chrome.notifications.create(
-      notifiId,
-      {
-        type: 'basic',
-        iconUrl: '/static/icons/icon38.png',
-        title: title,
-        message: content
-      },
-      function () {}
-    )
-    if (notifiId && cb instanceof Function) {
-      cbs[notifiId] = cb
-    }
-  }
-  chrome.notifications.onClicked.addListener(function (nId) {
-    cbs[nId] && cbs[nId]()
-  })
-  chrome.notifications.onClosed.addListener(function (nId) {
-    delete cbs[nId]
-  })
-  return notify
-})()
-
 // update extension ico near location bar
 function updateExtIcon (iconStyle) {
   if (iconStyle !== 'grey') iconStyle = ''
@@ -56,14 +29,13 @@ async function init () {
   await handleKeyChange('onoff', onoff)
   const isLogOn = await collection.getOnoff('log')
   if (isLogOn) {
-    pushNotification(
-      utils.i18n('bg_logison'),
-      utils.i18n('bg_logon_tip'),
-      'log-enabled-hint',
-      function () {
+    utils.pushNotification({
+      title: utils.i18n('bg_logison'),
+      content: utils.i18n('bg_logon_tip'),
+      onclick: function () {
         window.open('/options/index.html#/log')
       }
-    )
+    })
   }
   const config = await collection.get('config')
   updateExtIcon(config.iconStyle)

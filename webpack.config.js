@@ -44,7 +44,8 @@ const config = {
     'background/index': ['./src/background/index.js'],
     'popup/index': ['./src/popup/index.js'],
     'options/index': ['./src/options/index.js'],
-    'content-scripts/qr': ['./src/content-scripts/qr.js']
+    'content-scripts/qr': ['./src/content-scripts/qr.js'],
+    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.js']
   },
   notHotReload: [],
   mode: process.env.NODE_ENV,

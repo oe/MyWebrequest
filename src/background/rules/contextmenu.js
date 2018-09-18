@@ -1,4 +1,5 @@
 import collection from '@/common/collection'
+import utils from '@/common/utils'
 import RuleProcessor, { isRuleEnabled } from './common'
 import TurndownService from 'turndown'
 
@@ -35,8 +36,13 @@ const menuActions = {
     }
     const markdown = turndownService.turndown(content)
     copyText(markdown)
-    // TODO: copied
-    console.log('copied success')
+    utils.pushNotification(
+      {
+        title: 'Copy success',
+        content: markdown.slice(50)
+      },
+      1500
+    )
   }
 }
 
@@ -203,25 +209,58 @@ function toggle (isOn) {
   this.enabled = isOn
 }
 
-function getParams (tab, info) {
-  return {
+async function getPageInfo (tab) {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.executeScript(
+      tab.id,
+      {
+        file: '/content-scripts/page-excerpt.js',
+        // execute js ASAP, make QR feature available even before page loaded
+        runAt: 'document_start'
+      },
+      result => {
+        if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
+        resolve(result)
+      }
+    )
+  })
+}
+
+async function getParams (tab, info, needPageInfo) {
+  const result = {
     pageUrl: tab.url,
     pageTitle: tab.title,
     favIconUrl: tab.favIconUrl,
     selectedText: info.selectedText,
     linkUrl: info.linkUrl,
     srcUrl: info.srcUrl,
-    selectedLink: info.linkUrl || info.srcUrl,
-    // should get by injected js
-    selectedHtml: info.selectedHtml,
-    pageText: info.pageText,
-    pageHtml: info.pageHtml
+    selectedLink: info.linkUrl || info.srcUrl
   }
+  let pageInfo = {}
+  if (needPageInfo) {
+    pageInfo = await getPageInfo(tab)
+  }
+  return Object.assign(result, pageInfo)
 }
 
-function getContent (contentPattern, tab, info) {
+const PAGE_VAR_NAME = [
+  'selectedHtml',
+  'pageText',
+  'pageHtml',
+  'articleHtml',
+  'articleText'
+]
+function isNeedPageInfo (contentPattern) {
+  let count = 0
+  contentPattern.replace(/\{(\w+)\}/g, ($0, $1) => {
+    if (PAGE_VAR_NAME.includes($1)) ++count
+  })
+  return !!count
+}
+
+async function getContent (contentPattern, tab, info) {
   if (!/\{\w+\}/.test(contentPattern)) return contentPattern
-  const params = getParams(tab, info)
+  const params = await getParams(tab, info, isNeedPageInfo(contentPattern))
   return contentPattern.replace(/\{(\w+)\}/g, ($0, $1) => {
     return params[$1] || 0
   })

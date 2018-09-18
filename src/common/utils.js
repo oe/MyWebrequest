@@ -4,8 +4,37 @@ import i18n from './i18n'
 const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
 
 // const arrType = ['block', 'hsts', 'hotlink', 'log', 'custom']
+const notifyCbs = {}
+let notifyIndex = 0
+chrome.notifications.onClicked.addListener(function (nId) {
+  notifyCbs[nId] && notifyCbs[nId]()
+})
+chrome.notifications.onClosed.addListener(function (nId) {
+  delete notifyCbs[nId]
+})
 
 export default {
+  pushNotification ({ title, content, onclick, timeout }) {
+    const notifyId = notifyIndex++
+    chrome.notifications.create(
+      notifyId,
+      {
+        type: 'basic',
+        iconUrl: '/static/icons/icon38.png',
+        title: title,
+        message: content
+      },
+      function () {}
+    )
+    if (onclick instanceof Function) {
+      notifyCbs[notifyId] = onclick
+    }
+    if (timeout) {
+      setTimeout(() => {
+        chrome.notifications.clear(notifyId)
+      }, timeout)
+    }
+  },
   isURLMatchPattern (url, pattern) {
     let reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
     reg = RegExp('^' + reg + '$')

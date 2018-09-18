@@ -154,11 +154,11 @@ function updateQR () {
   })
 }
 
-function init () {
-  if (window.updateQR) {
-    return window.updateQR()
+function main () {
+  if (window.__updateQR__) {
+    return window.__updateQR__()
   }
-  window.updateQR = updateQR
+  window.__updateQR__ = updateQR
   const div = document.createElement('div')
   div.setAttribute('style', 'all: initial;')
   // prepend div to avoid html is still loading
@@ -172,7 +172,7 @@ function init () {
   shadowRoot.innerHTML = template
   maskDom = shadowRoot.querySelector('.mwr-qr-mask')
   maskDom.addEventListener('click', onClickMask)
-  window.updateQR()
+  window.__updateQR__()
 }
 
 function onClickMask (e) {
@@ -207,4 +207,4 @@ function copyText (text, target) {
   }
 }
 
-init()
+main()
