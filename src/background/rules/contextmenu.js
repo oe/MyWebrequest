@@ -51,6 +51,22 @@ const testRules = [
     content: '{articleHtml}',
     createdAt: 123,
     updatedAt: 123
+  },
+  {
+    // menu id
+    id: 'aaaa2225',
+    enabled: true,
+    valid: true,
+    title: 'Convert Selected Content to Markdown',
+    contexts: ['selection'],
+    documentUrlPatterns: 'all_urls',
+    // targetUrlPatterns: ['*://*/*'],
+    action: 'convert2md',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: '{selectedHtml}',
+    createdAt: 123,
+    updatedAt: 123
   }
 ]
 

@@ -48,3 +48,5 @@ function main () {
     }
   })
 }
+
+main()
