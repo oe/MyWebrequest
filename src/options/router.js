@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import utils from '@/common/utils'
 
 import union from './pages/union'
 import help from './pages/help'
@@ -8,7 +9,7 @@ import settings from './pages/settings'
 
 Vue.use(VueRouter)
 // pages use union-component to show
-const UNION_PAGES = ['block', 'custom', 'hsts', 'hotlink', 'log', 'cors']
+const UNION_PAGES = utils.RULE_TYPES
 
 export default new VueRouter({
   routes: [

@@ -130,7 +130,7 @@ function updateQR () {
   chrome.storage.local.get('qr-menu', result => {
     let data = result['qr-menu']
 
-    maskDom[isURL(data.content) ? 'setAttribute' : 'removeAttribute'](
+    maskDom[isURL(data.content) ? 'removeAttribute' : 'setAttribute'](
       'is-text',
       ''
     )

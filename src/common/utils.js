@@ -14,18 +14,14 @@ chrome.notifications.onClosed.addListener(function (nId) {
 })
 
 export default {
-  pushNotification ({ title, content, onclick, timeout }) {
-    const notifyId = notifyIndex++
-    chrome.notifications.create(
-      notifyId,
-      {
-        type: 'basic',
-        iconUrl: '/static/icons/icon38.png',
-        title: title,
-        message: content
-      },
-      function () {}
-    )
+  pushNotification ({ id, title, content, onclick, timeout }) {
+    const notifyId = id || `${notifyIndex++}`
+    chrome.notifications.create(notifyId, {
+      type: 'basic',
+      iconUrl: '/static/icons/icon38.png',
+      title: title,
+      message: content
+    })
     if (onclick instanceof Function) {
       notifyCbs[notifyId] = onclick
     }
@@ -65,7 +61,16 @@ export default {
 
   // reg to match [protocol, host, path, query]
   urlComponentReg: /^([^:]+):\/\/([^/]+)(\/[^?]*)(\?(.*))?$/,
-  RULE_TYPES: ['custom', 'block', 'hsts', 'log', 'hotlink', 'cors'],
+  RULE_TYPES: [
+    'custom',
+    'block',
+    'hsts',
+    'log',
+    'hotlink',
+    'cors',
+    'ua',
+    'contextmenu'
+  ],
   // parse querystring to object
   parseQs: qs.parse,
   /**

@@ -1,7 +1,58 @@
-import collection from '@/common/collection'
+// import collection from '@/common/collection'
 import utils from '@/common/utils'
 import RuleProcessor, { isRuleEnabled } from './common'
 import TurndownService from 'turndown'
+
+const testRules = [
+  {
+    // menu id
+    id: 'aaaa2222',
+    enabled: true,
+    valid: true,
+    title: 'Get QrCode of Text',
+    contexts: ['selection'],
+    documentUrlPatterns: 'all_urls',
+    // targetUrlPatterns?: string[]
+    action: 'genQrcode',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: '{selectedText}',
+    createdAt: 123,
+    updatedAt: 123
+  },
+  {
+    // menu id
+    id: 'aaaa2223',
+    enabled: true,
+    valid: true,
+    title: 'Get QrCode of Link',
+    contexts: ['link', 'image', 'video', 'audio'],
+    documentUrlPatterns: 'all_urls',
+    targetUrlPatterns: ['*://*/*'],
+    action: 'genQrcode',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: '{selectedLink}',
+    createdAt: 123,
+    updatedAt: 123
+  },
+  {
+    // menu id
+    id: 'aaaa2224',
+    enabled: true,
+    valid: true,
+    title: 'Convert Page Content to Markdown',
+    contexts: ['page'],
+    documentUrlPatterns: 'all_urls',
+    // targetUrlPatterns: ['*://*/*'],
+    action: 'convert2md',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: '{articleHtml}',
+    createdAt: 123,
+    updatedAt: 123
+  }
+]
 
 let turndownService = new TurndownService()
 
@@ -35,20 +86,19 @@ const menuActions = {
       turndownService = new TurndownService()
     }
     const markdown = turndownService.turndown(content)
+    console.log('markdown content', markdown)
     copyText(markdown)
-    utils.pushNotification(
-      {
-        title: 'Copy success',
-        content: markdown.slice(50)
-      },
-      1500
-    )
+    utils.pushNotification({
+      id: 'copy-tip',
+      title: 'Copy success',
+      content: markdown.slice(0, 200)
+    })
   }
 }
 
 function copyText (content) {
   document.oncopy = function (event) {
-    event.clipboardData.setData('plain/text', content)
+    event.clipboardData.setData('text/plain', content)
     event.preventDefault()
   }
   document.execCommand('copy', false, null)
@@ -58,7 +108,8 @@ function copyText (content) {
 async function updateCache (isOn) {
   if (isOn) {
     // ignore disabled
-    let result = await collection.get('contextmenu')
+    // let result = await collection.get('contextmenu')
+    let result = testRules
     cachedRules = result.filter(isRuleEnabled).map(item => ({
       id: item.id,
       action: item.action,
@@ -89,16 +140,30 @@ function updateMenu (item) {
 
 function normalizeMenuConfig (item, withoutID) {
   const documentUrlPatterns =
-    item.documentUrlPatterns === true
+    item.documentUrlPatterns === 'all_urls'
       ? ALL_URL_PTTRNS
-      : Array.isArray(item.documentUrlPatterns)
-        ? item.documentUrlPatterns
-        : []
+      : item.documentUrlPatterns
+        ? Array.isArray(item.documentUrlPatterns)
+          ? item.documentUrlPatterns
+          : [item.documentUrlPatterns]
+        : item.documentUrlPatterns
+
+  const targetUrlPatterns = item.targetUrlPatterns
+    ? Array.isArray(item.targetUrlPatterns)
+      ? item.targetUrlPatterns
+      : [item.targetUrlPatterns]
+    : item.targetUrlPatterns
+
   const config = {
     title: item.title,
     type: 'normal',
-    contexts: item.contexts,
-    documentUrlPatterns
+    contexts: item.contexts
+  }
+  if (documentUrlPatterns) {
+    config.documentUrlPatterns = documentUrlPatterns
+  }
+  if (targetUrlPatterns) {
+    config.targetUrlPatterns = targetUrlPatterns
   }
   if (withoutID !== true) config.id = item.id
   return config
@@ -191,15 +256,22 @@ function onChange (newVal, oldVal) {
 }
 
 async function getRule () {
-  let result = await collection.get('contextmenu')
-  // ignore disabled
-  return result.filter(isRuleEnabled).map(normalizeMenuConfig)
+  // let result = await collection.get('contextmenu')
+  let result = testRules
+  if (result) {
+    // ignore disabled
+    return result.filter(isRuleEnabled).map(normalizeMenuConfig)
+  }
+  return []
 }
 
-function toggle (isOn) {
+async function toggle (isOn) {
+  console.log('contextmenu.js isOn', isOn)
   chrome.contextMenus.onClicked.removeListener(onMenuClick)
   if (isOn) {
-    const menuItems = getRule()
+    const menuItems = await getRule()
+    console.log('menu items', menuItems)
+    if (!menuItems || !menuItems.length) return false
     menuItems.forEach(addMenu)
     chrome.contextMenus.onClicked.addListener(onMenuClick)
   } else {
@@ -210,6 +282,7 @@ function toggle (isOn) {
 }
 
 async function getPageInfo (tab) {
+  console.log('get page info', tab)
   return new Promise((resolve, reject) => {
     chrome.tabs.executeScript(
       tab.id,
@@ -218,9 +291,9 @@ async function getPageInfo (tab) {
         // execute js ASAP, make QR feature available even before page loaded
         runAt: 'document_start'
       },
-      result => {
+      () => {
         if (chrome.runtime.lastError) return reject(chrome.runtime.lastError)
-        resolve(result)
+        chrome.tabs.sendMessage(tab.id, { cmd: 'get-excerpt' }, resolve)
       }
     )
   })
@@ -231,7 +304,7 @@ async function getParams (tab, info, needPageInfo) {
     pageUrl: tab.url,
     pageTitle: tab.title,
     favIconUrl: tab.favIconUrl,
-    selectedText: info.selectedText,
+    selectedText: info.selectionText,
     linkUrl: info.linkUrl,
     srcUrl: info.srcUrl,
     selectedLink: info.linkUrl || info.srcUrl
@@ -258,15 +331,17 @@ function isNeedPageInfo (contentPattern) {
   return !!count
 }
 
-async function getContent (contentPattern, tab, info) {
+async function getContent (contentPattern, info, tab) {
+  console.warn('getContent', ...arguments)
   if (!/\{\w+\}/.test(contentPattern)) return contentPattern
   const params = await getParams(tab, info, isNeedPageInfo(contentPattern))
+  console.warn('getContent params', params)
   return contentPattern.replace(/\{(\w+)\}/g, ($0, $1) => {
     return params[$1] || 0
   })
 }
 
-function onMenuClick (info, tab) {
+async function onMenuClick (info, tab) {
   const matched = cachedRules.find(item => item.id === info.menuItemId)
   if (!matched) {
     console.warn('[menu-onMenuClick] can not find rule for', info)
@@ -277,7 +352,7 @@ function onMenuClick (info, tab) {
     console.warn('[menu-onMenuClick] can not find menuAction for', matched)
     return
   }
-  const content = getContent(matched.content, info, tab)
+  const content = await getContent(matched.content, info, tab)
   menuAction(content, tab, info)
 }
 

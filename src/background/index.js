@@ -59,6 +59,7 @@ async function handleKeyChange (key, newVal, oldVal) {
         while (len--) {
           const k = RULE_TYPES[len]
           console.log('handler rule', k, newVal, oldVal)
+          if (k === 'contextmenu') newVal[k] = true
           // rule is disabled on start
           if (!oldVal && !newVal[k]) continue
           // no change

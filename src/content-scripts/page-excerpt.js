@@ -21,7 +21,8 @@ function getSelectedHtml () {
 }
 
 function getExcerpt () {
-  const article = new Readability(document).parse()
+  const documentClone = document.cloneNode(true)
+  const article = new Readability(documentClone).parse()
   const container = document.createElement('div')
   container.innerHTML = article.content
   return {
@@ -31,16 +32,19 @@ function getExcerpt () {
 }
 
 function getAll () {
-  return Object.assign(getExcerpt(), getSelectedHtml(), getPageBody())
+  return Object.assign(getExcerpt(), getPageBody(), {
+    selectedHtml: getSelectedHtml()
+  })
 }
 
 function main () {
-  if (window.__getPageAll__) {
-    return window.__getPageAll__()
+  if (window.__is_page_excerpt_inited__) {
+    return
   }
-  window.__getPageAll__ = getAll
-  return getAll()
+  window.__is_page_excerpt_inited__ = true
+  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.cmd === 'get-excerpt') {
+      sendResponse(getAll())
+    }
+  })
 }
-
-/* eslint no-undef: "off" */
-result = main()

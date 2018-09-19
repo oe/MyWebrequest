@@ -16,21 +16,12 @@
 </template>
 
 <script>
-
+import utils from '@/common/utils'
 export default {
   data () {
+    const items = [...utils.RULE_TYPES, 'qrcode', 'settings', 'help']
     return {
-      sidebarItems: [
-        'custom',
-        'block',
-        'hsts',
-        'hotlink',
-        'cors',
-        'log',
-        'qrcode',
-        'settings',
-        'help'
-      ]
+      sidebarItems: items
     }
   }
 }
