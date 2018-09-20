@@ -67,6 +67,22 @@ const testRules = [
     content: '{selectedHtml}',
     createdAt: 123,
     updatedAt: 123
+  },
+  {
+    // menu id
+    id: 'aaaa2226',
+    enabled: true,
+    valid: true,
+    title: 'Send Selected Text as Mail Content',
+    contexts: ['selection'],
+    documentUrlPatterns: 'all_urls',
+    // targetUrlPatterns: ['*://*/*'],
+    action: 'openScheme',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: 'mailto:abc@qq.com?body={selectedText}',
+    createdAt: 123,
+    updatedAt: 123
   }
 ]
 
@@ -105,9 +121,9 @@ const menuActions = {
     console.log('markdown content', markdown)
     copyText(markdown)
     utils.pushNotification({
-      id: 'copy-tip',
       title: 'Copy success',
-      content: markdown.slice(0, 200)
+      content: markdown.slice(0, 200),
+      timeout: 2000
     })
   }
 }
