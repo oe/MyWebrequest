@@ -83,6 +83,22 @@ const testRules = [
     content: 'mailto:abc@qq.com?body={selectedText}',
     createdAt: 123,
     updatedAt: 123
+  },
+  {
+    // menu id
+    id: 'aaaa2227',
+    enabled: true,
+    valid: true,
+    title: 'Copy Selected',
+    contexts: ['selection'],
+    documentUrlPatterns: 'all_urls',
+    // targetUrlPatterns: ['*://*/*'],
+    action: 'copy',
+    // content assembled pattern
+    //     `${selectedText}`
+    content: '{selectedText} \nfrom [{pageTitle}]({pageUrl})',
+    createdAt: 123,
+    updatedAt: 123
   }
 ]
 
@@ -123,6 +139,14 @@ const menuActions = {
     utils.pushNotification({
       title: 'Copy success',
       content: markdown.slice(0, 200),
+      timeout: 2000
+    })
+  },
+  copy (content) {
+    copyText(content)
+    utils.pushNotification({
+      title: 'Copy success',
+      content: content.slice(0, 200),
       timeout: 2000
     })
   }
@@ -331,21 +355,42 @@ async function getPageInfo (tab) {
   })
 }
 
-async function getParams (tab, info, needPageInfo) {
+async function getParams (tab, info, pattern) {
   const result = {
     pageUrl: tab.url,
     pageTitle: tab.title,
     favIconUrl: tab.favIconUrl,
-    selectedText: info.selectionText,
+    // selectedText: info.selectionText,
     linkUrl: info.linkUrl,
     srcUrl: info.srcUrl,
     selectedLink: info.linkUrl || info.srcUrl
   }
   let pageInfo = {}
-  if (needPageInfo) {
+  if (isNeedPageInfo(pattern)) {
     pageInfo = await getPageInfo(tab)
   }
+
+  if (pattern.indexOf('{selectedText}') !== -1) {
+    result.selectedText = await getSeletedTextWithNL()
+  }
+
   return Object.assign(result, pageInfo)
+}
+
+// get selected text with new line
+function getSeletedTextWithNL () {
+  return new Promise(resolve => {
+    chrome.tabs.executeScript(
+      {
+        code: 'window.getSelection().toString();'
+      },
+      function (selection) {
+        console.log('selection from code', selection)
+        // selected contains text including line breaks
+        resolve(selection[0])
+      }
+    )
+  })
 }
 
 const PAGE_VAR_NAME = [
@@ -366,7 +411,7 @@ function isNeedPageInfo (contentPattern) {
 async function getContent (contentPattern, info, tab) {
   console.warn('getContent', ...arguments)
   if (!/\{\w+\}/.test(contentPattern)) return contentPattern
-  const params = await getParams(tab, info, isNeedPageInfo(contentPattern))
+  const params = await getParams(tab, info, contentPattern)
   console.warn('getContent params', params)
   return contentPattern.replace(/\{(\w+)\}/g, ($0, $1) => {
     return params[$1] || 0
