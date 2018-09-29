@@ -102,7 +102,7 @@ const testRules = [
   }
 ]
 
-let turndownService = new TurndownService()
+let turndownService
 
 let cachedRules = []
 
@@ -131,7 +131,11 @@ const menuActions = {
   },
   convert2md (content) {
     if (!turndownService) {
-      turndownService = new TurndownService()
+      turndownService = new TurndownService({
+        headingStyle: 'atx',
+        hr: '---',
+        codeBlockStyle: 'fenced'
+      })
     }
     const markdown = turndownService.turndown(content)
     console.log('markdown content', markdown)
