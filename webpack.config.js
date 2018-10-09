@@ -45,6 +45,7 @@ const config = {
     'popup/index': ['./src/popup/index.js'],
     'options/index': ['./src/options/index.js'],
     'content-scripts/qr': ['./src/content-scripts/qr.js'],
+    'content-scripts/change-ua': ['./src/content-scripts/change-ua.js'],
     'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.js']
   },
   notHotReload: [],

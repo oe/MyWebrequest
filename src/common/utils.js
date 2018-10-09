@@ -31,10 +31,13 @@ export default {
       }, timeout)
     }
   },
+  convertPattern2Reg (pattern) {
+    const reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
+    return RegExp('^' + reg + '$')
+  },
   isURLMatchPattern (url, pattern) {
-    let reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
-    reg = RegExp('^' + reg + '$')
-    return reg.test(url)
+    if (typeof pattern === 'string') pattern = this.convertPattern2Reg(pattern)
+    return pattern.test(url)
   },
   // get a UUID
   guid () {
