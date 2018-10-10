@@ -1,9 +1,30 @@
 function changeUaInfo (navi) {
-  Object.defineProperties(navigator, 'userAgent', {
-    get () {
-      return navi.ua
+  // change ua for content script env
+  Object.defineProperties(navigator, {
+    userAgent: {
+      get () {
+        return navi.ua
+      }
     }
   })
+
+  // change ua for normal browser env
+  const code = `
+  Object.defineProperties(navigator, {
+    userAgent: {
+      get () {
+        return ${navi.ua}
+      }
+    }
+  })
+  `
+  const script = document.createElement('script')
+  script.type = 'text/javascript'
+  script.innerText = code
+  document.documentElement.insertBefore(
+    script,
+    document.documentElement.firstChild
+  )
 }
 
 function main () {
@@ -11,7 +32,7 @@ function main () {
     return
   }
   window.__is_ua_inited__ = true
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  chrome.runtime.onMessage.addListener(request => {
     if (request.cmd === 'update-ua') {
       changeUaInfo(request.navi)
     }
