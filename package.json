@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development node webpack.config.js",
     "build": "cross-env NODE_ENV=production webpack --progress --colors",
+    "postbuild": "npm run crx",
+    "crx": "crx pack dist -o ext.crx",
     "lint": "eslint --ext .js,.vue -f ./node_modules/eslint-friendly-formatter src"
   },
   "author": "Saiya",
@@ -27,6 +29,7 @@
     "clean-webpack-plugin": "^0.1.17",
     "copy-webpack-plugin": "^4.0.1",
     "cross-env": "^3.0.0",
+    "crx": "^3.2.1",
     "css-loader": "^0.28.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
