@@ -20,7 +20,7 @@ async function migrateSimpleRules () {
       try {
         validate.checkChromeRule()
         valid = true
-      } catch(e) {
+      } catch (e) {
         console.log(`${key} rule ${item} is invalid`, e)
       }
       return {

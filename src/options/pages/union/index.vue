@@ -43,6 +43,8 @@ import collection from '@/common/collection'
 import utils from '@/options/components/helper/utils'
 import CustomForm from '@/options/components/add-rule/custom'
 import NormalForm from '@/options/components/add-rule/normal'
+import UaForm from '@/options/components/add-rule/ua'
+import CmForm from '@/options/components/add-rule/ctmenu'
 import { mapState, mapGetters } from 'vuex'
 import Helps from './help-tips/'
 import locales from './locales.json'
@@ -62,6 +64,8 @@ export default {
     RuleList,
     CustomForm,
     NormalForm,
+    UaForm,
+    CmForm,
     ...Helps
   },
   async created () {
@@ -76,10 +80,20 @@ export default {
       disabled: 'hasNoEnabledRule'
     }),
     formType () {
-      return this.module === 'custom' ? 'CustomForm' : 'NormalForm'
+      switch (this.module) {
+        case 'custom':
+          return 'CustomForm'
+        case 'ua':
+          return 'UaForm'
+        case 'contextmenu':
+          return 'CmForm'
+        default:
+          return 'NormalForm'
+      }
     },
     helpTipTag () {
-      const tagName = this.module.charAt(0).toUpperCase() + this.module.slice(1) + 'Help'
+      const tagName =
+        this.module.charAt(0).toUpperCase() + this.module.slice(1) + 'Help'
       return Helps[tagName] && tagName
     }
   },
