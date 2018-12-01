@@ -54,6 +54,7 @@
     "style-loader": "^0.21.0",
     "uglifyjs-webpack-plugin": "^1.2.5",
     "url-loader": "^1.0.1",
+    "user-agents": "^1.0.64",
     "vue-loader": "14",
     "vue-markdown-loader": "^2.4.1",
     "vue-style-loader": "^4.1.0",

@@ -1,8 +1,8 @@
 <template>
-<div>
-  <titlebar></titlebar>
-  <component :is="$getTipTagName('help')"/>
-</div>
+  <div>
+    <titlebar></titlebar>
+    <component :is="$getTipTagName('help')"/>
+  </div>
 </template>
 <i18n src='./locales.json'></i18n>
 <script>
@@ -21,15 +21,17 @@ export default {
   },
   computed: {
     ...mapState({
-      module: state => state.module
+      module: state => state.rule.module
     })
   }
 }
 </script>
 
 <style lang="scss">
-@import '~@/common/base';
-figure {display: inline-block;}
+@import "~@/common/base";
+figure {
+  display: inline-block;
+}
 .donate {
   display: flex;
   text-align: center;

@@ -1,59 +1,48 @@
 <template>
-<div>
-  <div class="item-title">{{ $t('manageRule') }}
-    <small >{{rules.length}} {{$t('ruleUnit')}}, {{activeCount}} {{$t('ruleUnit')}} {{$t('ruleIsActive')}}</small></div>
-  <el-table
-    :data="rules"
-    ref="tbl"
-    :empty-text="$t('noRules')"
-    row-key="id"
-    tooltip-effect="dark">
-    <el-table-column
-      type="selection"
-      align="center"
-      width="40">
-    </el-table-column>
-    <el-table-column
-      :label="$t('enabled')"
-      align="center"
-      width="80">
-      <template slot-scope="scope">
-        <el-switch
-          :disabled="!scope.row.valid"
-          v-model="scope.row.enabled"
-          @click.native.capture="onToggleRule($event, scope)"></el-switch>
-      </template>
-    </el-table-column>
-    <el-table-column
-      :label="$t('rule')"
-      cell-class-name="rule-cell"
-      show-overflow-tooltip>
-      <template slot-scope="scope">
-        <div v-if="module === 'custom'" class="cs-cell">
-          <div>{{scope.row.matchUrl}}</div>
-          <div>{{scope.row.redirectUrl}}</div>
-        </div>
-        <template v-else>{{ scope.row.url}}</template>
-      </template>
-    </el-table-column>
-    <el-table-column                                                                
-      :label="$t('actions')"
-      align="center"
-      width="120">
-      <template slot-scope="scope">
-        <el-button
-          size="mini"
-          @click="onEditItem(scope)"
-          type="text">{{$t(scope.row.valid ? 'edit' : 'fix')}}</el-button>
+  <div>
+    <div class="item-title">
+      {{ $t('manageRule') }}
+      <small>{{rules.length}} {{$t('ruleUnit')}}, {{activeCount}} {{$t('ruleUnit')}} {{$t('ruleIsActive')}}</small>
+    </div>
+    <el-table
+      :data="rules"
+      ref="tbl"
+      :empty-text="$t('noRules')"
+      row-key="id"
+      tooltip-effect="dark"
+    >
+      <el-table-column type="selection" align="center" width="40"></el-table-column>
+      <el-table-column :label="$t('enabled')" align="center" width="80">
+        <template slot-scope="scope">
+          <el-switch
+            :disabled="!scope.row.valid"
+            v-model="scope.row.enabled"
+            @click.native.capture="onToggleRule($event, scope)"
+          ></el-switch>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('rule')" cell-class-name="rule-cell" show-overflow-tooltip>
+        <template slot-scope="scope">
+          <div v-if="module === 'custom'" class="cs-cell">
+            <div>{{scope.row.matchUrl}}</div>
+            <div>{{scope.row.redirectUrl}}</div>
+          </div>
+          <template v-else>{{ scope.row.url}}</template>
+        </template>
+      </el-table-column>
+      <el-table-column :label="$t('actions')" align="center" width="120">
+        <template slot-scope="scope">
+          <el-button
+            size="mini"
+            @click="onEditItem(scope)"
+            type="text"
+          >{{$t(scope.row.valid ? 'edit' : 'fix')}}</el-button>
 
-        <el-button
-          size="mini"
-          @click="onDeleteItem(scope)"
-          type="text">{{$t('delete')}}</el-button>
-      </template>
-    </el-table-column>
-  </el-table>
-</div>
+          <el-button size="mini" @click="onDeleteItem(scope)" type="text">{{$t('delete')}}</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
 </template>
 
 <script>
@@ -89,7 +78,7 @@ export default {
   },
   computed: {
     ...mapState({
-      module: state => state.module
+      module: state => state.rule.module
     }),
     ...mapGetters({
       rules: 'sortedRules'
@@ -110,7 +99,8 @@ export default {
 </script>
 
 <style lang="scss">
-.el-table td, .el-table th {
+.el-table td,
+.el-table th {
   padding: 10px 0;
 }
 
@@ -125,15 +115,17 @@ export default {
   position: relative;
   padding-left: 14px;
   &:before {
-    content: '{';
+    content: "{";
     position: absolute;
     left: 0;
-    top: .2em;
+    top: 0.2em;
     font-size: 2em;
     color: lightgray;
     font-weight: 100;
   }
 
-  div { line-height: 1.4; }
+  div {
+    line-height: 1.4;
+  }
 }
 </style>

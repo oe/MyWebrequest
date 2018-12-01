@@ -120,8 +120,8 @@ export default {
   },
   computed: {
     ...mapState({
-      module: state => state.module,
-      rules: state => state.rules
+      module: state => state.rule.module,
+      rules: state => state.rule.rules
     })
   },
   watch: {

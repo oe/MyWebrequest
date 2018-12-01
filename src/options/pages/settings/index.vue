@@ -1,35 +1,35 @@
 <template>
-<div class="page-settings">
-  <titlebar></titlebar>
-  <div class="item-title">Extension icon style</div>
-  <el-radio-group size="mini" v-model="iconStyle" @click.native="onIconStyleClick">
-    <div class="icon-colored js-icon">
-      <el-radio label="colored" border>
-        Colored</el-radio>      
+  <div class="page-settings">
+    <titlebar></titlebar>
+    <div class="item-title">Extension icon style</div>
+    <el-radio-group size="mini" v-model="iconStyle" @click.native="onIconStyleClick">
+      <div class="icon-colored js-icon">
+        <el-radio label="colored" border>Colored</el-radio>
+      </div>
+      <div class="icon-grey js-icon">
+        <el-radio label="grey" border>Grey</el-radio>
+      </div>
+    </el-radio-group>
+    <div class="item-title">Show QR Contextmenu</div>
+    <div class="icon-qrmenu js-icon" @click="onIconStyleClick">
+      <el-checkbox v-model="showQrMenu" border size="mini">Enable ContextMenu</el-checkbox>
     </div>
-    <div class="icon-grey js-icon">
-      <el-radio label="grey" border>
-        Grey</el-radio>      
+    <div class="item-title">Data Backup / Restore</div>
+    <div class="backup-restore">
+      <div class="actions">
+        <a @click="onBackData">Backup</a>
+        /
+        <label>
+          <input @change="onRestoreData" type="file" accept=".json" hidden>
+          <a>Restore</a>
+        </label>
+      </div>
     </div>
-  </el-radio-group>
-  <div class="item-title">Show QR Contextmenu</div>
-  <div class="icon-qrmenu js-icon" @click="onIconStyleClick">
-    <el-checkbox v-model="showQrMenu" border size="mini">
-      Enable ContextMenu</el-checkbox>
+    <div class="tips">
+      When restoring, the config file should be in json format and file name with
+      <strong>.json</strong> extension
+    </div>
   </div>
-  <div class="item-title">Data Backup / Restore</div>
-  <div class="backup-restore">
-    <div class="actions">
-      <a @click="onBackData">Backup</a>
-      /
-      <label>
-        <input @change="onRestoreData" type="file" accept=".json" hidden>
-        <a>Restore</a>
-      </label>
-    </div>
-  </div>
-  <div class="tips">When restoring, the config file should be in json format and file name with <strong>.json</strong> extension</div>
-</div>
 </template>
 <i18n src='./locales.json'></i18n>
 <script>
@@ -51,7 +51,7 @@ export default {
   },
   computed: {
     ...mapState({
-      module: state => state.module
+      module: state => state.rule.module
     })
   },
   methods: {
@@ -96,7 +96,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/common/base';
+@import "~@/common/base";
 .page-settings {
   .el-radio,
   .el-checkbox {

@@ -1,4 +1,14 @@
 {
   "prettier.eslintIntegration": true,
-  "prettier.disableLanguages": ["typescript"]
+  "prettier.disableLanguages": ["typescript"],
+  "vetur.format.defaultFormatter.js": "vscode-typescript",
+  // "vetur.format.defaultFormatter.js": "prettier",
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    {
+      "language": "vue",
+      "autoFix": true
+    }
+  ]
 }

@@ -1,73 +1,79 @@
 <template>
-<el-form  label-position="top" :model="form" :rules="validateRules" ref="ruleForm">
-  <el-form-item class="form-item-url" prop="matchURL" size="small">
-    <template slot="label">
-      <div slot="label">
-        {{$t('matchLbl')}}
-      </div>
-      <el-checkbox v-model="needTest">I'd like to test my rule</el-checkbox>      
-    </template>
-    <el-input
-      v-model="form.matchURL"
-      @paste.native="onPaste"
-      ref="firstInput"
-      autocorrect="off"
-      spellcheck="false"
-      v-popover:urlPopover
-      :placeholder="$t('match-rule-ph')" >
-    </el-input>
-  </el-form-item>
-  <el-form-item class="form-item-url" prop="ua" size="small">
-    <template slot="label">
-      <div slot="label">
-        <!-- {{$t('matchLbl')}} -->
-        Change UA to
-      </div>
-    </template>
-    <el-input
+  <el-form label-position="top" :model="form" :rules="validateRules" ref="ruleForm" size="small">
+    <el-form-item class="form-item-url" prop="matchURL">
+      <template slot="label">
+        <div slot="label">{{$t('matchLbl')}}</div>
+        <el-checkbox v-model="needTest">I'd like to test my rule</el-checkbox>
+      </template>
+      <el-input
+        v-model="form.matchURL"
+        @paste.native="onPaste"
+        ref="firstInput"
+        autocorrect="off"
+        spellcheck="false"
+        :placeholder="$t('match-rule-ph')"
+      ></el-input>
+    </el-form-item>
+    <el-form-item class="form-item-url" prop="ua">
+      <template slot="label">
+        <div slot="label">
+          <!-- {{$t('matchLbl')}} -->
+          Change UA to
+        </div>
+      </template>
+      <el-select v-model="form.ua" filterable>
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+      <el-button v-if="!ruleID && !needTest" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+      <!-- <el-input
       v-model="form.ua"
       @keyup.native.enter="onAddRule"
       ref="firstInput"
       autocorrect="off"
       spellcheck="false"
-      v-popover:urlPopover
+      v-popover
       :placeholder="$t('match-rule-ph')" >
-      <el-button v-if="!ruleID && !needTest" slot="append" @click="onAddRule">
-        {{$t('addRuleBtn')}}
-      </el-button>
-    </el-input>
-  </el-form-item>
-  <el-form-item v-show="needTest" size="small" label="Test your rule" prop="testURL">
-    <el-input
-      autocorrect="off"
-      spellcheck="false"
-      v-model="form.testURL"
-      :placeholder="$t('test-url-ph')" >
-      <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
-    </el-input>
-  </el-form-item>
-<!--   <el-popover
-    ref="urlPopover"
+      </el-input>-->
+    </el-form-item>
+    <el-form-item v-show="needTest" size="small" label="Test your rule" prop="testURL">
+      <el-input
+        autocorrect="off"
+        spellcheck="false"
+        v-model="form.testURL"
+        :placeholder="$t('test-url-ph')"
+      >
+        <el-button slot="append" @click="onTestRule">{{$t('testRule')}}</el-button>
+      </el-input>
+    </el-form-item>
+    <!--   <el-popover
+    ref="
     placement="bottom"
     title="标题"
     trigger="focus"
     content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。">
-  </el-popover> -->
-  <el-form-item v-show="needTest" size="small" prop="testResult" label="Test Result" class="form-item-testresult">
-    <div class="url-result">
-      <span class="success-tip">
-        Test passed
-      </span>
-      <span class="failed-tip">
-        Failed to test
-      </span>
-      <span class="normal-tip">
-        Please test your rule before add, you can add your rule after passed test
-      </span>
-    </div>
-    <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
-  </el-form-item>
-</el-form>
+    </el-popover>-->
+    <el-form-item
+      v-show="needTest"
+      size="small"
+      prop="testResult"
+      label="Test Result"
+      class="form-item-testresult"
+    >
+      <div class="url-result">
+        <span class="success-tip">Test passed</span>
+        <span class="failed-tip">Failed to test</span>
+        <span
+          class="normal-tip"
+        >Please test your rule before add, you can add your rule after passed test</span>
+      </div>
+      <el-button v-if="!ruleID" @click="onAddRule">{{$t('addRuleBtn')}}</el-button>
+    </el-form-item>
+  </el-form>
 </template>
 
 <script>

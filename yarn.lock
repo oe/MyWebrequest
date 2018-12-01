@@ -3236,6 +3236,11 @@ dns-txt@^2.0.2:
   dependencies:
     buffer-indexof "^1.0.0"
 
+docopt@~0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/docopt/-/docopt-0.6.2.tgz#b28e9e2220da5ec49f7ea5bb24a47787405eeb11"
+  integrity sha1-so6eIiDaXsSffqW7JKR3h0Be6xE=
+
 doctrine@1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-1.5.0.tgz#379dce730f6166f76cefa4e6707a159b02c5a6fa"
@@ -3331,6 +3336,14 @@ domutils@^1.5.1:
   dependencies:
     dom-serializer "0"
     domelementtype "1"
+
+dot-json@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/dot-json/-/dot-json-1.0.4.tgz#b5c5818eb526a7917ac02df017fe9fba37b11195"
+  integrity sha1-tcWBjrUmp5F6wC3wF/6fujexEZU=
+  dependencies:
+    docopt "~0.6.2"
+    underscore-keypath "~0.0.22"
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -9485,6 +9498,18 @@ uid-number@^0.0.6:
   resolved "https://registry.yarnpkg.com/uid-number/-/uid-number-0.0.6.tgz#0ea10e8035e8eb5b8e4449f06da1c730663baa81"
   integrity sha1-DqEOgDXo61uOREnwbaHHMGY7qoE=
 
+underscore-keypath@~0.0.22:
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/underscore-keypath/-/underscore-keypath-0.0.22.tgz#48a528392bb6efc424be1caa56da4b5faccf264d"
+  integrity sha1-SKUoOSu278QkvhyqVtpLX6zPJk0=
+  dependencies:
+    underscore "*"
+
+underscore@*:
+  version "1.9.1"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.9.1.tgz#06dce34a0e68a7babc29b365b8e74b8925203961"
+  integrity sha512-5/4etnCkd9c8gwgowi5/om/mYO5ajCaOgdzj/oW+0eQV9WxKBDZw5+ycmKmeaTXjInS/W0BzpGLo2xR2aBwZdg==
+
 underscore@~1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.6.0.tgz#8b38b10cacdef63337b8b24e4ff86d45aea529a8"
@@ -9612,6 +9637,14 @@ use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
   integrity sha512-cwESVXlO3url9YWlFW/TA9cshCEhtu7IKJ/p5soJ/gGpj7vbvFrAY/eIioQ6Dw23KjZhYgiIo8HOs1nQ2vr/oQ==
+
+user-agents@^1.0.64:
+  version "1.0.64"
+  resolved "https://registry.yarnpkg.com/user-agents/-/user-agents-1.0.64.tgz#5a0c54da32453e06baf058b1f759b76d704b9ba7"
+  integrity sha512-PDHZYqzs2oGs9lqT6yWazydTA+z1N3z91WqkzCckR7OwRRfgvzxpo8iWjpvkhyAAQRW6F8Z5kAoLCVmc3+Voew==
+  dependencies:
+    dot-json "^1.0.4"
+    lodash.clonedeep "^4.5.0"
 
 util-deprecate@~1.0.1:
   version "1.0.2"

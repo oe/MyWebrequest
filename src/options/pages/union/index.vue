@@ -1,40 +1,38 @@
 <template>
-<div>
-  <titlebar>
-    <el-popover
-      v-if="helpTipTag"
-      width="400"
-      placement="top">
-      <component :is="helpTipTag" />
-      <a class="el-icon-info" slot="reference" ></a>
-    </el-popover>
-  </titlebar>
-  <el-checkbox
-    v-model="isEnabled"
-    :disabled="disabled"
-    @change="onFeatureSatusChange">{{$t('enaFeatureLbl')}}
-    <span v-show="this.disabled">
-      (<span v-show="this.ruleCount">{{$t('needARuleEnable')}}</span><span v-show="!this.ruleCount">{{$t('addARule2Enable')}}</span>)
-    </span>
-  </el-checkbox>
-  
-  <div class="item-title">{{ $t('addRuleTitle') }}</div>
-  <component :is="formType" ref="form"></component>
-  <rule-list ref="list"></rule-list>
-  <el-dialog
-    custom-class="rule-dialog"
-    title="Edit this rule"
-    :visible.sync="showEditDialog"
-    @close="onDlgClose">
-    <component ref="dlgForm" :is="formType" :ruleID="ruleID"></component>
-    <div slot="footer" class="dialog-footer">
-      <el-button size="small" @click="showEditDialog=false">Cancel</el-button>
-      <el-button size="small" type="primary" @click="onResetDlg">Reset</el-button>
-      <el-button size="small" type="primary" @click="onUpdateRule">Update</el-button>
-      <el-button size="small" type="primary" @click="onSaveANewRule">Save as a new Rule</el-button>
+  <div>
+    <titlebar>
+      <el-popover v-if="helpTipTag" width="400" placement="top">
+        <component :is="helpTipTag"/>
+        <a class="el-icon-info" slot="reference"></a>
+      </el-popover>
+    </titlebar>
+    <el-checkbox v-model="isEnabled" :disabled="disabled" @change="onFeatureSatusChange">
+      {{$t('enaFeatureLbl')}}
+      <span v-show="this.disabled">
+        (
+        <span v-show="this.ruleCount">{{$t('needARuleEnable')}}</span>
+        <span v-show="!this.ruleCount">{{$t('addARule2Enable')}}</span>)
+      </span>
+    </el-checkbox>
+
+    <div class="item-title">{{ $t('addRuleTitle') }}</div>
+    <component :is="formType" ref="form"></component>
+    <rule-list ref="list"></rule-list>
+    <el-dialog
+      custom-class="rule-dialog"
+      title="Edit this rule"
+      :visible.sync="showEditDialog"
+      @close="onDlgClose"
+    >
+      <component ref="dlgForm" :is="formType" :ruleID="ruleID"></component>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="small" @click="showEditDialog=false">Cancel</el-button>
+        <el-button size="small" type="primary" @click="onResetDlg">Reset</el-button>
+        <el-button size="small" type="primary" @click="onUpdateRule">Update</el-button>
+        <el-button size="small" type="primary" @click="onSaveANewRule">Save as a new Rule</el-button>
       </div>
-  </el-dialog>
-</div>
+    </el-dialog>
+  </div>
 </template>
 
 <script>
@@ -73,7 +71,7 @@ export default {
   },
   computed: {
     ...mapState({
-      module: state => state.module
+      module: state => state.rule.module
     }),
     ...mapGetters({
       ruleCount: 'ruleCount',
@@ -182,7 +180,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '~@/common/base';
+@import "~@/common/base";
 .el-popover__reference {
   font-size: 16px;
   text-decoration: none;
