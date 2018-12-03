@@ -23,7 +23,7 @@ const serverPort = 3031
 const PAGES = ['background/index', 'popup/index', 'options/index']
 
 // auto increaseVersion of manifest.json
-function increaseVersion (pkg) {
+function increaseVersion(pkg) {
   if (increaseVersion.versionUpdated) return
   increaseVersion.versionUpdated = true
 
@@ -41,15 +41,22 @@ function increaseVersion (pkg) {
 const config = {
   entry: {
     // your entry file file (entry.ts or entry.js)
-    'background/index': ['./src/background/index.js'],
-    'popup/index': ['./src/popup/index.js'],
-    'options/index': ['./src/options/index.js'],
-    'content-scripts/qr': ['./src/content-scripts/qr.js'],
-    'content-scripts/change-ua': ['./src/content-scripts/change-ua.js'],
-    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.js']
+    'background/index': ['./src/background/index.ts'],
+    'popup/index': ['./src/popup/index.ts'],
+    'options/index': ['./src/options/index.ts'],
+    'content-scripts/qr': ['./src/content-scripts/qr.ts'],
+    'content-scripts/change-ua': ['./src/content-scripts/change-ua.ts'],
+    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.ts']
   },
   notHotReload: [],
   mode: process.env.NODE_ENV,
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+    alias: {
+      // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
   output: {
     path: path.join(__dirname, './dist/'),
     filename: '[name].js',
@@ -58,46 +65,19 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
-      },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          extractCSS: process.env.NODE_ENV === 'production',
-          loaders: {
-            css: ExtractTextPlugin.extract({
-              use: 'css-loader',
-              fallback: 'vue-style-loader'
-            }),
-            scss: ExtractTextPlugin.extract({
-              use: ['css-loader', 'sass-loader'],
-              fallback: 'vue-style-loader'
-            }),
-            sass: ExtractTextPlugin.extract({
-              use: ['css-loader', 'sass-loader?indentedSyntax=1'],
-              fallback: 'vue-style-loader'
-            }),
-            less: ExtractTextPlugin.extract({
-              use: ['css-loader', 'less-loader'],
-              fallback: 'vue-style-loader'
-            })
-          }
-        }
+        test: /\.tsx?$/,
+        loader: 'awesome-typescript-loader'
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
+        enforce: 'pre',
+        loader: 'source-map-loader'
       },
+      // {
+      //   test: /\.js$/,
+      //   loader: 'babel-loader',
+      //   exclude: /node_modules/
+      // },
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
@@ -179,15 +159,7 @@ const config = {
         }
       }
     })
-  ],
-  resolve: {
-    extensions: ['.js', '.vue', '.json'],
-    alias: {
-      vue$: 'vue/dist/vue.esm.js',
-      // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
-      '@': path.resolve(__dirname, 'src')
-    }
-  }
+  ]
 }
 
 if (process.env.NODE_ENV === 'production') {

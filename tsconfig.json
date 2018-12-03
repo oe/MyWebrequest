@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "outDir": "./built/",
+    "sourceMap": true,
+    "declaration": true,
+    "strict": true,
+    "noImplicitReturns": true,
+    "noImplicitAny": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "none",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "target": "es6",
+    "allowJs": false,
+    "jsx": "react",
+    "baseUrl": "./",
+    "lib": ["dom", "es6"],
+    "paths": {
+      "@": ["./src"]
+    }
+  },
+  "include": ["./src/**/*.ts", "./src/**/*.tsx"]
+}
