@@ -18,6 +18,7 @@ config.codekit3
 
 # production
 /build
+/built
 
 # misc
 .DS_Store
