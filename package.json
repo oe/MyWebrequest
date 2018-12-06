@@ -13,6 +13,7 @@
     "lint": "tslint --project ./tsconfig.json --config tslint.json"
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.75",
     "awesome-typescript-loader": "^5.2.1",
     "chalk": "^2.4.1",
     "clean-webpack-plugin": "^1.0.0",
@@ -38,8 +39,12 @@
     "zip-folder": "^1.0.0"
   },
   "dependencies": {
+    "@types/lodash.clonedeep": "^4.5.4",
+    "@types/qs": "^6.5.1",
     "@types/react": "^16.7.11",
     "@types/react-dom": "^16.0.11",
+    "lodash.clonedeep": "^4.5.0",
+    "qs": "^6.6.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3"
   }
