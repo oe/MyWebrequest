@@ -46,7 +46,10 @@ const config = {
     'options/index': ['./src/options/index.ts'],
     'content-scripts/qr': ['./src/content-scripts/qr.ts'],
     'content-scripts/change-ua': ['./src/content-scripts/change-ua.ts'],
-    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.ts']
+    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.ts'],
+    'content-scripts/remove-referrer': [
+      './src/content-scripts/remove-referrer.ts'
+    ]
   },
   notHotReload: [],
   mode: process.env.NODE_ENV,

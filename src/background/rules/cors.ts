@@ -1,7 +1,7 @@
 // import utils from '@/common/utils'
 import { removeHeaders } from '@/background/utils'
 import { ICorsRule, IWebRequestRules } from '@/types/web-rule'
-
+import { isXDomain } from '@/common/utils'
 
 interface ICorsCache {
   [k: string]: {
@@ -126,9 +126,9 @@ const webrequests: IWebRequestRules<ICorsRule> = [
       const originHeader = (details.requestHeaders || []).find(
         header => header.name === 'Origin'
       )
-      if (utils.isXDomain(originHeader && originHeader.value, details.url)) {
+      if (isXDomain(originHeader && originHeader.value || '', details.url)) {
         corsRequestCache[details.requestId] = {}
-        handleCorsHeader(details, details.requestHeaders, corsRequestRules)
+        handleCorsHeader(details, details.requestHeaders || [], corsRequestRules)
       }
       return {
         requestHeaders: details.requestHeaders
@@ -138,9 +138,10 @@ const webrequests: IWebRequestRules<ICorsRule> = [
     on: 'onBeforeSendHeaders'
   },
   {
-    fn (details) {
+    // @ts-ignore
+    fn (details: chrome.webRequest.WebResponseHeadersDetails) {
       if (corsRequestCache[details.requestId]) {
-        handleCorsHeader(details, details.responseHeaders, corsResponseRules)
+        handleCorsHeader(details, details.responseHeaders || [], corsResponseRules)
         delete corsRequestCache[details.requestId]
       }
       return {

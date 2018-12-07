@@ -4,7 +4,7 @@
  * @param  {Array|String} names   names to remove
  * @return {Array}
  */
-export function removeHeaders(headers: chrome.webRequest.HttpHeader[], names: string | string[]) {
+export function removeHeaders (headers: chrome.webRequest.HttpHeader[], names: string | string[]) {
   let isInNames: Function
   if (Array.isArray(names)) {
     isInNames = (name: string) => names.includes(name)
@@ -17,4 +17,17 @@ export function removeHeaders(headers: chrome.webRequest.HttpHeader[], names: st
       headers.splice(len, 1)
     }
   }
+}
+
+interface IItem {
+  enabled: boolean
+  valid?: boolean
+}
+
+/**
+ * is a rule valid
+ * @param {Object} item rule object
+ */
+export function isRuleEnabled (item: IItem) {
+  return item.enabled && item.valid
 }

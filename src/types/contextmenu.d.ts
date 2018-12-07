@@ -14,13 +14,15 @@ export const enum EMenuContext {
 }
 
 export const enum EMenuAction {
-  genQrcode = 'genQrcode',
-  openScheme = 'openScheme',
-  convert2md = 'convert2md',
-  copy = 'copy'
+  GEN_QRCODE = 'GEN_QRCODE',
+  OPEN_SCHEME = 'OPEN_SCHEME',
+  CONVERT2MD = 'CONVERT2MD',
+  COPY = 'COPY'
 }
 
 export interface IMenuConfig {
+  /** menu ID */
+  id: string
   /** menu title */
   title: string
   /** menu context to display */
@@ -33,4 +35,8 @@ export interface IMenuConfig {
   action: EMenuAction
   /** the action deal content */
   content: string
+  updatedAt: number
+  enabled: boolean
 }
+
+export type IMenuConfigs = IMenuConfig[]

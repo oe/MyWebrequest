@@ -1,6 +1,23 @@
+export const enum EWebRuleType {
+  /** redirect url */
+  REDIRECT = 'REDIRECT',
+  /** enforece https connection */
+  HSTS = 'HSTS',
+  /** block url */
+  BLOCK = 'BLOCK',
+  /** change referrer */
+  REFERRER = 'REFERER',
+  /** alter header */
+  HEADER = 'HEADER',
+  /** allow cross origin request */
+  CORS = 'CORS',
+  /** log webrequest */
+  LOG = 'LOG'
+}
+
 /** custom url redirect rule */
 export interface IRedirectRule {
-  cmd: 'redirect'
+  cmd: EWebRuleType.REDIRECT
   /** chrome match url pattern */
   url: string
   /** if true matchUrl should be a valid reg string */
@@ -30,19 +47,19 @@ export interface IRedirectRule {
 
 /** redirect enforece https connect  */
 export interface IHstsRule {
-  cmd: 'hsts'
+  cmd: EWebRuleType.HSTS
   url: string
 }
 
 /** block connect */
 export interface IBlockRule {
-  cmd: 'block'
+  cmd: EWebRuleType.BLOCK
   url: string
 }
 
 /** no referer  */
 export interface IReferrerRule {
-  cmd: 'referer'
+  cmd: EWebRuleType.REFERRER
   /**
    * out: for remove referrer from the url
    * in: for remove referrer to the url
@@ -53,7 +70,7 @@ export interface IReferrerRule {
 
 /** remove exist header(can use in hotlink) */
 export interface IDeleteHeaderRule {
-  cmd: 'header'
+  cmd: EWebRuleType.HEADER
   url: string
   type: 'delete'
   name: string
@@ -61,7 +78,7 @@ export interface IDeleteHeaderRule {
 
 /** change exist header(set a new header if not exist) */
 export interface IUpdateHeaderRule {
-  cmd: 'header'
+  cmd: EWebRuleType.HEADER
   url: string
   type: 'update'
   name: string
@@ -72,7 +89,7 @@ export type IAlterHeaderRule = IDeleteHeaderRule | IUpdateHeaderRule
 
 /** allow cors request */
 export interface ICorsRule {
-  cmd: 'cors'
+  cmd: EWebRuleType.CORS
   /**
    * out: for allow cors from the url
    * in: for allow cors to the url
@@ -83,7 +100,7 @@ export interface ICorsRule {
 
 /** log the request info to the url */
 export interface ILogRule {
-  cmd: 'log'
+  cmd: EWebRuleType.LOG
   url: string
 }
 
@@ -105,12 +122,15 @@ export interface IRuleConfig {
   updatedAt: number
 }
 
-type Foo<T extends { a: any, b: any }> = T["a"] | T["b"];
+export interface IUaInfo {
+  ua: string
+}
 
-export interface IWebRequestRule<T extends IWebRule> {
-  fn: (details: chrome.webRequest.WebRequestHeadersDetails, rule: T) => any,
+export interface IWebRequestRule<T extends IWebRule, K extends chrome.webRequest.ResourceRequest> {
+  fn: (details: K, rule: T) => any,
   permit: string[]
   on: string
 }
 
-export type IWebRequestRules<T extends IWebRule> = IWebRequestRule<T>[]
+
+export type IWebRequestRules<T extends IWebRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]

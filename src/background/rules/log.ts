@@ -1,4 +1,4 @@
-import utils from '@/common/utils'
+import { getQs, parseQs } from '@/common/utils'
 import clonedeep from 'lodash.clonedeep'
 
 import { ILogRule, IWebRequestRules } from '@/types/web-rule'
@@ -7,16 +7,19 @@ const logger = window.console
 
 let logNum = 0
 
-const requestCache = {}
+interface ICache {
+  [k: string]: any
+}
+const requestCache: ICache = {}
 
 // format querystring
 function formatQstr (url: string) {
-  const qs = utils.getQs(url)
+  const qs = getQs(url)
   if (!qs) {
     return false
   }
   return {
-    formatedData: utils.parseQs(qs),
+    formatedData: parseQs(qs),
     rawData: qs
   }
 }
@@ -48,7 +51,8 @@ function formatHeaders (headers: chrome.webRequest.HttpHeader[]) {
 // const cache = {}
 const webrequests: IWebRequestRules<ILogRule> = [
   {
-    fn (details) {
+    // @ts-ignore
+    fn (details: chrome.webRequest.WebRequestBodyDetails) {
       if (details.requestBody) {
         return (requestCache[details.requestId] = clonedeep(
           details.requestBody
@@ -59,24 +63,25 @@ const webrequests: IWebRequestRules<ILogRule> = [
     on: 'onBeforeRequest'
   },
   {
-    fn (details) {
+    fn (details: chrome.webRequest.WebRequestHeadersDetails) {
       ++logNum
       const url = details.url
       const rid = details.requestId
 
       const queryBody = formatQstr(details.url)
-      if (queryBody) details.queryBody = queryBody
+      const extra: ICache = {}
+      if (queryBody) extra.queryBody = queryBody
 
-      let domain = /^(?:[\w-]+):\/\/([^/]+)\//.exec(url)
-      domain = domain ? domain[1] : url
+      const matchs = /^(?:[\w-]+):\/\/([^/]+)\//.exec(url)
+      const domain = matchs ? matchs[1] : url
 
-      if (requestCache[rid]) details.requestBody = requestCache[rid]
-      details.requestHeaders = formatHeaders(details.requestHeaders)
+      if (requestCache[rid]) extra.requestBody = requestCache[rid]
+      extra.requestHeaders = formatHeaders(details.requestHeaders || [])
       logger.log(
         '%c%d %o %csent to domain: %s',
         'color: #086',
         logNum,
-        details,
+        Object.assign({}, details, extra),
         'color: #557c30',
         domain
       )

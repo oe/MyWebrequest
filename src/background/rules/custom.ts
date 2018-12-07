@@ -1,20 +1,22 @@
-import utils from '@/common/utils'
+import { preprocessRouter, getTargetUrl } from '@/common/utils'
 import collection from '@/common/collection'
-import RuleProcessor, { isRuleEnabled } from './common'
+import { IRedirectRule, IWebRequestRules, EWebRuleType } from '@/types/web-rule'
 
+interface ICache {
+
+}
 // cache data for frequently usage
-let cachedRules = []
+let cachedRules: any[] = []
 
 // update cache
-async function updateCache (isOn) {
+async function updateCache (isOn: boolean) {
   if (isOn) {
     // ignore disabled
-    let result = await collection.get('custom')
-    result = result.filter(isRuleEnabled)
+    const result = await collection.get(EWebRuleType.REDIRECT) as IRedirectRule[]
     cachedRules = result
       .map(item => {
         try {
-          return utils.preprocessRouter(item)
+          return preprocessRouter(item)
         } catch (e) {
           console.error('custom rule invalid', item, e)
         }
@@ -25,13 +27,13 @@ async function updateCache (isOn) {
   }
 }
 
-const webrequests = [
+const webrequests: IWebRequestRules<IRedirectRule> = [
   {
     fn (details) {
       const url = details.url
       let len = cachedRules.length
       while (len--) {
-        const targetUrl = utils.getTargetUrl(cachedRules[len], details.url)
+        const targetUrl = getTargetUrl(cachedRules[len], details.url)
         if (targetUrl) {
           console.log(
             `${url} target url is ${targetUrl}, with rule`,
@@ -43,17 +45,12 @@ const webrequests = [
         }
       }
       console.log('can not find targe url for', url)
+      return
     },
     permit: ['blocking'],
     on: 'onBeforeRequest'
   }
 ]
 
-export default new RuleProcessor('custom', {
-  webrequests,
-  async toggle (isOn) {
-    const rule = await this._getRule()
-    this._toggleWebRequest(rule, isOn)
-    await updateCache(isOn)
-  }
-})
+export default webrequests
+
