@@ -101,12 +101,19 @@ const config = {
         })
       },
       {
-        // preprocess markdown file
-        test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: {
-          wrapper: 'article'
-        }
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                implementation: require('sass')
+              }
+            }
+          ]
+        })
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,

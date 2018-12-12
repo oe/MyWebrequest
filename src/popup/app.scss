@@ -1,0 +1,15 @@
+@import '~@/common/base';
+$popup-width: 260px;
+html,
+body {
+  width: $popup-width;
+  height: 310px;
+  overflow: hidden;
+}
+.popup {
+  width: $popup-width;
+}
+
+.popup-content {
+  margin: 4px;
+}
