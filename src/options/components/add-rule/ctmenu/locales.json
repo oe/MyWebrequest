@@ -1,8 +1,0 @@
-{
-  "en": {
-    "match-rule-ph": "url match rule, `*` can be use to match anything, e.g. http://*.abc.com/*"
-  },
-  "zh-cn": {
-    "match-rule-ph": "超链接匹配规则, `*` 可以用于匹配任意字符, 例如 http://*.abc.com/*"
-  }
-}

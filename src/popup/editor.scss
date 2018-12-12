@@ -1,0 +1,46 @@
+@import '~@/common/base';
+.text-container {
+  @include size(240px);
+  margin: 8px auto 0;
+  position: relative;
+
+  textarea {
+    width: 100%;
+    height: 220px;
+    border-radius: 4px;
+    padding: 8px;
+    resize: none;
+    font-size: 14px;
+    border-radius: 4px;
+    @include hyphens;
+    border: 1px solid #dcdfe6;
+
+    &:focus {
+      border-color: #409eff;
+      outline: none;
+    }
+  }
+
+  .action-btn {
+    text-align: center;
+    font-size: 14px;
+  }
+
+  button {
+    -webkit-appearance: none;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    outline: none;
+    &:hover {
+      color: #409eff;
+      border-color: #c6e2ff;
+      background-color: #ecf5ff;
+    }
+
+    &:active {
+      color: #3a8ee6;
+      border-color: #3a8ee6;
+    }
+  }
+}

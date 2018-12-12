@@ -6,7 +6,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const tsImportPluginFactory = require('ts-import-plugin')
+const UglifyJsPlugin = require('terser-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
@@ -23,7 +24,7 @@ const serverPort = 3031
 const PAGES = ['background/index', 'popup/index', 'options/index']
 
 // auto increaseVersion of manifest.json
-function increaseVersion (pkg) {
+function increaseVersion(pkg) {
   if (increaseVersion.versionUpdated) return
   increaseVersion.versionUpdated = true
 
@@ -41,15 +42,25 @@ function increaseVersion (pkg) {
 const config = {
   entry: {
     // your entry file file (entry.ts or entry.js)
-    'background/index': ['./src/background/index.js'],
-    'popup/index': ['./src/popup/index.js'],
-    'options/index': ['./src/options/index.js'],
-    'content-scripts/qr': ['./src/content-scripts/qr.js'],
-    'content-scripts/change-ua': ['./src/content-scripts/change-ua.js'],
-    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.js']
+    'background/index': ['./src/background/index.ts'],
+    'popup/index': ['./src/popup/index.tsx'],
+    'options/index': ['./src/options/index.tsx'],
+    'content-scripts/qr': ['./src/content-scripts/qr.ts'],
+    'content-scripts/change-ua': ['./src/content-scripts/change-ua.ts'],
+    'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.ts'],
+    'content-scripts/remove-referrer': [
+      './src/content-scripts/remove-referrer.ts'
+    ]
   },
   notHotReload: [],
   mode: process.env.NODE_ENV,
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+    alias: {
+      // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
+      '@': path.resolve(__dirname, 'src')
+    }
+  },
   output: {
     path: path.join(__dirname, './dist/'),
     filename: '[name].js',
@@ -58,46 +69,30 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.(js|vue)$/,
-        enforce: 'pre',
-        exclude: /node_modules/,
-        use: {
-          loader: 'eslint-loader',
-          options: {
-            formatter: require('eslint-friendly-formatter')
-          }
-        }
-      },
-      {
-        test: /\.vue$/,
-        loader: 'vue-loader',
+        test: /\.tsx?$/,
+        loader: 'awesome-typescript-loader',
         options: {
-          extractCSS: process.env.NODE_ENV === 'production',
-          loaders: {
-            css: ExtractTextPlugin.extract({
-              use: 'css-loader',
-              fallback: 'vue-style-loader'
-            }),
-            scss: ExtractTextPlugin.extract({
-              use: ['css-loader', 'sass-loader'],
-              fallback: 'vue-style-loader'
-            }),
-            sass: ExtractTextPlugin.extract({
-              use: ['css-loader', 'sass-loader?indentedSyntax=1'],
-              fallback: 'vue-style-loader'
-            }),
-            less: ExtractTextPlugin.extract({
-              use: ['css-loader', 'less-loader'],
-              fallback: 'vue-style-loader'
-            })
-          }
+          getCustomTransformers: () => ({
+            before: [
+              tsImportPluginFactory({
+                libraryDirectory: 'es',
+                libraryName: 'antd',
+                style: 'css'
+              })
+            ]
+          })
         }
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        exclude: /node_modules/
+        enforce: 'pre',
+        loader: 'source-map-loader'
       },
+      // {
+      //   test: /\.js$/,
+      //   loader: 'babel-loader',
+      //   exclude: /node_modules/
+      // },
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
@@ -106,12 +101,19 @@ const config = {
         })
       },
       {
-        // preprocess markdown file
-        test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: {
-          wrapper: 'article'
-        }
+        test: /\.scss$/,
+        loader: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: [
+            'css-loader',
+            {
+              loader: 'sass-loader',
+              options: {
+                implementation: require('sass')
+              }
+            }
+          ]
+        })
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
@@ -179,31 +181,24 @@ const config = {
         }
       }
     })
-  ],
-  resolve: {
-    extensions: ['.js', '.vue', '.json'],
-    alias: {
-      vue$: 'vue/dist/vue.esm.js',
-      // 'vue-i18n$': 'vue-i18n/dist/vue-i18n.min.js',
-      '@': path.resolve(__dirname, 'src')
-    }
-  }
+  ]
 }
 
 if (process.env.NODE_ENV === 'production') {
   delete config.notHotReload
   config.optimization = {
     sideEffects: false,
+    // minimize: false,
     minimizer: [
       // we specify a custom UglifyJsPlugin here to get source maps in production
       new UglifyJsPlugin({
         cache: true,
-        parallel: true,
-        uglifyOptions: {
-          compress: false,
-          ecma: 6,
-          mangle: true
-        }
+        parallel: true
+        // uglifyOptions: {
+        //   compress: false,
+        //   // ecma: 6,
+        //   mangle: true
+        // }
       })
     ]
   }
