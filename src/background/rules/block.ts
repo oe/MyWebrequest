@@ -1,6 +1,6 @@
-import { IBlockRule, IWebRequestRules } from '@/types/web-rule'
+import { IRtBlockRule, IWebRequestRules } from '@/types/runtime-webrule'
 
-const webrequests: IWebRequestRules<IBlockRule> = [
+const webrequests: IWebRequestRules<IRtBlockRule> = [
   {
     fn (details, rule) {
       console.warn('block url: ' + details.url)

@@ -14,7 +14,7 @@ function changeUaInfo (navi: IUaInfo) {
   Object.defineProperties(navigator, {
     userAgent: {
       get () {
-        return ${navi.ua}
+        return '${navi.ua}'
       }
     }
   })

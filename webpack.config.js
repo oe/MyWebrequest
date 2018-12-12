@@ -6,7 +6,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const tsImportPluginFactory = require('ts-import-plugin')
+const UglifyJsPlugin = require('terser-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
 const WriteFilePlugin = require('write-file-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
@@ -42,8 +43,8 @@ const config = {
   entry: {
     // your entry file file (entry.ts or entry.js)
     'background/index': ['./src/background/index.ts'],
-    'popup/index': ['./src/popup/index.ts'],
-    'options/index': ['./src/options/index.ts'],
+    'popup/index': ['./src/popup/index.tsx'],
+    'options/index': ['./src/options/index.tsx'],
     'content-scripts/qr': ['./src/content-scripts/qr.ts'],
     'content-scripts/change-ua': ['./src/content-scripts/change-ua.ts'],
     'content-scripts/page-excerpt': ['./src/content-scripts/page-excerpt.ts'],
@@ -69,7 +70,18 @@ const config = {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader'
+        loader: 'awesome-typescript-loader',
+        options: {
+          getCustomTransformers: () => ({
+            before: [
+              tsImportPluginFactory({
+                libraryDirectory: 'es',
+                libraryName: 'antd',
+                style: 'css'
+              })
+            ]
+          })
+        }
       },
       {
         test: /\.js$/,
@@ -169,16 +181,17 @@ if (process.env.NODE_ENV === 'production') {
   delete config.notHotReload
   config.optimization = {
     sideEffects: false,
+    // minimize: false,
     minimizer: [
       // we specify a custom UglifyJsPlugin here to get source maps in production
       new UglifyJsPlugin({
         cache: true,
-        parallel: true,
-        uglifyOptions: {
-          compress: false,
-          ecma: 6,
-          mangle: true
-        }
+        parallel: true
+        // uglifyOptions: {
+        //   compress: false,
+        //   // ecma: 6,
+        //   mangle: true
+        // }
       })
     ]
   }

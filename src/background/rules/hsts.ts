@@ -1,7 +1,6 @@
 // import utils from '@/common/utils'
-import { IHstsRule, IWebRequestRules } from '@/types/web-rule'
-
-const webrequests: IWebRequestRules<IHstsRule> = [
+import { IRtHstsRule, IWebRequestRules } from '@/types/runtime-webrule'
+const webrequests: IWebRequestRules<IRtHstsRule> = [
   {
     fn (details) {
       return {
