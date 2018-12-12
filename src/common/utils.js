@@ -70,9 +70,9 @@ export default {
     'hsts',
     'log',
     'hotlink',
-    'cors'
+    'cors',
+    'contextmenu'
     // 'ua'
-    // 'contextmenu'
   ],
   // parse querystring to object
   parseQs: qs.parse,
