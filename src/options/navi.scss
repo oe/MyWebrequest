@@ -1,0 +1,38 @@
+@import '~@/common/base';
+.navi {
+  .app-name {
+    padding: 20px 0 20px 20px;
+    font-size: 18px;
+    color: $main-color;
+    display: block;
+  }
+  .ant-menu-inline {
+    border-right: none;
+
+    .ant-menu-item {
+      color: #999;
+      height: 25px;
+      line-height: 25px;
+      &:hover {
+        color: currentColor;
+      }
+      &.ant-menu-item-selected {
+        font-weight: bolder;
+        background-color: unset;
+        color: #666;
+
+        &::after {
+          display: none;
+        }
+        &::before {
+          content: '';
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          border-left: 6px solid #666;
+        }
+      }
+    }
+  }
+}
