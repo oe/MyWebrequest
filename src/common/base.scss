@@ -9,7 +9,6 @@ $sidebar-padding: 20px;
 
 $settings-title-padding: $sidebar-padding;
 
-
 $page-wdith: 760px;
 $qr-size: 250px;
 
@@ -20,7 +19,7 @@ $big-input-wdith: $page-wdith - 100px;
 }
 
 html {
-  font-family: "Helvetica Neue", HelveticaNeue, Helvetica, Arial, sans-serif;;
+  font-family: 'Helvetica Neue', HelveticaNeue, Helvetica, Arial, sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: $main-font-color;
@@ -33,8 +32,8 @@ body {
 
 a {
   color: $main-color;
+  text-decoration: underline;
 }
-
 
 .invisible {
   opacity: 0;
@@ -44,12 +43,11 @@ a {
 
 @mixin size($width, $height: 0) {
   @if $height <= 0 {
-    $height: $width
+    $height: $width;
   }
   width: $width;
   height: $height;
 }
-
 
 // auto hyphens
 @mixin hyphens {
@@ -61,7 +59,6 @@ a {
 @mixin border-bottom {
   border-bottom: 1px solid #ccc;
 }
-
 
 @mixin clearfix {
   &:after {

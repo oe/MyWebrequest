@@ -11,6 +11,7 @@ interface IQrImgProps {
 interface IQrImgState {
   isDone: boolean
   url: string
+  errTip: string
 }
 export default class QrImg extends Component<IQrImgProps, IQrImgState> {
   static defaultProps: IQrImgProps = {
@@ -19,7 +20,7 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
   }
   constructor (props: IQrImgProps) {
     super(props)
-    this.state = { isDone: true, url: 'about:blank;' }
+    this.state = { isDone: true, url: 'about:blank;', errTip: '' }
     this.getQrUrl(props.text, props.size)
   }
   componentWillReceiveProps (newProps: IQrImgProps) {
@@ -31,7 +32,11 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
       this.setState({ isDone: true, url })
     } catch (error) {
       console.error(error)
-      this.setState({ isDone: false, url: 'about:blank;' })
+      this.setState({
+        isDone: false,
+        errTip:
+          'Failed to genrate QRCode, maybe caused by too much content, please try to shorten them'
+      })
     }
   }
   onDoubleClick (evt: MouseEvent<HTMLDivElement>) {
@@ -49,11 +54,10 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
           height: this.props.size + 'px'
         }}
       >
-        {this.state.isDone ? (
-          <img src={this.state.url} />
-        ) : (
-          'failed to load qrcode'
-        )}
+        <img src={this.state.url} />
+        {!this.state.isDone ? (
+          <div className="qr-code-error-tip">{this.state.errTip}</div>
+        ) : null}
       </div>
     )
   }

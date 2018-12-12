@@ -15,6 +15,12 @@ export default class App extends Component<{}, IState> {
     super(props)
     this.state = { isEdit: false, content: 'hello world', pageUrl: '' }
     this.getCurrentTab()
+    // added fade-in effects
+    document.body.style.opacity = '0'
+    document.body.style.transition = 'opacity ease-out .3s'
+    requestAnimationFrame(() => {
+      document.body.style.opacity = '1'
+    })
   }
   getCurrentTab () {
     chrome.tabs.query(
@@ -69,7 +75,7 @@ export default class App extends Component<{}, IState> {
   }
   render () {
     return (
-      <div className="popup">
+      <div className={'popup ' + (this.state.isEdit ? 'is-edit' : '')}>
         <Title {...this.getTitle()} />
         <div className="popup-content">
           {this.state.isEdit ? (
@@ -77,12 +83,18 @@ export default class App extends Component<{}, IState> {
               initVal={this.state.content}
               onSubmit={this.onTaSubmit.bind(this)}
             />
-          ) : (
-            <QrImg
-              onDoubleClick={this.onQrDoubleClick.bind(this)}
-              text={this.state.content}
-            />
-          )}
+          ) : null}
+          <QrImg
+            onDoubleClick={this.onQrDoubleClick.bind(this)}
+            text={this.state.content}
+          />
+          <a
+            href="/options/index.html#qrcode"
+            target="_blank"
+            className="more-link"
+          >
+            Add a rule for current page...
+          </a>
         </div>
       </div>
     )

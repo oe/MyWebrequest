@@ -3,11 +3,24 @@ $popup-width: 260px;
 html,
 body {
   width: $popup-width;
-  height: 310px;
+  height: 330px;
   overflow: hidden;
 }
 .popup {
   width: $popup-width;
+  text-align: center;
+  .text-container {
+    display: none;
+  }
+  &.is-edit {
+    .text-container {
+      display: block;
+    }
+    .more-link,
+    .qr-code {
+      display: none;
+    }
+  }
 }
 
 .popup-content {
