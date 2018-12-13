@@ -1,11 +1,17 @@
 import React, { Component } from 'react'
-// import { Route } from 'react-router-dom'
-// import Request from './pages/request'
+import { Route } from 'react-router-dom'
+import pages from './pages'
 export default class Routes extends Component {
   render () {
     return (
       <div className="pages">
-        {/* <Route exact path="/requests" component={Request} /> */}
+        {Object.keys(pages).map(pName => (
+          <Route
+            key={pName}
+            path={'/' + pName.toLocaleLowerCase()}
+            component={pages[pName]}
+          />
+        ))}
       </div>
     )
   }

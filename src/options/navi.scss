@@ -6,31 +6,39 @@
     color: $main-color;
     display: block;
   }
-  .ant-menu-inline {
+  .navi-menu {
     border-right: none;
 
-    .ant-menu-item {
+    .navi-menu-item {
       color: #999;
       height: 25px;
       line-height: 25px;
+      text-decoration: none;
+      display: block;
+      position: relative;
+      padding-left: 20px;
+      margin-bottom: 2px;
+
       &:hover {
         color: currentColor;
       }
-      &.ant-menu-item-selected {
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border-left: 6px solid transparent;
+      }
+      &.navi-selected {
         font-weight: bolder;
         background-color: unset;
         color: #666;
+        pointer-events: none;
 
-        &::after {
-          display: none;
-        }
         &::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          border-left: 6px solid #666;
+          border-left-color: #666;
         }
       }
     }

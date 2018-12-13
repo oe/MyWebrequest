@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
-// import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { Menu, Icon } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 import './navi.scss'
+import pages from './pages'
 
 export default class Navi extends Component {
   onClick (param: ClickParam) {
@@ -12,15 +13,18 @@ export default class Navi extends Component {
     return (
       <div className="navi">
         <span className="app-name">My Webrequest</span>
-        <Menu mode="inline" onClick={this.onClick.bind(this)}>
-          <Menu.Item key="requests">
-            Web requests
-            {/* <Link to="/requests">Web requests</Link> */}
-          </Menu.Item>
-          <Menu.Item key="menu">ContextMenu</Menu.Item>
-          <Menu.Item key="settings">Settings</Menu.Item>
-          <Menu.Item key="help">Help</Menu.Item>
-        </Menu>
+        <div className="navi-menu">
+          {Object.keys(pages).map(pName => (
+            <NavLink
+              key={pName.toLocaleLowerCase()}
+              className="navi-menu-item"
+              to={'/' + pName.toLocaleLowerCase()}
+              activeClassName="navi-selected"
+            >
+              {pName}
+            </NavLink>
+          ))}
+        </div>
       </div>
     )
   }
