@@ -15,7 +15,9 @@ export const enum EWebRuleType {
   /** allow cross origin request */
   CORS = 'CORS',
   /** log webrequest */
-  LOG = 'LOG'
+  LOG = 'LOG',
+  /** inject css/js to webpage */
+  INJECT = 'INJECT'
 }
 
 /** custom url redirect rule */
@@ -110,6 +112,19 @@ export interface ILogRule {
   cmd: EWebRuleType.LOG
 }
 
+/** inject css/js to webpage */
+export interface IInjectRule {
+  cmd: EWebRuleType.INJECT
+  /** inject type is css / javascript */
+  type: 'css' | 'js'
+  /** code content */
+  code?: string
+  /** remote file urls */
+  file?: string
+  // when to run
+  runtAt: "document_start" | "document_end" | "document_idle"
+}
+
 export type IWebRule =
   ILogRule |
   ICorsRule |
@@ -118,7 +133,8 @@ export type IWebRule =
   IHstsRule |
   IRedirectRule |
   IReferrerRule |
-  IUaRule
+  IUaRule |
+  IInjectRule
 
 
 export interface IRuleConfig {

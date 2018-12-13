@@ -1,6 +1,5 @@
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
-import { Menu, Icon } from 'antd'
 import { ClickParam } from 'antd/lib/menu'
 import './navi.scss'
 import pages from './pages'

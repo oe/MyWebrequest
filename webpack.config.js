@@ -148,7 +148,7 @@ const config = {
       })
     }),
     // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
-    new CleanWebpackPlugin(['dist', 'ext.zip']),
+    new CleanWebpackPlugin(['dist', 'ext.zip', 'ext.crx']),
     // copy custom static assets
     new CopyWebpackPlugin(
       [

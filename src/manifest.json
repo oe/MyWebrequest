@@ -23,13 +23,9 @@
   "background": {
     "page": "background/index.html"
   },
-  "web_accessible_resources": [
-    "options/index.html"
-  ],
+  "web_accessible_resources": ["options/index.html", "*://*/*"],
   "externally_connectable": {
-    "matches": [
-      "*://localhost/*"
-    ]
+    "matches": ["*://localhost/*"]
   },
   "permissions": [
     "<all_urls>",
