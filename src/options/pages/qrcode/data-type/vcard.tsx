@@ -8,7 +8,10 @@ const vcardFormConfig: IFormConfig = {
       type: 'input',
       name: 'N',
       label: 'Name',
-      placeholder: 'e.g. John Smith'
+      placeholder: 'e.g. John Smith',
+      config: {
+        autoFocus: true
+      }
     },
     {
       type: 'input',
@@ -49,6 +52,7 @@ const vcardFormConfig: IFormConfig = {
 
 const VcardForm = newForm(vcardFormConfig, {
   onValuesChange (props, changedVals: any, allVals: any) {
+    console.log('xxxx')
     let content = 'BEGIN:VCARD\nVERSION:3.0\n'
     content += Object.keys(allVals)
       .map(key => `${key}:${allVals[key] || ''}`)

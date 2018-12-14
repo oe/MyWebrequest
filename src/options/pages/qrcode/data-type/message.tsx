@@ -8,7 +8,10 @@ const messageFormConfig: IFormConfig = {
       type: 'input',
       name: 'tel',
       label: 'To',
-      placeholder: 'e.g. 18800000000'
+      placeholder: 'e.g. 18800000000',
+      config: {
+        autoFocus: true
+      }
     },
     {
       type: 'textarea',

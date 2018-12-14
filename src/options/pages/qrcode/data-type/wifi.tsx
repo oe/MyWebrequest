@@ -8,13 +8,19 @@ const wifiFormConfig: IFormConfig = {
       type: 'input',
       name: 'S',
       label: 'Wifi Name',
-      placeholder: 'e.g. Daddy Shop'
+      placeholder: 'e.g. Daddy Shop',
+      config: {
+        autoFocus: true
+      }
     },
     {
       type: 'select',
       name: 'T',
       label: 'Encryption',
       placeholder: 'Choose a encryption method',
+      decorator: {
+        initialValue: 'WPA'
+      },
       config: {
         options: [
           {
@@ -22,11 +28,11 @@ const wifiFormConfig: IFormConfig = {
             label: 'No encryption'
           },
           {
-            value: 'wep',
+            value: 'WEP',
             label: 'WEP'
           },
           {
-            value: 'wpa',
+            value: 'WPA',
             label: 'WPA/WPA2'
           }
         ]

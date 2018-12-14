@@ -1,13 +1,13 @@
 import React, { Component } from 'react'
+import { findDOMNode } from 'react-dom'
 import debounce from 'lodash.debounce'
-import { Tabs, Row, Col, Input } from 'antd'
+import { Tabs, Row, Col } from 'antd'
 import Title from '@/options/components/title'
 import QrImg from '@/common/qr-img'
 import DataType from './data-type'
 import './style.scss'
 
 const TabPane = Tabs.TabPane
-const TextArea = Input.TextArea
 
 interface IState {
   content: string
@@ -16,14 +16,25 @@ interface IState {
 export default class QrCode extends Component<{}, IState> {
   state = { content: 'https://evecalm.com/' }
   onTabClick (key: string) {
-    console.log('tab click', key)
+    const ref = this.refs[key]
+    if (!ref) return
+    const dom = findDOMNode(ref) as HTMLDivElement
+    const firstElement =
+      dom.querySelector('input') || dom.querySelector('textarea')
+    if (!firstElement) return
+
+    setTimeout(() => {
+      firstElement!.focus()
+    }, 100)
   }
   onChange (val: string) {
+    if (val === undefined) return
     this.updateContent(val)
+    console.warn('val', val)
   }
   updateContent = debounce(function (this: QrCode, val: string) {
     this.setState({ content: val })
-  }, 100)
+  }, 500)
   render () {
     return (
       <div className="qr-page">
@@ -36,25 +47,26 @@ export default class QrCode extends Component<{}, IState> {
               onTabClick={this.onTabClick.bind(this)}
             >
               <TabPane tab="Text" key="text">
-                <TextArea
-                  autoFocus
-                  onChange={evt => this.onChange(evt.target.value)}
-                  placeholder="text / url / email address / phone number (Extra spaces will be removed)"
-                  style={{ resize: 'none', height: 240 }}
-                />
+                <DataType.Text ref="text" onChange={this.onChange.bind(this)} />
               </TabPane>
               <TabPane tab="Vcard" key="vcard">
-                <DataType.Vcard onChange={this.onChange.bind(this)} />
+                <DataType.Vcard
+                  ref="vcard"
+                  onChange={this.onChange.bind(this)}
+                />
               </TabPane>
               <TabPane tab="Message" key="message">
-                <DataType.Message onChange={this.onChange.bind(this)} />
+                <DataType.Message
+                  ref="message"
+                  onChange={this.onChange.bind(this)}
+                />
               </TabPane>
               <TabPane tab="Wifi" key="wifi">
-                <DataType.Wifi onChange={this.onChange.bind(this)} />
+                <DataType.Wifi ref="wifi" onChange={this.onChange.bind(this)} />
               </TabPane>
             </Tabs>
           </Col>
-          <Col span={8} style={{ textAlign: 'center' }}>
+          <Col span={8} className="aside">
             <QrImg size={200} text={this.state.content} />
             <a
               href="https://www.qrcode-monkey.com/"

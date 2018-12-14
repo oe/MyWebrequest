@@ -10,10 +10,12 @@ import {
   FormCreateOption
 } from 'antd/lib/form/Form'
 
+import { FormItemProps } from 'antd/lib/form/FormItem'
+
 interface IInputConfig {
   type: string
   name: string
-  label: string
+  label?: string
   placeholder?: string
   decorator?: GetFieldDecoratorOptions
   config?: { [k: string]: any }
@@ -22,7 +24,7 @@ interface IInputConfig {
 export interface IFormConfig {
   onSubmit?: (evt: FormEvent) => void
   items: IInputConfig[]
-  itemConfig?: any
+  itemConfig?: FormItemProps
 }
 
 interface IFormElement {
