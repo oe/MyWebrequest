@@ -1,5 +1,7 @@
-import React, { Component, ChangeEvent, KeyboardEvent } from 'react'
+import React, { Component, KeyboardEvent } from 'react'
 import { Button } from 'antd'
+import { onInputChange } from '@/common/react-utils'
+
 import './editor.scss'
 
 interface IProps {
@@ -28,9 +30,6 @@ export default class Editor extends Component<IProps, IState> {
       val: newProps.initVal
     })
   }
-  onValChange (evt: ChangeEvent<HTMLTextAreaElement>) {
-    this.setState({ val: evt.target.value })
-  }
   onSubmit () {
     if (this.props.onSubmit) {
       this.props.onSubmit(this.state.val)
@@ -49,7 +48,7 @@ export default class Editor extends Component<IProps, IState> {
           ref={ta => (this.ta = ta!)}
           value={this.state.val}
           onKeyDown={this.onKeyDown.bind(this)}
-          onChange={this.onValChange.bind(this)}
+          onChange={onInputChange.bind(this, 'val')}
         />
         <div className="action-btn">
           <Button size="small" onClick={this.onSubmit.bind(this)}>
