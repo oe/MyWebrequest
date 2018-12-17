@@ -5,6 +5,7 @@ import BLOCK from './block'
 import HEADER from './header'
 import LOG from './log'
 import onTabChange from './tab-change'
+import { uniqueArray } from '@/common/utils'
 import { isRuleEnabled, diffArray, spliceArray } from '@/background/utils'
 import { IUaRule, IReferrerRule, IRuleConfig, IAlterHeaderRule, EWebRuleType } from '@/types/web-rule'
 import { IWebRequestRule } from '@/types/runtime-webrule'
@@ -67,10 +68,17 @@ function init () {
       })
     })
   })
+  Object.keys(evtProcessors).forEach((key) => {
+    const processor = evtProcessors[key]
+    processor.permit = uniqueArray(processor.permit)
+  })
   return evtProcessors
 }
 
+init()
+
 export function onRequestsChange (newVal: IRuleConfig[], oldVal?: IRuleConfig[]) {
+  console.warn('newVal', newVal)
   const diffResult = diffArray(newVal.filter(isRuleEnabled), (oldVal || []).filter(isRuleEnabled), isEqual, isSame)
   onTabChange(diffResult)
 }

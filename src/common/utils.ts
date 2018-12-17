@@ -86,16 +86,16 @@ export function guid () {
 export const urlComponentReg = /^([^:]+):\/\/([^/]+)(\/[^?]*)(\?(.*))?$/
 /** rule types */
 export const RULE_TYPES = [
-  'custom',
-  'block',
-  'hsts',
-  'log',
-  'hotlink',
-  'cors'
+  'requests',
   // 'ua'
   // 'contextmenu'
 ]
-// parse querystring to object
+/** unique array */
+export function uniqueArray<T> (arr: T[]) {
+  return arr.filter((item, idx) => arr.indexOf(item) === idx)
+}
+
+/** parse querystring to object */
 export const parseQs = qs.parse
 /**
  * is url1 cross domain of url2

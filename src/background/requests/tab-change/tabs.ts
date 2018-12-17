@@ -31,7 +31,7 @@ export function removeTabListener (cb: ITabListener) {
     return
   }
   EVT_CBS.splice(idx, 1)
-  if (!EVT_CBS.length) toggleListener(true)
+  if (!EVT_CBS.length && IS_LISTENER_STARTED) toggleListener(false)
 }
 
 function toggleListener (isOn: boolean) {

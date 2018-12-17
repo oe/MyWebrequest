@@ -1,6 +1,6 @@
 import { convertPattern2Reg } from '@/common/utils'
 import { IRuleConfig, EWebRuleType } from '@/types/web-rule'
-import { ITabEvent, addTabListener, removeTabListener } from '@/background/tabs'
+import { ITabEvent, addTabListener, removeTabListener } from '@/background/requests/tab-change/tabs'
 
 // cache data for frequently usage
 interface ICacheRule {

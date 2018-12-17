@@ -5,7 +5,7 @@ import { updateCache as updateReferrer } from './referrer'
 import { updateCache as updateUa } from './ua'
 
 export default function (diffResult: IDiffArrayResult<IRuleConfig>) {
-  const diff = Object.assign({}, diffResult.added, diffResult.updated)
+  const diff = [...diffResult.added, ...diffResult.updated]
   updateInject(diff)
   updateReferrer(diff)
   updateUa(diff)

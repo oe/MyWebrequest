@@ -29,7 +29,6 @@ export default class App extends Component<{}, IState> {
         lastFocusedWindow: true
       },
       tabs => {
-        console.log(tabs[0])
         const url = tabs[0].url || ''
         this.setState({
           content: url,
@@ -64,14 +63,10 @@ export default class App extends Component<{}, IState> {
     })
   }
   onTaSubmit (val: string) {
-    console.log('val', val)
     this.setState({
       content: val,
       isEdit: false
     })
-    setTimeout(() => {
-      console.warn(this.state)
-    }, 500)
   }
   render () {
     return (

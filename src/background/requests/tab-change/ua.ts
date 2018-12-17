@@ -1,5 +1,5 @@
 import { alterHeaders as removeHeaders, toggleWebRequest } from '@/background/utils'
-import { ITabEvent, addTabListener, removeTabListener } from '@/background/tabs'
+import { ITabEvent, addTabListener, removeTabListener } from '@/background/requests/tab-change/tabs'
 import { convertPattern2Reg } from '@/common/utils'
 import { IUaRule, IUaInfo, IRuleConfig, EWebRuleType } from '@/types/web-rule'
 import { IWebRequestRules } from '@/types/runtime-webrule'
