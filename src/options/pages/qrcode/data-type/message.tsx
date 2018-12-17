@@ -28,7 +28,9 @@ const messageFormConfig: IFormConfig = {
 
 const MessageForm = newForm(messageFormConfig, {
   onValuesChange (props, changedVals: any, allVals: any) {
-    const content = `SMSTO:${allVals.tel.trim()}:${allVals.content.trim()}`
+    const content = `SMSTO:${(allVals.tel || '').trim()}:${(
+      allVals.content || ''
+    ).trim()}`
     props.onChange && props.onChange(content)
   }
 })

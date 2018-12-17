@@ -1,6 +1,6 @@
 import { convertPattern2Reg } from '@/common/utils'
 import { IRuleConfig, EWebRuleType } from '@/types/web-rule'
-import { creatTabCache } from './cache'
+import { ITabEvent, addTabListener, removeTabListener } from '@/background/tabs'
 
 // cache data for frequently usage
 interface ICacheRule {
@@ -8,14 +8,12 @@ interface ICacheRule {
 }
 
 let cachedRules: ICacheRule[] = []
-const UA_TAB_CACHE = creatTabCache({ getTabMatchedRule: getMatchedRule, onTabUpdated })
-
 
 // update cache
 export async function updateCache (configs: IRuleConfig[]) {
-  cachedRules = configs.filter((cfg) => cfg.isValid && cfg.enabled).reduce((acc, cur) => {
-    const ua = cur.rules.find(item => item.cmd === EWebRuleType.REFERRER && item.type === 'out')
-    if (ua) {
+  cachedRules = configs.reduce((acc, cur) => {
+    const referrer = cur.rules.find(item => item.cmd === EWebRuleType.REFERRER && item.type === 'out')
+    if (referrer) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({
         reg
@@ -24,20 +22,17 @@ export async function updateCache (configs: IRuleConfig[]) {
     return acc
   }, [] as ICacheRule[])
 
-  // no rules anynore but tab listener is started
-  if (UA_TAB_CACHE.isListenerStarted && !cachedRules.length) {
-    UA_TAB_CACHE.toggleTabListener(false)
-    return
-  }
-  // has rules but tab listener isn't started yet
-  if (!UA_TAB_CACHE.isListenerStarted && cachedRules.length) {
-    UA_TAB_CACHE.toggleTabListener(true)
-    return
+  cachedRules.length ? addTabListener(onTabChange) : removeTabListener(onTabChange)
+}
+
+function onTabChange (evt: ITabEvent) {
+  if (evt.type === 'removed') return
+  if (isUrlMatch(evt.url)) {
+    removeReferrer(evt.tabId)
   }
 }
 
-function getMatchedRule (tab: chrome.tabs.Tab) {
-  const url = tab.url!
+function isUrlMatch (url: string) {
   return cachedRules.find((rule) => rule.reg.test(url))
 }
 
@@ -60,12 +55,4 @@ function removeReferrer (tabId: number) {
   )
 }
 
-function onTabUpdated (id: number) {
-  const cachedRule = UA_TAB_CACHE.tabCache[id]
-  if (!cachedRule) {
-    console.warn('can not find cache rule for tab', id)
-    return
-  }
-  removeReferrer(id)
-}
 

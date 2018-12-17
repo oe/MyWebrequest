@@ -60,37 +60,94 @@ export function toggleWebRequest (webrequests: IWebRequestRules<IRtRule>, rule: 
   forceWebrequestReload()
 }
 
+export interface IDiffArrayResult<T> {
+  added: T[]
+  updated: T[]
+  removed: T[]
+}
 
-export function diffArray<T> (newIds: T[], oldIds: T[], getRuleIdx: (oldTs: T[], netT: T) => number) {
+/**
+ * diff two array, return the diff
+ * @param newItems new data items
+ * @param oldItems old data tiems
+ * @param isEqual is two item totally equal
+ * @param isSame (optional) is two item mean to be the same item
+ */
+export function diffArray<T> (
+  newItems: T[],
+  oldItems: T[],
+  isEqual: (a: T, b: T) => boolean,
+  isSame?: (a: T, b: T) => boolean): IDiffArrayResult<T> {
   const result = {
-    added: [] as T[],
-    removed: [] as T[]
-  }
+    added: [],
+    updated: [],
+    removed: []
+  } as IDiffArrayResult<T>
   // shallow copy to avoid affect the oldIds
-  const olds = [...oldIds]
-  if (!newIds.length) {
+  const olds = [...oldItems]
+  if (!newItems.length) {
     result.removed = olds
     return result
   }
   if (!olds.length) {
-    result.added = newIds
+    result.added = newItems
     return result
   }
 
-  newIds.forEach((id) => {
-    const idx = getRuleIdx(olds, id)
+  const needTestIsSame = !!isSame
+  const findItem = isSame || isEqual
+  newItems.forEach((item) => {
+    const idx = olds.findIndex(oldItem => findItem(oldItem, item))
     if (idx > -1) {
+      if (needTestIsSame) {
+        if (!isEqual(olds[idx], item)) {
+          result.updated.push(item)
+        }
+      }
       olds.slice(idx, 1)
     } else {
-      result.added.push(id)
+      result.added.push(item)
     }
   })
-  result.removed = oldIds
+  result.removed = olds
 
   return result
 }
 
-export function sliceArray<T> (arr: T[], filter: (a: T) => boolean) {
+export function diffObject<T> (newObj: T, oldObj: T, isEqual?: (a: any, b: any) => boolean) {
+  const testEqual = isEqual || ((a: any, b: any) => a === b)
+  const result = {
+    added: {} as Partial<T>,
+    updated: {} as Partial<T>,
+    removed: {} as Partial<T>
+  }
+  const keys = Object.keys(newObj)
+  const oldDold = Object.assign({}, oldObj)
+  if (!Object.keys(oldDold).length) {
+    result.added = newObj
+    return result
+  }
+  keys.forEach(k => {
+    if (oldDold.hasOwnProperty(k)) {
+      // @ts-ignore
+      if (!testEqual(newObj[k], oldDold[k])) {
+        // @ts-ignore
+        result.updated[k] = newObj[k]
+      }
+    } else {
+      // @ts-ignore
+      result.added[k] = newObj[k]
+    }
+  })
+  result.removed = oldDold
+  return result
+}
+/**
+ * splice an array by filter, return splice elements
+ * @param arr array to process
+ * @param filter func
+ */
+export function spliceArray<T> (arr: T[], filter: (a: T) => boolean) {
   const idxs: number[] = []
   const result = arr.filter((item, idx) => {
     if (filter(item)) {

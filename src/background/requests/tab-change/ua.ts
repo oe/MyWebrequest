@@ -1,9 +1,8 @@
-import { alterHeaders as removeHeaders, diffArray, toggleWebRequest } from '@/background/utils'
-// import collection from '@/common/collection'
+import { alterHeaders as removeHeaders, toggleWebRequest } from '@/background/utils'
+import { ITabEvent, addTabListener, removeTabListener } from '@/background/tabs'
 import { convertPattern2Reg } from '@/common/utils'
 import { IUaRule, IUaInfo, IRuleConfig, EWebRuleType } from '@/types/web-rule'
 import { IWebRequestRules } from '@/types/runtime-webrule'
-import { creatTabCache } from './cache'
 
 // cache data for frequently usage
 interface ICacheRule {
@@ -12,12 +11,17 @@ interface ICacheRule {
 }
 
 let cachedRules: ICacheRule[] = []
-const UA_TAB_CACHE = creatTabCache({ getTabMatchedRule: getMatchedRule, onTabUpdated, onTabChanged })
 
+interface ITabCache {
+  [k: number]: {
+    ua: string
+  }
+}
+const tabCache: ITabCache = {}
 
 // update cache
 export async function updateCache (configs: IRuleConfig[]) {
-  cachedRules = configs.filter((cfg) => cfg.isValid && cfg.enabled).reduce((acc, cur) => {
+  cachedRules = configs.reduce((acc, cur) => {
     const ua = cur.rules.find(item => item.cmd === EWebRuleType.UA && item.type === 'out') as IUaRule
     if (ua) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
@@ -29,23 +33,30 @@ export async function updateCache (configs: IRuleConfig[]) {
     return acc
   }, [] as ICacheRule[])
 
-  // no rules anynore but tab listener is started
-  if (UA_TAB_CACHE.isListenerStarted && !cachedRules.length) {
-    UA_TAB_CACHE.toggleTabListener(false)
-    return
-  }
-  // has rules but tab listener isn't started yet
-  if (!UA_TAB_CACHE.isListenerStarted && cachedRules.length) {
-    UA_TAB_CACHE.toggleTabListener(true)
-    return
+  cachedRules.length ? addTabListener(onTabChange) : removeTabListener(onTabChange)
+}
+
+function onTabChange (evt: ITabEvent) {
+  if (evt.type === 'removed') {
+    if (tabCache[evt.tabId]) {
+      toggleTabRequest(evt.tabId, false)
+      delete tabCache[evt.tabId]
+    }
+  } else {
+    const matched = getMatchedRule(evt.url)
+    if (matched) {
+      if (!tabCache[evt.tabId]) {
+        toggleTabRequest(evt.tabId, true)
+      }
+      updateTabUa(evt.tabId, matched)
+      tabCache[evt.tabId] = matched
+    }
   }
 }
 
-function getMatchedRule (tab: chrome.tabs.Tab) {
-  const url = tab.url!
+function getMatchedRule (url: string) {
   return cachedRules.find((rule) => rule.reg.test(url))
 }
-
 
 function updateTabUa (tabId: number, navi: IUaInfo) {
   chrome.tabs.executeScript(
@@ -66,19 +77,11 @@ function updateTabUa (tabId: number, navi: IUaInfo) {
   )
 }
 
-function onTabUpdated (id: number) {
-  const cachedRule = UA_TAB_CACHE.tabCache[id]
-  if (!cachedRule) {
-    console.warn('can not find cache rule for tab', id)
-    return
-  }
-  updateTabUa(id, cachedRule)
-}
 
 const webrequests: IWebRequestRules<any> = [
   {
     fn (details) {
-      const matched = UA_TAB_CACHE.tabCache[details.tabId]
+      const matched = tabCache[details.tabId]
       if (!matched) return
       const headers = details.requestHeaders || []
       removeHeaders(headers, 'User-Agent')
@@ -104,14 +107,6 @@ function getRule (id: number): chrome.webRequest.RequestFilter {
   }
 }
 
-function getIdIdx (oldIds: number[], id: number) {
-  return oldIds.indexOf(id)
-}
-
-function onTabChanged (newTabIds: number[], oldTabIds: number[]) {
-  const diffs = diffArray(newTabIds, oldTabIds, getIdIdx)
-  // @ts-ignore
-  diffs.added.forEach(id => toggleWebRequest(webrequests, getRule(id), true))
-  // @ts-ignore
-  diffs.removed.forEach(id => toggleWebRequest(webrequests, getRule(id), false))
+function toggleTabRequest (id: number, isOn?: boolean) {
+  toggleWebRequest(webrequests, getRule(id), !!isOn)
 }

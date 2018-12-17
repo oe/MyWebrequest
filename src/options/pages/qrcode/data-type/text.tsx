@@ -22,7 +22,7 @@ const textFormConfig: IFormConfig = {
 
 const TextForm = newForm(textFormConfig, {
   onValuesChange (props, changedVals: any, allVals: any) {
-    props.onChange && props.onChange(allVals.content)
+    props.onChange && props.onChange((allVals.content || '').trim())
   }
 })
 
