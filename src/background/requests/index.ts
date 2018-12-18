@@ -5,10 +5,9 @@ import BLOCK from './block'
 import HEADER from './header'
 import LOG from './log'
 import onTabChange from './tab-change'
-import { uniqueArray } from '@/common/utils'
+import { uniqueArray, convertPattern2Reg } from '@/common/utils'
 import { isRuleEnabled, diffArray, spliceArray } from '@/background/utils'
-import { IUaRule, IReferrerRule, IRuleConfig, IAlterHeaderRule, EWebRuleType } from '@/types/web-rule'
-import { IWebRequestRule } from '@/types/runtime-webrule'
+import { IWebRequestRule, IRtHeaderRuleItem, IUaRule, IReferrerRule, IRequestConfig, IAlterHeaderRule, EWebRuleType, IRtRequestConfig } from '@/types/requests'
 
 const REQUESTS = {
   BLOCK,
@@ -19,7 +18,7 @@ const REQUESTS = {
   REDIRECT
 }
 
-const cacheRules: IRuleConfig[] = []
+const cacheRules: IRtRequestConfig[] = []
 
 const WEB_REQUEST_EVENT_FLOW = [
   /** synchronous, Fires when a request is about to occur. This event is sent before any TCP connection is made and can be used to cancel or redirect requests */
@@ -42,11 +41,13 @@ const WEB_REQUEST_EVENT_FLOW = [
   'onErrorOccurred'
 ]
 
+interface IRequestFn {
+  permit: string[]
+  fns: ({ type: string, fn: Function })[]
+}
+
 interface IRequestFns {
-  [k: string]: {
-    permit: string[]
-    fns: ({ type: string, fn: Function })[]
-  }
+  [k: string]: IRequestFn
 }
 
 function init () {
@@ -75,34 +76,48 @@ function init () {
   return evtProcessors
 }
 
-init()
+const EVT_PROCESSORS = init()
 
-export function onRequestsChange (newVal: IRuleConfig[], oldVal?: IRuleConfig[]) {
+export function onRequestsChange (newVal: IRequestConfig[], oldVal?: IRequestConfig[]) {
   console.warn('newVal', newVal)
   const diffResult = diffArray(newVal.filter(isRuleEnabled), (oldVal || []).filter(isRuleEnabled), isEqual, isSame)
   onTabChange(diffResult)
 }
 
-function isEqual (a: IRuleConfig, b: IRuleConfig) {
+function isEqual (a: IRequestConfig, b: IRequestConfig) {
+  // same id & chrome match url pattern not change
   return a.id === b.id && a.updatedAt === b.updatedAt
 }
 
-function isSame (a: IRuleConfig, b: IRuleConfig) {
+function isSame (a: IRequestConfig, b: IRequestConfig) {
   return a.id === b.id
 }
 
-function analyzeConfigs (configs: IRuleConfig[]) {
-  configs.map((cfg) => {
-    const headers = spliceArray(cfg.rules, (item) => {
-      return item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA
+function analyzeConfigs (configs: IRequestConfig[]) {
+  return configs.map((cfg) => {
+    const item: IRtRequestConfig = {
+      id: cfg.id,
+      matchUrl: cfg.id,
+      url: cfg.url,
+      useReg: cfg.useReg,
+      reg: cfg.useReg ? RegExp(cfg.matchUrl) : convertPattern2Reg(cfg.matchUrl),
+      rules: []
+    }
+    const inHeaders = spliceArray(cfg.rules, (item) => {
+      return (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA) && item.type === 'in'
     }) as (IUaRule | IReferrerRule)[]
-    const inHeaders = spliceArray(headers, (item) => item.type === 'in')
+
+    spliceArray(cfg.rules, (item) => {
+      return item.cmd === EWebRuleType.INJECT || (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA) && item.type === 'out'
+    })
+    // @ts-ignore
+    item.rules = cfg.rules
 
     const alterHeaders = (spliceArray(cfg.rules, (item) => item.cmd === EWebRuleType.HEADER) as IAlterHeaderRule[]).map(item => ({
       type: item.type,
       name: item.name,
       val: item.type === 'update' ? item.val : undefined
-    }))
+    })) as IRtHeaderRuleItem[]
 
     // @ts-ignore
     alterHeaders.push(...inHeaders.map(item => {
@@ -114,5 +129,36 @@ function analyzeConfigs (configs: IRuleConfig[]) {
         val: isRefer ? undefined : item.ua
       }
     }))
+    if (alterHeaders.length) {
+      item.rules.push({
+        cmd: EWebRuleType.HEADER,
+        rules: alterHeaders
+      })
+    }
+    return item
   })
+}
+
+function createRequestListener (type: string) {
+  return function (details: chrome.webRequest.WebRequestDetails) {
+    const url = details.url
+    const config = cacheRules.find(item => item.reg.test(url))
+    const processor = EVT_PROCESSORS[type]
+    if (!config || !config.rules.length || !processor) {
+      console.warn(`cannot match url ${url} or processor for ${type} not found`)
+      return
+    }
+    return runProcessor(processor.fns, config, details)
+  }
+}
+
+function runProcessor (fns: IRequestFn['fns'], config: IRtRequestConfig, details: chrome.webRequest.WebRequestDetails) {
+  const result: Partial<chrome.webRequest.WebRequestDetails> = {}
+  config.rules.forEach(rule => {
+    const cmd = rule.cmd
+    const fn = fns.find(fn => fn.type === cmd)
+    if (!fn) return
+    fn.fn(result, details, rule, config)
+  })
+  return result
 }

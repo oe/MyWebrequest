@@ -1,7 +1,6 @@
 import { getQs, parseQs } from '@/common/utils'
 import clonedeep from 'lodash.clonedeep'
-import { IRtLogRule, IWebRequestRules } from '@/types/runtime-webrule'
-// import { ILogRule, IWebRequestRules } from '@/types/web-rule'
+import { ILogRule, IWebRequestRules } from '@/types/requests'
 
 const logger = window.console
 
@@ -49,7 +48,7 @@ function formatHeaders (headers: chrome.webRequest.HttpHeader[]) {
 }
 
 // const cache = {}
-const webrequests: IWebRequestRules<IRtLogRule> = [
+const webrequests: IWebRequestRules<ILogRule> = [
   {
     // @ts-ignore
     fn (details: chrome.webRequest.WebRequestBodyDetails) {

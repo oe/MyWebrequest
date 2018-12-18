@@ -1,7 +1,5 @@
-// import utils from '@/common/utils'
 import { alterHeaders as removeHeaders } from '@/background/utils'
-// import { ICorsRule, IWebRequestRules } from '@/types/web-rule'
-import { IRtCorsRule, IWebRequestRules } from '@/types/runtime-webrule'
+import { ICorsRule, IWebRequestRules } from '@/types/requests'
 import { isXDomain } from '@/common/utils'
 
 interface ICorsCache {
@@ -121,7 +119,7 @@ function handleCorsHeader (details: chrome.webRequest.WebRequestDetails, headers
   })
 }
 
-const webrequests: IWebRequestRules<IRtCorsRule> = [
+const webrequests: IWebRequestRules<ICorsRule> = [
   {
     fn (details) {
       const originHeader = (details.requestHeaders || []).find(

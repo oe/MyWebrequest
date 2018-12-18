@@ -1,5 +1,5 @@
 import debounce from 'lodash.debounce'
-import { IWebRequestRules, IRtRule } from '@/types/runtime-webrule'
+import { IWebRequestRules, IRtRule } from '@/types/requests'
 /**
  * remove headers with names
  * @param  {Array} headers headers

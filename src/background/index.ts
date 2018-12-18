@@ -1,7 +1,7 @@
 import { pushNotification, i18n } from '@/common/utils'
 import { diffObject, diffArray, isRuleEnabled } from './utils'
 import collection from '@/common/collection'
-import { IRuleConfig, EWebRuleType } from '@/types/web-rule'
+import { IRuleConfig, EWebRuleType } from '@/types/requests'
 import { IExtSettings } from '@/types/settings'
 import { onRequestsChange } from './requests'
 

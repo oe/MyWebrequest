@@ -1,7 +1,6 @@
 import { preprocessRouter, getTargetUrl } from '@/common/utils'
 import collection from '@/common/collection'
-import { EWebRuleType } from '@/types/web-rule'
-import { IRtRedirectRule, IWebRequestRules } from '@/types/runtime-webrule'
+import { EWebRuleType, IRedirectRule, IWebRequestRules } from '@/types/requests'
 
 
 // cache data for frequently usage
@@ -11,7 +10,7 @@ let cachedRules: any[] = []
 async function updateCache (isOn: boolean) {
   if (isOn) {
     // ignore disabled
-    const result = await collection.get(EWebRuleType.REDIRECT) as IRtRedirectRule[]
+    const result = await collection.get(EWebRuleType.REDIRECT) as IRedirectRule[]
     cachedRules = result
       .map(item => {
         try {
@@ -26,7 +25,7 @@ async function updateCache (isOn: boolean) {
   }
 }
 
-const webrequests: IWebRequestRules<IRtRedirectRule> = [
+const webrequests: IWebRequestRules<IRedirectRule> = [
   {
     fn (details) {
       const url = details.url

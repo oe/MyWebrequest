@@ -7,8 +7,7 @@ export const enum EWebRuleType {
   BLOCK = 'BLOCK',
   /** alter header */
   HEADER = 'HEADER',
-  /** Referrer & UA actually belong to  header*/
-  /** change referrer */
+  /** Referrer & UA actually belong to  header, change referrer */
   REFERRER = 'REFERER',
   /** change user-agent */
   UA = 'UA',
@@ -61,7 +60,7 @@ export interface IReferrerRule {
   /**
    * out: for remove referrer from the url
    * in: for remove referrer to the url
-   * */
+   */
   type: 'out' | 'in'
 }
 
@@ -91,7 +90,7 @@ export interface ICorsRule {
   /**
    * out: for allow cors from the url
    * in: for allow cors to the url
-   * */
+   */
   type: 'out' | 'in'
 }
 
@@ -101,7 +100,7 @@ export interface IUaRule {
   /**
    * out: for change ua of all requests from the url
    * in: for change ua of all requests to the url
-   * */
+   */
   type: 'out' | 'in'
   /** ua want to change */
   ua: string
@@ -122,7 +121,7 @@ export interface IInjectRule {
   /** remote file urls */
   file?: string
   // when to run
-  runtAt: "document_start" | "document_end" | "document_idle"
+  runtAt: 'document_start' | 'document_end' | 'document_idle'
 }
 
 export type IWebRule =
@@ -137,14 +136,14 @@ export type IWebRule =
   IInjectRule
 
 
-export interface IRuleConfig {
+export interface IRequestConfig {
   /** rule id, auto-generated */
   id: string
   rules: IWebRule[]
   /** chrome match url pattern */
   url: string
   /** if true matchUrl should be a valid reg string */
-  useReg: false
+  useReg: boolean
   /** url input match pattern */
   matchUrl: string
   enabled: boolean
@@ -153,6 +152,45 @@ export interface IRuleConfig {
   updatedAt: number
 }
 
+export interface IRtHeaderRuleItem {
+  type: 'delete' | 'update'
+  name: string
+  val?: string
+}
+
+export interface IRtHeaderRule {
+  cmd: EWebRuleType.HEADER
+  rules: IRtHeaderRuleItem[]
+}
+
+export type IRtRequestRule = IRtHeaderRule | ILogRule | ICorsRule | IBlockRule | IRedirectRule | IHstsRule
+
+export interface IRtRequestConfig {
+  id: string
+  reg: RegExp
+  url: string
+  useReg: boolean
+  matchUrl: string
+  rules: IRtRequestRule[]
+}
+
 export interface IUaInfo {
   ua: string
 }
+
+export type IRtRule =
+  IRtHeaderRule |
+  IBlockRule |
+  ICorsRule |
+  IHstsRule |
+  ILogRule |
+  IRedirectRule
+
+export interface IWebRequestRule<T extends IRtRule, K extends chrome.webRequest.ResourceRequest> {
+  fn: (details: K, rule: T) => any,
+  permit: string[]
+  on: string
+}
+
+
+export type IWebRequestRules<T extends IRtRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]

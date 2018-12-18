@@ -1,9 +1,9 @@
-import { IUaInfo } from '@/types/web-rule'
-function changeUaInfo (navi: IUaInfo) {
+import { IUaInfo } from '@/types/requests'
+function changeUaInfo(navi: IUaInfo) {
   // change ua for content script env
   Object.defineProperties(navigator, {
     userAgent: {
-      get () {
+      get() {
         return navi.ua
       }
     }
@@ -28,7 +28,7 @@ function changeUaInfo (navi: IUaInfo) {
   )
 }
 
-function main () {
+function main() {
   // @ts-ignore
   if (window.__is_ua_inited__) {
     return

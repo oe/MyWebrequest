@@ -1,4 +1,4 @@
-import { IWebRequestRules, IRtHeaderRule } from '@/types/runtime-webrule'
+import { IWebRequestRules, IRtHeaderRule } from '@/types/requests'
 import { alterHeaders } from '@/background/utils'
 
 const webrequests: IWebRequestRules<IRtHeaderRule> = [

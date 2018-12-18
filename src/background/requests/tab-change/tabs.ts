@@ -1,3 +1,6 @@
+import { IDiffArrayResult, spliceArray } from '@/background/utils'
+import { IRequestConfig } from '@/types/requests'
+
 export interface ITabChangeEvent {
   type: 'updated' | 'created',
   tabId: number
@@ -32,6 +35,21 @@ export function removeTabListener (cb: ITabListener) {
   }
   EVT_CBS.splice(idx, 1)
   if (!EVT_CBS.length && IS_LISTENER_STARTED) toggleListener(false)
+}
+
+
+export async function updateTabCache<T> (diff: IDiffArrayResult<IRequestConfig>, onTabChange: ITabListener, cachedRules: T[], reducer: (acc: T[], cur: IRequestConfig) => T[]) {
+  const ids2remove = diff.removed.map(item => item.id)
+  ids2remove.push(...diff.updated.map(item => item.id))
+  if (ids2remove.length) {
+    // @ts-ignore
+    spliceArray(cachedRules, (item) => -1 !== ids2remove.indexOf(item.id))
+  }
+  const items2add = [...diff.added, ...diff.updated]
+  // @ts-ignore
+  items2add.reduce(reducer, cachedRules)
+
+  cachedRules.length ? addTabListener(onTabChange) : removeTabListener(onTabChange)
 }
 
 function toggleListener (isOn: boolean) {

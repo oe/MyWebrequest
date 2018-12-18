@@ -1,28 +1,29 @@
+import { IDiffArrayResult } from '@/background/utils'
 import { convertPattern2Reg } from '@/common/utils'
-import { IRuleConfig, EWebRuleType } from '@/types/web-rule'
-import { ITabEvent, addTabListener, removeTabListener } from '@/background/requests/tab-change/tabs'
+import { IRequestConfig, EWebRuleType } from '@/types/requests'
+import { ITabEvent, updateTabCache } from './tabs'
 
 // cache data for frequently usage
 interface ICacheRule {
+  id: string
   reg: RegExp
 }
 
-let cachedRules: ICacheRule[] = []
+const cachedRules: ICacheRule[] = []
 
 // update cache
-export async function updateCache (configs: IRuleConfig[]) {
-  cachedRules = configs.reduce((acc, cur) => {
+export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+  updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const referrer = cur.rules.find(item => item.cmd === EWebRuleType.REFERRER && item.type === 'out')
     if (referrer) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({
+        id: cur.id,
         reg
       })
     }
     return acc
-  }, [] as ICacheRule[])
-
-  cachedRules.length ? addTabListener(onTabChange) : removeTabListener(onTabChange)
+  })
 }
 
 function onTabChange (evt: ITabEvent) {

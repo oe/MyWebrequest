@@ -1,12 +1,11 @@
 import { IDiffArrayResult } from '@/background/utils'
-import { IRuleConfig } from '@/types/web-rule'
+import { IRequestConfig } from '@/types/requests'
 import { updateCache as updateInject } from './inject'
 import { updateCache as updateReferrer } from './referrer'
 import { updateCache as updateUa } from './ua'
 
-export default function (diffResult: IDiffArrayResult<IRuleConfig>) {
-  const diff = [...diffResult.added, ...diffResult.updated]
-  updateInject(diff)
-  updateReferrer(diff)
-  updateUa(diff)
+export default function (diffResult: IDiffArrayResult<IRequestConfig>) {
+  updateInject(diffResult)
+  updateReferrer(diffResult)
+  updateUa(diffResult)
 }

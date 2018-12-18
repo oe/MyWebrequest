@@ -1,35 +1,31 @@
 import { alterHeaders as removeHeaders, toggleWebRequest, IDiffArrayResult } from '@/background/utils'
-
+import corsRequest from '../cors'
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
-import { IWebRequestRules, IUaRule, IUaInfo, IRequestConfig, EWebRuleType } from '@/types/requests'
+import { IWebRequestRules, IUaRule, IRequestConfig, EWebRuleType } from '@/types/requests'
 
 // cache data for frequently usage
 interface ICacheRule {
   id: string
   reg: RegExp
-  ua: string
 }
 
 const cachedRules: ICacheRule[] = []
 
 interface ITabCache {
-  [k: number]: {
-    ua: string
-  }
+  [k: number]: true
 }
 const tabCache: ITabCache = {}
 
 // update cache
 export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
-    const ua = cur.rules.find(item => item.cmd === EWebRuleType.UA && item.type === 'out') as IUaRule
+    const ua = cur.rules.find(item => item.cmd === EWebRuleType.CORS && item.type === 'out') as IUaRule
     if (ua) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({
         id: cur.id,
-        reg,
-        ua: ua.ua
+        reg
       })
     }
     return acc
@@ -43,38 +39,18 @@ function onTabChange (evt: ITabEvent) {
       delete tabCache[evt.tabId]
     }
   } else {
-    const matched = getMatchedRule(evt.url)
+    const matched = isMatch(evt.url)
     if (matched) {
       if (!tabCache[evt.tabId]) {
         toggleTabRequest(evt.tabId, true)
       }
-      updateTabUa(evt.tabId, matched)
-      tabCache[evt.tabId] = matched
+      tabCache[evt.tabId] = true
     }
   }
 }
 
-function getMatchedRule (url: string) {
-  return cachedRules.find((rule) => rule.reg.test(url))
-}
-
-function updateTabUa (tabId: number, navi: IUaInfo) {
-  chrome.tabs.executeScript(
-    tabId,
-    {
-      file: '/content-scripts/change-ua.js',
-      // execute js ASAP, make QR feature available even before page loaded
-      runAt: 'document_start',
-      // change all frame's ua
-      allFrames: true
-    },
-    () => {
-      if (chrome.runtime.lastError) {
-        return console.warn(chrome.runtime.lastError)
-      }
-      chrome.tabs.sendMessage(tabId, { cmd: 'update-ua', navi })
-    }
-  )
+function isMatch (url: string) {
+  return cachedRules.some((rule) => rule.reg.test(url))
 }
 
 
@@ -87,7 +63,7 @@ const webrequests: IWebRequestRules<any> = [
       removeHeaders(headers, 'User-Agent')
       headers.push({
         name: 'User-Agent',
-        value: matched.ua
+        value: 'xxxx'
       })
 
       return {

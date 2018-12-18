@@ -1,30 +1,31 @@
+import { IDiffArrayResult } from '@/background/utils'
 import { convertPattern2Reg } from '@/common/utils'
-import { IRuleConfig, EWebRuleType, IInjectRule } from '@/types/web-rule'
-import { ITabEvent, addTabListener, removeTabListener } from '@/background/requests/tab-change/tabs'
+import { IRequestConfig, EWebRuleType, IInjectRule } from '@/types/requests'
+import { ITabEvent, updateTabCache } from './tabs'
 
 // cache data for frequently usage
 interface ICacheRule {
+  id: string
   reg: RegExp
   rules: IInjectRule[]
 }
 
-let cachedRules: ICacheRule[] = []
+const cachedRules: ICacheRule[] = []
 
 // update cache
-export async function updateCache (configs: IRuleConfig[]) {
-  cachedRules = configs.filter((cfg) => cfg.isValid && cfg.enabled).reduce((acc, cur) => {
+export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+  updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const rules = cur.rules.filter(item => item.cmd === EWebRuleType.INJECT) as IInjectRule[]
     if (rules.length) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({
+        id: cur.id,
         reg,
         rules
       })
     }
     return acc
-  }, [] as ICacheRule[])
-
-  cachedRules.length ? addTabListener(onTabChange) : removeTabListener(onTabChange)
+  })
 }
 
 function onTabChange (evt: ITabEvent) {
