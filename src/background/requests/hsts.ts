@@ -1,10 +1,10 @@
 import { IHstsRule, IWebRequestRules } from '@/types/requests'
 const webrequests: IWebRequestRules<IHstsRule> = [
   {
-    fn (details) {
-      return {
-        redirectUrl: details.url.replace(/^http:\/\//, 'https://')
-      }
+    fn (result, details) {
+      // @ts-ignore
+      result.redirectUrl = details.url.replace(/^http:\/\//, 'https://')
+      return result
     },
     permit: ['blocking'],
     on: 'onBeforeRequest'

@@ -1,4 +1,4 @@
-import { IDiffArrayResult } from '@/background/utils'
+import { IDiffArrayResult } from '@/background/requests/utils'
 import { IRequestConfig } from '@/types/requests'
 import { updateCache as updateInject } from './inject'
 import { updateCache as updateReferrer } from './referrer'

@@ -186,11 +186,11 @@ export type IRtRule =
   ILogRule |
   IRedirectRule
 
-export interface IWebRequestRule<T extends IRtRule, K extends chrome.webRequest.ResourceRequest> {
-  fn: (details: K, rule: T) => any,
+export interface IWebRequestRule<T extends IRtRequestRule, K extends chrome.webRequest.ResourceRequest> {
+  fn: (result: Partial<chrome.webRequest.WebRequestHeadersDetails>, details: K, rule: T, config: IRtRequestConfig) => any,
   permit: string[]
   on: string
 }
 
 
-export type IWebRequestRules<T extends IRtRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]
+export type IWebRequestRules<T extends IRtRequestRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]

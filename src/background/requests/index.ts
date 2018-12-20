@@ -6,7 +6,7 @@ import HEADER from './header'
 import LOG from './log'
 import onTabChange from './tab-change'
 import { uniqueArray, convertPattern2Reg } from '@/common/utils'
-import { isRuleEnabled, diffArray, spliceArray } from '@/background/utils'
+import { isRuleEnabled, diffArray, spliceArray } from '@/background/requests/utils'
 import { IWebRequestRule, IRtHeaderRuleItem, IUaRule, IReferrerRule, IRequestConfig, IAlterHeaderRule, EWebRuleType, IRtRequestConfig } from '@/types/requests'
 
 const REQUESTS = {
@@ -151,6 +151,8 @@ function createRequestListener (type: string) {
     return runProcessor(processor.fns, config, details)
   }
 }
+
+
 
 function runProcessor (fns: IRequestFn['fns'], config: IRtRequestConfig, details: chrome.webRequest.WebRequestDetails) {
   const result: Partial<chrome.webRequest.WebRequestDetails> = {}

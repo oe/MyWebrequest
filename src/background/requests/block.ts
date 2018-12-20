@@ -2,11 +2,11 @@ import { IBlockRule, IWebRequestRules } from '@/types/requests'
 
 const webrequests: IWebRequestRules<IBlockRule> = [
   {
-    fn (details, rule) {
+    fn (result, details) {
       console.warn('block url: ' + details.url)
-      return {
-        cancel: true
-      }
+      // @ts-ignore
+      result.cancel = true
+      return result
     },
     permit: ['blocking'],
     on: 'onBeforeRequest'

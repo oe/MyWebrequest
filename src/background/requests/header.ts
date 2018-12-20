@@ -1,9 +1,9 @@
 import { IWebRequestRules, IRtHeaderRule } from '@/types/requests'
-import { alterHeaders } from '@/background/utils'
+import { alterHeaders } from '@/background/requests/utils'
 
 const webrequests: IWebRequestRules<IRtHeaderRule> = [
   {
-    fn (details, rule) {
+    fn(result, details, rule) {
       const headers = details.requestHeaders || []
       rule.rules.forEach((item) => {
         alterHeaders(headers, item.name, item.val)

@@ -51,7 +51,7 @@ function formatHeaders (headers: chrome.webRequest.HttpHeader[]) {
 const webrequests: IWebRequestRules<ILogRule> = [
   {
     // @ts-ignore
-    fn (details: chrome.webRequest.WebRequestBodyDetails) {
+    fn (result, details: chrome.webRequest.WebRequestBodyDetails) {
       if (details.requestBody) {
         return (requestCache[details.requestId] = clonedeep(
           details.requestBody
@@ -62,7 +62,7 @@ const webrequests: IWebRequestRules<ILogRule> = [
     on: 'onBeforeRequest'
   },
   {
-    fn (details: chrome.webRequest.WebRequestHeadersDetails) {
+    fn (result, details: chrome.webRequest.WebRequestHeadersDetails) {
       ++logNum
       const url = details.url
       const rid = details.requestId

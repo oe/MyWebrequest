@@ -1,7 +1,7 @@
 import { pushNotification, i18n } from '@/common/utils'
-import { diffObject, diffArray, isRuleEnabled } from './utils'
+import { diffObject } from './requests/utils'
 import collection from '@/common/collection'
-import { IRuleConfig, EWebRuleType } from '@/types/requests'
+import { IRequestConfig, EWebRuleType } from '@/types/requests'
 import { IExtSettings } from '@/types/settings'
 import { onRequestsChange } from './requests'
 
@@ -24,7 +24,7 @@ async function init () {
   }
 }
 
-function isLogEnabled (requests?: IRuleConfig[]) {
+function isLogEnabled (requests?: IRequestConfig[]) {
   if (!requests || !requests.length) return false
   return requests.some((rule) => {
     return rule.isValid && rule.enabled && rule.rules.some((item) => item.cmd === EWebRuleType.LOG)
