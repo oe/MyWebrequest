@@ -2,7 +2,7 @@ import { alterHeaders as removeHeaders, toggleWebRequest, IDiffArrayResult } fro
 import corsRequest from '../cors'
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
-import { IWebRequestRules, IUaRule, IRequestConfig, EWebRuleType } from '@/types/requests'
+import { IWebRequestRules, ICorsRule, IRequestConfig, EWebRuleType } from '@/types/requests'
 
 // cache data for frequently usage
 interface ICacheRule {
@@ -18,10 +18,10 @@ interface ITabCache {
 const tabCache: ITabCache = {}
 
 // update cache
-export async function updateCache(diff: IDiffArrayResult<IRequestConfig>) {
+export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
-    const ua = cur.rules.find(item => item.cmd === EWebRuleType.CORS && item.type === 'out') as IUaRule
-    if (ua) {
+    const corsRule = cur.rules.find(item => item.cmd === EWebRuleType.CORS && item.type === 'out') as ICorsRule
+    if (corsRule) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({
         id: cur.id,
@@ -32,7 +32,7 @@ export async function updateCache(diff: IDiffArrayResult<IRequestConfig>) {
   })
 }
 
-function onTabChange(evt: ITabEvent) {
+function onTabChange (evt: ITabEvent) {
   if (evt.type === 'removed') {
     if (tabCache[evt.tabId]) {
       toggleTabRequest(evt.tabId, false)
@@ -49,19 +49,20 @@ function onTabChange(evt: ITabEvent) {
   }
 }
 
-function isMatch(url: string) {
+function isMatch (url: string) {
   return cachedRules.some((rule) => rule.reg.test(url))
 }
 
 
 
-function getRule(id: number): chrome.webRequest.RequestFilter {
+function getRule (id: number): chrome.webRequest.RequestFilter {
   return {
     tabId: id,
     urls: ['*://*/*']
   }
 }
 
-function toggleTabRequest(id: number, isOn?: boolean) {
+function toggleTabRequest (id: number, isOn?: boolean) {
+  // @ts-ignore
   toggleWebRequest(corsRequest, getRule(id), !!isOn)
 }

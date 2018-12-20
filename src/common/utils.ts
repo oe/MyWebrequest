@@ -269,3 +269,21 @@ export function toQueryString (key: string, val: any) {
   }
 }
 
+export interface IPlainify {
+  [k: string]: string
+}
+
+export function plainify (o: object, result = {} as IPlainify, prefix = '') {
+  Object.keys(o).reduce((acc, k) => {
+    // @ts-ignore
+    const val = o[k]
+    const p = prefix ? `${prefix}.${k}` : k
+    if (val && typeof val === 'object') {
+      return plainify(val, result, p)
+    }
+    // @ts-ignore
+    acc[p] = val
+    return acc
+  }, result)
+  return result
+}

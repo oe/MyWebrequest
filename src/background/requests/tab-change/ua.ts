@@ -21,7 +21,7 @@ interface ITabCache {
 const tabCache: ITabCache = {}
 
 // update cache
-export async function updateCache(diff: IDiffArrayResult<IRequestConfig>) {
+export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const ua = cur.rules.find(item => item.cmd === EWebRuleType.UA && item.type === 'out') as IUaRule
     if (ua) {
@@ -36,7 +36,7 @@ export async function updateCache(diff: IDiffArrayResult<IRequestConfig>) {
   })
 }
 
-function onTabChange(evt: ITabEvent) {
+function onTabChange (evt: ITabEvent) {
   if (evt.type === 'removed') {
     if (tabCache[evt.tabId]) {
       toggleTabRequest(evt.tabId, false)
@@ -54,11 +54,11 @@ function onTabChange(evt: ITabEvent) {
   }
 }
 
-function getMatchedRule(url: string) {
+function getMatchedRule (url: string) {
   return cachedRules.find((rule) => rule.reg.test(url))
 }
 
-function updateTabUa(tabId: number, navi: IUaInfo) {
+function updateTabUa (tabId: number, navi: IUaInfo) {
   chrome.tabs.executeScript(
     tabId,
     {
@@ -80,8 +80,8 @@ function updateTabUa(tabId: number, navi: IUaInfo) {
 
 const webrequests: IWebRequestRules<any> = [
   {
-    fn(details) {
-      const matched = tabCache[details.tabId]
+    fn (details) {
+      const matched = tabCache[details.tabId || -1]
       if (!matched) return
       const headers = details.requestHeaders || []
       removeHeaders(headers, 'User-Agent')
@@ -100,13 +100,13 @@ const webrequests: IWebRequestRules<any> = [
 ]
 
 
-function getRule(id: number): chrome.webRequest.RequestFilter {
+function getRule (id: number): chrome.webRequest.RequestFilter {
   return {
     tabId: id,
     urls: ['*://*/*']
   }
 }
 
-function toggleTabRequest(id: number, isOn?: boolean) {
+function toggleTabRequest (id: number, isOn?: boolean) {
   toggleWebRequest(webrequests, getRule(id), !!isOn)
 }

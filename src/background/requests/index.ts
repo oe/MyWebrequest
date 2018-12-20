@@ -104,7 +104,7 @@ function analyzeConfigs (configs: IRequestConfig[]) {
       rules: []
     }
     const inHeaders = spliceArray(cfg.rules, (item) => {
-      return (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA) && item.type === 'in'
+      return (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA || item.cmd === EWebRuleType.CORS) && item.type === 'in'
     }) as (IUaRule | IReferrerRule)[]
 
     spliceArray(cfg.rules, (item) => {

@@ -4,8 +4,8 @@ import Wifi from './wifi'
 import Text from './text'
 
 export default {
-  Vcard,
+  Text,
   Message,
-  Wifi,
-  Text
+  Vcard,
+  Wifi
 }

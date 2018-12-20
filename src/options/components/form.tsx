@@ -3,6 +3,7 @@
  */
 import React, { Component, FormEvent } from 'react'
 import { Input, Form, Select } from 'antd'
+import { injectIntl, InjectedIntl } from 'react-intl'
 import {
   GetFieldDecoratorOptions,
   WrappedFormUtils,
@@ -78,12 +79,46 @@ const forms: IFormElement = {
 
 interface IFormProps {
   onChange?: (val: string) => void
+  onMounted?: (formUtils: WrappedFormUtils) => void
+  intl: InjectedIntl
 }
 type IFormCreateProps = IFormProps & FormComponentProps
 
 function createForm (config: IFormConfig) {
-  return class EForm extends Component<IFormCreateProps> {
+  class EForm extends Component<IFormCreateProps> {
+    hasTranslated = false
+    componentDidMount () {
+      this.props.onMounted && this.props.onMounted(this.props.form)
+    }
+    i18nConfig (inputConfigs: IInputConfig[]) {
+      if (this.hasTranslated) return inputConfigs
+      const formatMessage = this.props.intl.formatMessage
+      inputConfigs.forEach(inputConfig => {
+        if (inputConfig.label) {
+          inputConfig.label = formatMessage({ id: inputConfig.label })
+        }
+        if (inputConfig.placeholder) {
+          inputConfig.placeholder = formatMessage({
+            id: inputConfig.placeholder
+          })
+        }
+        if (
+          inputConfig.type === 'select' &&
+          inputConfig.config &&
+          inputConfig.config.options
+        ) {
+          inputConfig.config.options.forEach((item: any) => {
+            item.label = formatMessage({
+              id: item.label
+            })
+          })
+        }
+      })
+      this.hasTranslated = true
+      return inputConfigs
+    }
     render () {
+      this.i18nConfig(config.items)
       return (
         <Form onSubmit={config.onSubmit ? config.onSubmit : undefined}>
           {config.items.map(item => {
@@ -97,6 +132,7 @@ function createForm (config: IFormConfig) {
       )
     }
   }
+  return injectIntl(EForm)
 }
 
 function newForm (

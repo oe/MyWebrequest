@@ -2,9 +2,12 @@ import React, { Component } from 'react'
 import { findDOMNode } from 'react-dom'
 import debounce from 'lodash.debounce'
 import { Tabs, Row, Col } from 'antd'
+import { WrappedFormUtils } from 'antd/lib/form/Form'
 import Title from '@/options/components/title'
 import QrImg from '@/common/qr-img'
 import DataType from './data-type'
+import { injectIntl, InjectedIntl } from 'react-intl'
+import { QR_CACHE_KEY } from '@/common/vars'
 import './style.scss'
 
 const TabPane = Tabs.TabPane
@@ -13,9 +16,14 @@ interface IState {
   content: string
 }
 
-export default class QrCode extends Component<{}, IState> {
+interface IQrProps {
+  intl: InjectedIntl
+}
+
+class QrCode extends Component<IQrProps, IState> {
   state = { content: 'https://evecalm.com/' }
   onTabClick (key: string) {
+    console.log('refs', this.refs, key)
     const ref = this.refs[key]
     if (!ref) return
     const dom = findDOMNode(ref) as HTMLDivElement
@@ -30,7 +38,34 @@ export default class QrCode extends Component<{}, IState> {
   onChange (val: string) {
     if (val === undefined) return
     this.updateContent(val)
-    console.warn('val', val)
+  }
+  // when form in tabpane mounted, try to fetch cached qr text in session storage
+  onFormMounted (formUtils: WrappedFormUtils) {
+    const text = sessionStorage.getItem(QR_CACHE_KEY)
+    if (!text) return
+    setTimeout(() => {
+      formUtils.setFieldsValue({ content: text })
+    }, 100)
+    sessionStorage.removeItem(QR_CACHE_KEY)
+  }
+  generateTabs () {
+    return Object.keys(DataType).map(k => {
+      // @ts-ignore
+      const TabPaneContent = DataType[k]
+      const name = k.toLowerCase()
+      return (
+        <TabPane
+          key={name}
+          tab={this.props.intl.formatMessage({ id: `qrcode.types.${name}` })}
+        >
+          <TabPaneContent
+            ref={name}
+            onChange={this.onChange.bind(this)}
+            onMounted={this.onFormMounted.bind(this)}
+          />
+        </TabPane>
+      )
+    })
   }
   updateContent = debounce(function (this: QrCode, val: string) {
     this.setState({ content: val })
@@ -46,24 +81,7 @@ export default class QrCode extends Component<{}, IState> {
               style={{ height: 250 }}
               onTabClick={this.onTabClick.bind(this)}
             >
-              <TabPane tab="Text" key="text">
-                <DataType.Text ref="text" onChange={this.onChange.bind(this)} />
-              </TabPane>
-              <TabPane tab="Vcard" key="vcard">
-                <DataType.Vcard
-                  ref="vcard"
-                  onChange={this.onChange.bind(this)}
-                />
-              </TabPane>
-              <TabPane tab="Message" key="message">
-                <DataType.Message
-                  ref="message"
-                  onChange={this.onChange.bind(this)}
-                />
-              </TabPane>
-              <TabPane tab="Wifi" key="wifi">
-                <DataType.Wifi ref="wifi" onChange={this.onChange.bind(this)} />
-              </TabPane>
+              {this.generateTabs()}
             </Tabs>
           </Col>
           <Col span={8} className="aside">
@@ -81,3 +99,5 @@ export default class QrCode extends Component<{}, IState> {
     )
   }
 }
+
+export default injectIntl(QrCode)

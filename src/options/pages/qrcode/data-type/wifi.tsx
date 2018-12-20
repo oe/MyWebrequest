@@ -7,8 +7,8 @@ const wifiFormConfig: IFormConfig = {
     {
       type: 'input',
       name: 'S',
-      label: 'Wifi Name',
-      placeholder: 'e.g. Daddy Shop',
+      label: 'qrcode.wifi.SLabel',
+      placeholder: 'qrcode.wifi.SPlh',
       config: {
         autoFocus: true
       }
@@ -16,8 +16,8 @@ const wifiFormConfig: IFormConfig = {
     {
       type: 'select',
       name: 'T',
-      label: 'Encryption',
-      placeholder: 'Choose a encryption method',
+      label: 'qrcode.wifi.TLabel',
+      placeholder: 'qrcode.wifi.TPlh',
       decorator: {
         initialValue: 'WPA'
       },
@@ -25,15 +25,15 @@ const wifiFormConfig: IFormConfig = {
         options: [
           {
             value: 'nopass',
-            label: 'No encryption'
+            label: 'qrcode.wifi.TOptionNopassLabel'
           },
           {
             value: 'WEP',
-            label: 'WEP'
+            label: 'qrcode.wifi.TOptionWEPLabel'
           },
           {
             value: 'WPA',
-            label: 'WPA/WPA2'
+            label: 'qrcode.wifi.TOptionWPALabel'
           }
         ]
       }
@@ -41,8 +41,8 @@ const wifiFormConfig: IFormConfig = {
     {
       type: 'input',
       name: 'P',
-      label: 'Password',
-      placeholder: 'e.g. xxxxxx'
+      label: 'qrcode.wifi.PLabel',
+      placeholder: 'qrcode.wifi.PPlh'
     }
   ]
 }

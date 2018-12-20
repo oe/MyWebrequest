@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import QrImg from '@/common/qr-img'
+import { QR_CACHE_KEY } from '@/common/vars'
 import Title from './title'
 import Editor from './editor'
 import './app.scss'
@@ -68,6 +69,9 @@ export default class App extends Component<{}, IState> {
       isEdit: false
     })
   }
+  onClickQrMore () {
+    sessionStorage.setItem(QR_CACHE_KEY, this.state.content)
+  }
   render () {
     return (
       <div className={'popup ' + (this.state.isEdit ? 'is-edit' : '')}>
@@ -86,6 +90,7 @@ export default class App extends Component<{}, IState> {
           <a
             href="/options/index.html#qrcode"
             target="_blank"
+            onClick={this.onClickQrMore.bind(this)}
             className="more-link"
           >
             Add a rule for current page...

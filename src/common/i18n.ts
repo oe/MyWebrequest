@@ -1,6 +1,9 @@
 // get lang
 const lang = chrome.i18n.getUILanguage().toLowerCase()
 export default {
+  /** default lang, use it if the specified lang not present */
+  defaultLang: 'en',
+  /** current browser lang */
   lang: lang === 'zh-cn' ? 'zh-cn' : 'en',
   internationalize (str: string) {
     return str.replace(/__MSG_([^_]+)__/g, function (m, key) {

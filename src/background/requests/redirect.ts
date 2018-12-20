@@ -31,7 +31,7 @@ const webrequests: IWebRequestRules<IRedirectRule> = [
       const url = details.url
       let len = cachedRules.length
       while (len--) {
-        const targetUrl = getTargetUrl(cachedRules[len], details.url)
+        const targetUrl = getTargetUrl(cachedRules[len], details.url || '')
         if (targetUrl) {
           console.log(
             `${url} target url is ${targetUrl}, with rule`,

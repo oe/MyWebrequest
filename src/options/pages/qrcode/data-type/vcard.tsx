@@ -7,8 +7,8 @@ const vcardFormConfig: IFormConfig = {
     {
       type: 'input',
       name: 'N',
-      label: 'Name',
-      placeholder: 'e.g. John Smith',
+      label: 'qrcode.vcard.NLabel',
+      placeholder: 'qrcode.vcard.NPlh',
       config: {
         autoFocus: true
       }
@@ -16,32 +16,32 @@ const vcardFormConfig: IFormConfig = {
     {
       type: 'input',
       name: 'TEL',
-      label: 'Phone',
-      placeholder: 'e.g. 18800000000'
+      label: 'qrcode.vcard.TELLabel',
+      placeholder: 'qrcode.vcard.TELPlh'
     },
     {
       type: 'input',
       name: 'EMAIL',
-      label: 'Email',
-      placeholder: 'e.g. sir@sample.com'
+      label: 'qrcode.vcard.EMAILLabel',
+      placeholder: 'qrcode.vcard.EMAILPlh'
     },
     {
       type: 'input',
       name: 'URL',
-      label: 'Home Page',
-      placeholder: 'e.g. http://www.evecalm.com'
+      label: 'qrcode.vcard.URLLabel',
+      placeholder: 'qrcode.vcard.URLPlh'
     },
     {
       type: 'input',
       name: 'ADR',
-      label: 'Address',
-      placeholder: 'e.g. NewTon Avu, NYC'
+      label: 'qrcode.vcard.ADRLabel',
+      placeholder: 'qrcode.vcard.ADRPlh'
     },
     {
       type: 'textarea',
       name: 'NOTE',
-      label: 'Meno',
-      placeholder: 'e.g. The guy in blue T-shirt',
+      label: 'qrcode.vcard.NOTELabel',
+      placeholder: 'qrcode.vcard.NOTEPlh',
       config: {
         style: { resize: 'none' },
         rows: 2

@@ -9,8 +9,7 @@ const textFormConfig: IFormConfig = {
     {
       type: 'textarea',
       name: 'content',
-      placeholder:
-        'text / url / email address / phone number (Extra spaces will be removed)',
+      placeholder: 'qrcode.text.contentPlh',
       config: {
         autoFocus: true,
         style: { resize: 'none' },

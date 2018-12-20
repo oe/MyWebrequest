@@ -7,8 +7,8 @@ const messageFormConfig: IFormConfig = {
     {
       type: 'input',
       name: 'tel',
-      label: 'To',
-      placeholder: 'e.g. 18800000000',
+      label: 'qrcode.message.telLabel',
+      placeholder: 'qrcode.message.telPlh',
       config: {
         autoFocus: true
       }
@@ -16,8 +16,8 @@ const messageFormConfig: IFormConfig = {
     {
       type: 'textarea',
       name: 'content',
-      label: 'Message',
-      placeholder: 'Extra spaces will be removed',
+      label: 'qrcode.message.contentLabel',
+      placeholder: 'qrcode.message.contentPlh',
       config: {
         style: { resize: 'none' },
         rows: 9
