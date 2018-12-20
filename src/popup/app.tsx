@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import QrImg from '@/common/qr-img'
 import { QR_CACHE_KEY } from '@/common/vars'
+import { injectIntl, InjectedIntl } from 'react-intl'
 import Title from './title'
 import Editor from './editor'
 import './app.scss'
@@ -11,7 +12,11 @@ interface IState {
   pageUrl: string
 }
 
-export default class App extends Component<{}, IState> {
+interface IProps {
+  intl: InjectedIntl
+}
+
+class App extends Component<IProps, IState> {
   constructor (props: any) {
     super(props)
     this.state = { isEdit: false, content: 'hello world', pageUrl: '' }
@@ -38,25 +43,34 @@ export default class App extends Component<{}, IState> {
       }
     )
   }
-  getTitle () {
+  _getTitle () {
     if (this.state.isEdit) {
       return {
-        title: 'Edit QRCode content',
-        subtitle: '(Don\'t type too much)'
+        title: 'editQrTitle',
+        subtitle: 'editQrSubTitle'
       }
     } else {
       if (!this.state.pageUrl || this.state.pageUrl === this.state.content) {
         return {
-          title: 'Current page\'s qrcode',
-          subtitle: '(double click to edit)'
+          title: 'curPageQrTitle',
+          subtitle: 'dblSubTitle'
         }
       } else {
         return {
-          title: 'You\'ve got a new QRCode',
-          subtitle: '(double click to edit)'
+          title: 'newQrTitle',
+          subtitle: 'dblSubTitle'
         }
       }
     }
+  }
+  getTitle () {
+    const formatMessage = this.props.intl.formatMessage
+    const title = this._getTitle()
+    Object.keys(title).forEach(k => {
+      // @ts-ignore
+      title[k] = formatMessage({ id: title[k] })
+    })
+    return title
   }
   onQrDoubleClick () {
     this.setState({
@@ -73,6 +87,7 @@ export default class App extends Component<{}, IState> {
     sessionStorage.setItem(QR_CACHE_KEY, this.state.content)
   }
   render () {
+    const formatMessage = this.props.intl.formatMessage
     return (
       <div className={'popup ' + (this.state.isEdit ? 'is-edit' : '')}>
         <Title {...this.getTitle()} />
@@ -93,10 +108,12 @@ export default class App extends Component<{}, IState> {
             onClick={this.onClickQrMore.bind(this)}
             className="more-link"
           >
-            Add a rule for current page...
+            {formatMessage({ id: 'addRule4Qr' })}
           </a>
         </div>
       </div>
     )
   }
 }
+
+export default injectIntl(App)
