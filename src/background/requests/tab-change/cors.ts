@@ -20,7 +20,7 @@ const tabCache: ITabCache = {}
 // update cache
 export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
-    const corsRule = cur.rules.find(item => item.cmd === EWebRuleType.CORS && item.type === 'out') as ICorsRule
+    const corsRule = cur.rules[EWebRuleType.CORS_OUT]
     if (corsRule) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({

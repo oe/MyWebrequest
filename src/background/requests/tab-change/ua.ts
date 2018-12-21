@@ -2,7 +2,7 @@ import { alterHeaders as removeHeaders, toggleWebRequest, IDiffArrayResult } fro
 
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
-import { IWebRequestRules, IUaRule, IUaInfo, IRequestConfig, EWebRuleType } from '@/types/requests'
+import { IWebRequestRules, IUaInfo, IRequestConfig, EWebRuleType } from '@/types/requests'
 
 // cache data for frequently usage
 interface ICacheRule {
@@ -23,7 +23,7 @@ const tabCache: ITabCache = {}
 // update cache
 export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
-    const ua = cur.rules.find(item => item.cmd === EWebRuleType.UA && item.type === 'out') as IUaRule
+    const ua = cur.rules[EWebRuleType.UA_OUT]
     if (ua) {
       const reg = cur.useReg ? RegExp(cur.matchUrl) : convertPattern2Reg(cur.url)
       acc.push({

@@ -27,7 +27,7 @@ async function init () {
 function isLogEnabled (requests?: IRequestConfig[]) {
   if (!requests || !requests.length) return false
   return requests.some((rule) => {
-    return rule.isValid && rule.enabled && rule.rules.some((item) => item.cmd === EWebRuleType.LOG)
+    return rule.isValid && rule.enabled && !!rule.rules[EWebRuleType.LOG]
   })
 }
 

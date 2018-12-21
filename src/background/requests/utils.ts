@@ -1,5 +1,5 @@
 import debounce from 'lodash.debounce'
-import { IWebRequestRules, IRtRequestRule } from '@/types/requests'
+import { IWebRequestRules, IRtWebRule } from '@/types/requests'
 /**
  * remove headers with names
  * @param  {Array} headers headers
@@ -43,8 +43,7 @@ const forceWebrequestReload = debounce(function () {
   chrome.webRequest.handlerBehaviorChanged()
 })
 
-export function toggleWebRequest (webrequests: IWebRequestRules<IRtRequestRule>, rule: chrome.webRequest.RequestFilter, isOn?: boolean) {
-  // if (ruleConfig.updateConfig) await ruleConfig.updateConfig(isOn)
+export function toggleWebRequest (webrequests: IWebRequestRules<IRtWebRule>, rule: chrome.webRequest.RequestFilter, isOn?: boolean) {
   const len = webrequests.length
   for (let i = 0; i < len; i++) {
     const requestConfig = webrequests[i]

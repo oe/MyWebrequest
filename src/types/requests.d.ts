@@ -8,16 +8,24 @@ export const enum EWebRuleType {
   /** alter header */
   HEADER = 'HEADER',
   /** Referrer & UA actually belong to  header, change referrer */
-  REFERRER = 'REFERER',
+  REFERRER = 'REFERRER',
+  /** remmove refer of request from matched url */
+  REFERRER_OUT = 'REFERRER_OUT',
   /** change user-agent */
   UA = 'UA',
-  /** allow cross origin request */
+  /** change UA of request from matched url  */
+  UA_OUT = 'UA_OUT',
+  /** allow cross origin request to matched url */
   CORS = 'CORS',
+  /** allow cross origin request from matched url */
+  CORS_OUT = 'CORS_OUT',
   /** log webrequest */
   LOG = 'LOG',
   /** inject css/js to webpage */
   INJECT = 'INJECT'
 }
+
+type ERuleTypeKeys = keyof typeof EWebRuleType
 
 /** custom url redirect rule */
 export interface IRedirectRule {
@@ -57,16 +65,14 @@ export interface IBlockRule {
 /** no referer  */
 export interface IReferrerRule {
   cmd: EWebRuleType.REFERRER
-  /**
-   * out: for remove referrer from the url
-   * in: for remove referrer to the url
-   */
-  type: 'out' | 'in'
+}
+
+export interface IReferrerOutRule {
+  cmd: EWebRuleType.REFERRER_OUT
 }
 
 /** remove exist header(can use in hotlink) */
 export interface IDeleteHeaderRule {
-  cmd: EWebRuleType.HEADER
   type: 'delete'
   /** header name to delete */
   name: string
@@ -74,7 +80,6 @@ export interface IDeleteHeaderRule {
 
 /** change exist header(set a new header if not exist) */
 export interface IUpdateHeaderRule {
-  cmd: EWebRuleType.HEADER
   type: 'update'
   /** header name that value need be changed */
   name: string
@@ -82,26 +87,34 @@ export interface IUpdateHeaderRule {
   val: string
 }
 
-export type IAlterHeaderRule = IDeleteHeaderRule | IUpdateHeaderRule
+export type IAlterHeaderItem = IDeleteHeaderRule | IUpdateHeaderRule
 
-/** allow cors request */
-export interface ICorsRule {
-  cmd: EWebRuleType.CORS
-  /**
-   * out: for allow cors from the url
-   * in: for allow cors to the url
-   */
-  type: 'out' | 'in'
+export interface IHeaderRule {
+  cmd: EWebRuleType.HEADER
+  rules: (IDeleteHeaderRule | IUpdateHeaderRule)[]
 }
 
-/** change ua  */
+/** allow cors request to the matched url */
+export interface ICorsRule {
+  cmd: EWebRuleType.CORS
+
+}
+
+/** allow cors request from the matched url*/
+export interface ICorsOutRule {
+  cmd: EWebRuleType.CORS_OUT
+}
+
+/** change ua to the match url */
 export interface IUaRule {
   cmd: EWebRuleType.UA
-  /**
-   * out: for change ua of all requests from the url
-   * in: for change ua of all requests to the url
-   */
-  type: 'out' | 'in'
+  /** ua want to change */
+  ua: string
+}
+
+/** change ua from the match url */
+export interface IUaOutRule {
+  cmd: EWebRuleType.UA_OUT
   /** ua want to change */
   ua: string
 }
@@ -111,9 +124,7 @@ export interface ILogRule {
   cmd: EWebRuleType.LOG
 }
 
-/** inject css/js to webpage */
-export interface IInjectRule {
-  cmd: EWebRuleType.INJECT
+export interface IInjectScript {
   /** inject type is css / javascript */
   type: 'css' | 'js'
   /** code content */
@@ -123,23 +134,86 @@ export interface IInjectRule {
   // when to run
   runtAt: 'document_start' | 'document_end' | 'document_idle'
 }
-
+/** inject css/js to webpage */
+export interface IInjectRule {
+  cmd: EWebRuleType.INJECT
+  rules: IInjectScript[]
+}
+/** all request rule type */
 export type IWebRule =
-  ILogRule |
-  ICorsRule |
-  IAlterHeaderRule |
-  IBlockRule |
-  IHstsRule |
-  IRedirectRule |
-  IReferrerRule |
-  IUaRule |
-  IInjectRule
+  /** redirect url */
+  IRedirectRule
+  /** enforece https connection */
+  | IHstsRule
+  /** block url */
+  | IBlockRule
+  /** alter header */
+  | IHeaderRule
+  /** Referrer & UA actually belong to  header, change referrer */
+  | IReferrerRule
+  /** remmove refer of request from matched url */
+  | IReferrerOutRule
+  /** change user-agent */
+  | IUaRule
+  /** change UA of request from matched url  */
+  | IUaOutRule
+  /** allow cross origin request to matched url */
+  | ICorsRule
+  /** allow cross origin request from matched url */
+  | ICorsOutRule
+  /** log webrequest */
+  | ILogRule
+  /** inject css/js to webpage */
+  | IInjectRule
 
+/** all request rule use in runtime */
+export type IRtWebRule =
+  /** redirect url */
+  IRedirectRule
+  /** enforece https connection */
+  | IHstsRule
+  /** block url */
+  | IBlockRule
+  /** alter header */
+  | IHeaderRule
+  /** allow cross origin request to matched url */
+  | ICorsRule
+  /** log webrequest */
+  | ILogRule
 
+/** all request rules in a single config */
+export interface IRequestRules {
+  /** redirect url */
+  REDIRECT: IRedirectRule
+  /** enforece https connection */
+  HSTS: IHstsRule
+  /** block url */
+  BLOCK: IBlockRule
+  /** alter header */
+  HEADER: IHeaderRule
+  /** Referrer & UA actually belong to  header, change referrer */
+  REFERRER: IReferrerRule
+  /** remmove refer of request from matched url */
+  REFERRER_OUT: IReferrerOutRule
+  /** change user-agent */
+  UA: IUaRule
+  /** change UA of request from matched url  */
+  UA_OUT: IUaOutRule
+  /** allow cross origin request to matched url */
+  CORS: ICorsRule
+  /** allow cross origin request from matched url */
+  CORS_OUT: ICorsOutRule
+  /** log webrequest */
+  LOG: ILogRule
+  /** inject css/js to webpage */
+  INJECT: IInjectRule
+}
+
+/** a single request config for storage */
 export interface IRequestConfig {
   /** rule id, auto-generated */
   id: string
-  rules: IWebRule[]
+  rules: Partial<IRequestRules>
   /** chrome match url pattern */
   url: string
   /** if true matchUrl should be a valid reg string */
@@ -152,39 +226,22 @@ export interface IRequestConfig {
   updatedAt: number
 }
 
-export interface IRtHeaderRuleItem {
-  type: 'delete' | 'update'
-  name: string
-  val?: string
-}
+/** rules in use on runtime */
+export type IRtRequestRule = Pick<Partial<IRequestRules>, Exclude<ERuleTypeKeys, 'INJECT' | 'CORS_OUT' | 'UA_OUT' | 'UA' | 'REFERRER_OUT' | 'REFERRER'>>
 
-export interface IRtHeaderRule {
-  cmd: EWebRuleType.HEADER
-  rules: IRtHeaderRuleItem[]
-}
-
-export type IRtRequestRule = IRtHeaderRule | ILogRule | ICorsRule | IBlockRule | IRedirectRule | IHstsRule
-
+/** a single request config for runtime */
 export interface IRtRequestConfig {
   id: string
   reg: RegExp
   url: string
   useReg: boolean
   matchUrl: string
-  rules: IRtRequestRule[]
+  rules: IRtRequestRule
 }
 
 export interface IUaInfo {
   ua: string
 }
-
-export type IRtRule =
-  IRtHeaderRule |
-  IBlockRule |
-  ICorsRule |
-  IHstsRule |
-  ILogRule |
-  IRedirectRule
 
 export interface IRequestListenerResult {
   cancel?: boolean
@@ -194,11 +251,11 @@ export interface IRequestListenerResult {
   [k: string]: any
 }
 
-export interface IWebRequestRule<T extends IRtRequestRule, K extends chrome.webRequest.ResourceRequest> {
+export interface IWebRequestRule<T extends IRtWebRule, K extends chrome.webRequest.ResourceRequest> {
   fn: (result: IRequestListenerResult, details: K, rule: T, config: IRtRequestConfig) => any,
   permit: string[]
   on: string
 }
 
 
-export type IWebRequestRules<T extends IRtRequestRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]
+export type IWebRequestRules<T extends IRtWebRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]
