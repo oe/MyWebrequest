@@ -1,7 +1,22 @@
 import React, { Component } from 'react'
+import Title from '@/options/components/title'
+import { injectIntl, InjectedIntl, FormattedMessage } from 'react-intl'
 
-export default class Settings extends Component {
+interface IProps {
+  intl: InjectedIntl
+}
+class Settings extends Component<IProps> {
   render () {
-    return <div>settings</div>
+    const formatMessage = this.props.intl.formatMessage
+    return (
+      <div className="settings-page">
+        <Title
+          title={formatMessage({ id: 'settings.title' })}
+          subtitle={formatMessage({ id: 'settings.subtitle' })}
+        />
+      </div>
+    )
   }
 }
+
+export default injectIntl(Settings)

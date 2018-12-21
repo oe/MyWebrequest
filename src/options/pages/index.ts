@@ -1,4 +1,3 @@
-import React, { Component } from 'react'
 import Requests from './requests'
 import ContextMenu from './contextmenu'
 import Settings from './settings'

@@ -1,14 +1,17 @@
 import React, { Component, MouseEvent } from 'react'
-import i18n from '@/common/i18n'
 import qrUtils from './qrcode'
 import locales from './locales'
-import { IntlProvider, FormattedMessage } from 'react-intl'
+import {
+  IntlProvider,
+  FormattedMessage,
+  injectIntl,
+  InjectedIntl
+} from 'react-intl'
 import './qr-img.scss'
 
-const locale = i18n.lang === 'zh' ? locales.zh : locales.en
-
 interface IQrImgProps {
-  size: number
+  intl: InjectedIntl
+  size?: number
   text: string
   onDoubleClick?: (evt: MouseEvent<HTMLDivElement>) => void
 }
@@ -17,7 +20,9 @@ interface IQrImgState {
   isDone: boolean
   url: string
 }
-export default class QrImg extends Component<IQrImgProps, IQrImgState> {
+
+class QrImg extends Component<IQrImgProps, IQrImgState> {
+  // @ts-ignore
   static defaultProps: IQrImgProps = {
     size: 250,
     text: 'Hello world!'
@@ -25,10 +30,10 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
   constructor (props: IQrImgProps) {
     super(props)
     this.state = { isDone: true, url: 'about:blank;' }
-    this.getQrUrl(props.text, props.size)
+    this.getQrUrl(props.text, props.size!)
   }
   componentWillReceiveProps (newProps: IQrImgProps) {
-    this.getQrUrl(newProps.text, newProps.size)
+    this.getQrUrl(newProps.text, newProps.size!)
   }
   async getQrUrl (text: string, size: number) {
     try {
@@ -47,6 +52,7 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
     }
   }
   render () {
+    const locale = this.props.intl.locale === 'zh' ? locales.zh : locales.en
     return (
       <IntlProvider messages={locale}>
         <div
@@ -70,3 +76,5 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
     )
   }
 }
+
+export default injectIntl(QrImg)

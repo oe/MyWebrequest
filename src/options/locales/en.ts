@@ -1,7 +1,22 @@
 import { plainify } from '@/common/utils'
 
 const fields = {
+  requests: {
+    title: 'Requests',
+    subtitle: 'custom all your web requests'
+  },
+  contextmenu: {
+    title: 'ContextMenu',
+    subtitle: 'Enhance browser contextmenu'
+  },
+  settings: {
+    title: 'Settings',
+    subtitle: 'Custom this extension'
+  },
   qrcode: {
+    title: 'QRCode',
+    subtitle: 'Generate QRCode',
+    moreQr: 'Get more data type QRCode...',
     types: {
       text: 'Text',
       vcard: 'Vcard',
@@ -42,6 +57,10 @@ const fields = {
       PLabel: 'Password',
       PPlh: 'e.g. xxxxxx'
     }
+  },
+  help: {
+    title: 'Help',
+    subtitle: 'Some useful information'
   }
 }
 

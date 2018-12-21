@@ -1,6 +1,21 @@
 import { plainify } from '@/common/utils'
 const fields = {
+  requests: {
+    title: '网络请求',
+    subtitle: '自定义浏览器的网络请求'
+  },
+  contextmenu: {
+    title: '右键菜单',
+    subtitle: '增加浏览器的右键菜单'
+  },
+  settings: {
+    title: '设置',
+    subtitle: '自定义本插件'
+  },
   qrcode: {
+    title: '二维码',
+    subtitle: '生成二维码',
+    moreQr: '获取更多丰富的QrCode...',
     types: {
       text: '文字',
       vcard: '名片',
@@ -41,6 +56,10 @@ const fields = {
       PLabel: '密码',
       PPlh: '如 xxxxxxxxxx (无密码时留空)'
     }
+  },
+  help: {
+    title: '帮助',
+    subtitle: '一些有用的帮助信息'
   }
 }
 

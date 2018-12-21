@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { NavLink } from 'react-router-dom'
+import { FormattedMessage } from 'react-intl'
 import { ClickParam } from 'antd/lib/menu'
 import './navi.scss'
 import pages from './pages'
@@ -20,7 +21,7 @@ export default class Navi extends Component {
               to={'/' + pName.toLocaleLowerCase()}
               activeClassName="navi-selected"
             >
-              {pName}
+              <FormattedMessage id={pName.toLocaleLowerCase() + '.title'} />
             </NavLink>
           ))}
         </div>

@@ -6,7 +6,7 @@ import { WrappedFormUtils } from 'antd/lib/form/Form'
 import Title from '@/options/components/title'
 import QrImg from '@/common/qr-img'
 import DataType from './data-type'
-import { injectIntl, InjectedIntl } from 'react-intl'
+import { injectIntl, InjectedIntl, FormattedMessage } from 'react-intl'
 import { QR_CACHE_KEY } from '@/common/vars'
 import './style.scss'
 
@@ -70,9 +70,13 @@ class QrCode extends Component<IQrProps, IState> {
     this.setState({ content: val })
   }, 500)
   render () {
+    const formatMessage = this.props.intl.formatMessage
     return (
       <div className="qr-page">
-        <Title title="QrCode" subtitle="Generate QRcode" tip="xxxx" />
+        <Title
+          title={formatMessage({ id: 'qrcode.title' })}
+          subtitle={formatMessage({ id: 'qrcode.subtitle' })}
+        />
         <Row>
           <Col span={16}>
             <Tabs
@@ -90,7 +94,7 @@ class QrCode extends Component<IQrProps, IState> {
               target="_blank"
               rel="noopener noreferrer"
             >
-              Get more data type QrCode...
+              <FormattedMessage id="qrcode.moreQr" />
             </a>
           </Col>
         </Row>
