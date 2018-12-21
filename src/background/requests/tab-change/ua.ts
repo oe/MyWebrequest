@@ -108,5 +108,5 @@ function getRule (id: number): chrome.webRequest.RequestFilter {
 }
 
 function toggleTabRequest (id: number, isOn?: boolean) {
-  toggleWebRequest(webrequests, getRule(id), !!isOn)
+  // toggleWebRequest(webrequests, getRule(id), !!isOn)
 }

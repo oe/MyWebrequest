@@ -259,3 +259,27 @@ export interface IWebRequestRule<T extends IRtWebRule, K extends chrome.webReque
 
 
 export type IWebRequestRules<T extends IRtWebRule, K extends chrome.webRequest.ResourceRequest = chrome.webRequest.WebRequestHeadersDetails> = IWebRequestRule<T, K>[]
+
+
+export interface IRequestCacheItem {
+  /** is the event listener on */
+  isOn: boolean
+  /** permission that need to declare for chrome  */
+  permit: string[]
+  /** chrome webrequest event name */
+  evtName: string
+  /** rule types (LOG, HSTS, HEADER, etc...) that need this event listener */
+  ruleTypes: EWebRuleType[]
+  /** event callbacks */
+  fns: ({ type: EWebRuleType, fn: Function })[]
+  /** cached user rule configs */
+  rules: IRtRequestConfig[]
+  /** chrome event listener to run the callbacks */
+  chromeRequestListener: Function
+}
+
+/** chrome event & event config map */
+export interface IRequestCache {
+  // k should be in WEB_REQUEST_EVENT_FLOW, aka chrome webrequest event name
+  [k: string]: IRequestCacheItem
+}

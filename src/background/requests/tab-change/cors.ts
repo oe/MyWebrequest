@@ -63,6 +63,5 @@ function getRule (id: number): chrome.webRequest.RequestFilter {
 }
 
 function toggleTabRequest (id: number, isOn?: boolean) {
-  // @ts-ignore
-  toggleWebRequest(corsRequest, getRule(id), !!isOn)
+  // toggleWebRequest(corsRequest, getRule(id), !!isOn)
 }

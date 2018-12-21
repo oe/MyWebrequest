@@ -1,5 +1,5 @@
 import debounce from 'lodash.debounce'
-import { IWebRequestRules, IRtWebRule } from '@/types/requests'
+import { IRtRequestConfig, IRequestCacheItem } from '@/types/requests'
 /**
  * remove headers with names
  * @param  {Array} headers headers
@@ -43,19 +43,26 @@ const forceWebrequestReload = debounce(function () {
   chrome.webRequest.handlerBehaviorChanged()
 })
 
-export function toggleWebRequest (webrequests: IWebRequestRules<IRtWebRule>, rule: chrome.webRequest.RequestFilter, isOn?: boolean) {
-  const len = webrequests.length
-  for (let i = 0; i < len; i++) {
-    const requestConfig = webrequests[i]
-    const action = isOn ? 'addListener' : 'removeListener'
-    // if (!isOn && requestConfig.cache) requestConfig.cache = null
+function getChromeMatchUrls (rules: IRtRequestConfig[]) {
+  return rules.map(item => item.url)
+}
+
+export function toggleWebRequest (requestConfig: IRequestCacheItem) {
+  const needToStop = !requestConfig.rules.length
+  // noting to do
+  if (needToStop && !requestConfig.isOn) return
+  if (requestConfig.isOn || !requestConfig.rules.length) {
     // @ts-ignore
-    chrome.webRequest[requestConfig.on][action](
-      requestConfig.fn,
-      rule,
-      requestConfig.permit
-    )
+    chrome.webRequest[requestConfig.evtName].removeListener(requestConfig.chromeRequestListener)
   }
+  // need to start a event
+  if (!needToStop) {
+    // @ts-ignore
+    chrome.webRequest[requestConfig.evtName].addListener(requestConfig.chromeRequestListener, {
+      urls: getChromeMatchUrls(requestConfig.rules)
+    }, requestConfig.permit)
+  }
+  requestConfig.isOn = !needToStop
   forceWebrequestReload()
 }
 
@@ -141,6 +148,19 @@ export function diffObject<T> (newObj: T, oldObj: T, isEqual?: (a: any, b: any) 
   result.removed = oldDold
   return result
 }
+
+export function pickObject<T extends object> (o: T, key: string | string[]): Partial<T> | undefined {
+  const keys = Array.isArray(key) ? key : [key]
+  const result = keys.reduce((acc, cur) => {
+    if (cur in o) {
+      // @ts-ignore
+      acc[cur] = o[cur]
+    }
+    return acc
+  }, {} as Partial<T>)
+  return Object.keys(result).length ? result : undefined
+}
+
 /**
  * splice an array by filter, return splice elements
  * @param arr array to process

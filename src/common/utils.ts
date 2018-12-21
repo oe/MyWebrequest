@@ -1,4 +1,5 @@
 import qs from 'qs'
+import { IRequestConfig } from '@/types/requests'
 import i18nMod from './i18n'
 
 const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
@@ -54,6 +55,11 @@ export function convertPattern2Reg (pattern: string) {
   const reg = pattern.replace(escapeRegExp, '\\$&').replace(/\*/g, '.*')
   return RegExp('^' + reg + '$')
 }
+
+export function getRuleUrlReg (config: IRequestConfig) {
+  return config.useReg ? RegExp(config.matchUrl) : convertPattern2Reg(config.matchUrl)
+}
+
 /** is url match the chrome url match pattern */
 export function isURLMatchPattern (url: string, pattern: string | RegExp) {
   if (typeof pattern === 'string') pattern = convertPattern2Reg(pattern)
@@ -123,7 +129,7 @@ export const i18n = i18nMod.internationalize
  * is type a valid rule type
  * @return {Boolean}      [description]
  */
-export function isUrlRuleType (type: string) {
+export function isUrlRuleType (type: string): boolean {
   return RULE_TYPES.indexOf(type) !== -1
 }
 

@@ -1,3 +1,4 @@
+import clonedeep from 'lodash.clonedeep'
 import REDIRECT from './redirect'
 import CORS from './cors'
 import HSTS from './hsts'
@@ -5,9 +6,9 @@ import BLOCK from './block'
 import HEADER from './header'
 import LOG from './log'
 import onTabChange from './tab-change'
-import { uniqueArray, convertPattern2Reg } from '@/common/utils'
-import { isRuleEnabled, diffArray, IDiffArrayResult } from '@/background/requests/utils'
-import { IRequestListenerResult, IWebRequestRule, IWebRule, IRequestConfig, EWebRuleType, IRtRequestConfig } from '@/types/requests'
+import { uniqueArray, convertPattern2Reg, getRuleUrlReg } from '@/common/utils'
+import { isRuleEnabled, diffArray, pickObject, IDiffArrayResult, toggleWebRequest } from '@/background/requests/utils'
+import { IRequestCacheItem, IRequestCache, IRequestListenerResult, IWebRequestRule, IWebRule, IRequestConfig, EWebRuleType, IRtRequestConfig } from '@/types/requests'
 
 const REQUESTS = {
   BLOCK,
@@ -39,20 +40,13 @@ const WEB_REQUEST_EVENT_FLOW = [
   'onErrorOccurred'
 ]
 
-interface IRequestCacheItem {
-  permit: string[]
-  fns: ({ type: string, fn: Function })[]
-  rules: IRtRequestConfig[]
-  chromeRequestListener: Function
-}
-
-interface IRequestCache {
-  // k should be in WEB_REQUEST_EVENT_FLOW
-  [k: string]: IRequestCacheItem
-}
 
 interface ITempRequestResult {
   [k: string]: IRtRequestConfig[]
+}
+
+interface ITempRequestItem {
+  [k: string]: IRtRequestConfig
 }
 
 const REQUEST_RULE_CACHE_DATA: IRequestCache = {}
@@ -68,12 +62,13 @@ function init () {
       if (processors.length > 1) throw new Error(`${type} should have only one processor on event ${evtName}`)
       const processor = processors[0]
       // @ts-ignore
-      const evtProcessor = REQUEST_RULE_CACHE_DATA[evtName] || (REQUEST_RULE_CACHE_DATA[evtName] = { permit: [], fns: [], rules: [] })
+      const evtProcessor = REQUEST_RULE_CACHE_DATA[evtName] || (REQUEST_RULE_CACHE_DATA[evtName] = { permit: [], fns: [], rules: [], ruleTypes: [], isOn: false, evtName })
       evtProcessor.permit.push(...processor.permit)
       evtProcessor.fns.push({
         fn: processor.fn,
-        type
+        type: type as EWebRuleType
       })
+      evtProcessor.ruleTypes.push(type as EWebRuleType)
     })
   })
   Object.keys(REQUEST_RULE_CACHE_DATA).forEach((key) => {
@@ -110,12 +105,24 @@ function updateRequests (diffResult: IDiffArrayResult<IRequestConfig>) {
   handleRemoved(tempResult, diffResult.removed)
   handleUpdated(tempResult, diffResult.updated)
   handleAdded(tempResult, diffResult.added)
+  Object.keys(REQUEST_RULE_CACHE_DATA).forEach(k => {
+    const isNotChange = isRuleSame(tempResult[k], REQUEST_RULE_CACHE_DATA[k].rules)
+    const newRules = tempResult[k] || []
+    REQUEST_RULE_CACHE_DATA[k].rules = newRules
+    if (!isNotChange) toggleWebRequest(REQUEST_RULE_CACHE_DATA[k])
+  })
+}
+
+function isRuleSame (newRules?: IRtRequestConfig[], oldRules?: IRtRequestConfig[]) {
+  if (!newRules && !oldRules) return true
+  if (!newRules || !oldRules) return false
+  if (newRules.length !== oldRules.length) return false
+  return newRules.some((item) => !oldRules.find(oitem => item.id === oitem.id && item.url === oitem.url))
 }
 
 function handleRemoved (result: ITempRequestResult, cfgs: IRequestConfig[]) {
   if (!cfgs.length) return result
-  const newCfgs = analyzeConfigs(cfgs)
-  newCfgs.forEach(cfg => {
+  cfgs.forEach(cfg => {
     const id = cfg.id
     Object.keys(result).forEach(k => {
       const items = result[k]
@@ -126,61 +133,69 @@ function handleRemoved (result: ITempRequestResult, cfgs: IRequestConfig[]) {
 }
 function handleUpdated (result: ITempRequestResult, cfgs: IRequestConfig[]) {
   if (!cfgs.length) return result
-  const newCfgs = analyzeConfigs(cfgs)
-  newCfgs.forEach(cfg => {
-    const id = cfg.id
-    Object.keys(result).forEach(k => {
-      const items = result[k]
-      result[k] = items.filter(item => item.id !== id)
+
+  return cfgs.reduce((acc, cur) => {
+    const cfg = normalizeConfig(cur)
+    const curId = cur.id
+    Object.keys(cfg).forEach(k => {
+      const resultList = result[k]
+      const idx = resultList.findIndex(item => item.id === curId)
+      resultList[idx] = cfg[k]
     })
-  })
-  return result
+    return acc
+  }, result)
 }
 
 function handleAdded (result: ITempRequestResult, cfgs: IRequestConfig[]) {
   if (!cfgs.length) return result
-  const newCfgs = analyzeConfigs(cfgs)
-  return result
+  return cfgs.reduce((acc, cur) => {
+    const cfg = normalizeConfig(cur)
+    Object.keys(cfg).forEach(k => {
+      result[k].push(cfg[k])
+    })
+    return acc
+  }, result)
 }
 
-function analyzeConfigs (configs: IRequestConfig[]) {
-  return configs.map((cfg) => {
-    const item: IRtRequestConfig = {
-      id: cfg.id,
-      matchUrl: cfg.id,
-      url: cfg.url,
-      useReg: cfg.useReg,
-      reg: cfg.useReg ? RegExp(cfg.matchUrl) : convertPattern2Reg(cfg.matchUrl),
-      rules: {}
-    }
-    const excluedKeys = ['INJECT', 'CORS_OUT', 'UA_OUT', 'UA', 'REFERRER_OUT', 'REFERRER']
-    const rules = item.rules
-    Object.keys(cfg.rules).reduce((acc, k) => {
-      if (!excluedKeys.includes(k)) {
-        // @ts-ignore
-        acc[k] = cfg.rules[k]
-      }
-      return acc
-    }, rules)
+function normalizeConfig (cfg: IRequestConfig) {
+  const item: IRtRequestConfig = {
+    id: cfg.id,
+    matchUrl: cfg.id,
+    url: cfg.url,
+    useReg: cfg.useReg,
+    reg: cfg.useReg ? RegExp(cfg.matchUrl) : convertPattern2Reg(cfg.matchUrl),
+    rules: {}
+  }
+  const pickKeys = ['REDIRECT', 'HSTS', 'BLOCK', 'HEADER', 'CORS', 'LOG']
+  item.rules = pickObject(item.rules, pickKeys)!
 
-    if (cfg.rules[EWebRuleType.REFERRER]) {
-      const headerRule = cfg.rules[EWebRuleType.HEADER] || (cfg.rules[EWebRuleType.HEADER] = { cmd: EWebRuleType.HEADER, rules: [] })
-      headerRule.rules.push({
-        type: 'delete',
-        name: 'Referer'
-      })
-    }
 
-    if (cfg.rules[EWebRuleType.UA]) {
-      const headerRule = cfg.rules[EWebRuleType.HEADER] || (cfg.rules[EWebRuleType.HEADER] = { cmd: EWebRuleType.HEADER, rules: [] })
-      headerRule.rules.push({
-        type: 'update',
-        name: 'User-Agent',
-        val: cfg.rules[EWebRuleType.UA]!.ua
-      })
+  if (cfg.rules[EWebRuleType.REFERRER]) {
+    const headerRule = cfg.rules[EWebRuleType.HEADER] || (cfg.rules[EWebRuleType.HEADER] = { cmd: EWebRuleType.HEADER, rules: [] })
+    headerRule.rules.push({
+      type: 'delete',
+      name: 'Referer'
+    })
+  }
+
+  if (cfg.rules[EWebRuleType.UA]) {
+    const headerRule = cfg.rules[EWebRuleType.HEADER] || (cfg.rules[EWebRuleType.HEADER] = { cmd: EWebRuleType.HEADER, rules: [] })
+    headerRule.rules.push({
+      type: 'update',
+      name: 'User-Agent',
+      val: cfg.rules[EWebRuleType.UA]!.ua
+    })
+  }
+  return Object.keys(REQUEST_RULE_CACHE_DATA).reduce((acc, cur) => {
+    const ruleTypes = REQUEST_RULE_CACHE_DATA[cur].ruleTypes
+    const rules = pickObject(cfg.rules, ruleTypes)
+    if (rules) {
+      const config = clonedeep(cfg)
+      config.rules = rules
+      acc[cur] = Object.assign(config, { reg: getRuleUrlReg(config) })
     }
-    return item
-  })
+    return acc
+  }, {} as ITempRequestItem)
 }
 
 function createRequestListener (type: string) {
@@ -196,7 +211,6 @@ function createRequestListener (type: string) {
     return Object.keys(result).length ? result : undefined
   }
 }
-
 
 function runProcessor (fns: IRequestCacheItem['fns'], config: IRtRequestConfig, details: chrome.webRequest.WebRequestDetails) {
   const result: IRequestListenerResult = {}
