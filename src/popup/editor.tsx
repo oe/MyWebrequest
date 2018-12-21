@@ -1,23 +1,28 @@
 import React, { Component, KeyboardEvent } from 'react'
 import { Button } from 'antd'
+import { injectIntl, InjectedIntl } from 'react-intl'
 import { onInputChange } from '@/common/react-utils'
+import { isMac } from '@/common/utils'
+import { QR_CACHE_KEY } from '@/common/vars'
 
 import './editor.scss'
 
 interface IProps {
   initVal: string
   onSubmit?: (val: string) => void
+  intl: InjectedIntl
 }
 
 interface IState {
   val: string
 }
 
-export default class Editor extends Component<IProps, IState> {
+class Editor extends Component<IProps, IState> {
   constructor (props: IProps) {
     super(props)
     this.state = { val: props.initVal }
   }
+  qrSubmitShortCut = isMac ? '⌘+⏎' : 'ctrl+⏎'
   ta!: HTMLTextAreaElement
   componentDidMount () {
     setTimeout(() => {
@@ -41,6 +46,9 @@ export default class Editor extends Component<IProps, IState> {
       this.onSubmit()
     }
   }
+  onClickMore () {
+    sessionStorage.setItem(QR_CACHE_KEY, this.state.val)
+  }
   render () {
     return (
       <div className="text-container">
@@ -52,13 +60,19 @@ export default class Editor extends Component<IProps, IState> {
         />
         <div className="action-btn">
           <Button size="small" onClick={this.onSubmit.bind(this)}>
-            Submit(⌘+⏎)
+            Go!({this.qrSubmitShortCut})
           </Button>
-          <a href="/options/index.html#qrcode" target="_blank">
-            more...
+          <a
+            href="/options/index.html#qrcode"
+            target="_blank"
+            onClick={this.onClickMore.bind(this)}
+          >
+            {this.props.intl.formatMessage({ id: 'moreQrLink' })}...
           </a>
         </div>
       </div>
     )
   }
 }
+
+export default injectIntl(Editor)

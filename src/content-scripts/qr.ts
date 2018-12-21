@@ -1,4 +1,4 @@
-import qrcode from '@/common/qrcode'
+import qrcode from '@/common/qr-img/qrcode'
 const template = `
 <style>
 .mwr-qr-mask {

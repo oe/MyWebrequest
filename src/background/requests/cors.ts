@@ -19,26 +19,26 @@ const corsRequestCache: ICorsCache = {}
 const corsRequestRules: IReqRule[] = [
   {
     name: 'Origin',
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       corsRequestCache[details.requestId].origin = header.value || ''
     }
   },
   {
     name: 'Referer',
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       header.value = details.url
     }
   },
   {
     name: 'X-DevTools-Emulate-Network-Conditions-Client-Id',
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       console.log('remove ', rule.name)
       removeHeaders(details.requestHeaders || [], rule.name)
     }
   },
   {
     name: 'Access-Control-Request-Headers',
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       corsRequestCache[details.requestId].allowHeaders = header.value || ''
     }
   }
@@ -56,24 +56,24 @@ const dftAllowHeaders = 'Origin, X-Requested-With, Content-Type, Accept'
 const corsResponseRules: IResRule[] = [
   {
     name: 'Access-Control-Allow-Origin',
-    getValue(details) {
+    getValue (details) {
       const origin = corsRequestCache[details.requestId].origin
       const matches = /(https?:\/\/[^/]+)/.exec(origin)
       const value = (matches && matches[1]) || '*'
       return value
     },
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       header.value = rule.getValue!(details)
     }
   },
   {
     name: 'Access-Control-Allow-Headers',
-    getValue(details) {
+    getValue (details) {
       const cache = corsRequestCache[details.requestId]
       const value = (cache && cache.allowHeaders) || dftAllowHeaders
       return value
     },
-    fn(rule, header, details) {
+    fn (rule, header, details) {
       header.value = rule.getValue!(details)
     }
   },
@@ -91,12 +91,12 @@ const corsResponseRules: IResRule[] = [
   }
 ]
 
-function getCorsRuleValue(details: chrome.webRequest.WebRequestDetails, header: null | chrome.webRequest.HttpHeader, rule: any) {
+function getCorsRuleValue (details: chrome.webRequest.WebRequestDetails, header: null | chrome.webRequest.HttpHeader, rule: any) {
   if (rule.value) return rule.value
   if (rule.getValue) return rule.getValue(details, header, rule)
 }
 
-function handleCorsHeader(details: chrome.webRequest.WebRequestDetails, headers: chrome.webRequest.HttpHeader[], rules: any[]) {
+function handleCorsHeader (details: chrome.webRequest.WebRequestDetails, headers: chrome.webRequest.HttpHeader[], rules: any[]) {
   rules.forEach(rule => {
     let found
     headers.forEach(header => {
@@ -121,7 +121,7 @@ function handleCorsHeader(details: chrome.webRequest.WebRequestDetails, headers:
 
 const webrequests: IWebRequestRules<ICorsRule, chrome.webRequest.WebRequestHeadersDetails> = [
   {
-    fn(result, details) {
+    fn (result, details) {
       const originHeader = (result.requestHeaders || details.requestHeaders || []).find(
         header => header.name === 'Origin'
       )
@@ -137,7 +137,7 @@ const webrequests: IWebRequestRules<ICorsRule, chrome.webRequest.WebRequestHeade
   },
   {
     // @ts-ignore
-    fn(result, details: chrome.webRequest.WebResponseHeadersDetails) {
+    fn (result, details: chrome.webRequest.WebResponseHeadersDetails) {
       if (corsRequestCache[details.requestId]) {
         // @ts-ignore
         handleCorsHeader(details, result.responseHeaders || details.responseHeaders || [], corsResponseRules)

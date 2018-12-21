@@ -186,8 +186,16 @@ export type IRtRule =
   ILogRule |
   IRedirectRule
 
+export interface IRequestListenerResult {
+  cancel?: boolean
+  requestHeaders?: chrome.webRequest.HttpHeader[]
+  responseHeaders?: chrome.webRequest.HttpHeader[]
+  redirectUrl?: string
+  [k: string]: any
+}
+
 export interface IWebRequestRule<T extends IRtRequestRule, K extends chrome.webRequest.ResourceRequest> {
-  fn: (result: Partial<chrome.webRequest.WebRequestHeadersDetails>, details: K, rule: T, config: IRtRequestConfig) => any,
+  fn: (result: IRequestListenerResult, details: K, rule: T, config: IRtRequestConfig) => any,
   permit: string[]
   on: string
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import QrImg from '@/common/qr-img'
-import { QR_CACHE_KEY } from '@/common/vars'
+// import { QR_CACHE_KEY } from '@/common/vars'
 import { injectIntl, InjectedIntl } from 'react-intl'
 import Title from './title'
 import Editor from './editor'
@@ -84,7 +84,7 @@ class App extends Component<IProps, IState> {
     })
   }
   onClickQrMore () {
-    sessionStorage.setItem(QR_CACHE_KEY, this.state.content)
+    // @TODO: set key to webrequest rule
   }
   render () {
     const formatMessage = this.props.intl.formatMessage

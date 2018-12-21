@@ -23,7 +23,6 @@ interface IQrProps {
 class QrCode extends Component<IQrProps, IState> {
   state = { content: 'https://evecalm.com/' }
   onTabClick (key: string) {
-    console.log('refs', this.refs, key)
     const ref = this.refs[key]
     if (!ref) return
     const dom = findDOMNode(ref) as HTMLDivElement

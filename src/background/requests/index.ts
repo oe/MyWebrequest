@@ -7,7 +7,7 @@ import LOG from './log'
 import onTabChange from './tab-change'
 import { uniqueArray, convertPattern2Reg } from '@/common/utils'
 import { isRuleEnabled, diffArray, spliceArray } from '@/background/requests/utils'
-import { IWebRequestRule, IRtHeaderRuleItem, IUaRule, IReferrerRule, IRequestConfig, IAlterHeaderRule, EWebRuleType, IRtRequestConfig } from '@/types/requests'
+import { IRequestListenerResult, IWebRequestRule, IRtHeaderRuleItem, IUaRule, IReferrerRule, IRequestConfig, IAlterHeaderRule, EWebRuleType, IRtRequestConfig } from '@/types/requests'
 
 const REQUESTS = {
   BLOCK,
@@ -104,11 +104,11 @@ function analyzeConfigs (configs: IRequestConfig[]) {
       rules: []
     }
     const inHeaders = spliceArray(cfg.rules, (item) => {
-      return (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA || item.cmd === EWebRuleType.CORS) && item.type === 'in'
+      return (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA) && item.type === 'in'
     }) as (IUaRule | IReferrerRule)[]
 
     spliceArray(cfg.rules, (item) => {
-      return item.cmd === EWebRuleType.INJECT || (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA) && item.type === 'out'
+      return item.cmd === EWebRuleType.INJECT || (item.cmd === EWebRuleType.REFERRER || item.cmd === EWebRuleType.UA || item.cmd === EWebRuleType.CORS) && item.type === 'out'
     })
     // @ts-ignore
     item.rules = cfg.rules
@@ -148,14 +148,14 @@ function createRequestListener (type: string) {
       console.warn(`cannot match url ${url} or processor for ${type} not found`)
       return
     }
-    return runProcessor(processor.fns, config, details)
+    const result = runProcessor(processor.fns, config, details)
+    return Object.keys(result).length ? result : undefined
   }
 }
 
 
-
 function runProcessor (fns: IRequestFn['fns'], config: IRtRequestConfig, details: chrome.webRequest.WebRequestDetails) {
-  const result: Partial<chrome.webRequest.WebRequestDetails> = {}
+  const result: IRequestListenerResult = {}
   config.rules.forEach(rule => {
     const cmd = rule.cmd
     const fn = fns.find(fn => fn.type === cmd)

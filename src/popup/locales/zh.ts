@@ -6,7 +6,8 @@ const fields = {
   editQrSubTitle: '( 别输入太多文字 )',
   curPageQrTitle: '当前页面地址的二维码',
   dblSubTitle: '( 双击编辑二维码 )',
-  newQrTitle: '新二维码生成啦'
+  newQrTitle: '新二维码生成啦',
+  moreQrLink: '更多...'
 }
 
 

@@ -51,7 +51,7 @@ function formatHeaders (headers: chrome.webRequest.HttpHeader[]) {
 const webrequests: IWebRequestRules<ILogRule> = [
   {
     // @ts-ignore
-    fn (result, details: chrome.webRequest.WebRequestBodyDetails) {
+    fn (_result, details: chrome.webRequest.WebRequestBodyDetails) {
       if (details.requestBody) {
         return (requestCache[details.requestId] = clonedeep(
           details.requestBody

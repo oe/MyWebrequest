@@ -4,7 +4,6 @@ const webrequests: IWebRequestRules<IBlockRule> = [
   {
     fn (result, details) {
       console.warn('block url: ' + details.url)
-      // @ts-ignore
       result.cancel = true
       return result
     },

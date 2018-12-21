@@ -6,7 +6,8 @@ const fields = {
   editQrSubTitle: '(Don\'t type too much)',
   curPageQrTitle: 'Current page\'s qrcode',
   dblSubTitle: '(double click to edit)',
-  newQrTitle: 'You\'ve got a new QRCode'
+  newQrTitle: 'You\'ve got a new QRCode',
+  moreQrLink: 'more...'
 }
 
 

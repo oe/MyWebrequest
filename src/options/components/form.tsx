@@ -23,6 +23,7 @@ interface IInputConfig {
 }
 
 export interface IFormConfig {
+  isTranslated?: boolean
   onSubmit?: (evt: FormEvent) => void
   items: IInputConfig[]
   itemConfig?: FormItemProps
@@ -90,10 +91,10 @@ function createForm (config: IFormConfig) {
     componentDidMount () {
       this.props.onMounted && this.props.onMounted(this.props.form)
     }
-    i18nConfig (inputConfigs: IInputConfig[]) {
-      if (this.hasTranslated) return inputConfigs
+    i18nConfig (formConfig: IFormConfig) {
+      if (formConfig.isTranslated) return formConfig
       const formatMessage = this.props.intl.formatMessage
-      inputConfigs.forEach(inputConfig => {
+      formConfig.items.forEach(inputConfig => {
         if (inputConfig.label) {
           inputConfig.label = formatMessage({ id: inputConfig.label })
         }
@@ -114,11 +115,11 @@ function createForm (config: IFormConfig) {
           })
         }
       })
-      this.hasTranslated = true
-      return inputConfigs
+      formConfig.isTranslated = true
+      return formConfig
     }
     render () {
-      this.i18nConfig(config.items)
+      this.i18nConfig(config)
       return (
         <Form onSubmit={config.onSubmit ? config.onSubmit : undefined}>
           {config.items.map(item => {

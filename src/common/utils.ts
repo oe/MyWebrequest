@@ -287,3 +287,6 @@ export function plainify (o: object, result = {} as IPlainify, prefix = '') {
   }, result)
   return result
 }
+
+/** is current user using a mac */
+export const isMac = /Macintosh/.test(navigator.userAgent)

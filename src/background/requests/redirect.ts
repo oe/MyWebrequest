@@ -9,7 +9,6 @@ let cachedRules: any[] = []
 // update cache
 async function updateCache (isOn: boolean) {
   if (isOn) {
-    // ignore disabled
     const result = await collection.get(EWebRuleType.REDIRECT) as IRedirectRule[]
     cachedRules = result
       .map(item => {
@@ -27,7 +26,7 @@ async function updateCache (isOn: boolean) {
 
 const webrequests: IWebRequestRules<IRedirectRule> = [
   {
-    fn (details) {
+    fn (result, details) {
       const url = details.url
       let len = cachedRules.length
       while (len--) {
@@ -37,9 +36,8 @@ const webrequests: IWebRequestRules<IRedirectRule> = [
             `${url} target url is ${targetUrl}, with rule`,
             cachedRules[len]
           )
-          return {
-            redirectUrl: targetUrl
-          }
+          result.redirectUrl = targetUrl
+          return result
         }
       }
       console.log('can not find targe url for', url)
