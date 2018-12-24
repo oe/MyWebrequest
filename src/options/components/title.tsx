@@ -7,6 +7,7 @@ interface IPageTitleProps {
   title: string
   subtitle: string
   tip?: string
+  middle?: boolean
 }
 
 export default class Title extends Component<IPageTitleProps> {
@@ -15,7 +16,7 @@ export default class Title extends Component<IPageTitleProps> {
   }
   render () {
     return (
-      <div className="title">
+      <div className={'title' + (this.props.middle ? ' middle' : '')}>
         {this.props.title} <small>{this.props.subtitle}</small>
         {this.props.tip ? (
           <Icon
