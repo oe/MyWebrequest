@@ -1,10 +1,9 @@
 import React, { Component } from 'react'
 import { Form, Input, Switch } from 'antd'
-import { formItemLayout } from './common'
-
+import { IFromUtisProps, formItemLayout } from './common'
 const FormItem = Form.Item
 
-export default class MatchForm extends Component {
+export default class MatchForm extends Component<IFromUtisProps> {
   getSwitch () {
     return (
       <div>
@@ -14,15 +13,13 @@ export default class MatchForm extends Component {
   }
   render () {
     return (
-      <Form>
-        <FormItem label="Match this url" {...formItemLayout}>
-          <Input
-            autoFocus
-            placeholder="input placeholder"
-            addonAfter={this.getSwitch()}
-          />
-        </FormItem>
-      </Form>
+      <FormItem label="Match this url" {...formItemLayout}>
+        <Input
+          autoFocus
+          placeholder="input placeholder"
+          addonAfter={this.getSwitch()}
+        />
+      </FormItem>
     )
   }
 }

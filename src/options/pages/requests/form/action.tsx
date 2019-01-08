@@ -1,14 +1,65 @@
-import React, { Component } from 'react'
-import { Form, Select } from 'antd'
-import { formItemLayout } from './common'
+import React, { Component, Fragment } from 'react'
+import { Form, Select, Input } from 'antd'
+import { IFromUtisProps, formItemLayout } from './common'
+import './style.scss'
 
 const FormItem = Form.Item
 const Option = Select.Option
 
-export default class ActionForm extends Component {
+function RedirectItems () {
+  return (
+    <Fragment>
+      <FormItem label="Redirect to">
+        <Input />
+      </FormItem>
+    </Fragment>
+  )
+}
+
+function HeaderItems () {
+  return (
+    <Fragment>
+      <FormItem label="Header Name">
+        <Input />
+      </FormItem>
+      <FormItem label="Header Value">
+        <Input />
+      </FormItem>
+    </Fragment>
+  )
+}
+
+function UaItems () {
+  return (
+    <Fragment>
+      <FormItem label="Change Ua to">
+        <Input />
+      </FormItem>
+    </Fragment>
+  )
+}
+
+function InjectItems () {
+  return (
+    <Fragment>
+      <FormItem label="Change Ua to">
+        <Select>
+          <Option value="css">CSS</Option>
+          <Option value="js">Javascript</Option>
+        </Select>
+        <Select>
+          <Option value="code">Source Code</Option>
+          <Option value="file">Remote Url</Option>
+        </Select>
+      </FormItem>
+    </Fragment>
+  )
+}
+
+export default class ActionForm extends Component<IFromUtisProps> {
   render () {
     return (
-      <Form>
+      <Form className="config-group">
         <FormItem label="What to do" {...formItemLayout}>
           <Select showSearch placeholder="what you want to do with this url">
             <Option value="REDIRECT">
@@ -52,6 +103,10 @@ export default class ActionForm extends Component {
             </Option>
           </Select>
         </FormItem>
+        <RedirectItems />
+        <HeaderItems />
+        <UaItems />
+        <InjectItems />
       </Form>
     )
   }

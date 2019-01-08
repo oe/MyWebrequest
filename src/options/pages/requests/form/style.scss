@@ -1,0 +1,12 @@
+.config-group {
+  background-color: opacify($color: #efefef, $amount: 0.2);
+  border-radius: 6px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-bottom: 1em;
+
+  &::after {
+    content: ' ';
+    display: table;
+  }
+}
