@@ -30,9 +30,4 @@ class DetailForm extends Component<IFormCreateProps> {
   }
 }
 
-export default function newForm (
-  // config: IFormConfig,
-  createOptions?: FormCreateOption<IFormCreateProps>
-) {
-  return Form.create(createOptions)(DetailForm)
-}
+export default Form.create()(DetailForm)

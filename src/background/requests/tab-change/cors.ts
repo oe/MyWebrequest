@@ -1,5 +1,5 @@
-import { alterHeaders as removeHeaders, toggleWebRequest, IDiffArrayResult } from '@/background/requests/utils'
-import corsRequest from '../cors'
+import { IDiffArrayResult } from '@/background/requests/utils'
+// import corsRequest from '../cors'
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
 import { IWebRequestRules, ICorsRule, IRequestConfig, EWebRuleType } from '@/types/requests'

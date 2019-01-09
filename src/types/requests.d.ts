@@ -97,7 +97,6 @@ export interface IHeaderRule {
 /** allow cors request to the matched url */
 export interface ICorsRule {
   cmd: EWebRuleType.CORS
-
 }
 
 /** allow cors request from the matched url*/
