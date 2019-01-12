@@ -1,9 +1,11 @@
 import React, { Component, Fragment } from 'react'
-import { Form, Select, Input } from 'antd'
+import { Form, Select, Input, Button, Row, Col } from 'antd'
 import { WrappedFormUtils } from 'antd/lib/form/Form'
-import { IFromUtisProps, formItemLayout } from './common'
+import { IFromUtisProps, formItemLayout } from '../common'
 import { EWebRuleType } from '@/types/requests'
-import './style.scss'
+
+import HeaderItems from './header'
+import InjectItems from './inject'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -19,50 +21,12 @@ function RedirectItems (props: IFromUtisProps) {
   )
 }
 
-function HeaderItems (props: IFromUtisProps) {
-  // const getFieldDecorator = props.formUtils.getFieldDecorator
-  return (
-    <Fragment>
-      <FormItem label="Header Name">
-        <Input />
-      </FormItem>
-      <FormItem label="Header Value">
-        <Input />
-      </FormItem>
-    </Fragment>
-  )
-}
-
 function UaItems (props: IFromUtisProps) {
   const getFieldDecorator = props.formUtils.getFieldDecorator
   return (
     <Fragment>
       <FormItem label="Change Ua to">
         {getFieldDecorator('ua')(<Input />)}
-      </FormItem>
-    </Fragment>
-  )
-}
-
-function InjectItems (props: IFromUtisProps) {
-  const getFieldDecorator = props.formUtils.getFieldDecorator
-  return (
-    <Fragment>
-      <FormItem label="inject">
-        {getFieldDecorator('type')(
-          <Select>
-            <Option value="css">CSS</Option>
-            <Option value="js">Javascript</Option>
-          </Select>
-        )}
-      </FormItem>
-      <FormItem label="inject with">
-        {getFieldDecorator('codeType')(
-          <Select>
-            <Option value="code">Source Code</Option>
-            <Option value="file">Remote Url</Option>
-          </Select>
-        )}
       </FormItem>
     </Fragment>
   )
