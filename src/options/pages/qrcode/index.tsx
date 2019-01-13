@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, ReactInstance } from 'react'
 import { findDOMNode } from 'react-dom'
 import debounce from 'lodash.debounce'
 import { Tabs, Row, Col } from 'antd'
@@ -22,8 +22,9 @@ interface IQrProps {
 
 class QrCode extends Component<IQrProps, IState> {
   state = { content: 'https://evecalm.com/' }
+  refCache: { [k: string]: ReactInstance } = {}
   onTabClick (key: string) {
-    const ref = this.refs[key]
+    const ref = this.refCache[key]
     if (!ref) return
     const dom = findDOMNode(ref) as HTMLDivElement
     const firstElement =
@@ -31,10 +32,10 @@ class QrCode extends Component<IQrProps, IState> {
     if (!firstElement) return
 
     setTimeout(() => {
-      firstElement!.focus()
+      firstElement.focus()
     }, 100)
   }
-  onChange (val: string) {
+  onChange (val?: string) {
     if (val === undefined) return
     this.updateContent(val)
   }
@@ -47,6 +48,9 @@ class QrCode extends Component<IQrProps, IState> {
     }, 100)
     sessionStorage.removeItem(QR_CACHE_KEY)
   }
+  updateRef = (name: string, node: ReactInstance) => {
+    this.refCache[name] = node
+  }
   generateTabs () {
     return Object.keys(DataType).map(k => {
       // @ts-ignore
@@ -58,7 +62,7 @@ class QrCode extends Component<IQrProps, IState> {
           tab={this.props.intl.formatMessage({ id: `qrcode.types.${name}` })}
         >
           <TabPaneContent
-            ref={name}
+            ref={(ref: ReactInstance) => this.updateRef(name, ref)}
             onChange={this.onChange.bind(this)}
             onMounted={this.onFormMounted.bind(this)}
           />

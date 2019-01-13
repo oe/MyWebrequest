@@ -6,6 +6,7 @@
     "prefer-const": true,
     "quotemark": [true, "single", "jsx-double"],
     "no-debugger": false,
+    "no-unused-variable": true,
     "interface-name": [true, "always-prefix"],
     "semicolon": [true, "never"]
   },

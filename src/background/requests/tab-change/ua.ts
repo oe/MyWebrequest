@@ -1,4 +1,4 @@
-import { alterHeaders as removeHeaders, toggleWebRequest, IDiffArrayResult } from '@/background/requests/utils'
+import { alterHeaders as removeHeaders, IDiffArrayResult } from '@/background/requests/utils'
 
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
@@ -21,7 +21,7 @@ interface ITabCache {
 const tabCache: ITabCache = {}
 
 // update cache
-export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+export function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const ua = cur.rules[EWebRuleType.UA_OUT]
     if (ua) {
@@ -77,7 +77,7 @@ function updateTabUa (tabId: number, navi: IUaInfo) {
   )
 }
 
-
+// @ts-ignore
 const webrequests: IWebRequestRules<any> = [
   {
     fn (details) {
@@ -99,7 +99,7 @@ const webrequests: IWebRequestRules<any> = [
   }
 ]
 
-
+// @ts-ignore
 function getRule (id: number): chrome.webRequest.RequestFilter {
   return {
     tabId: id,

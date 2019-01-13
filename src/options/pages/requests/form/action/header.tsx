@@ -1,33 +1,31 @@
 import React, { Fragment } from 'react'
 import { Form, Select, Input, Button, Row, Col } from 'antd'
-
-import AbstractForm from './abatract'
+import AbstractForm, { IRuleItemProps } from './abatract'
 
 const FormItem = Form.Item
 const Option = Select.Option
 
-export default class HeaderItems extends AbstractForm {
-  // should item show value colum
-  hasHeaderValue = (idx: number) => {
-    const item = this.state.arr.find(v => v.idx === idx)
-    return item && item.type === 'update'
-  }
-
+export default class HeaderItems extends AbstractForm<IRuleItemProps> {
   render () {
     const getFieldDecorator = this.props.formUtils.getFieldDecorator
+    const prefix = this.props.prefix
     return (
       <Fragment>
         <Row gutter={16}>
-          <Col span={6}>Action</Col>
+          <Col span={5}>Action</Col>
           <Col span={6}>Header Name</Col>
-          <Col span={8}>Header Value</Col>
+          <Col span={9}>Header Value</Col>
         </Row>
-        {this.state.arr.map((i, k) => (
-          <Row key={i.idx} gutter={16}>
-            <Col span={6}>
+        {this.state.arr.map((item, k) => (
+          <Row className="rule-group-item" key={item.idx} gutter={16}>
+            <Col span={5}>
               <FormItem>
-                {getFieldDecorator(`rules[${k}]type`)(
-                  <Select onChange={(v: string) => this.onTypeChange(i.idx, v)}>
+                {getFieldDecorator(`${prefix}.rules[${k}].type`, {
+                  rules: [{ required: true }]
+                })(
+                  <Select
+                    onChange={(v: string) => this.onTypeChange(item.idx, v)}
+                  >
                     <Option value="update">Update Header</Option>
                     <Option value="delete">Remove Header</Option>
                   </Select>
@@ -36,20 +34,25 @@ export default class HeaderItems extends AbstractForm {
             </Col>
             <Col span={6}>
               <FormItem>
-                {getFieldDecorator(`rules[${k}]name`)(<Input />)}
+                {getFieldDecorator(`${prefix}.rules[${k}]name`)(<Input />)}
               </FormItem>
             </Col>
-            <Col span={8}>
+            <Col span={9}>
               <FormItem>
-                {this.hasHeaderValue(i.idx)
-                  ? getFieldDecorator(`rules[${k}]val`)(<Input />)
+                {item.type === 'update'
+                  ? getFieldDecorator(`${prefix}.rules[${k}]val`, {
+                      rules: [{ required: true }]
+                    })(<Input />)
                   : '---'}
               </FormItem>
             </Col>
             <Col span={4}>
               {this.state.arr.length > 1 ? (
                 <FormItem>
-                  <Button type="danger" onClick={() => this.removeRow(i.idx)}>
+                  <Button
+                    type="danger"
+                    onClick={() => this.removeRow(item.idx)}
+                  >
                     Remove
                   </Button>
                 </FormItem>

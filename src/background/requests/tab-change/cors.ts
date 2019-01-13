@@ -2,7 +2,7 @@ import { IDiffArrayResult } from '@/background/requests/utils'
 // import corsRequest from '../cors'
 import { ITabEvent, updateTabCache } from './tabs'
 import { convertPattern2Reg } from '@/common/utils'
-import { IWebRequestRules, ICorsRule, IRequestConfig, EWebRuleType } from '@/types/requests'
+import { IRequestConfig, EWebRuleType } from '@/types/requests'
 
 // cache data for frequently usage
 interface ICacheRule {
@@ -18,7 +18,7 @@ interface ITabCache {
 const tabCache: ITabCache = {}
 
 // update cache
-export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+export function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const corsRule = cur.rules[EWebRuleType.CORS_OUT]
     if (corsRule) {
@@ -54,7 +54,7 @@ function isMatch (url: string) {
 }
 
 
-
+// @ts-ignore
 function getRule (id: number): chrome.webRequest.RequestFilter {
   return {
     tabId: id,

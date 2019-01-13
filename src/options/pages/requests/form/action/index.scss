@@ -1,0 +1,35 @@
+.rule-group {
+  position: relative;
+  background-color: rgba($color: #000000, $alpha: 0.03);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 5px;
+
+  .delete-remove-button {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    z-index: 1;
+    font-size: 16px;
+
+    &:hover {
+      color: #f5222d;
+    }
+  }
+
+  .ant-form-item-label {
+    line-height: 20px;
+  }
+}
+
+.rule-group-item {
+  position: relative;
+}
+
+.rule-group-item + .rule-group-item:before {
+  content: ' ';
+  display: block;
+  border-top: 1px dashed #ccc;
+  width: 90%;
+  margin: 0 auto;
+}

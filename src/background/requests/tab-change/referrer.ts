@@ -12,7 +12,7 @@ interface ICacheRule {
 const cachedRules: ICacheRule[] = []
 
 // update cache
-export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+export function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const referrer = cur.rules[EWebRuleType.REFERRER_OUT]
     if (referrer) {

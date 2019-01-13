@@ -5,20 +5,22 @@ const FormItem = Form.Item
 
 export default class MatchForm extends Component<IFromUtisProps> {
   getSwitch () {
-    return (
-      <div>
-        <Switch checkedChildren="use regexp" unCheckedChildren="use normal" />
-      </div>
+    const getFieldDecorator = this.props.formUtils.getFieldDecorator
+    return getFieldDecorator('useReg')(
+      <Switch checkedChildren="use regexp" unCheckedChildren="use normal" />
     )
   }
   render () {
+    const getFieldDecorator = this.props.formUtils.getFieldDecorator
     return (
       <FormItem label="Match this url" {...formItemLayout}>
-        <Input
-          autoFocus
-          placeholder="input placeholder"
-          addonAfter={this.getSwitch()}
-        />
+        {getFieldDecorator('matchUrl', { rules: [{ required: true }] })(
+          <Input
+            autoFocus
+            placeholder="input placeholder"
+            addonAfter={this.getSwitch()}
+          />
+        )}
       </FormItem>
     )
   }

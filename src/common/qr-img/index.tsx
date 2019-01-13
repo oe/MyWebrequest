@@ -30,9 +30,11 @@ class QrImg extends Component<IQrImgProps, IQrImgState> {
   constructor (props: IQrImgProps) {
     super(props)
     this.state = { isDone: true, url: 'about:blank;' }
+    // tslint:disable-next-line:no-floating-promises
     this.getQrUrl(props.text, props.size!)
   }
   componentWillReceiveProps (newProps: IQrImgProps) {
+    // tslint:disable-next-line:no-floating-promises
     this.getQrUrl(newProps.text, newProps.size!)
   }
   async getQrUrl (text: string, size: number) {

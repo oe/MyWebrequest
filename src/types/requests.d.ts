@@ -217,7 +217,7 @@ export interface IRequestConfig {
   url: string
   /** if true matchUrl should be a valid reg string */
   useReg: boolean
-  /** url input match pattern */
+  /** url input match pattern(user input) */
   matchUrl: string
   enabled: boolean
   isValid: boolean

@@ -22,7 +22,7 @@ type IMenuActions = {
   [k in EMenuAction]: (content: string, tab: chrome.tabs.Tab) => void
 }
 const menuActions: IMenuActions = {
-  [EMenuAction.GEN_QRCODE](content, tab) {
+  [EMenuAction.GEN_QRCODE] (content, tab) {
     const data = { content }
     chrome.storage.local.set({ 'qr-menu': data })
     console.log('qr-menu', data)
@@ -32,7 +32,7 @@ const menuActions: IMenuActions = {
       runAt: 'document_start'
     })
   },
-  [EMenuAction.OPEN_SCHEME](content) {
+  [EMenuAction.OPEN_SCHEME] (content) {
     chrome.tabs.create({ url: content }, () => {
       if (chrome.runtime.lastError) {
         console.warn(
@@ -42,7 +42,7 @@ const menuActions: IMenuActions = {
       }
     })
   },
-  [EMenuAction.CONVERT2MD](content) {
+  [EMenuAction.CONVERT2MD] (content) {
     if (!turndownService) {
       turndownService = new TurndownService({
         headingStyle: 'atx',
@@ -59,7 +59,7 @@ const menuActions: IMenuActions = {
       timeout: 2000
     })
   },
-  [EMenuAction.COPY](content) {
+  [EMenuAction.COPY] (content) {
     copyText(content)
     pushNotification({
       title: 'Copy success',
@@ -69,7 +69,7 @@ const menuActions: IMenuActions = {
   }
 }
 
-function copyText(content: string) {
+function copyText (content: string) {
   document.oncopy = function (event) {
     event.clipboardData.setData('text/plain', content)
     event.preventDefault()
@@ -78,7 +78,7 @@ function copyText(content: string) {
 }
 
 // update cache
-function updateCache(menus?: IMenuConfigs) {
+function updateCache (menus?: IMenuConfigs) {
   if (menus) {
     cachedRules = menus.map(item => ({
       id: item.id,
@@ -91,18 +91,18 @@ function updateCache(menus?: IMenuConfigs) {
 }
 
 // remove all context menu
-function removeAll() {
+function removeAll () {
   console.warn('remove menu')
   chrome.contextMenus.removeAll()
 }
 
 
-function addMenu(item: chrome.contextMenus.CreateProperties) {
+function addMenu (item: chrome.contextMenus.CreateProperties) {
   chrome.contextMenus.create(item)
 }
 
 
-function normalizeMenuConfig(item: IMenuConfig, withoutID?: boolean): chrome.contextMenus.CreateProperties {
+function normalizeMenuConfig (item: IMenuConfig, withoutID?: boolean): chrome.contextMenus.CreateProperties {
   const documentUrlPatterns =
     item.documentUrlPatterns === 'all_urls'
       ? ALL_URL_PTTRNS
@@ -134,7 +134,7 @@ function normalizeMenuConfig(item: IMenuConfig, withoutID?: boolean): chrome.con
 }
 
 
-async function getRule() {
+async function getRule () {
   const result = await collection.get('contextmenu') as IMenuConfigs
   if (result && result.length) {
     // ignore disabled
@@ -145,7 +145,7 @@ async function getRule() {
   return []
 }
 
-export async function toggle(isOn: boolean) {
+export async function toggle (isOn: boolean) {
   console.log('contextmenu.js isOn', isOn)
   // @ts-ignore
   chrome.contextMenus.onClicked.removeListener(onMenuClick)
@@ -162,7 +162,7 @@ export async function toggle(isOn: boolean) {
   }
 }
 
-async function getPageInfo(tab: chrome.tabs.Tab) {
+async function getPageInfo (tab: chrome.tabs.Tab) {
   console.log('get page info', tab)
   return new Promise((resolve, reject) => {
     chrome.tabs.executeScript(
@@ -180,7 +180,7 @@ async function getPageInfo(tab: chrome.tabs.Tab) {
   })
 }
 
-async function getParams(tab: chrome.tabs.Tab, info: chrome.contextMenus.OnClickData, pattern: string) {
+async function getParams (tab: chrome.tabs.Tab, info: chrome.contextMenus.OnClickData, pattern: string) {
   const result = {
     pageUrl: tab.url,
     pageTitle: tab.title,
@@ -203,7 +203,7 @@ async function getParams(tab: chrome.tabs.Tab, info: chrome.contextMenus.OnClick
 }
 
 // get selected text with new line
-function getSeletedTextWithNL() {
+function getSeletedTextWithNL () {
   return new Promise<string>(resolve => {
     chrome.tabs.executeScript(
       {
@@ -226,7 +226,7 @@ const PAGE_VAR_NAME = [
   'articleText'
 ]
 
-function isNeedPageInfo(contentPattern: string) {
+function isNeedPageInfo (contentPattern: string) {
   let count = 0
   contentPattern.replace(/\{(\w+)\}/g, ($0: string, $1: string) => {
     if (PAGE_VAR_NAME.includes($1))++count
@@ -235,7 +235,7 @@ function isNeedPageInfo(contentPattern: string) {
   return !!count
 }
 
-async function getContent(contentPattern: string, info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+async function getContent (contentPattern: string, info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   console.warn('getContent', ...arguments)
   if (!/\{\w+\}/.test(contentPattern)) return contentPattern
   const params = await getParams(tab, info, contentPattern)
@@ -246,7 +246,7 @@ async function getContent(contentPattern: string, info: chrome.contextMenus.OnCl
   })
 }
 
-async function onMenuClick(info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+async function onMenuClick (info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
   const matched = cachedRules.find(item => item.id === info.menuItemId)
   if (!matched) {
     console.warn('[menu-onMenuClick] can not find rule for', info)

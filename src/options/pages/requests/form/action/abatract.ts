@@ -1,17 +1,27 @@
-import React, { Component, Fragment } from 'react'
-import { Form, Select, Input, Button, Row, Col } from 'antd'
-import { IFromUtisProps, formItemLayout } from '../common'
+import { Component } from 'react'
+import { IFromUtisProps } from '../common'
+
+export interface IRuleItemState {
+  idx: number
+  type?: string
+}
+
+export interface IRuleItemProps extends IFromUtisProps {
+  /** rule type */
+  type: string
+  /** rule field name prefix */
+  prefix: string
+}
+
+// export type IRuleItemProps = IRuleItemExtraProps & IRuleItemState
 
 interface ICountState {
   idx: number
-  arr: {
-    idx: number;
-    type?: string;
-  }[]
+  arr: IRuleItemState[]
 }
 
-export default abstract class SelectForm extends Component<
-  IFromUtisProps,
+export default abstract class SelectForm<Props extends IFromUtisProps = IFromUtisProps> extends Component<
+  Props,
   ICountState
   > {
   state: ICountState = { idx: 0, arr: [{ idx: 0 }] }

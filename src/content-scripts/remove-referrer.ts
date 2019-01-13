@@ -4,7 +4,7 @@
   if (!refer) {
     refer = document.createElement('meta')
     refer.setAttribute('name', 'referrer')
-    document.head!.appendChild(refer)
+    document.head.appendChild(refer)
   }
   const content = refer.getAttribute('content') || ''
   const allowed = ['no-referrer', 'same-origin']

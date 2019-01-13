@@ -53,7 +53,9 @@ function updateSettings (newVal: IExtSettings, oldVal?: IExtSettings) {
 
 
 
-init()
+init().catch(err => {
+  console.warn('extension init failed', err)
+})
 
 async function handleKeyChange (key: string, newVal: any, oldVal?: any) {
   try {

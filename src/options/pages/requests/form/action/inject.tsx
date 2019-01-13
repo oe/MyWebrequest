@@ -1,53 +1,76 @@
 import React, { Fragment } from 'react'
 import { Form, Select, Input, Button, Row, Col } from 'antd'
-import AbstractForm from './abatract'
+import AbstractForm, { IRuleItemProps } from './abatract'
+import { formItemLayout } from '../common'
 
 const FormItem = Form.Item
 const Option = Select.Option
 
-export default class InjectItems extends AbstractForm {
-  // should item show value colum
-  shouldShowCode = (idx: number) => {
-    const item = this.state.arr.find(v => v.idx === idx)
-    return item && item.type === 'code'
-  }
-
+export default class InjectItems extends AbstractForm<IRuleItemProps> {
   render () {
     const getFieldDecorator = this.props.formUtils.getFieldDecorator
+    const prefix = this.props.prefix
     return (
       <Fragment>
-        {this.state.arr.map((i, k) => (
-          <Fragment key={i.idx}>
-            <Row gutter={16}>
-              <Col span={8}>
-                <FormItem label="inject">
-                  {getFieldDecorator(`rules[${k}]type`)(
-                    <Select>
-                      <Option value="css">CSS</Option>
-                      <Option value="js">Javascript</Option>
-                    </Select>
-                  )}
+        {this.state.arr.map((item, k) => (
+          <Row
+            key={item.idx}
+            className="rule-group-item"
+            gutter={16}
+            align="middle"
+            type="flex"
+          >
+            <Col span={20}>
+              <Row gutter={16}>
+                <Col span={12}>
+                  <FormItem label="inject" {...formItemLayout}>
+                    {getFieldDecorator(`${prefix}.rules[${k}]type`, {
+                      rules: [{ required: true }]
+                    })(
+                      <Select>
+                        <Option value="css">CSS</Option>
+                        <Option value="js">Javascript</Option>
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+                <Col span={12}>
+                  <FormItem label="inject with" {...formItemLayout}>
+                    {getFieldDecorator(`${prefix}.rules[${k}]codeType`, {
+                      rules: [{ required: true }]
+                    })(
+                      <Select
+                        onChange={(v: string) => this.onTypeChange(item.idx, v)}
+                      >
+                        <Option value="code">Source Code</Option>
+                        <Option value="file">Remote Url</Option>
+                      </Select>
+                    )}
+                  </FormItem>
+                </Col>
+              </Row>
+              <FormItem label="Source code" {...formItemLayout}>
+                {getFieldDecorator(`${prefix}.rules[${k}]content`, {
+                  rules: [
+                    { required: true },
+                    { type: item.type === 'file' ? 'url' : 'string' }
+                  ]
+                })(item.type === 'code' ? <Input.TextArea /> : <Input />)}
+              </FormItem>
+            </Col>
+            <Col span={4}>
+              {this.state.arr.length > 1 ? (
+                <FormItem>
+                  <Button
+                    type="danger"
+                    onClick={() => this.removeRow(item.idx)}
+                  >
+                    Remove
+                  </Button>
                 </FormItem>
-              </Col>
-              <Col span={8}>
-                <FormItem label="inject with">
-                  {getFieldDecorator(`rules[${k}]codeType`)(
-                    <Select
-                      onChange={(v: string) => this.onTypeChange(i.idx, v)}
-                    >
-                      <Option value="code">Source Code</Option>
-                      <Option value="file">Remote Url</Option>
-                    </Select>
-                  )}
-                </FormItem>
-              </Col>
-            </Row>
-            <FormItem>
-              {getFieldDecorator(`rules[${k}]content`)(
-                this.shouldShowCode(i.idx) ? <Input.TextArea /> : <Input />
-              )}
-            </FormItem>
-          </Fragment>
+              ) : null}
+            </Col>
+          </Row>
         ))}
         <Button onClick={this.addRow}>Add</Button>
       </Fragment>

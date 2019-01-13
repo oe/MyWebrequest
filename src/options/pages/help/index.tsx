@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Title from '@/options/components/title'
-import { injectIntl, InjectedIntl, FormattedMessage } from 'react-intl'
+import { injectIntl, InjectedIntl } from 'react-intl'
 
 interface IProps {
   intl: InjectedIntl

@@ -13,7 +13,7 @@ interface ICacheRule {
 const cachedRules: ICacheRule[] = []
 
 // update cache
-export async function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
+export function updateCache (diff: IDiffArrayResult<IRequestConfig>) {
   updateTabCache(diff, onTabChange, cachedRules, (acc, cur) => {
     const cfg = cur.rules[EWebRuleType.INJECT]
     if (cfg && cfg.rules.length) {

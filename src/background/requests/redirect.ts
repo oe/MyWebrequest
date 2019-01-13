@@ -7,6 +7,7 @@ import { EWebRuleType, IRedirectRule, IWebRequestRules } from '@/types/requests'
 let cachedRules: any[] = []
 
 // update cache
+// @ts-ignore
 async function updateCache (isOn: boolean) {
   if (isOn) {
     const result = await collection.get(EWebRuleType.REDIRECT) as IRedirectRule[]

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import Title from '@/options/components/title'
 /* import List from './list' */
 import MForm from './form'
-import { Provider, connect } from 'react-redux'
+import { Provider } from 'react-redux'
 import store from './store'
 
 export default class Requests extends Component {

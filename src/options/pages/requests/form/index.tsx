@@ -1,13 +1,11 @@
-import React, { Component } from 'react'
+import React, { Component, FormEvent } from 'react'
 import ActionForm from './action'
 import MatchForm from './match'
 // import { injectIntl, InjectedIntl } from 'react-intl'
-import { Form } from 'antd'
+import { Form, Button } from 'antd'
 import {
-  GetFieldDecoratorOptions,
   WrappedFormUtils,
-  FormComponentProps,
-  FormCreateOption
+  FormComponentProps
 } from 'antd/lib/form/Form'
 
 interface IFormProps {
@@ -19,12 +17,26 @@ type IFormCreateProps = IFormProps & FormComponentProps
 // import {  connect } from 'react-redux'
 
 class DetailForm extends Component<IFormCreateProps> {
+  onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        console.warn('Received values of form: ', values)
+      } else {
+        console.log('form data', values)
+      }
+    })
+  }
   render () {
     const formUtils = this.props.form
     return (
-      <Form>
+      <Form onSubmit={this.onSubmit}>
         <MatchForm formUtils={formUtils} />
         <ActionForm formUtils={formUtils} />
+
+        <Button type="primary" htmlType="submit">
+          Submit
+        </Button>
       </Form>
     )
   }
