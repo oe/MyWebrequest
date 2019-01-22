@@ -33,8 +33,6 @@ export interface IRedirectRule {
 
   /** redirect to url pattern */
   redirectUrl: string
-  /** reg string can match the source url */
-  reg: string
   /**
    * false for no wildcard param
    * string for wildcard reg string
@@ -208,20 +206,30 @@ export interface IRequestRules {
   INJECT: IInjectRule
 }
 
-/** a single request config for storage */
-export interface IRequestConfig {
-  /** rule id, auto-generated */
+/** very mini request confgi */
+export interface IMiniRequestConfig {
+  /** rule ID */
   id: string
-  rules: Partial<IRequestRules>
-  /** chrome match url pattern */
+  /** chrome url match pattern */
   url: string
-  /** if true matchUrl should be a valid reg string */
-  useReg: boolean
-  /** url input match pattern(user input) */
+  /** original match pattern input by user */
   matchUrl: string
+  /** whether is a regexp */
+  useReg: boolean
+}
+
+/** a single request config for storage */
+export interface IRequestConfig extends IMiniRequestConfig {
+  rules: Partial<IRequestRules>
+  /** reg string can match the source url */
+  reg: string
+  /** whether rule is enabled */
   enabled: boolean
+  /** whether rule is valid to use */
   isValid: boolean
+  /** created timestamp */
   createdAt: number
+  /** last updated timestamp */
   updatedAt: number
 }
 
@@ -229,12 +237,10 @@ export interface IRequestConfig {
 export type IRtRequestRule = Pick<Partial<IRequestRules>, Exclude<ERuleTypeKeys, 'INJECT' | 'CORS_OUT' | 'UA_OUT' | 'UA' | 'REFERRER_OUT' | 'REFERRER'>>
 
 /** a single request config for runtime */
-export interface IRtRequestConfig {
-  id: string
+export interface IRtRequestConfig extends IMiniRequestConfig {
+  /** target url match Regexp */
   reg: RegExp
-  url: string
-  useReg: boolean
-  matchUrl: string
+  /** sub rules */
   rules: IRtRequestRule
 }
 

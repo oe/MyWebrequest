@@ -11,7 +11,15 @@ const fields = {
   },
   settings: {
     title: 'Settings',
-    subtitle: 'Custom this extension'
+    subtitle: 'Custom this extension',
+    extension: {
+      title: 'Extension icon style',
+      colored: 'Colored',
+      grey: 'Grey',
+    },
+    datasync: {
+      title: 'Data Backup / Restore'
+    }
   },
   qrcode: {
     title: 'QRCode',

@@ -5,7 +5,7 @@ import './title.scss'
 
 interface IPageTitleProps {
   title: string
-  subtitle: string
+  subtitle?: string
   tip?: string
   middle?: boolean
 }

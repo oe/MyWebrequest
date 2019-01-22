@@ -94,6 +94,6 @@ chrome.storage.onChanged.addListener(async function (changes, area) {
 
 // on ext updated
 chrome.runtime.onInstalled.addListener(async () => {
-  const isUpdate = await collection.isExtUpdate()
+  const isUpdate = collection.isExtUpdate()
   if (isUpdate) chrome.runtime.openOptionsPage()
 })
