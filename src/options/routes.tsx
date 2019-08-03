@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Route } from 'react-router-dom'
 // @ts-ignore
 import { spring, AnimatedSwitch } from 'react-router-transition'
@@ -38,25 +38,23 @@ const bounceTransition = {
   }
 }
 
-export default class Routes extends Component {
-  render () {
-    return (
-      <AnimatedSwitch
-        className="pages"
-        atEnter={bounceTransition.atEnter}
-        atLeave={bounceTransition.atLeave}
-        atActive={bounceTransition.atActive}
-        mapStyles={mapStyles}
-      >
-        {Object.keys(pages).map(pName => (
-          <Route
-            exact
-            key={pName}
-            path={'/' + pName.toLocaleLowerCase()}
-            component={pages[pName]}
-          />
-        ))}
-      </AnimatedSwitch>
-    )
-  }
+export default function render () {
+  return (
+    <AnimatedSwitch
+      className="pages"
+      atEnter={bounceTransition.atEnter}
+      atLeave={bounceTransition.atLeave}
+      atActive={bounceTransition.atActive}
+      mapStyles={mapStyles}
+    >
+      {Object.keys(pages).map(pName => (
+        <Route
+          exact
+          key={pName}
+          path={'/' + pName.toLocaleLowerCase()}
+          component={pages[pName]}
+        />
+      ))}
+    </AnimatedSwitch>
+  )
 }
