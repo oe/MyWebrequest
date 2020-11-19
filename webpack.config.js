@@ -1,12 +1,12 @@
 const path = require('path')
 const webpack = require('webpack')
 const WebpackDevServer = require('webpack-dev-server')
-const CleanWebpackPlugin = require('clean-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
-const tsImportPluginFactory = require('ts-import-plugin')
+
 const UglifyJsPlugin = require('terser-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
 const WriteFilePlugin = require('write-file-webpack-plugin')
@@ -52,6 +52,11 @@ const config = {
       './src/content-scripts/remove-referrer.ts'
     ]
   },
+  output: {
+    path: path.join(__dirname, './dist/'),
+    filename: '[name].js',
+    publicPath: '/'
+  },
   notHotReload: [],
   mode: process.env.NODE_ENV,
   resolve: {
@@ -61,60 +66,28 @@ const config = {
       '@': path.resolve(__dirname, 'src')
     }
   },
-  output: {
-    path: path.join(__dirname, './dist/'),
-    filename: '[name].js',
-    publicPath: '/'
-  },
+
   module: {
     rules: [
       {
         test: /\.tsx?$/,
-        loader: 'awesome-typescript-loader',
-        options: {
-          getCustomTransformers: () => ({
-            before: [
-              tsImportPluginFactory({
-                libraryDirectory: 'es',
-                libraryName: 'antd',
-                style: 'css'
-              })
-            ]
-          })
-        },
-        exclude: /node_modules/
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
-        test: /\.js$/,
-        enforce: 'pre',
-        loader: 'source-map-loader'
-      },
-      // {
-      //   test: /\.js$/,
-      //   loader: 'babel-loader',
-      //   exclude: /node_modules/
-      // },
-      {
-        test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          use: 'css-loader',
-          fallback: 'style-loader'
-        })
+        test: /\.css$/i,
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
       {
-        test: /\.scss$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            'css-loader',
-            {
-              loader: 'sass-loader',
-              options: {
-                implementation: require('sass')
-              }
-            }
-          ]
-        })
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)(\?\S*)?$/,
@@ -148,29 +121,35 @@ const config = {
       })
     }),
     // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
-    new CleanWebpackPlugin(['dist', 'ext.zip', 'ext.crx']),
+    new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: ['dist', 'ext.zip', 'ext.crx']}),
     // copy custom static assets
-    new CopyWebpackPlugin(
-      [
+    new CopyWebpackPlugin({
+      patterns: [
         {
           from: path.resolve(__dirname, 'src/static/'),
-          to: path.resolve(__dirname, 'dist/static/')
+          to: path.resolve(__dirname, 'dist/static/'),
+          globOptions: {
+            ignore: ['**/.*', '**/*.map', '**/node_modules/*']
+          }
         },
         {
           from: path.resolve(__dirname, 'src/_locales/'),
-          to: path.resolve(__dirname, 'dist/_locales/')
+          to: path.resolve(__dirname, 'dist/_locales/'),
+          globOptions: {
+            ignore: ['**/.*', '**/*.map', '**/node_modules/*']
+          }
         },
         {
           from: path.resolve(__dirname, 'src/manifest.json'),
-          to: path.resolve(__dirname, 'dist/manifest.json')
+          to: path.resolve(__dirname, 'dist/manifest.json'),
+          globOptions: {
+            ignore: ['**/.*', '**/*.map', '**/node_modules/*']
+          }
         }
       ],
-      {
-        ignore: ['**/.*', '**/*.map', '**/node_modules/*']
-      }
-    ),
+    }),
     // extract css into its own file
-    new ExtractTextPlugin({
+    new MiniCssExtractPlugin({
       filename: '[name].css'
     }),
     new OptimizeCSSPlugin({
@@ -239,7 +218,7 @@ if (process.env.NODE_ENV === 'production') {
   // webpack(config, (err) => { if (err) throw err})
 } else {
   // config.devtool = "#cheap-module-eval-source-map"
-  config.devtool = 'sourcemap'
+  config.devtool = 'source-map'
   config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
     config.plugins || []
   )

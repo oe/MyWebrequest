@@ -5,7 +5,7 @@ import i18nMod from './i18n'
 const escapeRegExp = /[-[\]+?.,/\\^$|#\s]/g
 
 interface IKeyVal {
-  [k: string]: string
+  [k: string]: any
 }
 
 interface INotifyCbs {

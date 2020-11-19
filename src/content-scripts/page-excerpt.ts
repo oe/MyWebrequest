@@ -11,6 +11,7 @@ function getPageBody () {
 function getSelectedHtml () {
   const sel = window.getSelection()
   let html = ''
+  if (!sel) return html
   if (sel.rangeCount) {
     const container = document.createElement('div')
     const count = sel.rangeCount
@@ -25,7 +26,7 @@ function getSelectedHtml () {
 function getExcerpt () {
   const documentClone = document.cloneNode(true)
   // @ts-ignore
-  const article = new Readability(documentClone).parse()
+  const article = new Readability(documentClone).parse()!
   const container = document.createElement('div')
   container.innerHTML = article.content
   return {

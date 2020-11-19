@@ -1,51 +1,32 @@
-import React, { Component } from 'react'
+import React, { FunctionComponent} from 'react'
 import { Form, Input, Switch } from 'antd'
-import { ValidationRule } from 'antd/lib/form'
-import { onInputChange } from '@/common/react-utils'
-import { IFromUtisProps, formItemLayout } from './common'
+import { FormInstance } from 'rc-field-form'
+import { formItemLayout } from './common'
 import validate from './validate'
 
 const FormItem = Form.Item
 
-interface IState {
-  useReg: boolean
-}
-
-export default class MatchForm extends Component<IFromUtisProps, IState> {
-  constructor (props: IFromUtisProps) {
-    super(props)
-    this.state = { useReg: false }
-  }
-  getSwitch () {
-    const getFieldDecorator = this.props.formUtils.getFieldDecorator
-    return getFieldDecorator('useReg')(
+const MatchForm: FunctionComponent = () => {
+  return (<Input.Group {...formItemLayout}>
+    <FormItem label="Match this url" name="matchUrl" rules={[{ required: true }, validateMatchUrl]}>
+      <Input autoFocus placeholder="input placeholder" />
+    </FormItem>
+    <FormItem name="useReg" >
       <Switch
         checkedChildren="use regexp"
-        defaultChecked={this.state.useReg}
-        onChange={onInputChange.bind(this, 'useReg')}
+        // defaultChecked={this.state.useReg}
+        // onChange={onInputChange.bind(this, 'useReg')}
         unCheckedChildren="use normal"
       />
-    )
-  }
-  render () {
-    const getFieldDecorator = this.props.formUtils.getFieldDecorator
-    return (
-      <FormItem label="Match this url" {...formItemLayout}>
-        {getFieldDecorator('matchUrl', { rules: [{ required: true }] })(
-          <Input
-            autoFocus
-            placeholder="input placeholder"
-            addonAfter={this.getSwitch()}
-          />
-        )}
-      </FormItem>
-    )
-  }
+    </FormItem>
+  </Input.Group>)
+}
 
-  validateMatchUrl (rule: ValidationRule, value: string, callback: Function) {
+function validateMatchUrl (form: FormInstance) {
+  const validator = function (rule: any, value: string, callback: Function) {
     try {
       const matchURL = value.trim()
-      validate.checkCustomMatchRule(matchURL, this.state.useReg)
+      validate.checkCustomMatchRule(matchURL, form.getFieldValue('useReg'))
       // const matchMeta = cstRule.getMatchMeta(matchURL, true, this.state.useReg)
       // const ignoreID = true // this.isUpdate && this.ruleID
       // if (!ignoreID && this.isRuleExist(matchMeta.url)) {
@@ -59,4 +40,5 @@ export default class MatchForm extends Component<IFromUtisProps, IState> {
       return callback(e)
     }
   }
+  return { validator }
 }

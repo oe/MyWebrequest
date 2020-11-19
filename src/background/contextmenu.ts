@@ -71,7 +71,7 @@ const menuActions: IMenuActions = {
 
 function copyText (content: string) {
   document.oncopy = function (event) {
-    event.clipboardData.setData('text/plain', content)
+    event.clipboardData?.setData('text/plain', content)
     event.preventDefault()
   }
   document.execCommand('copy', false)
@@ -190,7 +190,7 @@ async function getParams (tab: chrome.tabs.Tab, info: chrome.contextMenus.OnClic
     srcUrl: info.srcUrl,
     selectedLink: info.linkUrl || info.srcUrl
   }
-  let pageInfo = {}
+  let pageInfo: any = {}
   if (isNeedPageInfo(pattern)) {
     pageInfo = await getPageInfo(tab)
   }

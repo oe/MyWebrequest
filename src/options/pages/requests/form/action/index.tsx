@@ -1,6 +1,6 @@
-import React, { createElement, Fragment } from 'react'
+import React, { createElement, Fragment, FunctionComponent } from 'react'
 import { Form, Select, Button, Icon } from 'antd'
-import { WrappedFormUtils } from 'antd/lib/form/Form'
+// import { WrappedFormUtils } from 'antd/lib/form/Form'
 import { formItemLayout } from '../common'
 import { EWebRuleType } from '@/types/requests'
 import './index.scss'
@@ -55,6 +55,12 @@ const CMD_OPTIONS: { [k: string]: string } = {
   LOG: '<b>LOG</b> requests to the matched url',
   INJECT: '<b>INJECT</b> css & js to the matched webpage'
 }
+
+// const AF: FunctionComponent = () => {
+//   return (<>
+  
+//   </>)
+// }
 
 export default class ActionForm extends AbstractForm {
   render () {
