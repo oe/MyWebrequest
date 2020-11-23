@@ -5,12 +5,12 @@ import {
   IntlProvider,
   FormattedMessage,
   injectIntl,
-  InjectedIntl
+  // InjectedIntl
 } from 'react-intl'
 import './qr-img.scss'
 
 interface IQrImgProps {
-  intl: InjectedIntl
+  // intl: InjectedIntl
   size?: number
   text: string
   onDoubleClick?: (evt: MouseEvent<HTMLDivElement>) => void
@@ -21,7 +21,7 @@ interface IQrImgState {
   url: string
 }
 
-class QrImg extends Component<IQrImgProps, IQrImgState> {
+export default class QrImg extends Component<IQrImgProps, IQrImgState> {
   // @ts-ignore
   static defaultProps: IQrImgProps = {
     size: 250,
@@ -54,9 +54,11 @@ class QrImg extends Component<IQrImgProps, IQrImgState> {
     }
   }
   render () {
-    const locale = this.props.intl.locale === 'zh' ? locales.zh : locales.en
+    // const locale = this.props.intl.locale === 'zh' ? locales.zh : locales.en
+    const locale = 'zh'
+    const messages = locales[locale]
     return (
-      <IntlProvider messages={locale}>
+      <IntlProvider locale={locale} messages={messages}>
         <div
           onDoubleClick={this.onDoubleClick.bind(this)}
           className="qr-code"
@@ -78,5 +80,3 @@ class QrImg extends Component<IQrImgProps, IQrImgState> {
     )
   }
 }
-
-export default injectIntl(QrImg)

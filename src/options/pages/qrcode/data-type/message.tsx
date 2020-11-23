@@ -3,6 +3,12 @@ import { formItemLayout } from './common'
 
 const messageFormConfig: IFormConfig = {
   itemConfig: formItemLayout,
+  onValuesChange (props: any, changedVals: any, allVals: any) {
+    const content = `SMSTO:${(allVals.tel || '').trim()}:${(
+      allVals.content || ''
+    ).trim()}`
+    props.onChange && props.onChange(content)
+  },
   items: [
     {
       type: 'input',
@@ -26,13 +32,6 @@ const messageFormConfig: IFormConfig = {
   ]
 }
 
-const MessageForm = newForm(messageFormConfig, {
-  onValuesChange (props, changedVals: any, allVals: any) {
-    const content = `SMSTO:${(allVals.tel || '').trim()}:${(
-      allVals.content || ''
-    ).trim()}`
-    props.onChange && props.onChange(content)
-  }
-})
+const MessageForm = newForm(messageFormConfig)
 
 export default MessageForm

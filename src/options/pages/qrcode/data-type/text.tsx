@@ -2,6 +2,9 @@ import newForm, { IFormConfig } from '@/options/components/form'
 // import { formItemLayout } from './common'
 
 const textFormConfig: IFormConfig = {
+  onValuesChange (props: any, changedVals: any, allVals: any) {
+    props.onChange && props.onChange((allVals.content || '').trim())
+  },
   itemConfig: {
     wrapperCol: { span: 24 }
   },
@@ -19,10 +22,6 @@ const textFormConfig: IFormConfig = {
   ]
 }
 
-const TextForm = newForm(textFormConfig, {
-  onValuesChange (props, changedVals: any, allVals: any) {
-    props.onChange && props.onChange((allVals.content || '').trim())
-  }
-})
+const TextForm = newForm(textFormConfig)
 
 export default TextForm

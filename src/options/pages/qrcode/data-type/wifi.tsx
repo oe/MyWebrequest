@@ -2,6 +2,14 @@ import newForm, { IFormConfig } from '@/options/components/form'
 import { formItemLayout } from './common'
 
 const wifiFormConfig: IFormConfig = {
+  onValuesChange (props: any, changedVals: any, allVals: any) {
+    let content = 'WIFI:'
+    content += Object.keys(allVals)
+      .map(key => `${key}:${allVals[key] || ''}`)
+      .join(';')
+    content += ';;'
+    props.onChange && props.onChange(content)
+  },
   itemConfig: formItemLayout,
   items: [
     {
@@ -18,9 +26,7 @@ const wifiFormConfig: IFormConfig = {
       name: 'T',
       label: 'qrcode.wifi.TLabel',
       placeholder: 'qrcode.wifi.TPlh',
-      decorator: {
-        initialValue: 'WPA'
-      },
+      initialValue: 'WPA',
       config: {
         options: [
           {
@@ -47,15 +53,6 @@ const wifiFormConfig: IFormConfig = {
   ]
 }
 
-const WifiForm = newForm(wifiFormConfig, {
-  onValuesChange (props, changedVals: any, allVals: any) {
-    let content = 'WIFI:'
-    content += Object.keys(allVals)
-      .map(key => `${key}:${allVals[key] || ''}`)
-      .join(';')
-    content += ';;'
-    props.onChange && props.onChange(content)
-  }
-})
+const WifiForm = newForm(wifiFormConfig)
 
 export default WifiForm

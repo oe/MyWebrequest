@@ -5,15 +5,10 @@ import { IRuleItemProps } from './abatract'
 const FormItem = Form.Item
 
 export default function RedirectItems (props: IRuleItemProps) {
-  const getFieldDecorator = props.formUtils.getFieldDecorator
   const prefix = props.prefix
   return (
-    <Fragment>
-      <FormItem label="Redirect to">
-        {getFieldDecorator(`${prefix}.redirectUrl`, {
-          rules: [{ required: true }]
-        })(<Input />)}
-      </FormItem>
-    </Fragment>
+    <FormItem label="Redirect to" name={[...prefix, 'redirectUrl']} fieldKey={name} rules={[{ required: true }]}>
+      <Input />
+    </FormItem>
   )
 }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import QrImg from '@/common/qr-img'
 // import { QR_CACHE_KEY } from '@/common/vars'
-import { injectIntl, InjectedIntl } from 'react-intl'
+import { injectIntl } from 'react-intl'
 import Title from './title'
 import Editor from './editor'
 import './app.scss'

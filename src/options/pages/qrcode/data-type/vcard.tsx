@@ -2,6 +2,15 @@ import newForm, { IFormConfig } from '@/options/components/form'
 import { formItemLayout } from './common'
 
 const vcardFormConfig: IFormConfig = {
+  onValuesChange (props: any, changedVals: any, allVals: any) {
+    console.log('xxxx')
+    let content = 'BEGIN:VCARD\nVERSION:3.0\n'
+    content += Object.keys(allVals)
+      .map(key => `${key}:${allVals[key] || ''}`)
+      .join('\n')
+    content += '\nEND:VCARD'
+    props.onChange && props.onChange(content)
+  },
   itemConfig: formItemLayout,
   items: [
     {
@@ -50,15 +59,5 @@ const vcardFormConfig: IFormConfig = {
   ]
 }
 
-const VcardForm = newForm(vcardFormConfig, {
-  onValuesChange (props, changedVals: any, allVals: any) {
-    console.log('xxxx')
-    let content = 'BEGIN:VCARD\nVERSION:3.0\n'
-    content += Object.keys(allVals)
-      .map(key => `${key}:${allVals[key] || ''}`)
-      .join('\n')
-    content += '\nEND:VCARD'
-    props.onChange && props.onChange(content)
-  }
-})
+const VcardForm = newForm(vcardFormConfig)
 export default VcardForm

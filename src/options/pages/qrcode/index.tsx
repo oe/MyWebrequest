@@ -2,11 +2,11 @@ import React, { Component, ReactInstance } from 'react'
 import { findDOMNode } from 'react-dom'
 import debounce from 'lodash.debounce'
 import { Tabs, Row, Col } from 'antd'
-import { WrappedFormUtils } from 'antd/lib/form/Form'
+import { FormInstance } from 'rc-field-form'
 import Title from '@/options/components/title'
 import QrImg from '@/common/qr-img'
 import DataType from './data-type'
-import { injectIntl, InjectedIntl, FormattedMessage } from 'react-intl'
+import { injectIntl, FormattedMessage } from 'react-intl'
 import { QR_CACHE_KEY } from '@/common/vars'
 import './style.scss'
 
@@ -16,11 +16,7 @@ interface IState {
   content: string
 }
 
-interface IQrProps {
-  intl: InjectedIntl
-}
-
-class QrCode extends Component<IQrProps, IState> {
+class QrCode extends Component<null, IState> {
   state = { content: 'https://evecalm.com/' }
   refCache: { [k: string]: ReactInstance } = {}
   onTabClick (key: string) {
@@ -40,11 +36,11 @@ class QrCode extends Component<IQrProps, IState> {
     this.updateContent(val)
   }
   // when form in tabpane mounted, try to fetch cached qr text in session storage
-  onFormMounted (formUtils: WrappedFormUtils) {
+  onFormMounted (form: FormInstance) {
     const text = sessionStorage.getItem(QR_CACHE_KEY)
     if (!text) return
     setTimeout(() => {
-      formUtils.setFieldsValue({ content: text })
+      form.setFieldsValue({ content: text })
     }, 100)
     sessionStorage.removeItem(QR_CACHE_KEY)
   }

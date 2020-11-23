@@ -17,6 +17,8 @@ import { Form, Button } from 'antd'
 // import {  connect } from 'react-redux'
 
 const DetailForm = () => {
+  const [form] = Form.useForm()
+
   const onFinish = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     // this.props.form.validateFields((err, values) => {
@@ -29,9 +31,9 @@ const DetailForm = () => {
   }
 
   return (
-    <Form onFinish={onFinish}>
+    <Form onFinish={onFinish} form={form}>
       <MatchForm />
-      <ActionForm formUtils={formUtils} />
+      <ActionForm form={form}/>
 
       <Button type="primary" htmlType="submit">
         Submit

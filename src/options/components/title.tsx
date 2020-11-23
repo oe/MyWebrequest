@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Icon } from 'antd'
+import { QuestionCircleTwoTone } from '@ant-design/icons'
 
 import './title.scss'
 
@@ -19,11 +19,7 @@ export default class Title extends Component<IPageTitleProps> {
       <div className={'title' + (this.props.middle ? ' middle' : '')}>
         {this.props.title} <small>{this.props.subtitle}</small>
         {this.props.tip ? (
-          <Icon
-            type="question-circle"
-            onClick={this.onClickTip.bind(this)}
-            theme="twoTone"
-          />
+          <QuestionCircleTwoTone onClick={this.onClickTip.bind(this)} />
         ) : null}
       </div>
     )

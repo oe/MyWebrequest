@@ -5,7 +5,7 @@ import collection from '@/common/collection'
 
 // const RadioGroup = Radio.Group
 
-import { injectIntl, InjectedIntl } from 'react-intl'
+import { injectIntl } from 'react-intl'
 
 interface IProps {
   intl: InjectedIntl

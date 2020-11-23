@@ -10,7 +10,7 @@ export interface IRuleItemProps extends IFromUtisProps {
   /** rule type */
   type: string
   /** rule field name prefix */
-  prefix: string
+  prefix: any[]
 }
 
 // export type IRuleItemProps = IRuleItemExtraProps & IRuleItemState

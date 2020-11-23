@@ -1,25 +1,28 @@
 import React, { createElement, Fragment, FunctionComponent } from 'react'
-import { Form, Select, Button, Icon } from 'antd'
+import { Form, Select, Button } from 'antd'
+import { FormInstance } from 'rc-field-form'
+import { MinusCircleOutlined } from '@ant-design/icons'
 // import { WrappedFormUtils } from 'antd/lib/form/Form'
 import { formItemLayout } from '../common'
 import { EWebRuleType } from '@/types/requests'
 import './index.scss'
-
 import AbstractForm, { IRuleItemState } from './abatract'
 import HeaderItems from './header'
-import InjectItems from './inject'
+// import InjectItems from './inject'
 import UaItems from './ua'
 import RedirectItems from './redirect'
 
+
 const FormItem = Form.Item
+const FormList = Form.List
 const Option = Select.Option
 
 const DETAIL_INPUTS_MAP = {
   [EWebRuleType.REDIRECT]: RedirectItems,
   [EWebRuleType.HEADER]: HeaderItems,
   [EWebRuleType.UA]: UaItems,
-  [EWebRuleType.UA_OUT]: UaItems,
-  [EWebRuleType.INJECT]: InjectItems
+  [EWebRuleType.UA_OUT]: UaItems
+  // [EWebRuleType.INJECT]: InjectItems
 }
 
 /** exclusive cmds, which can not coexist with other cmds */
@@ -56,108 +59,101 @@ const CMD_OPTIONS: { [k: string]: string } = {
   INJECT: '<b>INJECT</b> css & js to the matched webpage'
 }
 
-// const AF: FunctionComponent = () => {
-//   return (<>
-  
-//   </>)
-// }
+interface IProps {
+  form: FormInstance
+}
 
-export default class ActionForm extends AbstractForm {
-  render () {
-    const formUtils = this.props.formUtils
-    const getFieldDecorator = formUtils.getFieldDecorator
-    return (
-      <Fragment>
-        {this.state.arr.map((item, idx) => (
-          <div className="rule-group" key={item.idx}>
-            {this.state.arr.length > 1 ? (
-              <Icon
+const ActionForm: React.FC<IProps> = ({ form }) => {
+  return (<>
+    <FormList name="rules">
+      {(fields, {add, remove}, { errors }) => (
+        <>
+        {fields.map((field) => (
+          <div className="rule-group" key={field.key}>
+            {fields.length > 1 ? (
+              <MinusCircleOutlined
                 title="remove this rule"
                 className="delete-remove-button"
-                type="minus-circle-o"
-                onClick={() => this.removeRow(item.idx)}
+                onClick={() => remove(field.name)}
               />
             ) : null}
-            <FormItem label="What to do" {...formItemLayout}>
-              {getFieldDecorator(`rules[${idx}].cmd`, {
-                rules: [{ required: true }]
-              })(
-                <Select
-                  onChange={(v: string) => this.onTypeChange(item.idx, v)}
-                  showSearch
-                  placeholder="what you want to do with this url"
-                >
-                  {this.getSelectOptions()}
-                </Select>
-              )}
+            <FormItem label="What to do" {...formItemLayout} name={[field.name, "type"]} fieldKey={[field.fieldKey, 'type']} rules={[{required: true}]}>
+              <Select showSearch placeholder="what you want to do with this url">
+                {getSelectOptions(form)}
+              </Select>
             </FormItem>
-            {this.getDetailInputs(item, `rules[${idx}]`, formUtils)}
+            {getDetailInputs(form, field.name)}
           </div>
         ))}
-        <FormItem help={this.getAddBtnHelp()}>
-          <Button onClick={this.addRow} disabled={!this.canAddMoreRule()}>
+        <FormItem help={getAddBtnHelp(form)}>
+          <Button onClick={() => add()} disabled={!canAddMoreRule(form)}>
             Add More rule
           </Button>
         </FormItem>
-      </Fragment>
-    )
-  }
+        </>
+      )}
+    </FormList>
+  </>)
+}
 
-  getAddBtnHelp = () => {
-    if (this.hasExclusive()) {
-      return (
-        EXCLUSIVE_CMDS.join(',') +
-        ' can not be coexisted with others, you won\'t be able to add other rule'
-      )
-    } else if (!this.hasCmd()) {
-      return 'You should config one rule before another'
-    } else {
-      return ''
-    }
-  }
-
-  hasExclusive () {
-    return this.state.arr.some(item => isExclusive(item.type))
-  }
-
-  hasCmd () {
-    return this.state.arr.some(item => Boolean(item.type))
-  }
-
-  canAddMoreRule = () => {
-    return this.hasCmd() && !this.hasExclusive()
-  }
-
-  getSelectOptions () {
-    const hasExclusive = this.hasExclusive()
-    const cmdCount = this.state.arr.length
-
-    return Object.keys(CMD_OPTIONS).map(k => (
-      <Option
-        value={k}
-        key={k}
-        disabled={shouldDisableOption(cmdCount, hasExclusive, k)}
-      >
-        <div dangerouslySetInnerHTML={{ __html: CMD_OPTIONS[k] }} />
-      </Option>
-    ))
-  }
-
-  getDetailInputs (
-    item: IRuleItemState,
-    prefix: string,
-    formUtils: WrappedFormUtils
-  ) {
-    // @ts-ignore
-    const Inputs = DETAIL_INPUTS_MAP[item.type]
-    if (Inputs) {
-      return createElement(Inputs, {
-        formUtils,
-        prefix,
-        type: item.type
-      })
-    } else {
-      return null
-    }
+function getDetailInputs (form: FormInstance, idx: number) {
+  const vals = form.getFieldValue('rules')
+  if (!vals || !vals.length || !vals[idx]) return null
+  const type = vals[idx].type
+  // @ts-ignore
+  const Inputs = DETAIL_INPUTS_MAP[type]
+  if (Inputs) {
+    return createElement(Inputs, {
+      form,
+      idx,
+      type
+    })
+  } else {
+    return null
   }
 }
+
+function getSelectOptions (form: FormInstance) {
+  const vals = form.getFieldValue('rules')
+  const hasExcl = hasExclusive(vals)
+  const cmdCount = vals.length
+
+  return Object.keys(CMD_OPTIONS).map(k => (
+    <Option
+      value={k}
+      key={k}
+      disabled={shouldDisableOption(cmdCount, hasExcl, k)}
+    >
+      <div dangerouslySetInnerHTML={{ __html: CMD_OPTIONS[k] }} />
+    </Option>
+  ))
+}
+
+function hasExclusive (vals: any[]) {
+  return vals.some(item => isExclusive(item.type))
+}
+
+function getAddBtnHelp (form: FormInstance) {
+  const vals = form.getFieldValue('rules')
+  if (hasExclusive(vals)) {
+    return (
+      EXCLUSIVE_CMDS.join(',') +
+      ' can not be coexisted with others, you won\'t be able to add other rule'
+    )
+  } else if (!hasCmd(vals)) {
+    return 'You should config one rule before another'
+  } else {
+    return ''
+  }
+}
+
+function hasCmd (vals: any[]) {
+  return vals.some(item => Boolean(item.type))
+}
+
+function canAddMoreRule (form: FormInstance) {
+  const vals = form.getFieldValue('rules')
+  return hasCmd(vals) && !hasExclusive(vals)
+}
+
+export default ActionForm

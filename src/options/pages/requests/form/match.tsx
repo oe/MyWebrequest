@@ -42,3 +42,5 @@ function validateMatchUrl (form: FormInstance) {
   }
   return { validator }
 }
+
+export default MatchForm
