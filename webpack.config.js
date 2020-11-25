@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const ESLintPlugin = require('eslint-webpack-plugin')
 const WebpackDevServer = require('webpack-dev-server')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -9,7 +10,6 @@ const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 
 const UglifyJsPlugin = require('terser-webpack-plugin')
 const WebpackOnBuildPlugin = require('on-build-webpack')
-const WriteFilePlugin = require('write-file-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const chalk = require('chalk')
 const zipFolder = require('zip-folder')
@@ -132,6 +132,9 @@ const config = {
         }
       })
     }),
+    new ESLintPlugin({
+      extensions: ['js', 'ts', 'tsx']
+    }),
     // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
     new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: ['dist', 'ext.zip', 'ext.crx']}),
     // copy custom static assets
@@ -227,14 +230,12 @@ if (process.env.NODE_ENV === 'production') {
     // new PrepackWebpackPlugin({})
   ])
   module.exports = config
-  // webpack(config, (err) => { if (err) throw err})
 } else {
   // config.devtool = "#cheap-module-eval-source-map"
   config.devtool = 'source-map'
   config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
     config.plugins || []
   )
-  config.plugins.push(new WriteFilePlugin())
   config.plugins.push(new FriendlyErrorsPlugin())
 
   const notHotReload = config.notHotReload || []
@@ -253,6 +254,7 @@ if (process.env.NODE_ENV === 'production') {
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
     hot: true,
+    writeToDisk: true,
     stats: { colors: true },
     contentBase: path.join(__dirname, 'dist'),
     headers: { 'Access-Control-Allow-Origin': '*' }

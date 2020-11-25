@@ -30,10 +30,10 @@ class Editor extends Component<IProps & WrappedComponentProps, IState> {
       this.ta.focus()
     }, 10)
   }
-  componentWillReceiveProps (newProps: IProps) {
-    this.setState({
+  static getDerivedStateFromProps (newProps: IProps) {
+    return {
       val: newProps.initVal
-    })
+    }
   }
   onSubmit () {
     if (this.props.onSubmit) {

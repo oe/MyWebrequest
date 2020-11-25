@@ -1,4 +1,4 @@
-import React, { createElement, Fragment, FunctionComponent } from 'react'
+import React, { createElement } from 'react'
 import { Form, Select, Button } from 'antd'
 import { FormInstance } from 'rc-field-form'
 import { MinusCircleOutlined } from '@ant-design/icons'
@@ -6,7 +6,6 @@ import { MinusCircleOutlined } from '@ant-design/icons'
 import { formItemLayout } from '../common'
 import { EWebRuleType } from '@/types/requests'
 import './index.scss'
-import AbstractForm, { IRuleItemState } from './abatract'
 import HeaderItems from './header'
 // import InjectItems from './inject'
 import UaItems from './ua'
@@ -63,10 +62,10 @@ interface IProps {
   form: FormInstance
 }
 
-const ActionForm: React.FC<IProps> = ({ form }) => {
+const ActionForm: React.FC<IProps> = ({ form }: IProps) => {
   return (<>
     <FormList name="rules">
-      {(fields, {add, remove}, { errors }) => (
+      {(fields, {add, remove}) => (
         <>
         {fields.map((field) => (
           <div className="rule-group" key={field.key}>

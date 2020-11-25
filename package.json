@@ -11,7 +11,7 @@
     "build": "cross-env NODE_ENV=production webpack --progress --colors",
     "postbuild": "npm run crx",
     "crx": "crx pack dist -o ext.crx",
-    "lint": "tslint --project ./tsconfig.json --config tslint.json"
+    "lint": "eslint --fix 'src/**/*.{js,ts,tsx}'"
   },
   "husky": {
     "hooks": {
@@ -20,12 +20,17 @@
   },
   "devDependencies": {
     "@types/chrome": "^0.0.126",
+    "@typescript-eslint/eslint-plugin": "^4.8.2",
+    "@typescript-eslint/parser": "^4.8.2",
     "chalk": "^4.1.0",
     "clean-webpack-plugin": "^3.0.0",
     "copy-webpack-plugin": "^6.3.1",
     "cross-env": "^7.0.2",
     "crx": "^5.0.1",
     "css-loader": "^5.0.1",
+    "eslint": "^7.14.0",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-webpack-plugin": "^2.4.0",
     "file-loader": "^6.2.0",
     "friendly-errors-webpack-plugin": "^1.7.0",
     "html-webpack-plugin": "^4.5.0",
@@ -43,7 +48,6 @@
     "webpack": "^5.6.0",
     "webpack-cli": "^4.2.0",
     "webpack-dev-server": "^3.11.0",
-    "write-file-webpack-plugin": "^4.5.1",
     "zip-folder": "^1.0.0"
   },
   "dependencies": {

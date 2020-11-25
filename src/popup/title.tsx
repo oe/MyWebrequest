@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import './title.scss'
 
 interface IProps {
@@ -6,13 +6,13 @@ interface IProps {
   subtitle: string
 }
 
-export default class Title extends Component<IProps> {
-  render () {
-    return (
-      <div className="popup-title">
-        {this.props.title}
-        <small>{this.props.subtitle}</small>
-      </div>
-    )
-  }
+const Title: React.FC<IProps> = (props: IProps) => {
+  return (
+    <div className="popup-title">
+      {props.title}
+      <small>{props.subtitle}</small>
+    </div>
+  )
 }
+
+export default Title
