@@ -5,7 +5,7 @@ import ExtIcon from './ext-icon'
 import DataSync from './data-sync'
 
 class Settings extends Component<WrappedComponentProps> {
-  componentWillMount () {
+  componentDidMount () {
     // this.props.getCommits('evecalm/truncate-html')
   }
   render () {

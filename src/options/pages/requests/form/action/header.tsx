@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { Form, Select, Input, Button, Row, Col } from 'antd'
-import AbstractForm, { IRuleItemProps } from './abatract'
+import { IRuleItemProps } from './abatract'
 
 const FormList = Form.List
 const FormItem = Form.Item
@@ -17,7 +17,7 @@ const HeaderItems: React.FC<IRuleItemProps> = (props: IRuleItemProps) => {
         <Col span={9}>Header Value</Col>
       </Row>
       <FormList name="headers">
-        {(fields, {add, remove}, { errors }) => (
+        {(fields, {add, remove}) => (
           <>
           {fields.map((field) => (
             <Row className="rule-group-item" key={field.key} gutter={16}>

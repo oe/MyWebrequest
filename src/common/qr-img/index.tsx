@@ -1,11 +1,9 @@
-import React, { Component, MouseEvent } from 'react'
+import React, { PureComponent, MouseEvent } from 'react'
 import qrUtils from './qrcode'
 import locales from './locales'
 import {
   IntlProvider,
   FormattedMessage,
-  injectIntl,
-  // InjectedIntl
 } from 'react-intl'
 import './qr-img.scss'
 
@@ -21,7 +19,7 @@ interface IQrImgState {
   url: string
 }
 
-export default class QrImg extends Component<IQrImgProps, IQrImgState> {
+export default class QrImg extends PureComponent<IQrImgProps, IQrImgState> {
   // @ts-ignore
   static defaultProps: IQrImgProps = {
     size: 250,
@@ -30,16 +28,16 @@ export default class QrImg extends Component<IQrImgProps, IQrImgState> {
   constructor (props: IQrImgProps) {
     super(props)
     this.state = { isDone: true, url: 'about:blank;' }
-    // tslint:disable-next-line:no-floating-promises
-    this.getQrUrl(props.text, props.size!)
   }
-  componentWillReceiveProps (newProps: IQrImgProps) {
-    // tslint:disable-next-line:no-floating-promises
-    this.getQrUrl(newProps.text, newProps.size!)
+  componentDidMount() {
+    this.getQrUrl()
   }
-  async getQrUrl (text: string, size: number) {
+  componentDidUpdate () {
+    this.getQrUrl()
+  }
+  async getQrUrl () {
     try {
-      const url = await qrUtils.makeQRCode(text, size)
+      const url = await qrUtils.makeQRCode(this.props.text, this.props.size)
       this.setState({ isDone: true, url })
     } catch (error) {
       console.error(error)

@@ -1,9 +1,9 @@
 /**
  * create dynamic forms
  */
-import React, { Component, FormEvent, useEffect, useRef } from 'react'
+import React, { FormEvent, useEffect, useRef } from 'react'
 import { Input, Form, Select } from 'antd'
-import { injectIntl, useIntl, IntlFormatters } from 'react-intl'
+import { useIntl, IntlFormatters } from 'react-intl'
 import { FormInstance } from 'rc-field-form'
 
 import { FormItemProps } from 'antd/lib/form/FormItem'
@@ -89,7 +89,7 @@ function createForm (config: IFormConfig) {
 
     return (
       <Form onFinish={config.onSubmit ? config.onSubmit : undefined} form={form} onValuesChange={onValuesChange}>
-        {config.items.map(item => {
+        {ref.current.items.map(item => {
           return forms[item.type](
             item,
             config.itemConfig

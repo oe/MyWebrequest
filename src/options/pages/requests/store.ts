@@ -16,6 +16,7 @@ const ruleDetail: ModelConfig<IDataState> = {
   effects: {
     async asyncIncrease (payload, rootState) {
       /** */
+      return payload + rootState
     }
   }
 }

@@ -1,4 +1,4 @@
-import React, { Component, FormEvent } from 'react'
+import React, { FormEvent } from 'react'
 import ActionForm from './action'
 import MatchForm from './match'
 // import { injectIntl, InjectedIntl } from 'react-intl'

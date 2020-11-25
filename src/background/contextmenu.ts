@@ -236,6 +236,7 @@ function isNeedPageInfo (contentPattern: string) {
 }
 
 async function getContent (contentPattern: string, info: chrome.contextMenus.OnClickData, tab: chrome.tabs.Tab) {
+  // eslint-disable-next-line prefer-rest-params
   console.warn('getContent', ...arguments)
   if (!/\{\w+\}/.test(contentPattern)) return contentPattern
   const params = await getParams(tab, info, contentPattern)

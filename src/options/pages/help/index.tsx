@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Title from '@/options/components/title'
 import { injectIntl, WrappedComponentProps } from 'react-intl'
 
@@ -15,4 +15,4 @@ const Help: React.FC<WrappedComponentProps> = (props: WrappedComponentProps) => 
   )
 }
 
-export default Help
+export default injectIntl(Help)

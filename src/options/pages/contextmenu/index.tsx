@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React from 'react'
 import Title from '@/options/components/title'
 import { useIntl } from 'react-intl'
 
 
-const Contextmenu: React.FC = () => {
+export default function Contextmenu () {
   const { formatMessage } = useIntl()
   return (
     <div className="contextmenu-page">
@@ -14,5 +14,3 @@ const Contextmenu: React.FC = () => {
     </div>
   )
 }
-
-export default Contextmenu

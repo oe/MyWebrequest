@@ -53,7 +53,7 @@ class Editor extends Component<IProps & WrappedComponentProps, IState> {
     return (
       <div className="text-container">
         <textarea
-          ref={ta => (this.ta = ta!)}
+          ref={ta => (this.ta = ta as HTMLTextAreaElement)}
           value={this.state.val}
           onKeyDown={this.onKeyDown.bind(this)}
           onChange={onInputChange.bind(this, 'val')}

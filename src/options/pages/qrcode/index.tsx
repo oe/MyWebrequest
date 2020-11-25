@@ -22,6 +22,7 @@ class QrCode extends Component<WrappedComponentProps, IState> {
   onTabClick (key: string) {
     const ref = this.refCache[key]
     if (!ref) return
+    // eslint-disable-next-line react/no-find-dom-node
     const dom = findDOMNode(ref) as HTMLDivElement
     const firstElement =
       dom.querySelector('input') || dom.querySelector('textarea')

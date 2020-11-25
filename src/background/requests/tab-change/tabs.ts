@@ -79,7 +79,8 @@ function onTabCreated (tab: chrome.tabs.Tab) {
   runListener(evt)
 }
 
-function onTabUpdate (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
+// function onTabUpdate (tabId: number, changeInfo: chrome.tabs.TabChangeInfo, tab: chrome.tabs.Tab) {
+function onTabUpdate (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) {
   // ignore tab been discarded
   if (changeInfo.discarded || !changeInfo.url || !tabId || tabId < 0) return
   const evt: ITabChangeEvent = {

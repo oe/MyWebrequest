@@ -1,10 +1,10 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { NavLink } from 'react-router-dom'
 import { FormattedMessage } from 'react-intl'
 import './navi.scss'
 import pages from './pages'
 
-const Navi:React.FC = () => {
+export default function Navi () {
   return (
     <div className="navi">
       <span className="app-name">My Webrequest</span>
@@ -23,5 +23,3 @@ const Navi:React.FC = () => {
     </div>
   )
 }
-
-export default Navi

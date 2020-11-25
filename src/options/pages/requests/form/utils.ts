@@ -153,6 +153,7 @@ function getMatchRuleParams (url: string, useReg?: boolean) {
   if (useReg) {
     // RegExp only got properties $0 ~ $9
     const total = Math.min(9, getRegGroupCount(url))
+    // eslint-disable-next-line prefer-spread
     const params = Array.apply(null, Array(total)).map((u, i) => '$' + (i + 1))
     params.push('$0')
     return params
