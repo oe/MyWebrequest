@@ -1,13 +1,10 @@
 import React, { Component } from 'react'
 import Title from '@/options/components/title'
-import { injectIntl } from 'react-intl'
-import { connect } from 'react-redux'
-import { IRootState, IDispatch } from '@/options/store'
-// import { ReposListCommitsResponseItem } from '@octokit/rest'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import ExtIcon from './ext-icon'
 import DataSync from './data-sync'
 
-class Settings extends Component {
+class Settings extends Component<WrappedComponentProps> {
   componentWillMount () {
     // this.props.getCommits('evecalm/truncate-html')
   }
@@ -47,4 +44,4 @@ class Settings extends Component {
   }
 }
 
-export default Settings
+export default injectIntl(Settings)

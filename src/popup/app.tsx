@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import QrImg from '@/common/qr-img'
 // import { QR_CACHE_KEY } from '@/common/vars'
-import { injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import Title from './title'
 import Editor from './editor'
 import './app.scss'
@@ -12,12 +12,8 @@ interface IState {
   pageUrl: string
 }
 
-interface IProps {
-  intl: InjectedIntl
-}
-
-class App extends Component<IProps, IState> {
-  constructor (props: any) {
+class App extends Component<WrappedComponentProps, IState> {
+  constructor (props: WrappedComponentProps) {
     super(props)
     this.state = { isEdit: false, content: 'hello world', pageUrl: '' }
     this.getCurrentTab()

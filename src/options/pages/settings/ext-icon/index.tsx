@@ -8,17 +8,14 @@ import './index.scss'
 
 const RadioGroup = Radio.Group
 
-import { injectIntl, InjectedIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 
-interface IProps {
-  intl: InjectedIntl
-}
 interface IState {
   iconStyle: string
 }
 
-class ExtIcon extends Component<IProps, IState> {
-  constructor (props: IProps) {
+class ExtIcon extends Component<WrappedComponentProps, IState> {
+  constructor (props: WrappedComponentProps) {
     super(props)
     this.state = {
       iconStyle: collection.getConfig('iconStyle') || 'colored'

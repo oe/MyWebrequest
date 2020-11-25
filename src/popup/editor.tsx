@@ -1,6 +1,6 @@
 import React, { Component, KeyboardEvent } from 'react'
 import { Button } from 'antd'
-import { injectIntl, InjectedIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 import { onInputChange } from '@/common/react-utils'
 import { isMac } from '@/common/utils'
 import { QR_CACHE_KEY } from '@/common/vars'
@@ -10,15 +10,15 @@ import './editor.scss'
 interface IProps {
   initVal: string
   onSubmit?: (val: string) => void
-  intl: InjectedIntl
+  // intl: InjectedIntl
 }
 
 interface IState {
   val: string
 }
 
-class Editor extends Component<IProps, IState> {
-  constructor (props: IProps) {
+class Editor extends Component<IProps & WrappedComponentProps, IState> {
+  constructor (props: IProps & WrappedComponentProps) {
     super(props)
     this.state = { val: props.initVal }
   }

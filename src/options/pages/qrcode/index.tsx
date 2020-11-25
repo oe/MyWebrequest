@@ -6,7 +6,7 @@ import { FormInstance } from 'rc-field-form'
 import Title from '@/options/components/title'
 import QrImg from '@/common/qr-img'
 import DataType from './data-type'
-import { injectIntl, FormattedMessage } from 'react-intl'
+import { injectIntl, FormattedMessage, WrappedComponentProps } from 'react-intl'
 import { QR_CACHE_KEY } from '@/common/vars'
 import './style.scss'
 
@@ -16,7 +16,7 @@ interface IState {
   content: string
 }
 
-class QrCode extends Component<null, IState> {
+class QrCode extends Component<WrappedComponentProps, IState> {
   state = { content: 'https://evecalm.com/' }
   refCache: { [k: string]: ReactInstance } = {}
   onTabClick (key: string) {

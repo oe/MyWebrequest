@@ -5,17 +5,14 @@ import collection from '@/common/collection'
 
 // const RadioGroup = Radio.Group
 
-import { injectIntl } from 'react-intl'
+import { injectIntl, WrappedComponentProps } from 'react-intl'
 
-interface IProps {
-  intl: InjectedIntl
-}
 interface IState {
   iconStyle: string
 }
 
-class DataSync extends Component<IProps, IState> {
-  constructor (props: IProps) {
+class DataSync extends Component<WrappedComponentProps, IState> {
+  constructor (props: WrappedComponentProps) {
     super(props)
     this.state = {
       iconStyle: collection.getConfig('iconStyle') || 'colored'
