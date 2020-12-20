@@ -82,7 +82,6 @@ class QrCode extends Component<WrappedComponentProps, IState> {
           <Col span={16}>
             <Tabs
               tabPosition="left"
-              style={{ height: 250 }}
               onTabClick={this.onTabClick.bind(this)}
             >
               {this.generateTabs()}

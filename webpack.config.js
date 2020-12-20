@@ -57,7 +57,6 @@ const config = {
     filename: '[name].js',
     publicPath: '/'
   },
-  notHotReload: [],
   mode: process.env.NODE_ENV,
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
@@ -107,6 +106,9 @@ const config = {
     ]
   },
   plugins: [
+    // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
+    // new CleanWebpackPlugin(),
+    // new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: ['dist', 'ext.zip', 'ext.crx']}),
     ...PAGES.map(pn => {
       return new HtmlWebpackPlugin({
         filename: pn + '.html',
@@ -135,8 +137,6 @@ const config = {
     new ESLintPlugin({
       extensions: ['js', 'ts', 'tsx']
     }),
-    // autoprefixer({ remove: false, browsers: ['last 7 versions'] }),
-    new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: ['dist', 'ext.zip', 'ext.crx']}),
     // copy custom static assets
     new CopyWebpackPlugin({
       patterns: [
@@ -232,29 +232,16 @@ if (process.env.NODE_ENV === 'production') {
   module.exports = config
 } else {
   // config.devtool = "#cheap-module-eval-source-map"
-  config.devtool = 'source-map'
-  config.plugins = [new webpack.HotModuleReplacementPlugin()].concat(
-    config.plugins || []
-  )
+  config.devtool = "inline-source-map"
+
   config.plugins.push(new FriendlyErrorsPlugin())
 
-  const notHotReload = config.notHotReload || []
-  for (let entryName in config.entry) {
-    if (
-      config.entry.hasOwnProperty(entryName) &&
-      notHotReload.indexOf(entryName) === -1
-    ) {
-      config.entry[entryName] = [
-        'webpack-dev-server/client?http://localhost:' + serverPort,
-        'webpack/hot/dev-server'
-      ].concat(config.entry[entryName])
-    }
-  }
-  delete config.notHotReload
   const compiler = webpack(config)
   const server = new WebpackDevServer(compiler, {
-    hot: true,
+    hot: false,
+    inline: false,
     writeToDisk: true,
+    liveReload: false,
     stats: { colors: true },
     contentBase: path.join(__dirname, 'dist'),
     headers: { 'Access-Control-Allow-Origin': '*' }

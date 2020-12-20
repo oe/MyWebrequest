@@ -75,8 +75,8 @@ interface IFormProps {
 
 function createForm (config: IFormConfig) {
   const CForm: React.FC<IFormProps> = (props: IFormProps) => {
-    const { formatMessage } = useIntl()
     const [form] = Form.useForm()
+    const { formatMessage } = useIntl()
     const ref = useRef<IFormConfig>(i18nConfig(formatMessage, config))
     useEffect(()=> {
       props.onMounted && props.onMounted(form)
