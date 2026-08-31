@@ -15,7 +15,10 @@ describe('compileDnrRule', () => {
       rule: {
         id: 1001,
         priority: 20,
-        condition: { regexFilter: '^https://api\\.example\\.com/v1/(.*)$' },
+        condition: {
+          regexFilter: '^https://api\\.example\\.com/v1/(.*)$',
+          initiatorDomains: ['app.example.com'],
+        },
         action: {
           type: 'redirect',
           redirect: { regexSubstitution: 'http://localhost:3000/v1/\\1' },
@@ -41,7 +44,11 @@ describe('compileDnrRule', () => {
 
     const result = compileDnrRule({
       ...base,
-      condition: { ...base.condition, url: { kind: 'url-filter', value: '||example.com^' } },
+      condition: {
+        ...base.condition,
+        url: { kind: 'url-filter', value: '||example.com^' },
+        resourceTypes: ['main_frame'],
+      },
       action: { kind: 'redirect', target: 'https://example.net/' },
     });
     expect(result).toMatchObject({

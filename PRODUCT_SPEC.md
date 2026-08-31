@@ -1,7 +1,7 @@
 # My Webrequest 2 Product Specification
 
 Status: Approved baseline; implementation in progress  
-Last updated: 2026-08-31  
+Last updated: 2026-09-01  
 Owners: Product and engineering  
 Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md),
 [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
@@ -182,6 +182,8 @@ It is not a general browser utility, an ad blocker, a request recorder, or a rep
 
 - No required host permissions at installation.
 - Use optional host permissions and request them from a direct user gesture.
+- Safe block and HTTPS-upgrade rules require no host access. Redirect and header rules request the matched
+  origin; subresource-capable rules also require explicit initiator domains so access remains bounded.
 - No request-body, browsing-history, cookie, or authentication data collection.
 - No network endpoint owned by the product.
 - No remote code, remote fonts, remote analytics, or dynamically downloaded configuration.

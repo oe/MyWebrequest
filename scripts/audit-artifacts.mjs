@@ -3,7 +3,7 @@ import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const targets = ['chrome-mv3', 'edge-mv3', 'firefox-mv3'];
-const expectedPermissions = ['activeTab', 'declarativeNetRequestWithHostAccess', 'storage'];
+const expectedPermissions = ['activeTab', 'declarativeNetRequest', 'storage'];
 const expectedOptionalHosts = ['http://*/*', 'https://*/*'];
 const expectedLocales = ['en', 'es', 'fr', 'ja', 'ko', 'zh_CN'];
 
@@ -28,7 +28,10 @@ for (const target of targets) {
   assert.equal(manifest.content_scripts, undefined, `${target} must not inject content scripts.`);
   assert.equal(manifest.externally_connectable, undefined, `${target} must not expose external messaging.`);
   assert.deepEqual(locales, expectedLocales, `${target} does not contain the six release locales.`);
-  assert.ok(files.every((file) => !file.endsWith('.map')), `${target} contains source maps.`);
+  assert.ok(
+    files.every((file) => !file.endsWith('.map')),
+    `${target} contains source maps.`,
+  );
 
   const bundledCss = files
     .filter((path) => path.endsWith('.css'))

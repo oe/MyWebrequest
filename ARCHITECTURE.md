@@ -1,7 +1,7 @@
 # My Webrequest 2 Architecture
 
 Status: Approved implementation baseline  
-Last updated: 2026-08-31  
+Last updated: 2026-09-01  
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
 ## 1. Architectural goals
@@ -131,7 +131,7 @@ Target manifest principles:
 ```json
 {
   "manifest_version": 3,
-  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
+  "permissions": ["storage", "declarativeNetRequest"],
   "optional_host_permissions": ["http://*/*", "https://*/*"],
   "background": {
     "service_worker": "background.js",
@@ -148,6 +148,11 @@ Target manifest principles:
 ```
 
 This is an architectural sketch, not the final generated manifest.
+
+The DNR permission lets safe block and HTTPS-upgrade rules run without host access. Redirect and
+request-header rules request the matched URL origin; non-navigation rules additionally require explicit
+initiator domains and request those origins. This avoids silently installing ineffective rules or asking
+for unbounded initiator access.
 
 WXT generates the manifest from a browser-aware function. Firefox MV3 additionally declares a stable
 Gecko extension ID and `data_collection_permissions.required: ["none"]`; the latter truthfully reflects

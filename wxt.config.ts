@@ -13,7 +13,7 @@ export default defineConfig({
     name: '__MSG_appName__',
     description: '__MSG_appDesc__',
     default_locale: 'en',
-    permissions: ['activeTab', 'storage', 'declarativeNetRequestWithHostAccess'],
+    permissions: ['activeTab', 'storage', 'declarativeNetRequest'],
     optional_host_permissions: ['http://*/*', 'https://*/*'],
     action: {
       default_title: '__MSG_actionTitle__',

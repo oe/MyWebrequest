@@ -5,7 +5,9 @@ import type { Rule, StoredState } from '@/domain/rules/model';
 import {
   checkRuleRegexSupport,
   getInstalledDynamicRuleIds,
+  hasRulePermission,
   reconcileDynamicRules,
+  requestRulePermission,
   subscribeToPermissionChanges,
 } from '@/infrastructure/rule-runtime';
 
@@ -53,7 +55,13 @@ function installBrowserMock(options: {
     },
   });
 
-  return { onAdded, onRemoved, updateDynamicRules };
+  return {
+    onAdded,
+    onRemoved,
+    updateDynamicRules,
+    contains: browser.permissions.contains,
+    request: browser.permissions.request,
+  };
 }
 
 describe('rule runtime reconciliation', () => {
@@ -86,21 +94,34 @@ describe('rule runtime reconciliation', () => {
   });
 
   it.each([
-    { label: 'the rule was deleted', state: null, permitted: true },
-    { label: 'host permission was revoked', state: 'active', permitted: false },
-    { label: 'all rules are paused', state: 'paused', permitted: true },
-  ])('removes stale dynamic rules when $label', async ({ state, permitted }) => {
+    { label: 'the rule was deleted', state: null },
+    { label: 'all rules are paused', state: 'paused' },
+  ])('removes stale dynamic rules when $label', async ({ state }) => {
     const rule = sampleRules[1];
     expect(rule).toBeDefined();
     if (!rule) return;
 
-    const runtime = installBrowserMock({ installedIds: [rule.dnrId], permitted });
+    const runtime = installBrowserMock({ installedIds: [rule.dnrId], permitted: true });
     const nextState =
       state === null
         ? { schemaVersion: 1, rules: {}, order: [], settings: { globallyPaused: false } }
         : stateWith(rule, state === 'paused');
 
     await reconcileDynamicRules(nextState as StoredState);
+
+    expect(runtime.updateDynamicRules).toHaveBeenCalledWith({
+      removeRuleIds: [rule.dnrId],
+      addRules: [],
+    });
+  });
+
+  it('removes a redirect rule when its request or initiator permission was revoked', async () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    const runtime = installBrowserMock({ installedIds: [rule.dnrId], permitted: false });
+
+    await reconcileDynamicRules(stateWith(rule));
 
     expect(runtime.updateDynamicRules).toHaveBeenCalledWith({
       removeRuleIds: [rule.dnrId],
@@ -126,6 +147,34 @@ describe('rule runtime reconciliation', () => {
   it('reports the exact installed dynamic rule IDs', async () => {
     installBrowserMock({ installedIds: [101, 202], permitted: true });
     await expect(getInstalledDynamicRuleIds()).resolves.toEqual(new Set([101, 202]));
+  });
+
+  it('requests bounded request and initiator origins for a subresource redirect', async () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    const runtime = installBrowserMock({ installedIds: [], permitted: true });
+
+    await expect(hasRulePermission(rule)).resolves.toBe(true);
+    await expect(requestRulePermission(rule)).resolves.toBe(true);
+
+    const expected = {
+      origins: ['*://*.app.example.com/*', 'https://api.example.com/*'],
+    };
+    expect(runtime.contains).toHaveBeenCalledWith(expected);
+    expect(runtime.request).toHaveBeenCalledWith(expected);
+  });
+
+  it('does not touch host permissions for a safe block rule', async () => {
+    const rule = sampleRules[1];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    const runtime = installBrowserMock({ installedIds: [], permitted: false });
+
+    await expect(hasRulePermission(rule)).resolves.toBe(true);
+    await expect(requestRulePermission(rule)).resolves.toBe(true);
+    expect(runtime.contains).not.toHaveBeenCalled();
+    expect(runtime.request).not.toHaveBeenCalled();
   });
 
   it('uses the browser DNR engine to reject an unsupported wildcard expression', async () => {

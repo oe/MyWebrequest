@@ -22,7 +22,8 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 Installed-extension permission/action/service-worker certification remains required before a production
 release or browser support claim. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
 [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), [MIGRATION.md](MIGRATION.md), [PRIVACY.md](PRIVACY.md), and
-[STORE_LISTING.md](STORE_LISTING.md).
+[STORE_LISTING.md](STORE_LISTING.md). Use [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for installed-browser
+and store certification.
 
 ## Development
 
@@ -51,3 +52,9 @@ pnpm build:browsers
 ```
 
 Artifacts are written to `dist/chrome-mv3`, `dist/edge-mv3`, and `dist/firefox-mv3`.
+
+Create checksummed release candidates after the local gate passes:
+
+```bash
+pnpm release:package
+```

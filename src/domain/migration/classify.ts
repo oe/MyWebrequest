@@ -135,6 +135,15 @@ function classifySimpleRule(entry: LegacySourceEntry, enabledIntent: boolean, no
             kind: 'modify-request-headers',
             operations: [{ header: 'Referer', operation: 'remove' }],
           };
+  if (entry.key === 'hotlink') {
+    return makeItem(
+      entry,
+      'unsupported',
+      'initiator-permission-unbounded',
+      'The legacy header rule affected subresources from any site. Manifest V3 requires explicit initiator access, so the source is preserved for manual recreation with bounded initiator domains.',
+      enabledIntent,
+    );
+  }
   const reviewRequired = entry.key === 'hsts' && entry.value.startsWith('*://');
   const candidate = createCandidate(
     entry,
@@ -332,14 +341,16 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
     return makeItem(entry, 'unsupported', compiled.reasonCode, compiled.explanation, enabledIntent);
   }
 
-  const reviewRequired = compiled.captureCount > 0 || matchUrl.startsWith('*://');
   const candidate = createCandidate(
     entry,
     now,
     { kind: 'redirect', target: compiled.target },
-    reviewRequired ? 'review-required' : 'none',
+    'review-required',
     enabledIntent,
-    { url: { kind: 'regex', value: compiled.regex } },
+    {
+      url: { kind: 'regex', value: compiled.regex },
+      resourceTypes: ['main_frame', 'sub_frame'],
+    },
     compiled.permissionOrigins,
   );
   const dnrResult = compileDnrRule(candidate);
@@ -355,11 +366,11 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
 
   return makeItem(
     entry,
-    reviewRequired ? 'review-required' : 'automatic',
-    reviewRequired ? 'substitution-semantics-review' : 'equivalent-fixed-redirect',
-    reviewRequired
-      ? 'The route can compile to MV3, but raw capture substitution may differ from legacy encoding behavior.'
-      : 'The fixed Custom URL redirect has an equivalent MV3 representation.',
+    'review-required',
+    compiled.captureCount > 0 ? 'substitution-and-navigation-scope-review' : 'navigation-scope-review',
+    compiled.captureCount > 0
+      ? 'The route is limited to navigations, and raw capture substitution may differ from legacy encoding behavior.'
+      : 'The route is limited to top-level and frame navigations so it can use bounded Manifest V3 permissions.',
     enabledIntent,
     candidate,
   );

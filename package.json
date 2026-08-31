@@ -22,6 +22,7 @@
     "zip:edge": "wxt zip -b edge --mv3",
     "zip:firefox": "wxt zip -b firefox --mv3",
     "zip:browsers": "pnpm zip:chrome && pnpm zip:edge && pnpm zip:firefox",
+    "release:package": "pnpm check && pnpm zip:browsers && node scripts/write-release-checksums.mjs",
     "lint:firefox": "node scripts/lint-firefox.mjs",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{css,json,md,ts,tsx}\"",

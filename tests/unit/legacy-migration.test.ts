@@ -13,9 +13,9 @@ describe('legacy migration', () => {
     const bundle = await createMigrationBundle(fixture, 'legacy-json-import', now);
 
     expect(bundle.report.summary).toEqual({
-      automatic: 3,
+      automatic: 2,
       reviewRequired: 3,
-      unsupported: 3,
+      unsupported: 4,
       removedFeature: 11,
       invalid: 0,
     });
@@ -47,11 +47,12 @@ describe('legacy migration', () => {
     expect(custom).toMatchObject({
       outcome: 'review-required',
       enabledIntent: true,
-      reasonCode: 'substitution-semantics-review',
+      reasonCode: 'substitution-and-navigation-scope-review',
       candidateRule: {
         enabled: false,
         migrationState: 'review-required',
         condition: {
+          resourceTypes: ['main_frame', 'sub_frame'],
           url: {
             kind: 'regex',
             value: '^https:\\/\\/api\\.example\\.com/v1/([^/?]+)/([^?]*)',
@@ -60,6 +61,17 @@ describe('legacy migration', () => {
         action: { kind: 'redirect', target: 'https://local.example/$1/$2' },
       },
     });
+  });
+
+  it('preserves legacy cross-site header rules instead of requesting unbounded initiator access', async () => {
+    const { report } = await createMigrationBundle(fixture, 'legacy-json-import', now);
+    const hotlink = report.items.find((item) => item.sourceLocator === 'hotlink[0]');
+
+    expect(hotlink).toMatchObject({
+      outcome: 'unsupported',
+      reasonCode: 'initiator-permission-unbounded',
+    });
+    expect(hotlink?.candidateRule).toBeUndefined();
   });
 
   it('retains query extraction, reserved computation, removed features, and unknown keys without activation', async () => {

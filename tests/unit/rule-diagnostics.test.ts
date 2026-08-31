@@ -34,14 +34,20 @@ describe('rule diagnostics', () => {
       ...base,
       id: 'first',
       dnrId: 3001,
-      condition: { url: { kind: 'wildcard', value: 'https://one.example/*' } },
+      condition: {
+        url: { kind: 'wildcard', value: 'https://one.example/*' },
+        resourceTypes: ['main_frame'],
+      },
       action: { kind: 'redirect', target: 'https://two.example/page' },
     };
     const second: Rule = {
       ...base,
       id: 'second',
       dnrId: 3002,
-      condition: { url: { kind: 'wildcard', value: 'https://two.example/*' } },
+      condition: {
+        url: { kind: 'wildcard', value: 'https://two.example/*' },
+        resourceTypes: ['main_frame'],
+      },
       action: { kind: 'redirect', target: 'https://one.example/page' },
     };
 
@@ -54,10 +60,16 @@ describe('rule diagnostics', () => {
   it('counts only enabled runnable dynamic rules toward the internal quota', () => {
     const active = sampleRules[1];
     const review = sampleRules[3];
+    const redirect = sampleRules[0];
     expect(active).toBeDefined();
     expect(review).toBeDefined();
-    if (!active || !review) return;
+    expect(redirect).toBeDefined();
+    if (!active || !review || !redirect) return;
 
-    expect(getRuleQuotaUsage(stateWith([active, review]))).toMatchObject({ used: 1, limit: 4_500 });
+    const { initiatorDomains: ignored, ...invalidCondition } = redirect.condition;
+    void ignored;
+    const invalid = { ...redirect, condition: invalidCondition };
+
+    expect(getRuleQuotaUsage(stateWith([active, review, invalid]))).toMatchObject({ used: 1, limit: 4_500 });
   });
 });

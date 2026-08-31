@@ -1,7 +1,7 @@
 # My Webrequest Legacy Migration Plan
 
 Status: Required V1 workstream
-Last updated: 2026-08-31  
+Last updated: 2026-09-01  
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
 ## 1. Migration promise
@@ -66,18 +66,18 @@ The report stores source text only in the bounded local migration snapshot. UI-f
 
 ## 5. Mapping matrix
 
-| Legacy category              | Target                                 | Default migration outcome                                  |
-| ---------------------------- | -------------------------------------- | ---------------------------------------------------------- |
-| `block`                      | Block action                           | Automatic when filter is valid                             |
-| `hsts`                       | Advanced upgrade-scheme action         | Automatic but surfaced as consolidated capability          |
-| `hotlink`                    | Remove `Referer` request-header action | Review required because naming and scope change            |
-| `custom`                     | Fixed or regex redirect                | Automatic, review required, or unsupported per grammar     |
-| `log`                        | No target                              | Removed feature                                            |
-| `gsearch`                    | Ordinary redirect preset               | Review required and disabled by default                    |
-| `gstatic`                    | No target                              | Removed feature; endpoint is obsolete                      |
-| `onoff`                      | Enabled intent                         | Preserved only after rule conversion and permission review |
-| `config.iconStyle`           | No target                              | Removed preference                                         |
-| demo/custom onboarding flags | No target                              | Ignored after recording in raw snapshot                    |
+| Legacy category              | Target                                  | Default migration outcome                                  |
+| ---------------------------- | --------------------------------------- | ---------------------------------------------------------- |
+| `block`                      | Block action                            | Automatic when filter is valid                             |
+| `hsts`                       | Advanced upgrade-scheme action          | Automatic but surfaced as consolidated capability          |
+| `hotlink`                    | Preserved legacy record                 | Unsupported until bounded initiator domains are chosen     |
+| `custom`                     | Navigation-only fixed or regex redirect | Review required or unsupported per grammar                 |
+| `log`                        | No target                               | Removed feature                                            |
+| `gsearch`                    | Ordinary redirect preset                | Review required and disabled by default                    |
+| `gstatic`                    | No target                               | Removed feature; endpoint is obsolete                      |
+| `onoff`                      | Enabled intent                          | Preserved only after rule conversion and permission review |
+| `config.iconStyle`           | No target                               | Removed preference                                         |
+| demo/custom onboarding flags | No target                               | Ignored after recording in raw snapshot                    |
 
 No migrated rule is enabled before required host permissions are granted.
 

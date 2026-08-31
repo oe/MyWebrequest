@@ -1,5 +1,6 @@
 import { compileDnrRule } from '@/domain/rules/compile-dnr';
 import type { Rule, StoredState } from '@/domain/rules/model';
+import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { wildcardToRegExpSource } from '@/domain/rules/test-match';
 
 function hasExtensionRuntime(): boolean {
@@ -31,14 +32,16 @@ export async function checkRuleRegexSupport(rule: Rule): Promise<RegexSupportRes
 
 export async function hasRulePermission(rule: Rule): Promise<boolean> {
   if (!hasExtensionRuntime()) return true;
-  if (rule.permissionOrigins.length === 0) return true;
-  return browser.permissions.contains({ origins: rule.permissionOrigins });
+  const origins = requiredPermissionOrigins(rule);
+  if (origins.length === 0) return true;
+  return browser.permissions.contains({ origins });
 }
 
 export async function requestRulePermission(rule: Rule): Promise<boolean> {
   if (!hasExtensionRuntime()) return true;
-  if (rule.permissionOrigins.length === 0) return true;
-  return browser.permissions.request({ origins: rule.permissionOrigins });
+  const origins = requiredPermissionOrigins(rule);
+  if (origins.length === 0) return true;
+  return browser.permissions.request({ origins });
 }
 
 export function subscribeToPermissionChanges(listener: PermissionChangeListener): () => void {

@@ -1,7 +1,7 @@
 # Browser Support Plan
 
 Status: Multi-target build baseline implemented; per-browser runtime certification pending  
-Last updated: 2026-08-31
+Last updated: 2026-09-01
 
 ## Current matrix
 
@@ -23,6 +23,8 @@ It must not be presented as store-ready.
   WXT otherwise defaults Firefox builds to Manifest V2.
 - Keep installation host access empty and request narrow origins at runtime with
   `optional_host_permissions`.
+- Use `declarativeNetRequest` so safe block and HTTPS-upgrade rules need no host access. Redirect and
+  request-header rules request the matched origin, plus explicit initiator origins for subresources.
 - Include Firefox `browser_specific_settings.gecko.id` for signing and declare
   `data_collection_permissions.required: ["none"]` because the product sends no user data off-device.
 - Fail Firefox validation on errors or new warnings. The two expected warnings are pinned to React's
@@ -36,8 +38,8 @@ It must not be presented as store-ready.
   restart on Chrome, Edge, and Firefox.
 - Verify DNR block, upgrade, redirect, regex substitution, and request-header modification independently
   on each browser.
-- Model initiator-origin permissions for cross-origin subresource redirects and header changes. DNR may
-  require access to both the request URL and its initiator, while top-level navigation rules differ.
+- Certify the implemented initiator-origin permission model for cross-origin subresource redirects and
+  header changes; navigation-only rules request only the request URL origin.
 - Add capability checks around regex support, match testing, rule quotas, and any API whose browser support
   differs.
 - Run Chrome Web Store, Edge Add-ons, and AMO packaging validators in CI before enabling a release job.

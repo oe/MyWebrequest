@@ -3,6 +3,7 @@ import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, Searc
 import { toast } from 'sonner';
 
 import type { Rule } from '@/domain/rules/model';
+import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import {
@@ -119,7 +120,12 @@ export function OptionsApp() {
 
   const handleToggle = (id: string, enabled: boolean) => {
     const rule = manager.state?.rules[id];
-    if (enabled && rule && manager.permissions[id] !== true && rule.permissionOrigins.length > 0) {
+    if (enabled && manager.statuses[id] === 'invalid') {
+      manager.setSelectedId(id);
+      toast.error(t('invalidRuleCannotEnable'));
+      return;
+    }
+    if (enabled && rule && manager.permissions[id] !== true && requiredPermissionOrigins(rule).length > 0) {
       setPendingPermissionRule(rule);
       return;
     }
@@ -329,7 +335,7 @@ export function OptionsApp() {
           <div className="rounded-lg border bg-muted/35 p-3">
             <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
             <p className="font-mono text-sm break-all">
-              {pendingPermissionRule?.permissionOrigins.join(', ')}
+              {pendingPermissionRule ? requiredPermissionOrigins(pendingPermissionRule).join(', ') : ''}
             </p>
           </div>
           <DialogFooter>

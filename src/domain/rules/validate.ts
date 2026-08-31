@@ -1,4 +1,5 @@
 import type { Rule, RuleStatus } from './model';
+import { requiresInitiatorPermission } from './permissions';
 import { ruleSchema } from './schema';
 
 export type ValidationIssue = {
@@ -13,6 +14,7 @@ export type ValidationIssue = {
     | 'capture-match-required'
     | 'capture-index-invalid'
     | 'initiator-domain-invalid'
+    | 'initiator-permission-required'
     | 'header-name-invalid'
     | 'header-forbidden';
   message: string;
@@ -47,7 +49,7 @@ const forbiddenRequestHeaders = new Set([
 
 const headerNamePattern = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
 const domainPattern =
-  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i;
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/;
 
 export function validateRule(rule: Rule): ValidationResult {
   const errors: ValidationIssue[] = [];
@@ -94,6 +96,15 @@ export function validateRule(rule: Rule): ValidationResult {
         value: domain,
       });
     }
+  }
+
+  if (requiresInitiatorPermission(rule) && !rule.condition.initiatorDomains?.length) {
+    errors.push({
+      field: 'initiators',
+      code: 'initiator-permission-required',
+      message:
+        'Redirect and header rules that can affect subresources require an initiator domain for bounded host access.',
+    });
   }
 
   if (rule.action.kind === 'redirect') {

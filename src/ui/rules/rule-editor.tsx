@@ -23,6 +23,7 @@ import {
   type RuleStatus,
 } from '@/domain/rules/model';
 import type { RuleDiagnostic } from '@/domain/rules/diagnostics';
+import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { matchRule, type MatchResult } from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
@@ -112,7 +113,7 @@ function parseInitiatorDomains(value: string): string[] {
     ...new Set(
       value
         .split(/[\s,]+/)
-        .map((domain) => domain.trim())
+        .map((domain) => domain.trim().toLowerCase())
         .filter(Boolean),
     ),
   ];
@@ -143,6 +144,7 @@ function validationMessage(issue: ValidationIssue, t: Translate): string {
     'capture-match-required': 'validationCaptureMatch',
     'capture-index-invalid': 'validationCaptureIndex',
     'initiator-domain-invalid': 'validationInitiatorDomain',
+    'initiator-permission-required': 'validationInitiatorPermission',
     'header-name-invalid': 'validationHeaderName',
     'header-forbidden': 'validationHeaderForbidden',
   } as const;
@@ -209,6 +211,8 @@ export function RuleEditor({
   const destinationError = validation.errors.find((issue) => issue.field === 'destination');
   const headerError = validation.errors.find((issue) => issue.field === 'headers');
   const initiatorError = validation.errors.find((issue) => issue.field === 'initiators');
+  const requiredOrigins = useMemo(() => requiredPermissionOrigins(draft), [draft]);
+  const originalRequiredOrigins = useMemo(() => requiredPermissionOrigins(rule), [rule]);
   const headerOperationCount =
     draft.action.kind === 'modify-request-headers' ? draft.action.operations.length : 0;
 
@@ -266,8 +270,8 @@ export function RuleEditor({
 
   const handleSave = () => {
     const permissionScopeChanged =
-      JSON.stringify(draft.permissionOrigins) !== JSON.stringify(rule.permissionOrigins);
-    if (draft.enabled && (!hasPermission || permissionScopeChanged) && draft.permissionOrigins.length > 0) {
+      JSON.stringify(requiredOrigins) !== JSON.stringify(originalRequiredOrigins);
+    if (draft.enabled && (!hasPermission || permissionScopeChanged) && requiredOrigins.length > 0) {
       setPermissionOpen(true);
       return;
     }
@@ -510,6 +514,9 @@ export function RuleEditor({
                 </SelectContent>
               </Select>
               <FieldDescription>{t('actionHelp')}</FieldDescription>
+              {!advanced && initiatorError ? (
+                <FieldError>{validationMessage(initiatorError, t)}</FieldError>
+              ) : null}
             </Field>
             {draft.action.kind === 'redirect' ? (
               <Field data-invalid={Boolean(destinationError)}>
@@ -673,13 +680,33 @@ export function RuleEditor({
             ) : null}
           </FieldGroup>
 
-          <Alert variant={hasPermission ? 'success' : 'warning'}>
-            {hasPermission ? <CheckCircle2Icon /> : <KeyRoundIcon />}
-            <AlertTitle>{t(hasPermission ? 'hostAccessGranted' : 'hostAccessRequired')}</AlertTitle>
+          <Alert
+            variant={
+              !initiatorError && (requiredOrigins.length === 0 || hasPermission) ? 'success' : 'warning'
+            }
+          >
+            {!initiatorError && (requiredOrigins.length === 0 || hasPermission) ? (
+              <CheckCircle2Icon />
+            ) : (
+              <KeyRoundIcon />
+            )}
+            <AlertTitle>
+              {t(
+                initiatorError
+                  ? 'hostAccessRequired'
+                  : requiredOrigins.length === 0
+                    ? 'hostAccessNotNeeded'
+                    : hasPermission
+                      ? 'hostAccessGranted'
+                      : 'hostAccessRequired',
+              )}
+            </AlertTitle>
             <AlertDescription>
-              {draft.permissionOrigins.length > 0
-                ? draft.permissionOrigins.join(', ')
-                : t('concreteHostHelp')}
+              {initiatorError
+                ? validationMessage(initiatorError, t)
+                : requiredOrigins.length > 0
+                  ? requiredOrigins.join(', ')
+                  : t('noHostAccessNeeded')}
             </AlertDescription>
           </Alert>
 
@@ -852,7 +879,7 @@ export function RuleEditor({
           </DialogHeader>
           <div className="rounded-lg border bg-muted/35 p-3">
             <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
-            <p className="font-mono text-sm break-all">{draft.permissionOrigins.join(', ')}</p>
+            <p className="font-mono text-sm break-all">{requiredOrigins.join(', ')}</p>
           </div>
           <DialogFooter>
             <Button variant="outline" disabled={saving} onClick={() => setPermissionOpen(false)}>

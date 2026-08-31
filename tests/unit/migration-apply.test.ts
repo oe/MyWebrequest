@@ -21,7 +21,7 @@ describe('migration application', () => {
       migration.selectedItemIds.includes(item.id),
     );
 
-    expect(selectedItems).toHaveLength(3);
+    expect(selectedItems).toHaveLength(2);
     expect(selectedItems.every((item) => item.outcome === 'automatic' && item.candidateRule)).toBe(true);
   });
 
@@ -45,7 +45,7 @@ describe('migration application', () => {
       appliedAt,
       preMigrationState: previous,
     });
-    expect(result.state.order).toHaveLength(3);
+    expect(result.state.order).toHaveLength(2);
     expect(Object.values(result.state.rules).every((rule) => !rule.enabled)).toBe(true);
     expect(reconcile).toHaveBeenCalledWith(result.state);
     expect(commit).toHaveBeenCalledWith(result.state, result.migration);

@@ -1,3 +1,7 @@
+import type { Rule } from './model';
+
+const navigationResourceTypes = new Set(['main_frame', 'sub_frame']);
+
 export function permissionOriginsFromMatch(value: string): string[] {
   if (value.startsWith('||')) {
     const host = value.slice(2).replace(/\^.*$/, '').replace(/^\*\./, '');
@@ -30,4 +34,22 @@ export function permissionOriginsFromMatch(value: string): string[] {
   } catch {
     return [];
   }
+}
+
+export function requiresInitiatorPermission(rule: Rule): boolean {
+  if (rule.action.kind !== 'redirect' && rule.action.kind !== 'modify-request-headers') return false;
+  const resourceTypes = rule.condition.resourceTypes;
+  return !resourceTypes?.length || resourceTypes.some((type) => !navigationResourceTypes.has(type));
+}
+
+export function requiredPermissionOrigins(rule: Rule): string[] {
+  if (rule.action.kind === 'block' || rule.action.kind === 'upgrade-scheme') return [];
+
+  const origins = [...rule.permissionOrigins];
+  if (requiresInitiatorPermission(rule)) {
+    for (const domain of rule.condition.initiatorDomains ?? []) {
+      origins.push(`*://*.${domain.toLowerCase()}/*`);
+    }
+  }
+  return [...new Set(origins)].sort();
 }

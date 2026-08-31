@@ -8,7 +8,9 @@ import {
   restoreRule,
   upsertRule,
 } from '@/application/rule-service';
-import { createEmptyState } from '@/domain/rules/fixtures';
+import { createEmptyState, sampleRules } from '@/domain/rules/fixtures';
+import { requiredPermissionOrigins } from '@/domain/rules/permissions';
+import { validateRule } from '@/domain/rules/validate';
 
 describe('rule service', () => {
   it('derives a narrow optional permission from a concrete match', () => {
@@ -18,6 +20,41 @@ describe('rule service', () => {
   it('preserves legacy match-pattern schemes and wildcard subdomains', () => {
     expect(permissionOriginsFromMatch('*://*.example.com/*')).toEqual(['*://*.example.com/*']);
     expect(permissionOriginsFromMatch('http://example.com/*')).toEqual(['http://example.com/*']);
+  });
+
+  it('requires no host access for safe DNR actions', () => {
+    const block = sampleRules[1];
+    expect(block).toBeDefined();
+    if (!block) return;
+
+    expect(requiredPermissionOrigins(block)).toEqual([]);
+  });
+
+  it('requests both request and initiator origins for subresource redirects', () => {
+    const redirect = sampleRules[0];
+    expect(redirect).toBeDefined();
+    if (!redirect) return;
+
+    expect(requiredPermissionOrigins(redirect)).toEqual([
+      '*://*.app.example.com/*',
+      'https://api.example.com/*',
+    ]);
+  });
+
+  it('rejects an unsafe subresource action without a bounded initiator domain', () => {
+    const redirect = sampleRules[0];
+    expect(redirect).toBeDefined();
+    if (!redirect) return;
+    const { initiatorDomains: ignored, ...condition } = redirect.condition;
+    void ignored;
+
+    const result = validateRule({
+      ...redirect,
+      condition,
+    });
+    expect(result.errors).toContainEqual(
+      expect.objectContaining({ code: 'initiator-permission-required', field: 'initiators' }),
+    );
   });
 
   it('creates a disabled site-scoped rule', () => {

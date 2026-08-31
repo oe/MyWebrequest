@@ -1,9 +1,10 @@
 # My Webrequest V1 Goal
 
 Status: Active delivery goal  
-Last updated: 2026-08-31  
+Last updated: 2026-09-01  
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
-[MIGRATION.md](MIGRATION.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md)
+[MIGRATION.md](MIGRATION.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md),
+[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
 
 ## Outcome
 
@@ -55,18 +56,18 @@ Automatic migration is the preferred path for a same-extension-ID update. It run
 that can read the retained legacy `localStorage`, stages a report, and applies nothing until validation is
 complete. Versioned JSON import uses the same parser when automatic access is unavailable.
 
-| Legacy input          | V1 treatment                    | Default outcome                                        |
-| --------------------- | ------------------------------- | ------------------------------------------------------ |
-| `block` URL array     | Modern block rule               | Automatic when valid                                   |
-| `hsts` URL array      | Advanced HTTPS-upgrade rule     | Automatic when scope is equivalent                     |
-| `hotlink` URL array   | Remove `Referer` request header | Automatic when scope is equivalent                     |
-| `custom` route object | Fixed or regex redirect         | Automatic, review-required, or unsupported per grammar |
-| `gsearch` rules       | Ordinary redirect candidate     | Review-required; disabled until equivalence is proven  |
-| `gstatic` rules       | Preserved legacy record         | Removed feature; obsolete destination is never enabled |
-| `log` rules           | Preserved legacy record         | Removed feature; request logging is not restored       |
-| `onoff`               | Per-rule enabled intent         | Preserved only after conversion and permission review  |
-| `config`              | Relevant preference mapping     | Unsupported preferences retained in the snapshot       |
-| Unknown keys          | Raw migration snapshot          | Retained, never activated                              |
+| Legacy input          | V1 treatment                | Default outcome                                        |
+| --------------------- | --------------------------- | ------------------------------------------------------ |
+| `block` URL array     | Modern block rule           | Automatic when valid                                   |
+| `hsts` URL array      | Advanced HTTPS-upgrade rule | Automatic when scope is equivalent                     |
+| `hotlink` URL array   | Preserved legacy record     | Unsupported until bounded initiator domains are chosen |
+| `custom` route object | Fixed or regex redirect     | Automatic, review-required, or unsupported per grammar |
+| `gsearch` rules       | Ordinary redirect candidate | Review-required; disabled until equivalence is proven  |
+| `gstatic` rules       | Preserved legacy record     | Removed feature; obsolete destination is never enabled |
+| `log` rules           | Preserved legacy record     | Removed feature; request logging is not restored       |
+| `onoff`               | Per-rule enabled intent     | Preserved only after conversion and permission review  |
+| `config`              | Relevant preference mapping | Unsupported preferences retained in the snapshot       |
+| Unknown keys          | Raw migration snapshot      | Retained, never activated                              |
 
 Legacy Custom URL compatibility includes named host/path parameters, terminal splats, query-parameter
 holders, reserved values (`p`, `h`, `m`, `r`, `q`, `u`), encoding behavior, repeated query keys, and the

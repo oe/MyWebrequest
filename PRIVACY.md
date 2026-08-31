@@ -13,11 +13,12 @@ authentication data, or incognito activity.
 ## Permissions
 
 - `storage` stores rules and preferences on the device.
-- `declarativeNetRequestWithHostAccess` lets the browser apply user-authored request rules without the
-  extension reading request contents.
+- `declarativeNetRequest` lets the browser apply user-authored request rules without the extension reading
+  request contents. Safe block and HTTPS-upgrade rules need no website access.
 - `activeTab` lets the popup identify the current HTTP or HTTPS site after the user opens it.
 - Optional `http://*/*` and `https://*/*` host access is not granted at installation. My Webrequest asks
-  only for the concrete origins needed by a rule when the user chooses to enable it.
+  only for the concrete request and, when required, initiator origins needed by a redirect or header rule
+  when the user chooses to enable it.
 
 Exporting a backup writes a JSON file chosen by the user. Importing reads only the file the user selects.
 Neither operation sends data over the network.

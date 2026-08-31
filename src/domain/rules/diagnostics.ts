@@ -1,5 +1,6 @@
 import type { Rule, StoredState } from './model';
 import { matchRule } from './test-match';
+import { validateRule } from './validate';
 
 export const INTERNAL_DYNAMIC_RULE_LIMIT = 4_500;
 
@@ -16,7 +17,7 @@ export type RuleQuotaUsage = {
 function runnableRules(state: StoredState): Rule[] {
   return state.order.flatMap((id) => {
     const rule = state.rules[id];
-    return rule?.enabled && rule.migrationState === 'none' ? [rule] : [];
+    return rule?.enabled && rule.migrationState === 'none' && validateRule(rule).valid ? [rule] : [];
   });
 }
 
