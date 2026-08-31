@@ -9,34 +9,37 @@ import {
 
 import type { RuleStatus } from '@/domain/rules/model';
 import { Badge } from '@/ui/components/badge';
+import { useI18n } from '@/ui/i18n';
+import type { MessageKey } from '@/ui/i18n/messages';
 
 const statusConfig: Record<
   RuleStatus,
   {
-    label: string;
+    label: MessageKey;
     icon: typeof CircleCheckIcon;
     variant: 'success' | 'warning' | 'destructive' | 'muted' | 'outline';
   }
 > = {
-  active: { label: 'Active', icon: CircleCheckIcon, variant: 'success' },
-  disabled: { label: 'Disabled', icon: CircleDashedIcon, variant: 'muted' },
-  paused: { label: 'Paused', icon: CircleOffIcon, variant: 'muted' },
-  'needs-permission': { label: 'Permission', icon: KeyRoundIcon, variant: 'warning' },
-  'not-applied': { label: 'Not applied', icon: CircleDashedIcon, variant: 'warning' },
-  'runtime-error': { label: 'Runtime error', icon: TriangleAlertIcon, variant: 'destructive' },
-  invalid: { label: 'Invalid', icon: TriangleAlertIcon, variant: 'destructive' },
-  unsupported: { label: 'Unsupported', icon: BanIcon, variant: 'destructive' },
-  'review-required': { label: 'Needs review', icon: TriangleAlertIcon, variant: 'warning' },
-  removed: { label: 'Removed', icon: CircleOffIcon, variant: 'muted' },
+  active: { label: 'statusActive', icon: CircleCheckIcon, variant: 'success' },
+  disabled: { label: 'statusDisabled', icon: CircleDashedIcon, variant: 'muted' },
+  paused: { label: 'statusPaused', icon: CircleOffIcon, variant: 'muted' },
+  'needs-permission': { label: 'statusPermission', icon: KeyRoundIcon, variant: 'warning' },
+  'not-applied': { label: 'statusNotApplied', icon: CircleDashedIcon, variant: 'warning' },
+  'runtime-error': { label: 'statusRuntimeError', icon: TriangleAlertIcon, variant: 'destructive' },
+  invalid: { label: 'statusInvalid', icon: TriangleAlertIcon, variant: 'destructive' },
+  unsupported: { label: 'statusUnsupported', icon: BanIcon, variant: 'destructive' },
+  'review-required': { label: 'statusNeedsReview', icon: TriangleAlertIcon, variant: 'warning' },
+  removed: { label: 'statusRemoved', icon: CircleOffIcon, variant: 'muted' },
 };
 
 export function StatusBadge({ status }: { status: RuleStatus }) {
+  const { t } = useI18n();
   const config = statusConfig[status];
   const Icon = config.icon;
   return (
     <Badge variant={config.variant}>
       <Icon data-icon="inline-start" />
-      {config.label}
+      {t(config.label)}
     </Badge>
   );
 }

@@ -9,6 +9,7 @@ import { Toaster } from '@/ui/components/sonner';
 import { TooltipProvider } from '@/ui/components/tooltip';
 import { useMigrationManager } from '@/ui/hooks/use-migration-manager';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
+import { useI18n } from '@/ui/i18n';
 import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
@@ -18,6 +19,7 @@ import { cn } from '@/ui/lib/utils';
 import { errorMessage } from '@/ui/lib/error-message';
 
 export function OptionsApp() {
+  const { t } = useI18n();
   const manager = useRuleManager();
   const migrationManager = useMigrationManager();
   const [view, setView] = useState<OptionsView>('rules');
@@ -40,7 +42,7 @@ export function OptionsApp() {
     try {
       await manager.addRule();
     } catch (error) {
-      toast.error(errorMessage(error, 'The rule could not be created.'));
+      toast.error(errorMessage(error, t('createRuleError')));
     } finally {
       setCreating(false);
     }
@@ -52,10 +54,10 @@ export function OptionsApp() {
     try {
       const granted = await manager.toggleRule(id, enabled);
       if (enabled && !granted) {
-        toast.warning('Rule enabled, but it still needs host permission.');
+        toast.warning(t('enabledNeedsPermission'));
       }
     } catch (error) {
-      toast.error(errorMessage(error, 'The rule state could not be changed.'));
+      toast.error(errorMessage(error, t('changeRuleStateError')));
     } finally {
       setPendingRuleIds((current) => {
         const next = new Set(current);
@@ -68,7 +70,7 @@ export function OptionsApp() {
   if (manager.loading || !manager.state) {
     return (
       <main className="grid min-h-screen place-items-center bg-muted/30">
-        <p className="text-sm text-muted-foreground">Loading request rules…</p>
+        <p className="text-sm text-muted-foreground">{t('loadingRules')}</p>
       </main>
     );
   }
@@ -82,11 +84,11 @@ export function OptionsApp() {
         >
           <div className="flex h-full items-center border-r px-5 max-[1049px]:justify-center max-[1049px]:px-0 max-[799px]:justify-start max-[799px]:border-r-0 max-[799px]:px-4">
             <span className="text-lg font-semibold tracking-tight max-[1049px]:hidden max-[799px]:inline">
-              Request Rules
+              {t('appName')}
             </span>
             <span
               className="hidden text-base font-semibold max-[1049px]:inline max-[799px]:hidden"
-              aria-label="Request Rules"
+              aria-label={t('appName')}
             >
               RR
             </span>
@@ -98,26 +100,26 @@ export function OptionsApp() {
                   <SearchIcon />
                 </InputGroupAddon>
                 <InputGroupInput
-                  aria-label="Search rules"
-                  placeholder="Search rules"
+                  aria-label={t('searchRules')}
+                  placeholder={t('searchRules')}
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                 />
                 <InputGroupAddon align="inline-end">⌘K</InputGroupAddon>
               </InputGroup>
             ) : (
-              <p className="px-2 text-sm font-medium">Review preserved legacy data</p>
+              <p className="px-2 text-sm font-medium">{t('reviewLegacyData')}</p>
             )}
           </div>
           <div className="flex justify-end gap-2 px-4 max-[799px]:px-3">
             <Button
               className="min-[800px]:hidden"
               variant="outline"
-              aria-label={view === 'rules' ? 'Open legacy migration' : 'Open rules'}
+              aria-label={t(view === 'rules' ? 'openMigration' : 'openRules')}
               onClick={() => setView(view === 'rules' ? 'migration' : 'rules')}
             >
               {view === 'rules' ? <ArchiveRestoreIcon /> : <ListFilterIcon />}
-              <span className="max-[479px]:sr-only">{view === 'rules' ? 'Migration' : 'Rules'}</span>
+              <span className="max-[479px]:sr-only">{t(view === 'rules' ? 'migration' : 'rules')}</span>
               {view === 'rules' && migrationCount > 0 ? (
                 <Badge variant="warning">{migrationCount}</Badge>
               ) : null}
@@ -125,7 +127,7 @@ export function OptionsApp() {
             {view === 'rules' ? (
               <Button disabled={creating} onClick={() => void handleCreate()}>
                 <PlusIcon data-icon="inline-start" />
-                {creating ? 'Creating…' : 'New rule'}
+                {creating ? t('creating') : t('newRule')}
               </Button>
             ) : null}
           </div>
@@ -177,10 +179,8 @@ export function OptionsApp() {
               ) : (
                 <section className="hidden place-items-center p-8 text-center min-[800px]:grid">
                   <div className="flex max-w-sm flex-col gap-2">
-                    <h1 className="text-xl font-semibold">Select a rule</h1>
-                    <p className="text-sm text-muted-foreground">
-                      Choose a rule from the list or create a new one to start editing.
-                    </p>
+                    <h1 className="text-xl font-semibold">{t('selectRule')}</h1>
+                    <p className="text-sm text-muted-foreground">{t('selectRuleDescription')}</p>
                   </div>
                 </section>
               )}

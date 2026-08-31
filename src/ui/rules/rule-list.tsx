@@ -1,12 +1,12 @@
 import { ChevronRightIcon, SearchIcon } from 'lucide-react';
 
 import type { Rule, RuleStatus } from '@/domain/rules/model';
-import { actionLabel } from '@/domain/rules/model';
 import { Badge } from '@/ui/components/badge';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
 import { ScrollArea } from '@/ui/components/scroll-area';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
+import { useI18n, type Translate } from '@/ui/i18n';
 import { cn } from '@/ui/lib/utils';
 import { StatusBadge } from './status-badge';
 
@@ -21,14 +21,17 @@ type RuleListProps = {
   pendingIds?: ReadonlySet<string>;
 };
 
-const sections: Array<{ label: string; statuses: RuleStatus[] }> = [
-  {
-    label: 'Enabled',
-    statuses: ['active', 'paused', 'needs-permission', 'not-applied', 'runtime-error', 'disabled', 'invalid'],
-  },
-  { label: 'Needs review', statuses: ['review-required', 'unsupported'] },
-  { label: 'Removed', statuses: ['removed'] },
-];
+function localizedActionLabel(action: Rule['action'], t: Translate): string {
+  return t(
+    action.kind === 'block'
+      ? 'actionBlockShort'
+      : action.kind === 'redirect'
+        ? 'actionRedirectShort'
+        : action.kind === 'upgrade-scheme'
+          ? 'actionUpgradeShort'
+          : 'actionHeaderShort',
+  );
+}
 
 export function RuleList({
   query,
@@ -40,16 +43,33 @@ export function RuleList({
   onToggle,
   pendingIds,
 }: RuleListProps) {
+  const { t } = useI18n();
+  const sections: Array<{ label: string; statuses: RuleStatus[] }> = [
+    {
+      label: t('enabledSection'),
+      statuses: [
+        'active',
+        'paused',
+        'needs-permission',
+        'not-applied',
+        'runtime-error',
+        'disabled',
+        'invalid',
+      ],
+    },
+    { label: t('needsReviewSection'), statuses: ['review-required', 'unsupported'] },
+    { label: t('removedSection'), statuses: ['removed'] },
+  ];
   const normalizedQuery = query.trim().toLowerCase();
   const filtered = rules.filter((rule) =>
-    [rule.name, actionLabel(rule.action), rule.condition.url.value].some((value) =>
+    [rule.name, localizedActionLabel(rule.action, t), rule.condition.url.value].some((value) =>
       value.toLowerCase().includes(normalizedQuery),
     ),
   );
 
   return (
     <section
-      aria-label="Rules"
+      aria-label={t('rules')}
       data-material="glass-content"
       className="flex min-h-0 flex-col border-r max-[799px]:border-r-0"
     >
@@ -59,8 +79,8 @@ export function RuleList({
             <SearchIcon />
           </InputGroupAddon>
           <InputGroupInput
-            aria-label="Search rules"
-            placeholder="Search rules"
+            aria-label={t('searchRules')}
+            placeholder={t('searchRules')}
             value={query}
             onChange={(event) => onQueryChange(event.target.value)}
           />
@@ -102,7 +122,7 @@ export function RuleList({
                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                           <span className="truncate text-sm font-medium">{rule.name}</span>
                           <span className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-                            <span>{actionLabel(rule.action)}</span>
+                            <span>{localizedActionLabel(rule.action, t)}</span>
                             <span aria-hidden="true">·</span>
                             <span className="truncate font-mono">{rule.condition.url.value}</span>
                           </span>
@@ -115,7 +135,7 @@ export function RuleList({
                       </button>
                       <div className="pr-4">
                         <Switch
-                          aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`}
+                          aria-label={t(rule.enabled ? 'disableRule' : 'enableRule', { name: rule.name })}
                           checked={rule.enabled}
                           disabled={!editable || pendingIds?.has(rule.id)}
                           onCheckedChange={(checked) => onToggle(rule.id, checked)}
@@ -130,8 +150,8 @@ export function RuleList({
         })}
         {filtered.length === 0 ? (
           <div className="flex min-h-48 flex-col items-center justify-center gap-2 px-6 text-center">
-            <p className="text-sm font-medium">No matching rules</p>
-            <p className="text-sm text-muted-foreground">Try a different name, action, or URL.</p>
+            <p className="text-sm font-medium">{t('noMatchingRules')}</p>
+            <p className="text-sm text-muted-foreground">{t('noMatchingRulesDescription')}</p>
           </div>
         ) : null}
       </ScrollArea>

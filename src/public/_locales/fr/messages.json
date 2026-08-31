@@ -1,0 +1,5 @@
+{
+  "appName": { "message": "Règles de requête" },
+  "appDesc": { "message": "Créez, testez et gérez localement les règles de requête du navigateur." },
+  "actionTitle": { "message": "Ouvrir les règles de requête" }
+}

@@ -1,12 +1,14 @@
 import { ListPlusIcon, PlusIcon } from 'lucide-react';
 
 import { Button } from '@/ui/components/button';
+import { useI18n } from '@/ui/i18n';
 
 type EmptyRulesProps = {
   onCreate: () => void;
 };
 
 export function EmptyRules({ onCreate }: EmptyRulesProps) {
+  const { t } = useI18n();
   return (
     <section
       aria-labelledby="empty-rules-title"
@@ -18,15 +20,13 @@ export function EmptyRules({ onCreate }: EmptyRulesProps) {
         </div>
         <div className="flex flex-col gap-2">
           <h1 id="empty-rules-title" className="text-xl font-semibold tracking-tight">
-            No rules yet
+            {t('noRules')}
           </h1>
-          <p className="text-sm leading-6 text-muted-foreground">
-            Create your first rule to redirect, block, or modify matching requests.
-          </p>
+          <p className="text-sm leading-6 text-muted-foreground">{t('noRulesDescription')}</p>
         </div>
         <Button onClick={onCreate}>
           <PlusIcon data-icon="inline-start" />
-          Create first rule
+          {t('createFirstRule')}
         </Button>
       </div>
     </section>

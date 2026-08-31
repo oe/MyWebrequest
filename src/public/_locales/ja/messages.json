@@ -1,0 +1,5 @@
+{
+  "appName": { "message": "リクエストルール" },
+  "appDesc": { "message": "ブラウザのリクエストルールを端末内で作成、テスト、管理します。" },
+  "actionTitle": { "message": "リクエストルールを開く" }
+}

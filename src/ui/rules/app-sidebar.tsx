@@ -4,6 +4,7 @@ import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import { Separator } from '@/ui/components/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
+import { useI18n } from '@/ui/i18n';
 
 export type OptionsView = 'rules' | 'migration';
 
@@ -13,18 +14,18 @@ type AppSidebarProps = {
   onViewChange: (view: OptionsView) => void;
 };
 
-const items = [
-  { id: 'rules', label: 'Rules', icon: ListFilterIcon },
-  { id: 'migration', label: 'Legacy migration', icon: ArchiveRestoreIcon },
-] as const;
-
 export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarProps) {
+  const { t } = useI18n();
+  const items = [
+    { id: 'rules', label: t('rules'), icon: ListFilterIcon },
+    { id: 'migration', label: t('legacyMigration'), icon: ArchiveRestoreIcon },
+  ] as const;
   return (
     <aside
       data-material="glass-sidebar"
       className="flex min-h-0 flex-col border-r p-3 max-[1049px]:items-center max-[799px]:hidden"
     >
-      <nav aria-label="Primary" className="flex w-full flex-col gap-1">
+      <nav aria-label={t('primaryNavigation')} className="flex w-full flex-col gap-1">
         {items.map((item) => {
           const Icon = item.icon;
           const active = view === item.id;
@@ -61,7 +62,7 @@ export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarPro
         <Separator />
         <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground max-[1049px]:justify-center max-[1049px]:px-0">
           <ShieldCheckIcon className="size-4" aria-hidden="true" />
-          <span className="max-[1049px]:sr-only">Manifest V3 · Local only</span>
+          <span className="max-[1049px]:sr-only">{t('localOnly')}</span>
         </div>
       </div>
     </aside>

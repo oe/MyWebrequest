@@ -1,6 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { I18nProvider } from '@/ui/i18n';
 import { PopupApp } from '@/ui/surfaces/popup-app';
 import './style.css';
 
@@ -12,6 +13,8 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <PopupApp />
+    <I18nProvider>
+      <PopupApp />
+    </I18nProvider>
   </StrictMode>,
 );
