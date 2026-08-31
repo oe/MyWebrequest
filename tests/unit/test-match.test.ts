@@ -24,6 +24,7 @@ describe('matchRule', () => {
     expect(matchRule(rule, 'https://example.org/v1/users')).toEqual({
       matched: false,
       reason: 'The URL does not match this rule.',
+      reasonCode: 'url-no-match',
     });
   });
 

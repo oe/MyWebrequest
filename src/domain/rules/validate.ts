@@ -3,7 +3,19 @@ import { ruleSchema } from './schema';
 
 export type ValidationIssue = {
   field: 'name' | 'match' | 'destination' | 'headers' | 'permission' | 'rule';
+  code:
+    | 'schema-invalid'
+    | 'regex-invalid'
+    | 'wildcard-without-star'
+    | 'redirect-scheme'
+    | 'redirect-url-invalid'
+    | 'redirect-self'
+    | 'capture-match-required'
+    | 'capture-index-invalid'
+    | 'header-name-invalid'
+    | 'header-forbidden';
   message: string;
+  value?: string;
 };
 
 export type ValidationResult = {
@@ -50,7 +62,7 @@ export function validateRule(rule: Rule): ValidationResult {
             : root === 'action'
               ? 'destination'
               : 'rule';
-      errors.push({ field, message: issue.message });
+      errors.push({ field, code: 'schema-invalid', message: issue.message });
     }
   }
 
@@ -58,13 +70,14 @@ export function validateRule(rule: Rule): ValidationResult {
     try {
       new RegExp(rule.condition.url.value);
     } catch {
-      errors.push({ field: 'match', message: 'The regular expression is not valid.' });
+      errors.push({ field: 'match', code: 'regex-invalid', message: 'The regular expression is not valid.' });
     }
   }
 
   if (rule.condition.url.kind === 'wildcard' && !rule.condition.url.value.includes('*')) {
     warnings.push({
       field: 'match',
+      code: 'wildcard-without-star',
       message: 'This wildcard rule contains no wildcard and behaves like an exact match.',
     });
   }
@@ -74,26 +87,40 @@ export function validateRule(rule: Rule): ValidationResult {
     try {
       const url = new URL(target);
       if (!['http:', 'https:'].includes(url.protocol)) {
-        errors.push({ field: 'destination', message: 'Redirects must use HTTP or HTTPS.' });
+        errors.push({
+          field: 'destination',
+          code: 'redirect-scheme',
+          message: 'Redirects must use HTTP or HTTPS.',
+        });
       }
     } catch {
-      errors.push({ field: 'destination', message: 'Enter a valid redirect URL.' });
+      errors.push({
+        field: 'destination',
+        code: 'redirect-url-invalid',
+        message: 'Enter a valid redirect URL.',
+      });
     }
 
     if (rule.condition.url.value === rule.action.target) {
-      errors.push({ field: 'destination', message: 'A rule cannot redirect a URL to itself.' });
+      errors.push({
+        field: 'destination',
+        code: 'redirect-self',
+        message: 'A rule cannot redirect a URL to itself.',
+      });
     }
 
     const captureReferences = [...rule.action.target.matchAll(/\$(\d+)/g)].map((match) => Number(match[1]));
     if (captureReferences.length > 0 && rule.condition.url.kind === 'url-filter') {
       errors.push({
         field: 'destination',
+        code: 'capture-match-required',
         message: 'Capture references require a wildcard or regular-expression match.',
       });
     }
     if (captureReferences.some((index) => index < 1 || index > 9)) {
       errors.push({
         field: 'destination',
+        code: 'capture-index-invalid',
         message: 'Chrome redirects support capture references from $1 through $9.',
       });
     }
@@ -103,12 +130,19 @@ export function validateRule(rule: Rule): ValidationResult {
     for (const operation of rule.action.operations) {
       const normalizedName = operation.header.toLowerCase();
       if (!headerNamePattern.test(operation.header)) {
-        errors.push({ field: 'headers', message: `“${operation.header}” is not a valid header name.` });
+        errors.push({
+          field: 'headers',
+          code: 'header-name-invalid',
+          message: `“${operation.header}” is not a valid header name.`,
+          value: operation.header,
+        });
       }
       if (forbiddenRequestHeaders.has(normalizedName)) {
         errors.push({
           field: 'headers',
+          code: 'header-forbidden',
           message: `Chrome does not allow this rule to modify “${operation.header}”.`,
+          value: operation.header,
         });
       }
     }

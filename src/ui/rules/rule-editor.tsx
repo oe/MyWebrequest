@@ -13,7 +13,7 @@ import { toast } from 'sonner';
 import { permissionOriginsFromMatch } from '@/application/rule-service';
 import type { Rule, RuleAction, RuleStatus } from '@/domain/rules/model';
 import { matchRule, type MatchResult } from '@/domain/rules/test-match';
-import { validateRule } from '@/domain/rules/validate';
+import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Button } from '@/ui/components/button';
 import {
@@ -46,7 +46,7 @@ import {
 } from '@/ui/components/select';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
-import { useI18n } from '@/ui/i18n';
+import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { StatusBadge } from './status-badge';
 
@@ -73,6 +73,33 @@ function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleActi
   }
 }
 
+function validationMessage(issue: ValidationIssue, t: Translate): string {
+  const key = {
+    'schema-invalid': 'validationSchema',
+    'regex-invalid': 'validationRegex',
+    'wildcard-without-star': 'validationWildcard',
+    'redirect-scheme': 'validationRedirectScheme',
+    'redirect-url-invalid': 'validationRedirectUrl',
+    'redirect-self': 'validationRedirectSelf',
+    'capture-match-required': 'validationCaptureMatch',
+    'capture-index-invalid': 'validationCaptureIndex',
+    'header-name-invalid': 'validationHeaderName',
+    'header-forbidden': 'validationHeaderForbidden',
+  } as const;
+  return t(key[issue.code], { value: issue.value ?? '' });
+}
+
+function matchResultText(result: MatchResult, t: Translate): string {
+  if (!result.matched) {
+    return t(result.reasonCode === 'invalid-rule' ? 'matchInvalidRule' : 'matchUrlMismatch');
+  }
+  if (result.resultCode === 'request-blocked') return t('matchRequestBlocked');
+  if (result.resultCode === 'header-operations') {
+    return t('matchHeaderOperations', { count: result.operationCount ?? 0 });
+  }
+  return result.result;
+}
+
 export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSave }: RuleEditorProps) {
   const { t } = useI18n();
   const initialTestUrl =
@@ -91,6 +118,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
   const matchError = validation.errors.find((issue) => issue.field === 'match');
   const destinationError = validation.errors.find((issue) => issue.field === 'destination');
+  const headerError = validation.errors.find((issue) => issue.field === 'headers');
 
   const updateMatch = (value: string) => {
     setDraft((current) => ({
@@ -221,7 +249,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 onChange={(event) => updateMatch(event.target.value)}
               />
               <FieldDescription>{t('matchHelp')}</FieldDescription>
-              {matchError ? <FieldError>{matchError.message}</FieldError> : null}
+              {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
             </Field>
             <Field>
               <FieldLabel htmlFor="rule-action">{t('action')}</FieldLabel>
@@ -266,16 +294,17 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                   }
                 />
                 <FieldDescription>{t('destinationHelp')}</FieldDescription>
-                {destinationError ? <FieldError>{destinationError.message}</FieldError> : null}
+                {destinationError ? <FieldError>{validationMessage(destinationError, t)}</FieldError> : null}
               </Field>
             ) : null}
             {draft.action.kind === 'modify-request-headers' ? (
-              <Field>
+              <Field data-invalid={Boolean(headerError)}>
                 <FieldLabel htmlFor="rule-header">{t('requestHeader')}</FieldLabel>
                 <Input
                   id="rule-header"
                   value={draft.action.operations[0]?.header ?? ''}
                   disabled={readOnly}
+                  aria-invalid={Boolean(headerError)}
                   onChange={(event) =>
                     setDraft((current) => ({
                       ...current,
@@ -287,6 +316,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                   }
                 />
                 <FieldDescription>{t('headerHelp')}</FieldDescription>
+                {headerError ? <FieldError>{validationMessage(headerError, t)}</FieldError> : null}
               </Field>
             ) : null}
           </FieldGroup>
@@ -339,7 +369,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
                 <AlertTitle>{t(testResult.matched ? 'ruleMatches' : 'noMatch')}</AlertTitle>
                 <AlertDescription className="font-mono break-all">
-                  {testResult.matched ? testResult.result : testResult.reason}
+                  {matchResultText(testResult, t)}
                 </AlertDescription>
               </Alert>
             ) : null}
