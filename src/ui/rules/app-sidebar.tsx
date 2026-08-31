@@ -1,15 +1,8 @@
-import { ArrowDownUpIcon, KeyRoundIcon, ListFilterIcon, SettingsIcon, ShieldCheckIcon } from 'lucide-react';
+import { ListFilterIcon, ShieldCheckIcon } from 'lucide-react';
 
 import { Button } from '@/ui/components/button';
 import { Separator } from '@/ui/components/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
-
-const items = [
-  { label: 'Rules', icon: ListFilterIcon, active: true },
-  { label: 'Permissions', icon: KeyRoundIcon },
-  { label: 'Import & export', icon: ArrowDownUpIcon },
-  { label: 'Settings', icon: SettingsIcon },
-];
 
 export function AppSidebar() {
   return (
@@ -18,26 +11,21 @@ export function AppSidebar() {
       className="flex min-h-0 flex-col border-r p-3 max-[1049px]:items-center max-[799px]:hidden"
     >
       <nav aria-label="Primary" className="flex w-full flex-col gap-1">
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <Tooltip key={item.label}>
-              <TooltipTrigger asChild>
-                <Button
-                  aria-current={item.active ? 'page' : undefined}
-                  className="w-full justify-start max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
-                  variant={item.active ? 'secondary' : 'ghost'}
-                >
-                  <Icon data-icon="inline-start" />
-                  <span className="max-[1049px]:sr-only">{item.label}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent className="min-[1050px]:hidden" side="right">
-                {item.label}
-              </TooltipContent>
-            </Tooltip>
-          );
-        })}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              aria-current="page"
+              className="w-full justify-start max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
+              variant="secondary"
+            >
+              <ListFilterIcon data-icon="inline-start" />
+              <span className="max-[1049px]:sr-only">Rules</span>
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent className="min-[1050px]:hidden" side="right">
+            Rules
+          </TooltipContent>
+        </Tooltip>
       </nav>
       <div className="mt-auto flex w-full flex-col gap-3">
         <Separator />

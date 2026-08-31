@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { createRule, removeRule, updatePausedState, upsertRule } from '@/application/rule-service';
+import { commitRuleState } from '@/application/rule-transaction';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
 import {
@@ -79,13 +80,8 @@ export function useRuleManager() {
 
   const persist = useCallback(
     async (nextState: StoredState) => {
-      await reconcileDynamicRules(nextState);
-      try {
-        await saveState(nextState);
-      } catch (error) {
-        if (state) await reconcileDynamicRules(state);
-        throw error;
-      }
+      if (!state) return;
+      await commitRuleState(state, nextState, { reconcile: reconcileDynamicRules, save: saveState });
       setState(nextState);
       await refreshRuntimeState(nextState);
     },
