@@ -58,3 +58,6 @@ Create checksummed release candidates after the local gate passes:
 ```bash
 pnpm release:package
 ```
+
+The same command is the CI quality gate. Every successful run uploads the exact Chrome, Edge, Firefox,
+and Firefox source archives together with `SHA256SUMS` for installed-browser certification.

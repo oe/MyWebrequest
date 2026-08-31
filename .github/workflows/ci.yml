@@ -27,4 +27,12 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
+      - run: pnpm release:package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: browser-release-candidates-${{ github.sha }}
+          path: |
+            dist/*.zip
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 14

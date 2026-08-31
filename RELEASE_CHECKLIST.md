@@ -16,7 +16,12 @@ pnpm release:package
 ```
 
 This runs the complete repository gate, creates Chrome, Edge, Firefox, and Firefox source archives in
-`dist/`, and writes `dist/SHA256SUMS`. Do not rebuild an archive after recording its checksum.
+`dist/`, re-audits the final package directories, and writes `dist/SHA256SUMS`. Do not rebuild an archive
+after recording its checksum.
+
+CI runs the same command on Node.js 24 and uploads the four archives plus `SHA256SUMS` as one immutable
+workflow artifact. Use that artifact for installed-browser testing and store submissions so the tested
+package and submitted package are identical.
 
 ## 2. Installed-browser matrix
 
