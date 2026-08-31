@@ -203,6 +203,10 @@ const zhCN = {
   unverifiedBackupHelp: '状态结构有效，但此旧格式不含校验和。',
   sourceRuleCount: '备份中的规则',
   conflictCount: 'ID 冲突',
+  rulesAdded: '新增',
+  rulesUpdated: '更新',
+  rulesSkipped: '跳过',
+  rulesDeleted: '删除',
   importMode: '导入方式',
   mergeImport: '作为安全副本合并',
   mergeImportHelp: '保留当前规则，发生冲突时生成确定性的新 ID。',
@@ -216,6 +220,14 @@ const zhCN = {
   importBackupError: '无法导入规则备份。',
   replaceWarningTitle: '当前规则将被替换',
   replaceWarningDescription: '如果以后可能需要当前状态，请先将其导出。',
+  recoveryAvailable: '已有替换前快照',
+  recoveryAvailableHelp: '创建于 {date}。恢复后将丢弃此后所做的规则更改。',
+  restoreImportedState: '恢复之前的规则',
+  restoreImportTitle: '要恢复上次替换前的规则吗？',
+  restoreImportDescription: '当前规则以及导入后所做的编辑都会被移除。',
+  restoringImport: '正在恢复…',
+  restoreImportComplete: '已恢复替换前的规则快照。',
+  restoreImportError: '无法恢复替换前快照。',
 } satisfies Messages;
 
 const ko = {
@@ -429,6 +441,10 @@ const ko = {
   unverifiedBackupHelp: '상태 구조는 올바르지만 이전 형식에는 체크섬이 없습니다.',
   sourceRuleCount: '백업의 규칙',
   conflictCount: 'ID 충돌',
+  rulesAdded: '추가',
+  rulesUpdated: '업데이트',
+  rulesSkipped: '건너뜀',
+  rulesDeleted: '삭제',
   importMode: '가져오기 방식',
   mergeImport: '안전한 사본으로 병합',
   mergeImportHelp: '현재 규칙을 유지하고 충돌에는 결정적인 새 ID를 부여합니다.',
@@ -442,6 +458,14 @@ const ko = {
   importBackupError: '규칙 백업을 가져올 수 없습니다.',
   replaceWarningTitle: '현재 규칙이 교체됩니다',
   replaceWarningDescription: '나중에 현재 상태가 필요할 수 있다면 먼저 내보내세요.',
+  recoveryAvailable: '교체 전 스냅샷 사용 가능',
+  recoveryAvailableHelp: '{date}에 생성되었습니다. 복원하면 이후 규칙 변경 사항이 삭제됩니다.',
+  restoreImportedState: '이전 규칙 복원',
+  restoreImportTitle: '마지막 교체 전 규칙을 복원할까요?',
+  restoreImportDescription: '현재 규칙과 가져오기 이후의 편집 내용이 제거됩니다.',
+  restoringImport: '복원 중…',
+  restoreImportComplete: '교체 전 규칙 스냅샷을 복원했습니다.',
+  restoreImportError: '교체 전 스냅샷을 복원할 수 없습니다.',
 } satisfies Messages;
 
 const ja = {
@@ -654,6 +678,10 @@ const ja = {
   unverifiedBackupHelp: '状態の構造は有効ですが、この旧形式にはチェックサムがありません。',
   sourceRuleCount: 'バックアップ内のルール',
   conflictCount: 'ID の競合',
+  rulesAdded: '追加',
+  rulesUpdated: '更新',
+  rulesSkipped: 'スキップ',
+  rulesDeleted: '削除',
   importMode: '読み込み方法',
   mergeImport: '安全なコピーとして結合',
   mergeImportHelp: '現在のルールを保持し、競合には決定的な新しい ID を付けます。',
@@ -667,6 +695,14 @@ const ja = {
   importBackupError: 'ルールのバックアップを読み込めませんでした。',
   replaceWarningTitle: '現在のルールは置き換えられます',
   replaceWarningDescription: '現在の状態が後で必要になる場合は、先に書き出してください。',
+  recoveryAvailable: '置換前のスナップショットがあります',
+  recoveryAvailableHelp: '{date} に作成されました。復元すると、それ以降のルール変更は破棄されます。',
+  restoreImportedState: '以前のルールを復元',
+  restoreImportTitle: '前回の置換前のルールを復元しますか？',
+  restoreImportDescription: '現在のルールと読み込み後の編集内容は削除されます。',
+  restoringImport: '復元中…',
+  restoreImportComplete: '置換前のルールスナップショットを復元しました。',
+  restoreImportError: '置換前のスナップショットを復元できませんでした。',
 } satisfies Messages;
 
 const fr = {
@@ -890,6 +926,10 @@ const fr = {
     'L’état est structurellement valide, mais cet ancien format ne contient aucune somme de contrôle.',
   sourceRuleCount: 'Règles dans la sauvegarde',
   conflictCount: 'Conflits d’identifiants',
+  rulesAdded: 'Ajouts',
+  rulesUpdated: 'Mises à jour',
+  rulesSkipped: 'Ignorées',
+  rulesDeleted: 'Suppressions',
   importMode: 'Mode d’importation',
   mergeImport: 'Fusionner sous forme de copies sûres',
   mergeImportHelp:
@@ -905,6 +945,16 @@ const fr = {
   importBackupError: 'Impossible d’importer la sauvegarde des règles.',
   replaceWarningTitle: 'Les règles actuelles seront remplacées',
   replaceWarningDescription: 'Exportez d’abord l’état actuel si vous pensez en avoir besoin plus tard.',
+  recoveryAvailable: 'Instantané antérieur au remplacement disponible',
+  recoveryAvailableHelp:
+    'Créé le {date}. Sa restauration supprimera les modifications de règles ultérieures.',
+  restoreImportedState: 'Restaurer les règles précédentes',
+  restoreImportTitle: 'Restaurer les règles antérieures au dernier remplacement ?',
+  restoreImportDescription:
+    'Les règles actuelles et les modifications effectuées après cette importation seront supprimées.',
+  restoringImport: 'Restauration…',
+  restoreImportComplete: 'L’instantané antérieur au remplacement a été restauré.',
+  restoreImportError: 'Impossible de restaurer l’instantané antérieur au remplacement.',
 } satisfies Messages;
 
 const es = {
@@ -1124,6 +1174,10 @@ const es = {
     'El estado tiene una estructura válida, pero este formato anterior no incluye suma de comprobación.',
   sourceRuleCount: 'Reglas en la copia',
   conflictCount: 'Conflictos de ID',
+  rulesAdded: 'Añadir',
+  rulesUpdated: 'Actualizar',
+  rulesSkipped: 'Omitir',
+  rulesDeleted: 'Eliminar',
   importMode: 'Modo de importación',
   mergeImport: 'Combinar como copias seguras',
   mergeImportHelp: 'Conserva las reglas actuales. Los conflictos reciben nuevos ID deterministas.',
@@ -1138,6 +1192,15 @@ const es = {
   importBackupError: 'No se pudo importar la copia de reglas.',
   replaceWarningTitle: 'Se reemplazarán las reglas actuales',
   replaceWarningDescription: 'Exporta primero el estado actual si puedes necesitarlo más adelante.',
+  recoveryAvailable: 'Instantánea anterior al reemplazo disponible',
+  recoveryAvailableHelp: 'Creada el {date}. Al restaurarla se descartarán los cambios posteriores.',
+  restoreImportedState: 'Restaurar reglas anteriores',
+  restoreImportTitle: '¿Restaurar las reglas anteriores al último reemplazo?',
+  restoreImportDescription:
+    'Se eliminarán las reglas actuales y los cambios realizados después de esa importación.',
+  restoringImport: 'Restaurando…',
+  restoreImportComplete: 'Se restauró la instantánea anterior al reemplazo.',
+  restoreImportError: 'No se pudo restaurar la instantánea anterior al reemplazo.',
 } satisfies Messages;
 
 export const translations: Record<'zh-CN' | 'ko' | 'ja' | 'fr' | 'es', Messages> = {

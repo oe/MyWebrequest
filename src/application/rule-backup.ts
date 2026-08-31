@@ -32,6 +32,10 @@ export type RuleImportPreview = {
   nextState: StoredState;
   sourceRuleCount: number;
   importedRuleCount: number;
+  addCount: number;
+  updateCount: number;
+  skipCount: number;
+  deleteCount: number;
   conflictCount: number;
   mode: RuleImportMode;
   integrity: ParsedRuleBackup['integrity'];
@@ -97,8 +101,14 @@ export async function parseRuleBackup(text: string): Promise<ParsedRuleBackup> {
 
   const legacyState = storedStateSchema.safeParse(candidate);
   if (!legacyState.success) throw new Error('The file is not a supported rule backup.');
-  const exportedAt = new Date().toISOString();
-  const backup = await createRuleBackup(legacyState.data as StoredState, exportedAt);
+  const state = legacyState.data as StoredState;
+  const exportedAt =
+    state.order
+      .map((id) => state.rules[id]?.updatedAt)
+      .filter((value): value is string => Boolean(value))
+      .sort()
+      .at(-1) ?? '1970-01-01T00:00:00.000Z';
+  const backup = await createRuleBackup(state, exportedAt);
   return { backup, integrity: 'legacy-unverified' };
 }
 
@@ -113,15 +123,30 @@ function safeImportedRule(rule: Rule, id: string, now: string): Rule {
   };
 }
 
+function equivalentRule(left: Rule, right: Rule): boolean {
+  const comparable = (rule: Rule) => ({
+    name: rule.name,
+    priority: rule.priority,
+    condition: rule.condition,
+    action: rule.action,
+    migrationState: rule.migrationState,
+  });
+  return canonicalize(comparable(left)) === canonicalize(comparable(right));
+}
+
 async function conflictId(
   checksum: string,
   sourceId: string,
+  sourceRule: Rule,
+  rules: Readonly<Record<string, Rule>>,
   occupiedIds: ReadonlySet<string>,
   occupiedDnrIds: ReadonlySet<number>,
-): Promise<string> {
+): Promise<string | null> {
   const token = (await sha256({ checksum, sourceId })).slice(0, 20);
   for (let suffix = 0; suffix < 10_000; suffix += 1) {
     const id = `import-${token}${suffix === 0 ? '' : `-${suffix}`}`;
+    const existing = rules[id];
+    if (existing && equivalentRule(existing, sourceRule)) return null;
     if (!occupiedIds.has(id) && !occupiedDnrIds.has(stableDnrId(id))) return id;
   }
   throw new Error('A unique imported rule ID could not be allocated.');
@@ -140,16 +165,38 @@ export async function createRuleImportPreview(
   const occupiedIds = new Set(Object.keys(rules));
   const occupiedDnrIds = new Set(Object.values(rules).map((rule) => rule.dnrId));
   let conflictCount = 0;
+  let addCount = 0;
+  let updateCount = 0;
+  let skipCount = 0;
 
   for (const sourceId of source.order) {
     const sourceRule = source.rules[sourceId];
     if (!sourceRule) continue;
     let id = sourceId;
+    if (mode === 'merge' && rules[sourceId] && equivalentRule(rules[sourceId], sourceRule)) {
+      skipCount += 1;
+      continue;
+    }
     if (occupiedIds.has(id) || occupiedDnrIds.has(stableDnrId(id))) {
       conflictCount += 1;
-      id = await conflictId(parsed.backup.checksum, sourceId, occupiedIds, occupiedDnrIds);
+      const allocated = await conflictId(
+        parsed.backup.checksum,
+        sourceId,
+        sourceRule,
+        rules,
+        occupiedIds,
+        occupiedDnrIds,
+      );
+      if (!allocated) {
+        conflictCount -= 1;
+        skipCount += 1;
+        continue;
+      }
+      id = allocated;
     }
     const rule = safeImportedRule(sourceRule, id, now);
+    if (mode === 'replace' && current.rules[sourceId]) updateCount += 1;
+    else addCount += 1;
     rules[id] = rule;
     order.push(id);
     occupiedIds.add(id);
@@ -166,7 +213,11 @@ export async function createRuleImportPreview(
   return {
     nextState,
     sourceRuleCount: source.order.length,
-    importedRuleCount: source.order.length,
+    importedRuleCount: addCount + updateCount,
+    addCount,
+    updateCount,
+    skipCount,
+    deleteCount: mode === 'replace' ? current.order.filter((id) => !source.rules[id]).length : 0,
     conflictCount,
     mode,
     integrity: parsed.integrity,

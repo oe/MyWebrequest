@@ -4,6 +4,13 @@ import { createRule, removeRule, updatePausedState, upsertRule } from '@/applica
 import { commitRuleState } from '@/application/rule-transaction';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
+import type { RuleImportMode } from '@/application/rule-backup';
+import {
+  clearRuleImportRecovery,
+  loadRuleImportRecovery,
+  saveRuleImportRecovery,
+  type RuleImportRecovery,
+} from '@/infrastructure/rule-import-recovery';
 import {
   getInstalledDynamicRuleIds,
   hasRulePermission,
@@ -23,6 +30,7 @@ export function useRuleManager() {
   const [runtimeError, setRuntimeError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [importRecovery, setImportRecovery] = useState<RuleImportRecovery | null>(null);
 
   const refreshRuntimeState = useCallback(async (nextState: StoredState) => {
     try {
@@ -58,9 +66,10 @@ export function useRuleManager() {
 
   useEffect(() => {
     let cancelled = false;
-    void loadState().then(async (loaded) => {
+    void Promise.all([loadState(), loadRuleImportRecovery()]).then(async ([loaded, recovery]) => {
       if (cancelled) return;
       setState(loaded);
+      setImportRecovery(recovery);
       setSelectedId(loaded.order[0] ?? null);
       await refreshRuntimeState(loaded);
       if (!cancelled) setLoading(false);
@@ -147,6 +156,30 @@ export function useRuleManager() {
     [persist, state],
   );
 
+  const replaceStateFromImport = useCallback(
+    async (nextState: StoredState, mode: RuleImportMode) => {
+      if (!state) return;
+      if (mode === 'replace') {
+        const recovery: RuleImportRecovery = {
+          version: 1,
+          createdAt: new Date().toISOString(),
+          state,
+        };
+        await saveRuleImportRecovery(recovery);
+        setImportRecovery(recovery);
+      }
+      await persist(nextState);
+    },
+    [persist, state],
+  );
+
+  const restoreImportRecovery = useCallback(async () => {
+    if (!importRecovery) return;
+    await persist(importRecovery.state);
+    await clearRuleImportRecovery();
+    setImportRecovery(null);
+  }, [importRecovery, persist]);
+
   const rules = useMemo(
     () => state?.order.flatMap((id) => (state.rules[id] ? [state.rules[id]] : [])) ?? [],
     [state],
@@ -172,8 +205,10 @@ export function useRuleManager() {
     addRule,
     deleteRule,
     loading,
+    importRecovery,
     permissions,
-    replaceState: persist,
+    replaceStateFromImport,
+    restoreImportRecovery,
     rules,
     saveRule,
     selectedId,

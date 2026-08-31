@@ -177,7 +177,12 @@ export function OptionsApp() {
               onStateCommitted={manager.adoptState}
             />
           ) : view === 'data' ? (
-            <DataPanel state={manager.state} onCommit={manager.replaceState} />
+            <DataPanel
+              state={manager.state}
+              recovery={manager.importRecovery}
+              onCommit={manager.replaceStateFromImport}
+              onRestore={manager.restoreImportRecovery}
+            />
           ) : hasRules ? (
             <>
               <div className={cn(selectedRule && 'max-[799px]:hidden')}>

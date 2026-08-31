@@ -11,27 +11,51 @@ import {
   type RuleImportPreview,
 } from '@/application/rule-backup';
 import type { StoredState } from '@/domain/rules/model';
+import type { RuleImportRecovery } from '@/infrastructure/rule-import-recovery';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/components/dialog';
 import { ScrollArea } from '@/ui/components/scroll-area';
 import { Separator } from '@/ui/components/separator';
 import { useI18n } from '@/ui/i18n';
+import type { MessageKey } from '@/ui/i18n/messages';
 import { downloadJson } from '@/ui/lib/download-json';
 
 type DataPanelProps = {
   state: StoredState;
-  onCommit: (state: StoredState) => Promise<void>;
+  recovery: RuleImportRecovery | null;
+  onCommit: (state: StoredState, mode: RuleImportMode) => Promise<void>;
+  onRestore: () => Promise<void>;
 };
 
-export function DataPanel({ state, onCommit }: DataPanelProps) {
-  const { t } = useI18n();
+export function DataPanel({ state, recovery, onCommit, onRestore }: DataPanelProps) {
+  const { locale, t } = useI18n();
   const input = useRef<HTMLInputElement>(null);
   const [parsed, setParsed] = useState<ParsedRuleBackup | null>(null);
   const [preview, setPreview] = useState<RuleImportPreview | null>(null);
   const [mode, setMode] = useState<RuleImportMode>('merge');
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [restoreOpen, setRestoreOpen] = useState(false);
+  const previewCounts = preview
+    ? ([
+        [preview.sourceRuleCount, 'sourceRuleCount'],
+        [preview.addCount, 'rulesAdded'],
+        [preview.updateCount, 'rulesUpdated'],
+        [preview.skipCount, 'rulesSkipped'],
+        [preview.conflictCount, 'conflictCount'],
+        [preview.deleteCount, 'rulesDeleted'],
+      ] satisfies Array<readonly [number, MessageKey]>)
+    : [];
 
   const preparePreview = async (source: ParsedRuleBackup, nextMode: RuleImportMode) => {
     const next = await createRuleImportPreview(state, source, nextMode, new Date().toISOString());
@@ -86,12 +110,26 @@ export function DataPanel({ state, onCommit }: DataPanelProps) {
     setBusy(true);
     try {
       const currentPreview = await createRuleImportPreview(state, parsed, mode, new Date().toISOString());
-      await onCommit(currentPreview.nextState);
+      await onCommit(currentPreview.nextState, mode);
       toast.success(t('importComplete', { count: currentPreview.importedRuleCount }));
       setParsed(null);
       setPreview(null);
     } catch {
       toast.error(t('importBackupError'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await onRestore();
+      setRestoreOpen(false);
+      toast.success(t('restoreImportComplete'));
+    } catch {
+      toast.error(t('restoreImportError'));
     } finally {
       setBusy(false);
     }
@@ -130,6 +168,26 @@ export function DataPanel({ state, onCommit }: DataPanelProps) {
             </div>
           </div>
 
+          {recovery ? (
+            <Alert variant="warning">
+              <CircleAlertIcon />
+              <AlertTitle>{t('recoveryAvailable')}</AlertTitle>
+              <AlertDescription>
+                <p>
+                  {t('recoveryAvailableHelp', {
+                    date: new Intl.DateTimeFormat(locale, {
+                      dateStyle: 'medium',
+                      timeStyle: 'short',
+                    }).format(new Date(recovery.createdAt)),
+                  })}
+                </p>
+                <Button className="mt-3" size="sm" variant="outline" onClick={() => setRestoreOpen(true)}>
+                  {t('restoreImportedState')}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
           {parsed && preview ? (
             <div className="space-y-5 rounded-xl border bg-background/35 p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -146,15 +204,13 @@ export function DataPanel({ state, onCommit }: DataPanelProps) {
                 </Alert>
               ) : null}
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="rounded-lg border bg-background/50 p-4">
-                  <p className="text-2xl font-semibold tabular-nums">{preview.sourceRuleCount}</p>
-                  <p className="text-xs text-muted-foreground">{t('sourceRuleCount')}</p>
-                </div>
-                <div className="rounded-lg border bg-background/50 p-4">
-                  <p className="text-2xl font-semibold tabular-nums">{preview.conflictCount}</p>
-                  <p className="text-xs text-muted-foreground">{t('conflictCount')}</p>
-                </div>
+              <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                {previewCounts.map(([count, label]) => (
+                  <div key={label} className="rounded-lg border bg-background/50 p-3">
+                    <p className="text-xl font-semibold tabular-nums">{count}</p>
+                    <p className="text-xs text-muted-foreground">{t(label)}</p>
+                  </div>
+                ))}
               </div>
 
               <fieldset className="space-y-3">
@@ -220,6 +276,25 @@ export function DataPanel({ state, onCommit }: DataPanelProps) {
           </footer>
         </>
       ) : null}
+
+      <Dialog open={restoreOpen} onOpenChange={(open) => !busy && setRestoreOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('restoreImportTitle')}</DialogTitle>
+            <DialogDescription>{t('restoreImportDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline" disabled={busy}>
+                {t('cancel')}
+              </Button>
+            </DialogClose>
+            <Button variant="destructive" disabled={busy} onClick={() => void handleRestore()}>
+              {busy ? t('restoringImport') : t('restoreImportedState')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

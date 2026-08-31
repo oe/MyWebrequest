@@ -39,17 +39,33 @@ describe('rule backups', () => {
     expect(parsed.backup.state.order).toHaveLength(5);
   });
 
-  it('merges conflicts as deterministic disabled copies without trusting stored permissions', async () => {
+  it('skips equivalent IDs when the same backup is merged again', async () => {
     const current = createSampleState();
     const parsed = await parseRuleBackup(JSON.stringify(await createRuleBackup(current, exportedAt)));
     const preview = await createRuleImportPreview(current, parsed, 'merge', exportedAt);
 
-    expect(preview.conflictCount).toBe(5);
-    expect(preview.nextState.order).toHaveLength(10);
-    const importedIds = preview.nextState.order.slice(5);
-    expect(importedIds.every((id) => id.startsWith('import-'))).toBe(true);
-    expect(importedIds.every((id) => preview.nextState.rules[id]?.enabled === false)).toBe(true);
-    expect(new Set(Object.values(preview.nextState.rules).map((rule) => rule.dnrId)).size).toBe(10);
+    expect(preview).toMatchObject({ conflictCount: 0, skipCount: 5, importedRuleCount: 0 });
+    expect(preview.nextState.order).toHaveLength(5);
+  });
+
+  it('merges a changed ID as a deterministic disabled copy without trusting permissions', async () => {
+    const current = createSampleState();
+    const source = structuredClone(current);
+    const firstId = source.order[0];
+    expect(firstId).toBeDefined();
+    if (!firstId) return;
+    source.rules[firstId]!.name = 'Changed imported rule';
+    source.rules[firstId]!.permissionOrigins = ['https://overbroad.example/*'];
+    const parsed = await parseRuleBackup(JSON.stringify(await createRuleBackup(source, exportedAt)));
+    const preview = await createRuleImportPreview(current, parsed, 'merge', exportedAt);
+
+    expect(preview).toMatchObject({ conflictCount: 1, skipCount: 4, importedRuleCount: 1 });
+    const importedId = preview.nextState.order.at(-1);
+    expect(importedId).toMatch(/^import-/);
+    expect(preview.nextState.rules[importedId!]).toMatchObject({
+      enabled: false,
+      permissionOrigins: ['https://api.example.com/*'],
+    });
   });
 
   it('previews replacement without activating imported rules', async () => {
