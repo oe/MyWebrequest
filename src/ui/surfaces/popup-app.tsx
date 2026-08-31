@@ -9,6 +9,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { ruleMatchesOrigin } from '@/domain/rules/origin-scope';
+import { requiredPermissionOrigins } from '@/domain/rules/permissions';
+import { validateRule } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
@@ -49,13 +52,26 @@ export function PopupApp() {
     });
   }, [t]);
 
-  const scopedRules = useMemo(
+  const scopedEnabledRules = useMemo(
     () =>
-      manager.rules.filter((rule) =>
-        rule.permissionOrigins.some((permission) => permission.includes(origin.replace(/^https?:\/\//, ''))),
+      manager.rules.filter(
+        (rule) =>
+          rule.enabled &&
+          rule.migrationState === 'none' &&
+          validateRule(rule).valid &&
+          ruleMatchesOrigin(rule, origin),
       ),
     [manager.rules, origin],
   );
+  const permissionScopedRules = scopedEnabledRules.filter(
+    (rule) => requiredPermissionOrigins(rule).length > 0,
+  );
+  const siteAccessState =
+    permissionScopedRules.length === 0
+      ? 'not-needed'
+      : permissionScopedRules.every((rule) => manager.permissions[rule.id] === true)
+        ? 'granted'
+        : 'required';
 
   if (manager.loading || !manager.state) {
     return (
@@ -105,9 +121,20 @@ export function PopupApp() {
         <Separator />
 
         <section className="flex flex-col gap-4 p-4">
-          <div className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-muted-foreground">{t('currentSite')}</p>
-            <p className="truncate text-sm font-medium">{origin}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-xs font-medium text-muted-foreground">{t('currentSite')}</p>
+              <p className="truncate text-sm font-medium">{origin}</p>
+            </div>
+            <Badge variant={siteAccessState === 'required' ? 'warning' : 'secondary'}>
+              {t(
+                siteAccessState === 'granted'
+                  ? 'hostAccessGranted'
+                  : siteAccessState === 'required'
+                    ? 'hostAccessRequired'
+                    : 'hostAccessNotNeeded',
+              )}
+            </Badge>
           </div>
 
           <Alert variant={paused ? 'warning' : 'success'}>
@@ -115,8 +142,8 @@ export function PopupApp() {
             <AlertTitle>
               {paused
                 ? t('allRulesPaused')
-                : t(scopedRules.length === 1 ? 'siteRulesOne' : 'siteRulesMany', {
-                    count: scopedRules.length,
+                : t(scopedEnabledRules.length === 1 ? 'siteRulesOne' : 'siteRulesMany', {
+                    count: scopedEnabledRules.length,
                   })}
             </AlertTitle>
             <AlertDescription>{paused ? t('resumeRulesHelp') : t('localRulesHelp')}</AlertDescription>
