@@ -20,7 +20,10 @@ const statusConfig: Record<
 > = {
   active: { label: 'Active', icon: CircleCheckIcon, variant: 'success' },
   disabled: { label: 'Disabled', icon: CircleDashedIcon, variant: 'muted' },
+  paused: { label: 'Paused', icon: CircleOffIcon, variant: 'muted' },
   'needs-permission': { label: 'Permission', icon: KeyRoundIcon, variant: 'warning' },
+  'not-applied': { label: 'Not applied', icon: CircleDashedIcon, variant: 'warning' },
+  'runtime-error': { label: 'Runtime error', icon: TriangleAlertIcon, variant: 'destructive' },
   invalid: { label: 'Invalid', icon: TriangleAlertIcon, variant: 'destructive' },
   unsupported: { label: 'Unsupported', icon: BanIcon, variant: 'destructive' },
   'review-required': { label: 'Needs review', icon: TriangleAlertIcon, variant: 'warning' },

@@ -5,6 +5,8 @@ function hasExtensionRuntime(): boolean {
   return typeof browser !== 'undefined' && Boolean(browser.declarativeNetRequest && browser.permissions);
 }
 
+type PermissionChangeListener = () => void;
+
 export async function hasRulePermission(rule: Rule): Promise<boolean> {
   if (!hasExtensionRuntime()) return true;
   if (rule.permissionOrigins.length === 0) return true;
@@ -17,24 +19,49 @@ export async function requestRulePermission(rule: Rule): Promise<boolean> {
   return browser.permissions.request({ origins: rule.permissionOrigins });
 }
 
+export function subscribeToPermissionChanges(listener: PermissionChangeListener): () => void {
+  if (!hasExtensionRuntime()) return () => undefined;
+
+  const handleChange = () => listener();
+  browser.permissions.onAdded.addListener(handleChange);
+  browser.permissions.onRemoved.addListener(handleChange);
+
+  return () => {
+    browser.permissions.onAdded.removeListener(handleChange);
+    browser.permissions.onRemoved.removeListener(handleChange);
+  };
+}
+
+export async function getInstalledDynamicRuleIds(): Promise<Set<number> | null> {
+  if (!hasExtensionRuntime()) return null;
+  const installedRules = await browser.declarativeNetRequest.getDynamicRules();
+  return new Set(installedRules.map((rule) => rule.id));
+}
+
 export async function reconcileDynamicRules(state: StoredState): Promise<void> {
   if (!hasExtensionRuntime()) return;
 
-  const managedIds = Object.values(state.rules).map((rule) => rule.dnrId);
-  const addRules: Browser.declarativeNetRequest.Rule[] = [];
+  const installedRules = await browser.declarativeNetRequest.getDynamicRules();
+  const removeRuleIds = installedRules.map((rule) => rule.id);
+  let addRules: Browser.declarativeNetRequest.Rule[] = [];
 
   if (!state.settings.globallyPaused) {
-    for (const id of state.order) {
+    const candidates = state.order.flatMap((id) => {
       const rule = state.rules[id];
-      if (!rule?.enabled || rule.migrationState !== 'none') continue;
-      if (!(await hasRulePermission(rule))) continue;
-      const compiled = compileDnrRule(rule);
-      if (compiled.ok) addRules.push(compiled.rule as Browser.declarativeNetRequest.Rule);
-    }
+      return rule?.enabled && rule.migrationState === 'none' ? [rule] : [];
+    });
+    const compiled = await Promise.all(
+      candidates.map(async (rule) => {
+        if (!(await hasRulePermission(rule))) return null;
+        const result = compileDnrRule(rule);
+        return result.ok ? (result.rule as Browser.declarativeNetRequest.Rule) : null;
+      }),
+    );
+    addRules = compiled.filter((rule): rule is Browser.declarativeNetRequest.Rule => rule !== null);
   }
 
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: managedIds,
+    removeRuleIds,
     addRules,
   });
 }

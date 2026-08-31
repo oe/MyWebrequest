@@ -117,12 +117,25 @@ export function validateRule(rule: Rule): ValidationResult {
   return { valid: errors.length === 0, errors, warnings };
 }
 
-export function deriveRuleStatus(rule: Rule, hasPermission: boolean): RuleStatus {
+type RuleRuntimeState = {
+  globallyPaused?: boolean | undefined;
+  isInstalled?: boolean | null | undefined;
+  runtimeError?: boolean | undefined;
+};
+
+export function deriveRuleStatus(
+  rule: Rule,
+  hasPermission: boolean,
+  runtimeState: RuleRuntimeState = {},
+): RuleStatus {
   if (rule.migrationState === 'removed') return 'removed';
   if (rule.migrationState === 'unsupported') return 'unsupported';
   if (rule.migrationState === 'review-required') return 'review-required';
   if (!validateRule(rule).valid) return 'invalid';
   if (!rule.enabled) return 'disabled';
+  if (runtimeState.globallyPaused) return 'paused';
   if (!hasPermission) return 'needs-permission';
+  if (runtimeState.runtimeError) return 'runtime-error';
+  if (runtimeState.isInstalled === false) return 'not-applied';
   return 'active';
 }

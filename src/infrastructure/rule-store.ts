@@ -2,7 +2,7 @@ import { createEmptyState, createSampleState } from '@/domain/rules/fixtures';
 import type { StoredState } from '@/domain/rules/model';
 import { storedStateSchema } from '@/domain/rules/schema';
 
-const STORAGE_KEY = 'requestRulesState';
+export const RULES_STORAGE_KEY = 'requestRulesState';
 const PREVIEW_KEY = 'request-rules-preview-state';
 
 type StateListener = (state: StoredState) => void;
@@ -29,8 +29,8 @@ export async function loadState(): Promise<StoredState> {
   let candidate: unknown;
 
   if (hasExtensionStorage()) {
-    const result = await browser.storage.local.get(STORAGE_KEY);
-    candidate = result[STORAGE_KEY];
+    const result = await browser.storage.local.get(RULES_STORAGE_KEY);
+    candidate = result[RULES_STORAGE_KEY];
   } else {
     const raw = globalThis.localStorage?.getItem(PREVIEW_KEY);
     candidate = raw ? JSON.parse(raw) : undefined;
@@ -45,7 +45,7 @@ export async function loadState(): Promise<StoredState> {
 export async function saveState(state: StoredState): Promise<void> {
   const parsed = storedStateSchema.parse(state);
   if (hasExtensionStorage()) {
-    await browser.storage.local.set({ [STORAGE_KEY]: parsed });
+    await browser.storage.local.set({ [RULES_STORAGE_KEY]: parsed });
     return;
   }
   globalThis.localStorage?.setItem(PREVIEW_KEY, JSON.stringify(parsed));
@@ -55,7 +55,7 @@ export function subscribeToState(listener: StateListener): () => void {
   if (hasExtensionStorage()) {
     const handleChange = (changes: Record<string, Browser.storage.StorageChange>, areaName: string) => {
       if (areaName !== 'local') return;
-      const nextState = parseState(changes[STORAGE_KEY]?.newValue);
+      const nextState = parseState(changes[RULES_STORAGE_KEY]?.newValue);
       if (nextState) listener(nextState);
     };
 

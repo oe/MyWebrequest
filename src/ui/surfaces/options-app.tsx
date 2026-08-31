@@ -12,15 +12,49 @@ import { EmptyRules } from '@/ui/rules/empty-rules';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
 import { cn } from '@/ui/lib/utils';
+import { errorMessage } from '@/ui/lib/error-message';
 
 export function OptionsApp() {
   const manager = useRuleManager();
   const [query, setQuery] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
   const selectedRule = useMemo(
     () => manager.rules.find((rule) => rule.id === manager.selectedId) ?? null,
     [manager.rules, manager.selectedId],
   );
   const hasRules = manager.rules.length > 0;
+
+  const handleCreate = async () => {
+    if (creating) return;
+    setCreating(true);
+    try {
+      await manager.addRule();
+    } catch (error) {
+      toast.error(errorMessage(error, 'The rule could not be created.'));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleToggle = async (id: string, enabled: boolean) => {
+    if (pendingRuleIds.has(id)) return;
+    setPendingRuleIds((current) => new Set(current).add(id));
+    try {
+      const granted = await manager.toggleRule(id, enabled);
+      if (enabled && !granted) {
+        toast.warning('Rule enabled, but it still needs host permission.');
+      }
+    } catch (error) {
+      toast.error(errorMessage(error, 'The rule state could not be changed.'));
+    } finally {
+      setPendingRuleIds((current) => {
+        const next = new Set(current);
+        next.delete(id);
+        return next;
+      });
+    }
+  };
 
   if (manager.loading || !manager.state) {
     return (
@@ -63,9 +97,9 @@ export function OptionsApp() {
             </InputGroup>
           </div>
           <div className="flex justify-end px-4 max-[799px]:px-3">
-            <Button onClick={() => void manager.addRule()}>
+            <Button disabled={creating} onClick={() => void handleCreate()}>
               <PlusIcon data-icon="inline-start" />
-              New rule
+              {creating ? 'Creating…' : 'New rule'}
             </Button>
           </div>
         </header>
@@ -80,15 +114,10 @@ export function OptionsApp() {
                   rules={manager.rules}
                   selectedId={manager.selectedId}
                   statuses={manager.statuses}
+                  pendingIds={pendingRuleIds}
                   onQueryChange={setQuery}
                   onSelect={manager.setSelectedId}
-                  onToggle={(id, enabled) => {
-                    void manager.toggleRule(id, enabled).then((granted) => {
-                      if (enabled && !granted) {
-                        toast.warning('Rule enabled, but it still needs host permission.');
-                      }
-                    });
-                  }}
+                  onToggle={(id, enabled) => void handleToggle(id, enabled)}
                 />
               </div>
               {selectedRule ? (
@@ -113,7 +142,7 @@ export function OptionsApp() {
               )}
             </>
           ) : (
-            <EmptyRules onCreate={() => void manager.addRule()} />
+            <EmptyRules onCreate={() => void handleCreate()} />
           )}
         </div>
       </main>

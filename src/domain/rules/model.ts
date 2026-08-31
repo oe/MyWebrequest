@@ -55,7 +55,16 @@ export type Rule = {
 };
 
 export type RuleStatus =
-  'active' | 'disabled' | 'needs-permission' | 'invalid' | 'unsupported' | 'review-required' | 'removed';
+  | 'active'
+  | 'disabled'
+  | 'paused'
+  | 'needs-permission'
+  | 'not-applied'
+  | 'runtime-error'
+  | 'invalid'
+  | 'unsupported'
+  | 'review-required'
+  | 'removed';
 
 export type StoredState = {
   schemaVersion: 1;

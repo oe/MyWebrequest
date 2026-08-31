@@ -18,10 +18,14 @@ type RuleListProps = {
   onQueryChange: (query: string) => void;
   onSelect: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
+  pendingIds?: ReadonlySet<string>;
 };
 
 const sections: Array<{ label: string; statuses: RuleStatus[] }> = [
-  { label: 'Enabled', statuses: ['active', 'needs-permission', 'disabled', 'invalid'] },
+  {
+    label: 'Enabled',
+    statuses: ['active', 'paused', 'needs-permission', 'not-applied', 'runtime-error', 'disabled', 'invalid'],
+  },
   { label: 'Needs review', statuses: ['review-required', 'unsupported'] },
   { label: 'Removed', statuses: ['removed'] },
 ];
@@ -34,6 +38,7 @@ export function RuleList({
   onQueryChange,
   onSelect,
   onToggle,
+  pendingIds,
 }: RuleListProps) {
   const normalizedQuery = query.trim().toLowerCase();
   const filtered = rules.filter((rule) =>
@@ -112,7 +117,7 @@ export function RuleList({
                         <Switch
                           aria-label={`${rule.enabled ? 'Disable' : 'Enable'} ${rule.name}`}
                           checked={rule.enabled}
-                          disabled={!editable}
+                          disabled={!editable || pendingIds?.has(rule.id)}
                           onCheckedChange={(checked) => onToggle(rule.id, checked)}
                         />
                       </div>

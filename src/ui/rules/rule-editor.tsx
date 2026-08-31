@@ -46,6 +46,7 @@ import {
 } from '@/ui/components/select';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
+import { errorMessage } from '@/ui/lib/error-message';
 import { StatusBadge } from './status-badge';
 
 type RuleEditorProps = {
@@ -81,6 +82,8 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
   const [testUrl, setTestUrl] = useState(initialTestUrl);
   const [testResult, setTestResult] = useState<MatchResult | null>(() => matchRule(rule, initialTestUrl));
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
@@ -97,12 +100,33 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
   };
 
   const handleSave = async () => {
-    if (!validation.valid) return;
-    const result = await onSave(draft);
-    if (draft.enabled && !result.permissionGranted) {
-      toast.warning('Rule saved, but host permission was not granted.');
-    } else {
-      toast.success('Rule saved and applied.');
+    if (!validation.valid || saving) return;
+    setSaving(true);
+    try {
+      const result = await onSave(draft);
+      if (draft.enabled && !result.permissionGranted) {
+        toast.warning('Rule saved, but host permission was not granted.');
+      } else {
+        toast.success(draft.enabled ? 'Rule saved and applied.' : 'Rule saved.');
+      }
+    } catch (error) {
+      toast.error(errorMessage(error, 'The rule could not be saved.'));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    try {
+      await onDelete(rule.id);
+      setDeleteOpen(false);
+      toast.success('Rule deleted.');
+    } catch (error) {
+      toast.error(errorMessage(error, 'The rule could not be deleted.'));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -365,13 +389,16 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
           <Button variant="outline" onClick={() => setDraft(rule)}>
             Cancel
           </Button>
-          <Button disabled={readOnly || !validation.valid} onClick={() => void handleSave()}>
-            Save changes
+          <Button
+            disabled={readOnly || !validation.valid || saving || deleting}
+            onClick={() => void handleSave()}
+          >
+            {saving ? 'Saving…' : 'Save changes'}
           </Button>
         </div>
       </footer>
 
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+      <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Delete “{rule.name}”?</DialogTitle>
@@ -384,15 +411,8 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                void onDelete(rule.id);
-                setDeleteOpen(false);
-                toast.success('Rule deleted.');
-              }}
-            >
-              Delete rule
+            <Button variant="destructive" disabled={deleting} onClick={() => void handleDelete()}>
+              {deleting ? 'Deleting…' : 'Delete rule'}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -4,28 +4,44 @@ import { createRule, removeRule, updatePausedState, upsertRule } from '@/applica
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
 import {
+  getInstalledDynamicRuleIds,
   hasRulePermission,
   reconcileDynamicRules,
   requestRulePermission,
+  subscribeToPermissionChanges,
 } from '@/infrastructure/rule-runtime';
 import { loadState, saveState, subscribeToState } from '@/infrastructure/rule-store';
 
 type PermissionMap = Record<string, boolean>;
+type InstalledRuleIds = Set<number> | null | undefined;
 
 export function useRuleManager() {
   const [state, setState] = useState<StoredState | null>(null);
   const [permissions, setPermissions] = useState<PermissionMap>({});
+  const [installedRuleIds, setInstalledRuleIds] = useState<InstalledRuleIds>(undefined);
+  const [runtimeError, setRuntimeError] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshPermissions = useCallback(async (nextState: StoredState) => {
-    const entries = await Promise.all(
-      nextState.order.map(async (id) => {
-        const rule = nextState.rules[id];
-        return [id, rule ? await hasRulePermission(rule) : false] as const;
-      }),
-    );
-    setPermissions(Object.fromEntries(entries));
+  const refreshRuntimeState = useCallback(async (nextState: StoredState) => {
+    try {
+      const [entries, installedIds] = await Promise.all([
+        Promise.all(
+          nextState.order.map(async (id) => {
+            const rule = nextState.rules[id];
+            return [id, rule ? await hasRulePermission(rule) : false] as const;
+          }),
+        ),
+        getInstalledDynamicRuleIds(),
+      ]);
+      setPermissions(Object.fromEntries(entries));
+      setInstalledRuleIds(installedIds);
+      setRuntimeError(false);
+    } catch (error) {
+      console.error('Failed to read extension runtime state.', error);
+      setInstalledRuleIds(undefined);
+      setRuntimeError(true);
+    }
   }, []);
 
   useEffect(() => {
@@ -34,13 +50,13 @@ export function useRuleManager() {
       if (cancelled) return;
       setState(loaded);
       setSelectedId(loaded.order[0] ?? null);
-      await refreshPermissions(loaded);
+      await refreshRuntimeState(loaded);
       if (!cancelled) setLoading(false);
     });
     return () => {
       cancelled = true;
     };
-  }, [refreshPermissions]);
+  }, [refreshRuntimeState]);
 
   useEffect(
     () =>
@@ -49,10 +65,17 @@ export function useRuleManager() {
         setSelectedId((currentId) =>
           currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
         );
-        void refreshPermissions(nextState);
+        void refreshRuntimeState(nextState);
       }),
-    [refreshPermissions],
+    [refreshRuntimeState],
   );
+
+  useEffect(() => {
+    if (!state) return;
+    return subscribeToPermissionChanges(() => {
+      void refreshRuntimeState(state);
+    });
+  }, [refreshRuntimeState, state]);
 
   const persist = useCallback(
     async (nextState: StoredState) => {
@@ -64,9 +87,9 @@ export function useRuleManager() {
         throw error;
       }
       setState(nextState);
-      await refreshPermissions(nextState);
+      await refreshRuntimeState(nextState);
     },
-    [refreshPermissions, state],
+    [refreshRuntimeState, state],
   );
 
   const saveRule = useCallback(
@@ -130,9 +153,16 @@ export function useRuleManager() {
   const statuses = useMemo(
     () =>
       Object.fromEntries(
-        rules.map((rule) => [rule.id, deriveRuleStatus(rule, permissions[rule.id] === true)]),
+        rules.map((rule) => [
+          rule.id,
+          deriveRuleStatus(rule, permissions[rule.id] === true, {
+            globallyPaused: state?.settings.globallyPaused,
+            isInstalled: installedRuleIds?.has(rule.dnrId),
+            runtimeError,
+          }),
+        ]),
       ),
-    [permissions, rules],
+    [installedRuleIds, permissions, rules, runtimeError, state?.settings.globallyPaused],
   );
 
   return {
