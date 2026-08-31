@@ -8,7 +8,7 @@ import {
   reconcileDynamicRules,
   requestRulePermission,
 } from '@/infrastructure/rule-runtime';
-import { loadState, saveState } from '@/infrastructure/rule-store';
+import { loadState, saveState, subscribeToState } from '@/infrastructure/rule-store';
 
 type PermissionMap = Record<string, boolean>;
 
@@ -41,6 +41,18 @@ export function useRuleManager() {
       cancelled = true;
     };
   }, [refreshPermissions]);
+
+  useEffect(
+    () =>
+      subscribeToState((nextState) => {
+        setState(nextState);
+        setSelectedId((currentId) =>
+          currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
+        );
+        void refreshPermissions(nextState);
+      }),
+    [refreshPermissions],
+  );
 
   const persist = useCallback(
     async (nextState: StoredState) => {
