@@ -6,7 +6,7 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 
 ## 1. Architectural goals
 
-- Manifest V3 only.
+- Manifest V3 only across Chrome, Edge, and Firefox targets.
 - Correct behavior under an ephemeral extension service worker.
 - Minimum installation permissions and per-origin optional grants.
 - A pure, testable rule domain independent of Chrome APIs and React.
@@ -20,14 +20,14 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 | --------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
 | Runtime         | Node.js 24 LTS                                       | Supported production baseline; avoid non-LTS/EOL Node releases                          |
 | Package manager | pnpm with committed lockfile                         | Deterministic installs and efficient dependency management                              |
-| Extension build | WXT, Chrome MV3 target                               | Manifest generation, entrypoint structure, Vite integration, extension-aware testing    |
+| Extension build | WXT, Chrome/Edge/Firefox MV3 targets                 | Manifest generation, shared entrypoints, Vite integration, extension-aware testing      |
 | Language        | TypeScript strict                                    | Typed domain models and safer Chrome API integration                                    |
 | UI              | React for popup/options only                         | Existing team familiarity and component/state needs without putting React in the worker |
 | Styling         | Tailwind CSS v4 plus shadcn `radix-nova` tokens      | Local CSS variables and utilities, no runtime CSS-in-JS                                 |
 | Unit tests      | Vitest                                               | Fast pure-domain and component tests                                                    |
 | E2E             | Playwright Chromium or Puppeteer after a spike       | Real extension installation and service-worker testing                                  |
 | Validation      | Versioned JSON Schema with a typed runtime validator | Treat imports and legacy data as untrusted                                              |
-| CI              | GitHub Actions on Node 24                            | Typecheck, lint, unit, E2E, build, artifact audit                                       |
+| CI              | GitHub Actions on Node 24                            | Typecheck, lint, unit, per-browser E2E, build, artifact and store-validator audit       |
 
 Exact dependency versions are pinned in the committed lockfile and upgraded only through the complete
 quality gate. `latest` ranges are not permitted.
@@ -136,6 +136,11 @@ Target manifest principles:
 ```
 
 This is an architectural sketch, not the final generated manifest.
+
+WXT generates the manifest from a browser-aware function. Firefox MV3 additionally declares a stable
+Gecko extension ID and `data_collection_permissions.required: ["none"]`; the latter truthfully reflects
+the local-only architecture and is required for new AMO submissions. Chrome and Edge share the Chromium
+manifest shape. See [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md) for release gates.
 
 Rules:
 

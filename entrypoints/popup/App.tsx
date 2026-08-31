@@ -48,7 +48,7 @@ export function App() {
 
   return (
     <TooltipProvider>
-      <main className="flex w-[380px] flex-col bg-background">
+      <main data-material="glass-popup" className="flex w-[380px] flex-col">
         <header className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <ShieldCheckIcon className="size-5" aria-hidden="true" />

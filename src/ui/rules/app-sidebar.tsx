@@ -13,7 +13,10 @@ const items = [
 
 export function AppSidebar() {
   return (
-    <aside className="flex min-h-0 flex-col border-r bg-sidebar p-3 max-[1049px]:items-center max-[799px]:hidden">
+    <aside
+      data-material="glass-sidebar"
+      className="flex min-h-0 flex-col border-r p-3 max-[1049px]:items-center max-[799px]:hidden"
+    >
       <nav aria-label="Primary" className="flex w-full flex-col gap-1">
         {items.map((item) => {
           const Icon = item.icon;

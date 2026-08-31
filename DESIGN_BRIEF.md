@@ -157,3 +157,8 @@ The selected direction should score best on:
 Selected direction: the developer-workbench split-pane hierarchy, refined to use shadcn's default
 `radix-nova` style. The implementation keeps a neutral palette, compact controls, Geist typography,
 subtle separators, Lucide icons, and semantic color only for permission, warning, and error states.
+
+The selected refinement adds a restrained Apple-like material system without changing the information
+architecture: translucent structural chrome, stronger edge highlights, system-font preference, immediate
+press feedback, and solid fallbacks for reduced transparency or increased contrast. Glass is reserved for
+the header, sidebar, popup, overlays, and persistent editor toolbar; form content remains calm and legible.

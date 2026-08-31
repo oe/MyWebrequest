@@ -112,7 +112,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
   };
 
   return (
-    <section aria-label={`Edit ${rule.name}`} className="flex min-h-0 flex-col bg-background">
+    <section aria-label={`Edit ${rule.name}`} data-material="glass-content" className="flex min-h-0 flex-col">
       <ScrollArea className="min-h-0 flex-1">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6 lg:p-8">
           <div className="flex items-start gap-3">
@@ -355,7 +355,10 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
         </div>
       </ScrollArea>
 
-      <footer className="flex items-center justify-between gap-3 border-t bg-background p-4 lg:px-8">
+      <footer
+        data-material="glass-toolbar"
+        className="flex items-center justify-between gap-3 border-t p-4 lg:px-8"
+      >
         <Button variant="destructive" disabled={readOnly} onClick={() => setDeleteOpen(true)}>
           <Trash2Icon data-icon="inline-start" />
           Delete rule

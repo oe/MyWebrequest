@@ -3,53 +3,62 @@
 Date: 2026-08-31  
 Final result: `passed`
 
-## Visual truth and capture normalization
+## Visual truth and normalization
 
-- Source visual truth: `/Users/alfred/.codex/generated_images/01a0579e-8667-7f80-b6ac-5bbf8fedd483/exec-58252b08-f7bd-419b-946a-5a24aa034954.png`
-- Source dimensions: 1487 x 1058 physical pixels; normalized to 1440 x 1024 for the full-view comparison.
-- Implementation capture: `artifacts/options-1440x1024-pass-1.png`
-- Implementation viewport and capture: 1440 x 1024 CSS/physical pixels at 1x density.
-- State: light theme, `Mirror API to local` selected, permission granted, matching test URL.
+- Structural source truth: `artifacts/options-1440x1024-pass-1.png`.
+- Requested refinement: preserve the approved shadcn `radix-nova` hierarchy while adding a restrained
+  Apple-like translucent material system, immediate press feedback, and accessibility fallbacks.
+- Implementation: `artifacts/options-apple-glass-1440x1024.png`.
+- Source and implementation: 1440 x 1024 physical pixels at a 1440 x 1024 CSS viewport and 1x density.
+- State: light appearance, `Mirror API to local` selected, permission granted, matching test URL.
 
 ## Comparison evidence
 
-- Full view: `artifacts/options-comparison-pass-1.png`
-- Focused editor region: `artifacts/options-editor-comparison-pass-1.png`
-- Popup state: `artifacts/popup-420x640.png`
+- Full-view comparison: `artifacts/options-apple-glass-comparison.png`.
+- Focused header/sidebar/list comparison: `artifacts/options-apple-glass-material-comparison.png`.
+- Popup comparison: `artifacts/popup-apple-glass-comparison.png`.
+- Focused popup implementation: `artifacts/popup-apple-glass-cropped.png` at 380 x 428 pixels.
 
-The implementation preserves the selected concept's primary hierarchy: top action bar, restrained
-navigation, grouped rule list, persistent editor, contextual permission state, and visible rule tester.
-It intentionally replaces the concept's blue-accented custom styling with the user-selected shadcn
-default: neutral `radix-nova` tokens, Geist typography, compact controls, subtle dividers, and Lucide
-icons. The additional rule-name field is a deliberate functional requirement rather than visual drift.
+The comparison confirms that navigation, list density, editor geometry, field order, persistent actions,
+and above-the-fold content remain unchanged. The refinement is limited to a cool neutral canvas,
+translucent structural chrome, softened borders, light-catching inset edges, material shadows, slightly
+larger radii, and a system-font-first stack.
 
 ## Required fidelity surfaces
 
-- Typography: Geist is bundled locally; hierarchy and monospace URL treatment match the target intent.
-- Spacing and layout: the three-region split and desktop density match; no nested dashboard-card treatment.
-- Color and tokens: neutral shadcn defaults are used, with semantic green/amber/red states carrying icons
-  and text so color is not the only signal.
-- Images and icons: the interface has no content imagery or placeholders; all functional icons are local
-  Lucide components.
-- Copy and content: the selected rule, URL, destination, permission, and test state match the visual truth.
+- Fonts and typography: the type scale, weights, wrapping, and monospace URL treatment are preserved. The
+  stack now prefers the platform system font and falls back to bundled Geist, so macOS receives native SF
+  metrics without introducing a remote font.
+- Spacing and layout rhythm: all three desktop tracks, 64px header, row heights, form rhythm, and sticky
+  action toolbar remain aligned with the source. The 780px list/editor navigation still works.
+- Colors and visual tokens: neutral shadcn semantics remain intact. Glass is reserved for structural
+  regions and overlays; semantic green, amber, and red states retain icon and text labels.
+- Image and asset quality: the product UI contains no content imagery or placeholders. Existing Lucide
+  icons remain sharp and consistent; no CSS-drawn or substitute assets were introduced.
+- Copy and content: rule names, match, destination, permission, result, and popup copy match the approved
+  baseline.
 
 ## Interaction and runtime checks
 
-- Search filtering was verified with `referer` and returned only the matching header rule.
-- Matching and non-matching URL test states were verified.
-- Save, toast feedback, reload persistence, and restoration of the baseline destination were verified.
-- Delete confirmation was opened and canceled without data loss.
-- Popup pause/resume and current-site rule count states were verified.
-- At 780px, list/editor navigation, back behavior, search visibility, and selection were verified.
-- Browser console warnings and errors were checked on both options and popup surfaces: none found.
+- Search filtering returned only the matching `referer` rule.
+- Matching and non-matching URL test states both rendered the expected explanation.
+- Advanced settings expanded and collapsed without changing the editor layout.
+- At 780 x 900, the editor exposed `Back to rules` and returned to the searchable rule list.
+- Computed header material was verified as `blur(24px) saturate(1.6)` with a translucent background and
+  inset edge/shadow.
+- `prefers-reduced-motion`, `prefers-reduced-transparency`, unsupported-backdrop, and
+  `prefers-contrast: more` fallbacks are defined.
+- Browser console warnings and errors after render and interaction: none.
 
-## Severity findings and comparison history
+## Findings and comparison history
 
 - P0: none.
 - P1: none.
 - P2: none.
-- P3: the implementation is intentionally denser and more neutral than the source concept to conform to
-  the selected shadcn default style; no corrective iteration is required.
-- Pass 1: full-view and focused-region comparison completed with no actionable P0/P1/P2 mismatch.
+- P3: the glass effect is intentionally quiet on flat content areas; increasing it further would reduce
+  the shadcn clarity the user selected and risk stacked translucent surfaces.
+- Baseline pass: the shadcn implementation passed against the selected split-pane concept.
+- Apple-material pass: the full-view, focused material, and popup comparisons found no actionable
+  P0/P1/P2 regression, so no corrective visual iteration was required.
 
 Final result: `passed`

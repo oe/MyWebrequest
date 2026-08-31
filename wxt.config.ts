@@ -6,7 +6,7 @@ export default defineConfig({
   vite: () => ({
     plugins: [tailwindcss()],
   }),
-  manifest: {
+  manifest: ({ browser }) => ({
     name: '__MSG_appName__',
     description: '__MSG_appDesc__',
     default_locale: 'en',
@@ -19,5 +19,17 @@ export default defineConfig({
       page: 'options.html',
       open_in_tab: true,
     },
-  },
+    ...(browser === 'firefox'
+      ? {
+          browser_specific_settings: {
+            gecko: {
+              id: 'mywebrequest@evecalm.com',
+              data_collection_permissions: {
+                required: ['none'],
+              },
+            },
+          },
+        }
+      : {}),
+  }),
 });

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v3';
 
 import { RESOURCE_TYPES } from './model';
 
@@ -49,8 +49,8 @@ export const ruleSchema = z.object({
   ]),
   permissionOrigins: z.array(z.string().min(1).max(2_000)).max(100),
   migrationState: z.enum(['none', 'review-required', 'removed', 'unsupported']),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  createdAt: z.string().datetime(),
+  updatedAt: z.string().datetime(),
 });
 
 export const storedStateSchema = z.object({

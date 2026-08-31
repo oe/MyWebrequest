@@ -45,7 +45,8 @@ export function RuleList({
   return (
     <section
       aria-label="Rules"
-      className="flex min-h-0 flex-col border-r bg-background max-[799px]:border-r-0"
+      data-material="glass-content"
+      className="flex min-h-0 flex-col border-r max-[799px]:border-r-0"
     >
       <div className="border-b p-3 min-[800px]:hidden">
         <InputGroup>

@@ -6,13 +6,20 @@
   "type": "module",
   "packageManager": "pnpm@11.21.0",
   "engines": {
-    "node": ">=24 <26",
+    "node": ">=24 <25",
     "pnpm": ">=11"
   },
   "scripts": {
     "dev": "wxt",
-    "build": "wxt build",
-    "zip": "wxt zip",
+    "dev:firefox": "wxt -b firefox --mv3",
+    "build": "pnpm build:chrome",
+    "build:chrome": "wxt build -b chrome --mv3",
+    "build:edge": "wxt build -b edge --mv3",
+    "build:firefox": "wxt build -b firefox --mv3",
+    "build:browsers": "pnpm build:chrome && pnpm build:edge && pnpm build:firefox",
+    "zip": "wxt zip -b chrome --mv3",
+    "zip:firefox": "wxt zip -b firefox --mv3",
+    "lint:firefox": "node scripts/lint-firefox.mjs",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{css,json,md,ts,tsx}\"",
     "format:check": "prettier --check \"**/*.{css,json,md,ts,tsx}\"",
@@ -20,7 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "security:audit": "node scripts/verify-image-size-patch.mjs && pnpm audit --audit-level high",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm security:audit && pnpm build",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm security:audit && pnpm build:browsers && pnpm lint:firefox",
     "postinstall": "wxt prepare"
   },
   "dependencies": {

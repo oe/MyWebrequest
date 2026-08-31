@@ -88,6 +88,7 @@ It is not a general browser utility, an ad blocker, a request recorder, or a rep
 - Full-page options UI as the primary rule manager.
 - First-run or upgrade migration flow inside the options UI.
 - English and Simplified Chinese from the first release.
+- Shared Chrome, Edge, and Firefox Manifest V3 builds, with a separate release gate for each browser.
 
 ### Deferred beyond V1
 
@@ -95,7 +96,7 @@ It is not a general browser utility, an ad blocker, a request recorder, or a rep
 - Side panel and live match inspection.
 - Rule groups, reusable variables, and shared presets.
 - Cross-device sync.
-- Firefox, Edge, and Safari releases.
+- Safari packaging and release.
 - Team sharing and managed enterprise policies.
 
 ### Removed
@@ -202,6 +203,7 @@ V1 is complete only when:
 
 - A clean install requests no host access.
 - Each supported action is proven by a real browser E2E test.
+- Each published browser target passes its own installed-extension E2E suite and store validator.
 - A rule still works after the extension service worker terminates and restarts.
 - Permission grant, refusal, revocation, and re-grant have tested UI states.
 - All captured legacy fixtures produce a deterministic migration report.
