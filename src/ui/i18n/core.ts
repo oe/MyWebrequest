@@ -3,9 +3,10 @@ import { translations } from './translations';
 
 export const supportedLocales = ['en', 'zh-CN', 'ko', 'ja', 'fr', 'es'] as const;
 export type AppLocale = (typeof supportedLocales)[number];
+export type LocalePreference = 'system' | AppLocale;
 export type Translate = (key: MessageKey, params?: Record<string, string | number>) => string;
 
-function normalizeLocale(locale: string): AppLocale | null {
+export function normalizeLocale(locale: string): AppLocale | null {
   const normalized = locale.replace('_', '-').toLowerCase();
   if (normalized.startsWith('zh')) return 'zh-CN';
   return supportedLocales.find((candidate) => candidate.toLowerCase() === normalized) ?? null;

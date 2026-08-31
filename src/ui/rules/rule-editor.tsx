@@ -46,6 +46,7 @@ import {
 } from '@/ui/components/select';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
+import { useI18n } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { StatusBadge } from './status-badge';
 
@@ -73,6 +74,7 @@ function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleActi
 }
 
 export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSave }: RuleEditorProps) {
+  const { t } = useI18n();
   const initialTestUrl =
     rule.id === 'mirror-api-local'
       ? 'https://api.example.com/v1/users'
@@ -105,12 +107,12 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
     try {
       const result = await onSave(draft);
       if (draft.enabled && !result.permissionGranted) {
-        toast.warning('Rule saved, but host permission was not granted.');
+        toast.warning(t('permissionDenied'));
       } else {
-        toast.success(draft.enabled ? 'Rule saved and applied.' : 'Rule saved.');
+        toast.success(t(draft.enabled ? 'ruleSavedApplied' : 'ruleSaved'));
       }
     } catch (error) {
-      toast.error(errorMessage(error, 'The rule could not be saved.'));
+      toast.error(errorMessage(error, t('ruleSaveError')));
     } finally {
       setSaving(false);
     }
@@ -122,16 +124,20 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
     try {
       await onDelete(rule.id);
       setDeleteOpen(false);
-      toast.success('Rule deleted.');
+      toast.success(t('ruleDeleted'));
     } catch (error) {
-      toast.error(errorMessage(error, 'The rule could not be deleted.'));
+      toast.error(errorMessage(error, t('ruleDeleteError')));
     } finally {
       setDeleting(false);
     }
   };
 
   return (
-    <section aria-label={`Edit ${rule.name}`} data-material="glass-content" className="flex min-h-0 flex-col">
+    <section
+      aria-label={t('editRule', { name: rule.name })}
+      data-material="glass-content"
+      className="flex min-h-0 flex-col"
+    >
       <ScrollArea className="min-h-0 flex-1">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6 lg:p-8">
           <div className="flex items-start gap-3">
@@ -139,7 +145,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
               className="min-[800px]:hidden"
               size="icon"
               variant="ghost"
-              aria-label="Back to rules"
+              aria-label={t('backToRules')}
               onClick={onBack}
             >
               <ArrowLeftIcon />
@@ -149,13 +155,11 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 <h1 className="truncate text-2xl font-semibold tracking-tight lg:text-3xl">{draft.name}</h1>
                 <StatusBadge status={status} />
               </div>
-              <p className="text-sm text-muted-foreground">
-                Configure what the browser should match and how the request should change.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('editorDescription')}</p>
             </div>
             <div className="flex items-center gap-3">
               <Field orientation="horizontal" className="w-auto">
-                <FieldLabel htmlFor="rule-enabled">Enabled</FieldLabel>
+                <FieldLabel htmlFor="rule-enabled">{t('enabled')}</FieldLabel>
                 <Switch
                   id="rule-enabled"
                   checked={draft.enabled}
@@ -165,7 +169,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
               </Field>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button size="icon" variant="ghost" aria-label="Rule actions">
+                  <Button size="icon" variant="ghost" aria-label={t('ruleActions')}>
                     <EllipsisIcon />
                   </Button>
                 </DropdownMenuTrigger>
@@ -173,7 +177,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                   <DropdownMenuGroup>
                     <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
                       <Trash2Icon />
-                      Delete rule
+                      {t('deleteRule')}
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
@@ -184,26 +188,21 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
           {draft.migrationState === 'review-required' ? (
             <Alert variant="warning">
               <CircleAlertIcon />
-              <AlertTitle>Review this migrated rule</AlertTitle>
-              <AlertDescription>
-                Its behavior may differ from the legacy extension. Confirm the match and destination before
-                enabling it.
-              </AlertDescription>
+              <AlertTitle>{t('migratedReviewTitle')}</AlertTitle>
+              <AlertDescription>{t('migratedReviewDescription')}</AlertDescription>
             </Alert>
           ) : null}
           {readOnly ? (
             <Alert variant="destructive">
               <CircleAlertIcon />
-              <AlertTitle>This legacy rule cannot run in Manifest V3</AlertTitle>
-              <AlertDescription>
-                The original data remains exportable. Delete it when you no longer need the migration record.
-              </AlertDescription>
+              <AlertTitle>{t('unsupportedRuleTitle')}</AlertTitle>
+              <AlertDescription>{t('unsupportedRuleDescription')}</AlertDescription>
             </Alert>
           ) : null}
 
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="rule-name">Rule name</FieldLabel>
+              <FieldLabel htmlFor="rule-name">{t('ruleName')}</FieldLabel>
               <Input
                 id="rule-name"
                 value={draft.name}
@@ -212,7 +211,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
               />
             </Field>
             <Field data-invalid={Boolean(matchError)}>
-              <FieldLabel htmlFor="rule-match">Match URL</FieldLabel>
+              <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
               <Input
                 id="rule-match"
                 className="font-mono"
@@ -221,13 +220,11 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 aria-invalid={Boolean(matchError)}
                 onChange={(event) => updateMatch(event.target.value)}
               />
-              <FieldDescription>
-                Use a wildcard (*) to capture the part reused as $1 in a redirect.
-              </FieldDescription>
+              <FieldDescription>{t('matchHelp')}</FieldDescription>
               {matchError ? <FieldError>{matchError.message}</FieldError> : null}
             </Field>
             <Field>
-              <FieldLabel htmlFor="rule-action">Action</FieldLabel>
+              <FieldLabel htmlFor="rule-action">{t('action')}</FieldLabel>
               <Select
                 value={draft.action.kind}
                 disabled={readOnly}
@@ -243,18 +240,18 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="block">Block request</SelectItem>
-                    <SelectItem value="redirect">Redirect</SelectItem>
-                    <SelectItem value="modify-request-headers">Modify request header</SelectItem>
-                    <SelectItem value="upgrade-scheme">Upgrade to HTTPS</SelectItem>
+                    <SelectItem value="block">{t('blockRequest')}</SelectItem>
+                    <SelectItem value="redirect">{t('redirect')}</SelectItem>
+                    <SelectItem value="modify-request-headers">{t('modifyRequestHeader')}</SelectItem>
+                    <SelectItem value="upgrade-scheme">{t('upgradeHttps')}</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
-              <FieldDescription>The action is applied only when every condition matches.</FieldDescription>
+              <FieldDescription>{t('actionHelp')}</FieldDescription>
             </Field>
             {draft.action.kind === 'redirect' ? (
               <Field data-invalid={Boolean(destinationError)}>
-                <FieldLabel htmlFor="rule-destination">Destination</FieldLabel>
+                <FieldLabel htmlFor="rule-destination">{t('destination')}</FieldLabel>
                 <Input
                   id="rule-destination"
                   className="font-mono"
@@ -268,15 +265,13 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                     }))
                   }
                 />
-                <FieldDescription>
-                  Capture groups from the match can be inserted with $1, $2, and so on.
-                </FieldDescription>
+                <FieldDescription>{t('destinationHelp')}</FieldDescription>
                 {destinationError ? <FieldError>{destinationError.message}</FieldError> : null}
               </Field>
             ) : null}
             {draft.action.kind === 'modify-request-headers' ? (
               <Field>
-                <FieldLabel htmlFor="rule-header">Request header</FieldLabel>
+                <FieldLabel htmlFor="rule-header">{t('requestHeader')}</FieldLabel>
                 <Input
                   id="rule-header"
                   value={draft.action.operations[0]?.header ?? ''}
@@ -291,18 +286,18 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                     }))
                   }
                 />
-                <FieldDescription>This V1 editor removes the selected request header.</FieldDescription>
+                <FieldDescription>{t('headerHelp')}</FieldDescription>
               </Field>
             ) : null}
           </FieldGroup>
 
           <Alert variant={hasPermission ? 'success' : 'warning'}>
             {hasPermission ? <CheckCircle2Icon /> : <KeyRoundIcon />}
-            <AlertTitle>{hasPermission ? 'Host access granted' : 'Host access required'}</AlertTitle>
+            <AlertTitle>{t(hasPermission ? 'hostAccessGranted' : 'hostAccessRequired')}</AlertTitle>
             <AlertDescription>
               {draft.permissionOrigins.length > 0
                 ? draft.permissionOrigins.join(', ')
-                : 'Use a concrete HTTP or HTTPS host so the extension can request narrow access.'}
+                : t('concreteHostHelp')}
             </AlertDescription>
           </Alert>
 
@@ -310,13 +305,11 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <h2 className="text-base font-medium">Test rule</h2>
-              <p className="text-sm text-muted-foreground">
-                Preview the match and result without sending a network request.
-              </p>
+              <h2 className="text-base font-medium">{t('testRule')}</h2>
+              <p className="text-sm text-muted-foreground">{t('testRuleDescription')}</p>
             </div>
             <Field>
-              <FieldLabel htmlFor="test-url">Test URL</FieldLabel>
+              <FieldLabel htmlFor="test-url">{t('testUrl')}</FieldLabel>
               <InputGroup>
                 <InputGroupInput
                   id="test-url"
@@ -332,11 +325,11 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 />
                 <InputGroupAddon align="inline-end">
                   <InputGroupButton
-                    aria-label="Test rule"
+                    aria-label={t('testRule')}
                     onClick={() => setTestResult(matchRule(draft, testUrl))}
                   >
                     <PlayIcon data-icon="inline-start" />
-                    Test
+                    {t('test')}
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>
@@ -344,7 +337,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
             {testResult ? (
               <Alert variant={testResult.matched ? 'success' : 'default'}>
                 {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
-                <AlertTitle>{testResult.matched ? 'Rule matches' : 'No match'}</AlertTitle>
+                <AlertTitle>{t(testResult.matched ? 'ruleMatches' : 'noMatch')}</AlertTitle>
                 <AlertDescription className="font-mono break-all">
                   {testResult.matched ? testResult.result : testResult.reason}
                 </AlertDescription>
@@ -355,7 +348,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
           {advanced ? (
             <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="rule-priority">Priority</FieldLabel>
+                <FieldLabel htmlFor="rule-priority">{t('priority')}</FieldLabel>
                 <Input
                   id="rule-priority"
                   type="number"
@@ -367,7 +360,7 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                     setDraft((current) => ({ ...current, priority: Number(event.target.value) }))
                   }
                 />
-                <FieldDescription>Higher priority rules are evaluated first.</FieldDescription>
+                <FieldDescription>{t('priorityHelp')}</FieldDescription>
               </Field>
             </FieldGroup>
           ) : null}
@@ -380,20 +373,20 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
       >
         <Button variant="destructive" disabled={readOnly} onClick={() => setDeleteOpen(true)}>
           <Trash2Icon data-icon="inline-start" />
-          Delete rule
+          {t('deleteRule')}
         </Button>
         <div className="flex items-center gap-2">
           <Button variant="outline" onClick={() => setAdvanced((value) => !value)}>
-            {advanced ? 'Hide advanced' : 'Advanced settings'}
+            {t(advanced ? 'hideAdvanced' : 'advancedSettings')}
           </Button>
           <Button variant="outline" onClick={() => setDraft(rule)}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             disabled={readOnly || !validation.valid || saving || deleting}
             onClick={() => void handleSave()}
           >
-            {saving ? 'Saving…' : 'Save changes'}
+            {saving ? t('saving') : t('saveChanges')}
           </Button>
         </div>
       </footer>
@@ -401,18 +394,15 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
       <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete “{rule.name}”?</DialogTitle>
-            <DialogDescription>
-              This removes the saved rule and its active browser rule. This action cannot be undone in this
-              preview.
-            </DialogDescription>
+            <DialogTitle>{t('deleteRuleTitle', { name: rule.name })}</DialogTitle>
+            <DialogDescription>{t('deleteRuleDescription')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">{t('cancel')}</Button>
             </DialogClose>
             <Button variant="destructive" disabled={deleting} onClick={() => void handleDelete()}>
-              {deleting ? 'Deleting…' : 'Delete rule'}
+              {deleting ? t('deleting') : t('deleteRule')}
             </Button>
           </DialogFooter>
         </DialogContent>

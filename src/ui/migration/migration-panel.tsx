@@ -28,6 +28,8 @@ import {
 import { ScrollArea } from '@/ui/components/scroll-area';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
+import { useI18n, type Translate } from '@/ui/i18n';
+import type { MessageKey } from '@/ui/i18n/messages';
 import { downloadJson } from '@/ui/lib/download-json';
 import { errorMessage } from '@/ui/lib/error-message';
 import { cn } from '@/ui/lib/utils';
@@ -52,13 +54,13 @@ type MigrationPanelProps = {
 
 const outcomeConfig: Record<
   MigrationOutcome,
-  { label: string; variant: 'success' | 'warning' | 'destructive' | 'muted' }
+  { label: MessageKey; variant: 'success' | 'warning' | 'destructive' | 'muted' }
 > = {
-  automatic: { label: 'Automatic', variant: 'success' },
-  'review-required': { label: 'Needs review', variant: 'warning' },
-  unsupported: { label: 'Unsupported', variant: 'destructive' },
-  'removed-feature': { label: 'Removed feature', variant: 'muted' },
-  invalid: { label: 'Invalid', variant: 'destructive' },
+  automatic: { label: 'outcomeAutomatic', variant: 'success' },
+  'review-required': { label: 'outcomeReview', variant: 'warning' },
+  unsupported: { label: 'outcomeUnsupported', variant: 'destructive' },
+  'removed-feature': { label: 'outcomeRemoved', variant: 'muted' },
+  invalid: { label: 'outcomeInvalid', variant: 'destructive' },
 };
 
 const outcomes: MigrationOutcome[] = [
@@ -70,11 +72,11 @@ const outcomes: MigrationOutcome[] = [
 ];
 const filterOrder: Filter[] = ['all', ...outcomes];
 
-function sourceText(item: MigrationItem): string {
+function sourceText(item: MigrationItem, t: Translate, locale: string): string {
   if (item.sourceValue === null) {
     return item.sourceByteLength
-      ? `Source omitted from the bounded snapshot (${item.sourceByteLength.toLocaleString()} bytes).`
-      : 'Source value unavailable.';
+      ? t('sourceOmitted', { count: item.sourceByteLength.toLocaleString(locale) })
+      : t('sourceUnavailable');
   }
   return typeof item.sourceValue === 'string' ? item.sourceValue : JSON.stringify(item.sourceValue, null, 2);
 }
@@ -84,8 +86,34 @@ function summaryCount(migration: StoredMigration, filter: Filter): number {
   return migration.bundle.report.items.filter((item) => item.outcome === filter).length;
 }
 
-function filterLabel(filter: Filter): string {
-  return filter === 'all' ? 'All' : outcomeConfig[filter].label;
+function filterLabel(filter: Filter, t: Translate): string {
+  return t(filter === 'all' ? 'all' : outcomeConfig[filter].label);
+}
+
+function explanationLabel(outcome: MigrationOutcome): MessageKey {
+  switch (outcome) {
+    case 'automatic':
+      return 'migrationExplanationAutomatic';
+    case 'review-required':
+      return 'migrationExplanationReview';
+    case 'unsupported':
+      return 'migrationExplanationUnsupported';
+    case 'removed-feature':
+      return 'migrationExplanationRemoved';
+    case 'invalid':
+      return 'migrationExplanationInvalid';
+  }
+}
+
+function migrationStatusLabel(status: StoredMigration['status']): MessageKey {
+  switch (status) {
+    case 'pending':
+      return 'migrationStatusPending';
+    case 'applied':
+      return 'migrationStatusApplied';
+    case 'rolled-back':
+      return 'migrationStatusRolledBack';
+  }
 }
 
 function MigrationItemRow({
@@ -99,9 +127,10 @@ function MigrationItemRow({
   disabled: boolean;
   onSelectedChange: (selected: boolean) => void;
 }) {
+  const { locale, t } = useI18n();
   const applicable = Boolean(item.candidateRule) && ['automatic', 'review-required'].includes(item.outcome);
   const config = outcomeConfig[item.outcome];
-  const raw = sourceText(item);
+  const raw = sourceText(item, t, locale);
   return (
     <article
       className="grid gap-3 border-b px-5 py-4 [contain-intrinsic-size:0_150px] [content-visibility:auto] last:border-b-0 sm:grid-cols-[minmax(0,1fr)_auto]"
@@ -112,32 +141,33 @@ function MigrationItemRow({
           <h3 id={`${item.id}-title`} className="truncate text-sm font-medium">
             {item.sourceLocator}
           </h3>
-          <Badge variant={config.variant}>{config.label}</Badge>
-          {item.enabledIntent ? <Badge variant="outline">Previously enabled</Badge> : null}
+          <Badge variant={config.variant}>{t(config.label)}</Badge>
+          {item.enabledIntent ? <Badge variant="outline">{t('previouslyEnabled')}</Badge> : null}
         </div>
-        <p className="text-sm leading-5 text-muted-foreground">{item.explanation}</p>
+        <p className="text-sm leading-5 text-muted-foreground">{t(explanationLabel(item.outcome))}</p>
+        <p className="text-xs text-muted-foreground">{t('migrationReason', { code: item.reasonCode })}</p>
         <code className="block max-h-28 overflow-auto rounded-md bg-muted/55 px-3 py-2 text-xs leading-5 break-all whitespace-pre-wrap">
           {raw}
         </code>
         {item.candidateRule ? (
           <div className="grid gap-1 text-xs text-muted-foreground">
             <span>
-              Candidate: <span className="font-mono">{item.candidateRule.condition.url.value}</span>
+              {t('candidate')}: <span className="font-mono">{item.candidateRule.condition.url.value}</span>
             </span>
-            <span>This rule will be imported disabled and will request no permission yet.</span>
+            <span>{t('candidateDisabled')}</span>
           </div>
         ) : null}
       </div>
       <div className="flex items-start justify-end pt-1">
         {applicable ? (
           <Switch
-            aria-label={`${selected ? 'Exclude' : 'Include'} ${item.sourceLocator}`}
+            aria-label={t(selected ? 'excludeItem' : 'includeItem', { name: item.sourceLocator })}
             checked={selected}
             disabled={disabled}
             onCheckedChange={onSelectedChange}
           />
         ) : (
-          <BanIcon className="size-4 text-muted-foreground" aria-label="Cannot be imported" />
+          <BanIcon className="size-4 text-muted-foreground" aria-label={t('cannotImport')} />
         )}
       </div>
     </article>
@@ -159,6 +189,7 @@ export function MigrationPanel({
   onRollback,
   onStateCommitted,
 }: MigrationPanelProps) {
+  const { t } = useI18n();
   const fileInput = useRef<HTMLInputElement>(null);
   const [filter, setFilter] = useState<Filter>('all');
   const [visibleCount, setVisibleCount] = useState(100);
@@ -184,9 +215,9 @@ export function MigrationPanel({
     if (!file) return;
     try {
       await onPreviewImport(await file.text());
-      toast.success('Legacy import preview is ready.');
+      toast.success(t('previewReady'));
     } catch (caught) {
-      toast.error(errorMessage(caught, 'The legacy file could not be read.'));
+      toast.error(errorMessage(caught, t('legacyReadError')));
     } finally {
       if (fileInput.current) fileInput.current.value = '';
     }
@@ -196,20 +227,18 @@ export function MigrationPanel({
     try {
       const nextState = await onApply([...selectedIds]);
       if (nextState) await onStateCommitted(nextState);
-      toast.success(
-        `Migration completed with ${selectedIds.size} imported rule${selectedIds.size === 1 ? '' : 's'}.`,
-      );
+      toast.success(t('migrationComplete', { count: selectedIds.size }));
     } catch (caught) {
-      toast.error(errorMessage(caught, 'The migration could not be applied.'));
+      toast.error(errorMessage(caught, t('migrationApplyError')));
     }
   };
 
   const handleConfirmImport = async () => {
     try {
       await onConfirmImport();
-      toast.success('The imported migration report is now staged.');
+      toast.success(t('reportStaged'));
     } catch (caught) {
-      toast.error(errorMessage(caught, 'The imported report could not be staged.'));
+      toast.error(errorMessage(caught, t('reportStageError')));
     }
   };
 
@@ -218,16 +247,16 @@ export function MigrationPanel({
       const previousState = await onRollback();
       if (previousState) await onStateCommitted(previousState);
       setRollbackOpen(false);
-      toast.success('The pre-migration rule snapshot was restored.');
+      toast.success(t('snapshotRestored'));
     } catch (caught) {
-      toast.error(errorMessage(caught, 'The migration could not be rolled back.'));
+      toast.error(errorMessage(caught, t('rollbackError')));
     }
   };
 
   if (loading) {
     return (
       <section className="col-span-2 grid place-items-center text-sm text-muted-foreground">
-        Checking legacy data…
+        {t('checkingLegacy')}
       </section>
     );
   }
@@ -242,13 +271,12 @@ export function MigrationPanel({
           <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">Legacy migration</h1>
-                {migration ? <Badge variant="outline">{migration.status}</Badge> : null}
+                <h1 className="text-2xl font-semibold tracking-tight lg:text-3xl">{t('legacyMigration')}</h1>
+                {migration ? (
+                  <Badge variant="outline">{t(migrationStatusLabel(migration.status))}</Badge>
+                ) : null}
               </div>
-              <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                Review old My Webrequest data before anything is added. Unsupported data remains available in
-                the exported snapshot and is never activated.
-              </p>
+              <p className="max-w-2xl text-sm leading-6 text-muted-foreground">{t('migrationIntro')}</p>
             </div>
             <div className="flex flex-wrap gap-2">
               <input
@@ -256,13 +284,13 @@ export function MigrationPanel({
                 className="sr-only"
                 type="file"
                 accept="application/json,.json"
-                aria-label="Choose legacy JSON file"
+                aria-label={t('chooseLegacyFile')}
                 disabled={busy || applied}
                 onChange={(event) => void handleFile(event.target.files?.[0])}
               />
               <Button variant="outline" disabled={busy || applied} onClick={() => fileInput.current?.click()}>
                 <UploadIcon data-icon="inline-start" />
-                Import legacy JSON
+                {t('importLegacyJson')}
               </Button>
               {migration ? (
                 <Button
@@ -279,7 +307,7 @@ export function MigrationPanel({
                   }
                 >
                   <DownloadIcon data-icon="inline-start" />
-                  Export report
+                  {t('exportReport')}
                 </Button>
               ) : null}
             </div>
@@ -288,7 +316,7 @@ export function MigrationPanel({
           {error ? (
             <Alert variant="destructive">
               <CircleAlertIcon />
-              <AlertTitle>Migration operation failed</AlertTitle>
+              <AlertTitle>{t('migrationFailed')}</AlertTitle>
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           ) : null}
@@ -296,10 +324,11 @@ export function MigrationPanel({
           {detection === 'source-changed' ? (
             <Alert variant="warning">
               <CircleAlertIcon />
-              <AlertTitle>Legacy source changed after this report was staged</AlertTitle>
+              <AlertTitle>{t('sourceChangedTitle')}</AlertTitle>
               <AlertDescription>
-                The existing report was preserved. Export or finish it before importing the newer source
-                fingerprint {detectedFingerprint?.slice(0, 12)}.
+                {t('sourceChangedDescription', {
+                  fingerprint: detectedFingerprint?.slice(0, 12) ?? '',
+                })}
               </AlertDescription>
             </Alert>
           ) : null}
@@ -307,18 +336,15 @@ export function MigrationPanel({
           {importPreview ? (
             <Alert variant="warning">
               <FileJsonIcon />
-              <AlertTitle>Replace the staged report with this import preview?</AlertTitle>
+              <AlertTitle>{t('replacePreviewTitle')}</AlertTitle>
               <AlertDescription>
-                <p>
-                  {importPreview.bundle.report.items.length} source items were classified. Active rules will
-                  not change until you apply the new report.
-                </p>
+                <p>{t('previewClassified', { count: importPreview.bundle.report.items.length })}</p>
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button disabled={busy} onClick={() => void handleConfirmImport()}>
-                    Confirm preview
+                    {t('confirmPreview')}
                   </Button>
                   <Button variant="outline" disabled={busy} onClick={onCancelImport}>
-                    Cancel
+                    {t('cancel')}
                   </Button>
                 </div>
               </AlertDescription>
@@ -332,17 +358,14 @@ export function MigrationPanel({
                   <CheckCircle2Icon className="size-5 text-muted-foreground" />
                 </div>
                 <div className="space-y-2">
-                  <h2 className="text-lg font-semibold">No legacy data detected</h2>
-                  <p className="text-sm leading-6 text-muted-foreground">
-                    If this browser used a different extension ID, import a JSON backup from the old
-                    extension.
-                  </p>
+                  <h2 className="text-lg font-semibold">{t('noLegacyData')}</h2>
+                  <p className="text-sm leading-6 text-muted-foreground">{t('noLegacyDataDescription')}</p>
                 </div>
               </div>
             </div>
           ) : (
             <>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5" aria-label="Migration summary">
+              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5" aria-label={t('migrationSummary')}>
                 {outcomes.map((outcome) => {
                   const config = outcomeConfig[outcome];
                   return (
@@ -359,7 +382,7 @@ export function MigrationPanel({
                       <span className="text-2xl font-semibold tabular-nums">
                         {summaryCount(migration, outcome)}
                       </span>
-                      <span className="mt-1 block text-xs text-muted-foreground">{config.label}</span>
+                      <span className="mt-1 block text-xs text-muted-foreground">{t(config.label)}</span>
                     </button>
                   );
                 })}
@@ -367,7 +390,7 @@ export function MigrationPanel({
 
               <div className="overflow-hidden rounded-xl border bg-background/35">
                 <div className="flex flex-col justify-between gap-3 border-b p-4 sm:flex-row sm:items-center">
-                  <div className="flex flex-wrap gap-2" aria-label="Filter migration items">
+                  <div className="flex flex-wrap gap-2" aria-label={t('filterMigration')}>
                     {filterOrder.map((value) => (
                       <Button
                         key={value}
@@ -376,7 +399,7 @@ export function MigrationPanel({
                         aria-pressed={filter === value}
                         onClick={() => changeFilter(value)}
                       >
-                        {filterLabel(value)}
+                        {filterLabel(value, t)}
                         <Badge variant="muted">{summaryCount(migration, value)}</Badge>
                       </Button>
                     ))}
@@ -395,7 +418,7 @@ export function MigrationPanel({
                         )
                       }
                     >
-                      Reset to automatic
+                      {t('resetAutomatic')}
                     </Button>
                   ) : null}
                 </div>
@@ -418,15 +441,13 @@ export function MigrationPanel({
                     />
                   ))}
                   {visibleItems.length === 0 ? (
-                    <p className="p-8 text-center text-sm text-muted-foreground">
-                      No items in this category.
-                    </p>
+                    <p className="p-8 text-center text-sm text-muted-foreground">{t('noCategoryItems')}</p>
                   ) : null}
                 </div>
                 {visibleItems.length < filteredItems.length ? (
                   <div className="border-t p-3 text-center">
                     <Button variant="ghost" onClick={() => setVisibleCount((count) => count + 100)}>
-                      Show 100 more
+                      {t('showMore')}
                     </Button>
                   </div>
                 ) : null}
@@ -434,11 +455,11 @@ export function MigrationPanel({
 
               <Alert variant={applied ? 'success' : 'default'}>
                 {applied ? <CheckCircle2Icon /> : <CircleAlertIcon />}
-                <AlertTitle>{applied ? 'Migration applied' : 'Review before applying'}</AlertTitle>
+                <AlertTitle>{t(applied ? 'migrationApplied' : 'reviewBeforeApply')}</AlertTitle>
                 <AlertDescription>
                   {applied
-                    ? `${migration.appliedRuleIds.length} rules were imported disabled. The original snapshot remains available for rollback.`
-                    : `${selectedIds.size} candidate rule${selectedIds.size === 1 ? '' : 's'} selected. Permissions will only be requested later when you enable each rule.`}
+                    ? t('appliedRules', { count: migration.appliedRuleIds.length })
+                    : t('selectedCandidates', { count: selectedIds.size })}
                 </AlertDescription>
               </Alert>
             </>
@@ -453,13 +474,13 @@ export function MigrationPanel({
             {applied ? (
               <Button variant="destructive" disabled={busy} onClick={() => setRollbackOpen(true)}>
                 <RotateCcwIcon data-icon="inline-start" />
-                {busy ? 'Restoring…' : 'Restore pre-migration snapshot'}
+                {busy ? t('restoring') : t('restoreSnapshot')}
               </Button>
             ) : null}
             {pending ? (
               <Button disabled={busy || Boolean(importPreview)} onClick={() => void handleApply()}>
                 <CheckCircle2Icon data-icon="inline-start" />
-                {busy ? 'Applying…' : `Apply ${selectedIds.size} selected`}
+                {busy ? t('applying') : t('applySelected', { count: selectedIds.size })}
               </Button>
             ) : null}
           </footer>
@@ -469,20 +490,17 @@ export function MigrationPanel({
       <Dialog open={rollbackOpen} onOpenChange={(open) => !busy && setRollbackOpen(open)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Restore the complete pre-migration snapshot?</DialogTitle>
-            <DialogDescription>
-              This restores every rule exactly as it was before migration. Rules or edits created afterward
-              will be removed. Export anything you need before continuing.
-            </DialogDescription>
+            <DialogTitle>{t('restoreTitle')}</DialogTitle>
+            <DialogDescription>{t('restoreDescription')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <DialogClose asChild>
               <Button variant="outline" disabled={busy}>
-                Cancel
+                {t('cancel')}
               </Button>
             </DialogClose>
             <Button variant="destructive" disabled={busy} onClick={() => void handleRollback()}>
-              {busy ? 'Restoring…' : 'Restore snapshot'}
+              {busy ? t('restoring') : t('restore')}
             </Button>
           </DialogFooter>
         </DialogContent>

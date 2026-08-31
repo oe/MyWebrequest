@@ -17,6 +17,7 @@ import { Switch } from '@/ui/components/switch';
 import { Toaster } from '@/ui/components/sonner';
 import { TooltipProvider } from '@/ui/components/tooltip';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
+import { useI18n } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 
 function canUseExtensionTabs(): boolean {
@@ -30,6 +31,7 @@ async function openRuleManager(): Promise<void> {
 }
 
 export function PopupApp() {
+  const { t } = useI18n();
   const manager = useRuleManager();
   const [origin, setOrigin] = useState('https://api.example.com');
   const [pausing, setPausing] = useState(false);
@@ -42,10 +44,10 @@ export function PopupApp() {
       try {
         setOrigin(new URL(tab.url).origin);
       } catch {
-        setOrigin('Unavailable on this page');
+        setOrigin(t('unavailablePage'));
       }
     });
-  }, []);
+  }, [t]);
 
   const scopedRules = useMemo(
     () =>
@@ -56,7 +58,9 @@ export function PopupApp() {
   );
 
   if (manager.loading || !manager.state) {
-    return <main className="grid min-h-64 place-items-center text-sm text-muted-foreground">Loading…</main>;
+    return (
+      <main className="grid min-h-64 place-items-center text-sm text-muted-foreground">{t('loading')}</main>
+    );
   }
 
   const paused = manager.state.settings.globallyPaused;
@@ -67,7 +71,7 @@ export function PopupApp() {
     try {
       await manager.setGloballyPaused(checked);
     } catch (error) {
-      toast.error(errorMessage(error, 'The global rule state could not be changed.'));
+      toast.error(errorMessage(error, t('pauseError')));
     } finally {
       setPausing(false);
     }
@@ -80,7 +84,7 @@ export function PopupApp() {
       await manager.addRule(origin);
       await openRuleManager();
     } catch (error) {
-      toast.error(errorMessage(error, 'The rule could not be created.'));
+      toast.error(errorMessage(error, t('createRuleError')));
     } finally {
       setCreating(false);
     }
@@ -92,15 +96,17 @@ export function PopupApp() {
         <header className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <ShieldCheckIcon className="size-5" aria-hidden="true" />
-            <h1 className="text-base font-semibold">Request Rules</h1>
+            <h1 className="text-base font-semibold">{t('appName')}</h1>
           </div>
-          <Badge variant={paused ? 'warning' : 'success'}>{paused ? 'Paused' : 'Active'}</Badge>
+          <Badge variant={paused ? 'warning' : 'success'}>
+            {t(paused ? 'statusPaused' : 'statusActive')}
+          </Badge>
         </header>
         <Separator />
 
         <section className="flex flex-col gap-4 p-4">
           <div className="flex flex-col gap-1">
-            <p className="text-xs font-medium text-muted-foreground">CURRENT SITE</p>
+            <p className="text-xs font-medium text-muted-foreground">{t('currentSite')}</p>
             <p className="truncate text-sm font-medium">{origin}</p>
           </div>
 
@@ -108,23 +114,21 @@ export function PopupApp() {
             {paused ? <CirclePauseIcon /> : <ShieldCheckIcon />}
             <AlertTitle>
               {paused
-                ? 'All rules are paused'
-                : `${scopedRules.length} rule${scopedRules.length === 1 ? '' : 's'} for this site`}
+                ? t('allRulesPaused')
+                : t(scopedRules.length === 1 ? 'siteRulesOne' : 'siteRulesMany', {
+                    count: scopedRules.length,
+                  })}
             </AlertTitle>
-            <AlertDescription>
-              {paused
-                ? 'Resume to let enabled rules affect requests again.'
-                : 'Rules stay on this device and run through Manifest V3.'}
-            </AlertDescription>
+            <AlertDescription>{paused ? t('resumeRulesHelp') : t('localRulesHelp')}</AlertDescription>
           </Alert>
 
           <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
             <div className="flex min-w-0 flex-col gap-1">
-              <span className="text-sm font-medium">Pause all rules</span>
-              <span className="text-xs text-muted-foreground">Keeps your rules saved.</span>
+              <span className="text-sm font-medium">{t('pauseAllRules')}</span>
+              <span className="text-xs text-muted-foreground">{t('keepsRulesSaved')}</span>
             </div>
             <Switch
-              aria-label="Pause all rules"
+              aria-label={t('pauseAllRules')}
               checked={paused}
               disabled={pausing}
               onCheckedChange={(checked) => void handlePausedChange(checked)}
@@ -134,18 +138,18 @@ export function PopupApp() {
           <div className="flex flex-col gap-2">
             <Button disabled={!origin.startsWith('http') || creating} onClick={() => void handleCreate()}>
               <PlusIcon data-icon="inline-start" />
-              {creating ? 'Creating…' : 'Create rule for this site'}
+              {creating ? t('creating') : t('createSiteRule')}
             </Button>
             <Button
               variant="outline"
               onClick={() =>
                 void openRuleManager().catch((error: unknown) =>
-                  toast.error(errorMessage(error, 'The rule manager could not be opened.')),
+                  toast.error(errorMessage(error, t('openRuleManagerError'))),
                 )
               }
             >
               <ListFilterIcon data-icon="inline-start" />
-              Open rule manager
+              {t('openRuleManager')}
               <ArrowUpRightIcon data-icon="inline-end" />
             </Button>
           </div>
@@ -154,7 +158,7 @@ export function PopupApp() {
         <Separator />
         <footer className="flex items-center gap-2 px-4 py-3 text-xs text-muted-foreground">
           <KeyRoundIcon className="size-4" aria-hidden="true" />
-          Host access is requested only when a rule needs it.
+          {t('hostAccessOnDemand')}
         </footer>
         <Toaster position="bottom-center" richColors />
       </main>

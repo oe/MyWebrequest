@@ -5,6 +5,7 @@ import { Button } from '@/ui/components/button';
 import { Separator } from '@/ui/components/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
 import { useI18n } from '@/ui/i18n';
+import { LanguageMenu } from '@/ui/i18n/language-menu';
 
 export type OptionsView = 'rules' | 'migration';
 
@@ -59,6 +60,7 @@ export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarPro
         })}
       </nav>
       <div className="mt-auto flex w-full flex-col gap-3">
+        <LanguageMenu />
         <Separator />
         <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground max-[1049px]:justify-center max-[1049px]:px-0">
           <ShieldCheckIcon className="size-4" aria-hidden="true" />

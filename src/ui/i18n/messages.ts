@@ -6,6 +6,9 @@ export const en = {
   legacyMigration: 'Legacy migration',
   primaryNavigation: 'Primary navigation',
   localOnly: 'Manifest V3 · Local only',
+  language: 'Language',
+  systemLanguage: 'Follow browser language',
+  languageChangeError: 'The language preference could not be saved.',
   searchRules: 'Search rules',
   reviewLegacyData: 'Review preserved legacy data',
   openMigration: 'Open legacy migration',
@@ -81,6 +84,7 @@ export const en = {
   hideAdvanced: 'Hide advanced',
   advancedSettings: 'Advanced settings',
   cancel: 'Cancel',
+  close: 'Close',
   saving: 'Saving…',
   saveChanges: 'Save changes',
   deleteRuleTitle: 'Delete “{name}”?',
@@ -114,6 +118,9 @@ export const en = {
   importLegacyJson: 'Import legacy JSON',
   exportReport: 'Export report',
   migrationFailed: 'Migration operation failed',
+  migrationStatusPending: 'Pending',
+  migrationStatusApplied: 'Applied',
+  migrationStatusRolledBack: 'Rolled back',
   sourceChangedTitle: 'Legacy source changed after this report was staged',
   sourceChangedDescription:
     'The existing report was preserved. Export or finish it before importing the newer source fingerprint {fingerprint}.',
@@ -136,6 +143,7 @@ export const en = {
     '{count} candidate rules selected. Permissions are requested only when each rule is enabled.',
   restoreSnapshot: 'Restore pre-migration snapshot',
   restoring: 'Restoring…',
+  applying: 'Applying…',
   applySelected: 'Apply {count} selected',
   restoreTitle: 'Restore the complete pre-migration snapshot?',
   restoreDescription:
@@ -146,6 +154,16 @@ export const en = {
   outcomeUnsupported: 'Unsupported',
   outcomeRemoved: 'Removed feature',
   outcomeInvalid: 'Invalid',
+  migrationReason: 'Reason: {code}',
+  migrationExplanationAutomatic: 'This legacy behavior has a safe Manifest V3 equivalent.',
+  migrationExplanationReview:
+    'A conversion is available, but its behavior may differ and must be reviewed before enabling.',
+  migrationExplanationUnsupported:
+    'Manifest V3 has no safe equivalent. The original source is preserved for export.',
+  migrationExplanationRemoved:
+    'This legacy feature was intentionally removed. The original source is preserved for export.',
+  migrationExplanationInvalid:
+    'This source item is invalid or exceeds safe migration bounds. It was preserved but will not be imported.',
   all: 'All',
   previouslyEnabled: 'Previously enabled',
   sourceOmitted: 'Source omitted from the bounded snapshot ({count} bytes).',
@@ -157,6 +175,10 @@ export const en = {
   cannotImport: 'Cannot be imported',
   previewReady: 'Legacy import preview is ready.',
   legacyReadError: 'The legacy file could not be read.',
+  legacyDetectionError: 'Legacy data could not be checked.',
+  legacyTooLarge: 'Legacy imports must be 5 MB or smaller.',
+  legacyInvalidJson: 'The selected file is not valid JSON.',
+  legacyObjectRequired: 'A legacy import must contain a JSON object.',
   migrationComplete: 'Migration completed with {count} imported rules.',
   migrationApplyError: 'The migration could not be applied.',
   reportStaged: 'The imported migration report is now staged.',

@@ -14,6 +14,7 @@ import { createMigrationBundle } from '@/application/migration-service';
 import type { StoredState } from '@/domain/rules/model';
 import { commitStateAndMigration, saveStoredMigration } from '@/infrastructure/migration-store';
 import { reconcileDynamicRules } from '@/infrastructure/rule-runtime';
+import { useI18n } from '@/ui/i18n';
 
 const MAX_IMPORT_BYTES = 5 * 1024 * 1024;
 
@@ -22,6 +23,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 export function useMigrationManager() {
+  const { t } = useI18n();
   const [migration, setMigration] = useState<StoredMigration | null>(null);
   const [importPreview, setImportPreview] = useState<StoredMigration | null>(null);
   const [detection, setDetection] = useState<LegacyMigrationDetection['kind']>('none');
@@ -39,8 +41,8 @@ export function useMigrationManager() {
         if ('migration' in result) setMigration(result.migration);
         if (result.kind === 'source-changed') setDetectedFingerprint(result.detectedFingerprint);
       })
-      .catch((caught: unknown) => {
-        if (!cancelled) setError(caught instanceof Error ? caught.message : 'Legacy detection failed.');
+      .catch(() => {
+        if (!cancelled) setError(t('legacyDetectionError'));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -48,25 +50,28 @@ export function useMigrationManager() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
-  const previewLegacyImport = useCallback(async (text: string) => {
-    if (new TextEncoder().encode(text).byteLength > MAX_IMPORT_BYTES) {
-      throw new Error('Legacy imports must be 5 MB or smaller.');
-    }
-    let parsed: unknown;
-    try {
-      parsed = JSON.parse(text);
-    } catch {
-      throw new Error('The selected file is not valid JSON.');
-    }
-    if (!isRecord(parsed)) throw new Error('A legacy import must contain a JSON object.');
-    const now = new Date().toISOString();
-    const bundle = await createMigrationBundle(parsed, 'legacy-json-import', now);
-    const pending = createPendingMigration(bundle, now);
-    setImportPreview(pending);
-    return pending;
-  }, []);
+  const previewLegacyImport = useCallback(
+    async (text: string) => {
+      if (new TextEncoder().encode(text).byteLength > MAX_IMPORT_BYTES) {
+        throw new Error(t('legacyTooLarge'));
+      }
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(text);
+      } catch {
+        throw new Error(t('legacyInvalidJson'));
+      }
+      if (!isRecord(parsed)) throw new Error(t('legacyObjectRequired'));
+      const now = new Date().toISOString();
+      const bundle = await createMigrationBundle(parsed, 'legacy-json-import', now);
+      const pending = createPendingMigration(bundle, now);
+      setImportPreview(pending);
+      return pending;
+    },
+    [t],
+  );
 
   const confirmImportPreview = useCallback(async () => {
     if (!importPreview || busy) return;
@@ -79,12 +84,13 @@ export function useMigrationManager() {
       setDetectedFingerprint(null);
       setImportPreview(null);
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : 'The import preview could not be staged.');
-      throw caught;
+      const message = t('reportStageError');
+      setError(message);
+      throw new Error(message, { cause: caught });
     } finally {
       setBusy(false);
     }
-  }, [busy, importPreview]);
+  }, [busy, importPreview, t]);
 
   const applySelected = useCallback(
     async (state: StoredState, selectedItemIds: readonly string[]) => {
@@ -102,13 +108,14 @@ export function useMigrationManager() {
         setMigration(result.migration);
         return result.state;
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : 'The migration could not be applied.');
-        throw caught;
+        const message = t('migrationApplyError');
+        setError(message);
+        throw new Error(message, { cause: caught });
       } finally {
         setBusy(false);
       }
     },
-    [busy, migration],
+    [busy, migration, t],
   );
 
   const rollback = useCallback(
@@ -126,13 +133,14 @@ export function useMigrationManager() {
         setMigration(result.migration);
         return result.state;
       } catch (caught) {
-        setError(caught instanceof Error ? caught.message : 'The migration could not be rolled back.');
-        throw caught;
+        const message = t('rollbackError');
+        setError(message);
+        throw new Error(message, { cause: caught });
       } finally {
         setBusy(false);
       }
     },
-    [busy, migration],
+    [busy, migration, t],
   );
 
   return {
