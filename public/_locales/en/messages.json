@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "Request Rules"
+  },
+  "appDesc": {
+    "message": "Create, test, and control browser request rules locally."
+  },
+  "actionTitle": {
+    "message": "Open Request Rules"
+  }
+}

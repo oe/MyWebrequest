@@ -1,0 +1,404 @@
+import { useMemo, useState } from 'react';
+import {
+  ArrowLeftIcon,
+  CheckCircle2Icon,
+  CircleAlertIcon,
+  EllipsisIcon,
+  KeyRoundIcon,
+  PlayIcon,
+  Trash2Icon,
+} from 'lucide-react';
+import { toast } from 'sonner';
+
+import { permissionOriginsFromMatch } from '@/src/application/rule-service';
+import type { Rule, RuleAction, RuleStatus } from '@/src/domain/rules/model';
+import { matchRule, type MatchResult } from '@/src/domain/rules/test-match';
+import { validateRule } from '@/src/domain/rules/validate';
+import { Alert, AlertDescription, AlertTitle } from '@/src/ui/components/alert';
+import { Button } from '@/src/ui/components/button';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/src/ui/components/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/src/ui/components/dropdown-menu';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/src/ui/components/field';
+import { Input } from '@/src/ui/components/input';
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/src/ui/components/input-group';
+import { ScrollArea } from '@/src/ui/components/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/src/ui/components/select';
+import { Separator } from '@/src/ui/components/separator';
+import { Switch } from '@/src/ui/components/switch';
+import { StatusBadge } from './status-badge';
+
+type RuleEditorProps = {
+  hasPermission: boolean;
+  rule: Rule;
+  status: RuleStatus;
+  onBack: () => void;
+  onDelete: (id: string) => Promise<void>;
+  onSave: (rule: Rule) => Promise<{ permissionGranted: boolean }>;
+};
+
+function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleAction {
+  if (kind === current.kind) return current;
+  switch (kind) {
+    case 'block':
+      return { kind: 'block' };
+    case 'redirect':
+      return { kind: 'redirect', target: 'https://example.com/$1' };
+    case 'upgrade-scheme':
+      return { kind: 'upgrade-scheme' };
+    case 'modify-request-headers':
+      return { kind: 'modify-request-headers', operations: [{ header: 'Referer', operation: 'remove' }] };
+  }
+}
+
+export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSave }: RuleEditorProps) {
+  const initialTestUrl =
+    rule.id === 'mirror-api-local'
+      ? 'https://api.example.com/v1/users'
+      : rule.condition.url.value.replace('*', 'sample');
+  const [draft, setDraft] = useState(rule);
+  const [advanced, setAdvanced] = useState(false);
+  const [testUrl, setTestUrl] = useState(initialTestUrl);
+  const [testResult, setTestResult] = useState<MatchResult | null>(() => matchRule(rule, initialTestUrl));
+  const [deleteOpen, setDeleteOpen] = useState(false);
+
+  const validation = useMemo(() => validateRule(draft), [draft]);
+  const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
+  const matchError = validation.errors.find((issue) => issue.field === 'match');
+  const destinationError = validation.errors.find((issue) => issue.field === 'destination');
+
+  const updateMatch = (value: string) => {
+    setDraft((current) => ({
+      ...current,
+      condition: { ...current.condition, url: { ...current.condition.url, value } },
+      permissionOrigins: permissionOriginsFromMatch(value),
+    }));
+    setTestResult(null);
+  };
+
+  const handleSave = async () => {
+    if (!validation.valid) return;
+    const result = await onSave(draft);
+    if (draft.enabled && !result.permissionGranted) {
+      toast.warning('Rule saved, but host permission was not granted.');
+    } else {
+      toast.success('Rule saved and applied.');
+    }
+  };
+
+  return (
+    <section aria-label={`Edit ${rule.name}`} className="flex min-h-0 flex-col bg-background">
+      <ScrollArea className="min-h-0 flex-1">
+        <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6 lg:p-8">
+          <div className="flex items-start gap-3">
+            <Button
+              className="min-[800px]:hidden"
+              size="icon"
+              variant="ghost"
+              aria-label="Back to rules"
+              onClick={onBack}
+            >
+              <ArrowLeftIcon />
+            </Button>
+            <div className="flex min-w-0 flex-1 flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <h1 className="truncate text-2xl font-semibold tracking-tight lg:text-3xl">{draft.name}</h1>
+                <StatusBadge status={status} />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Configure what the browser should match and how the request should change.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Field orientation="horizontal" className="w-auto">
+                <FieldLabel htmlFor="rule-enabled">Enabled</FieldLabel>
+                <Switch
+                  id="rule-enabled"
+                  checked={draft.enabled}
+                  disabled={readOnly}
+                  onCheckedChange={(checked) => setDraft((current) => ({ ...current, enabled: checked }))}
+                />
+              </Field>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button size="icon" variant="ghost" aria-label="Rule actions">
+                    <EllipsisIcon />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-44">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                      <Trash2Icon />
+                      Delete rule
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+
+          {draft.migrationState === 'review-required' ? (
+            <Alert variant="warning">
+              <CircleAlertIcon />
+              <AlertTitle>Review this migrated rule</AlertTitle>
+              <AlertDescription>
+                Its behavior may differ from the legacy extension. Confirm the match and destination before
+                enabling it.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {readOnly ? (
+            <Alert variant="destructive">
+              <CircleAlertIcon />
+              <AlertTitle>This legacy rule cannot run in Manifest V3</AlertTitle>
+              <AlertDescription>
+                The original data remains exportable. Delete it when you no longer need the migration record.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="rule-name">Rule name</FieldLabel>
+              <Input
+                id="rule-name"
+                value={draft.name}
+                disabled={readOnly}
+                onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
+              />
+            </Field>
+            <Field data-invalid={Boolean(matchError)}>
+              <FieldLabel htmlFor="rule-match">Match URL</FieldLabel>
+              <Input
+                id="rule-match"
+                className="font-mono"
+                value={draft.condition.url.value}
+                disabled={readOnly}
+                aria-invalid={Boolean(matchError)}
+                onChange={(event) => updateMatch(event.target.value)}
+              />
+              <FieldDescription>
+                Use a wildcard (*) to capture the part reused as $1 in a redirect.
+              </FieldDescription>
+              {matchError ? <FieldError>{matchError.message}</FieldError> : null}
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="rule-action">Action</FieldLabel>
+              <Select
+                value={draft.action.kind}
+                disabled={readOnly}
+                onValueChange={(value) =>
+                  setDraft((current) => ({
+                    ...current,
+                    action: actionFromKind(value as RuleAction['kind'], current.action),
+                  }))
+                }
+              >
+                <SelectTrigger id="rule-action" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="block">Block request</SelectItem>
+                    <SelectItem value="redirect">Redirect</SelectItem>
+                    <SelectItem value="modify-request-headers">Modify request header</SelectItem>
+                    <SelectItem value="upgrade-scheme">Upgrade to HTTPS</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <FieldDescription>The action is applied only when every condition matches.</FieldDescription>
+            </Field>
+            {draft.action.kind === 'redirect' ? (
+              <Field data-invalid={Boolean(destinationError)}>
+                <FieldLabel htmlFor="rule-destination">Destination</FieldLabel>
+                <Input
+                  id="rule-destination"
+                  className="font-mono"
+                  value={draft.action.target}
+                  disabled={readOnly}
+                  aria-invalid={Boolean(destinationError)}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      action: { kind: 'redirect', target: event.target.value },
+                    }))
+                  }
+                />
+                <FieldDescription>
+                  Capture groups from the match can be inserted with $1, $2, and so on.
+                </FieldDescription>
+                {destinationError ? <FieldError>{destinationError.message}</FieldError> : null}
+              </Field>
+            ) : null}
+            {draft.action.kind === 'modify-request-headers' ? (
+              <Field>
+                <FieldLabel htmlFor="rule-header">Request header</FieldLabel>
+                <Input
+                  id="rule-header"
+                  value={draft.action.operations[0]?.header ?? ''}
+                  disabled={readOnly}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      action: {
+                        kind: 'modify-request-headers',
+                        operations: [{ header: event.target.value, operation: 'remove' }],
+                      },
+                    }))
+                  }
+                />
+                <FieldDescription>This V1 editor removes the selected request header.</FieldDescription>
+              </Field>
+            ) : null}
+          </FieldGroup>
+
+          <Alert variant={hasPermission ? 'success' : 'warning'}>
+            {hasPermission ? <CheckCircle2Icon /> : <KeyRoundIcon />}
+            <AlertTitle>{hasPermission ? 'Host access granted' : 'Host access required'}</AlertTitle>
+            <AlertDescription>
+              {draft.permissionOrigins.length > 0
+                ? draft.permissionOrigins.join(', ')
+                : 'Use a concrete HTTP or HTTPS host so the extension can request narrow access.'}
+            </AlertDescription>
+          </Alert>
+
+          <Separator />
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-base font-medium">Test rule</h2>
+              <p className="text-sm text-muted-foreground">
+                Preview the match and result without sending a network request.
+              </p>
+            </div>
+            <Field>
+              <FieldLabel htmlFor="test-url">Test URL</FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  id="test-url"
+                  className="font-mono"
+                  value={testUrl}
+                  onChange={(event) => {
+                    setTestUrl(event.target.value);
+                    setTestResult(null);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') setTestResult(matchRule(draft, testUrl));
+                  }}
+                />
+                <InputGroupAddon align="inline-end">
+                  <InputGroupButton
+                    aria-label="Test rule"
+                    onClick={() => setTestResult(matchRule(draft, testUrl))}
+                  >
+                    <PlayIcon data-icon="inline-start" />
+                    Test
+                  </InputGroupButton>
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+            {testResult ? (
+              <Alert variant={testResult.matched ? 'success' : 'default'}>
+                {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
+                <AlertTitle>{testResult.matched ? 'Rule matches' : 'No match'}</AlertTitle>
+                <AlertDescription className="font-mono break-all">
+                  {testResult.matched ? testResult.result : testResult.reason}
+                </AlertDescription>
+              </Alert>
+            ) : null}
+          </div>
+
+          {advanced ? (
+            <FieldGroup>
+              <Field>
+                <FieldLabel htmlFor="rule-priority">Priority</FieldLabel>
+                <Input
+                  id="rule-priority"
+                  type="number"
+                  min={1}
+                  max={1_000_000}
+                  value={draft.priority}
+                  disabled={readOnly}
+                  onChange={(event) =>
+                    setDraft((current) => ({ ...current, priority: Number(event.target.value) }))
+                  }
+                />
+                <FieldDescription>Higher priority rules are evaluated first.</FieldDescription>
+              </Field>
+            </FieldGroup>
+          ) : null}
+        </div>
+      </ScrollArea>
+
+      <footer className="flex items-center justify-between gap-3 border-t bg-background p-4 lg:px-8">
+        <Button variant="destructive" disabled={readOnly} onClick={() => setDeleteOpen(true)}>
+          <Trash2Icon data-icon="inline-start" />
+          Delete rule
+        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setAdvanced((value) => !value)}>
+            {advanced ? 'Hide advanced' : 'Advanced settings'}
+          </Button>
+          <Button variant="outline" onClick={() => setDraft(rule)}>
+            Cancel
+          </Button>
+          <Button disabled={readOnly || !validation.valid} onClick={() => void handleSave()}>
+            Save changes
+          </Button>
+        </div>
+      </footer>
+
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete “{rule.name}”?</DialogTitle>
+            <DialogDescription>
+              This removes the saved rule and its active browser rule. This action cannot be undone in this
+              preview.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                void onDelete(rule.id);
+                setDeleteOpen(false);
+                toast.success('Rule deleted.');
+              }}
+            >
+              Delete rule
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}

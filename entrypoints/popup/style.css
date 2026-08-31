@@ -1,0 +1,6 @@
+@import "../../src/ui/styles.css";
+
+body {
+  margin: 0;
+  min-width: 380px;
+}

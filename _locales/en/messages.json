@@ -1,18 +1,18 @@
 {
-  "appName":  {
+  "appName": {
     "message": "My Webrequest"
   },
   "iconTitle": {
-  	"message": "Get current page's QRCode"
+    "message": "Get current page's QRCode"
   },
-    "ok_btn": {
+  "ok_btn": {
     "message": "OK"
   },
   "cancel_btn": {
     "message": "Cancel"
   },
   "appDesc": {
-  	"message": "Control your browser's web request."
+    "message": "Control your browser's web request."
   },
   "bg_logison": {
     "message": "Log function is enabled"
@@ -21,28 +21,28 @@
     "message": "If U no long need inspecting webrequest, just disable it."
   },
   "pop_prompt": {
-  	"message": "Current page url's QRCode"
+    "message": "Current page url's QRCode"
   },
   "pop_action_tip": {
-  	"message": "(double click QRCode to edit)"
+    "message": "(double click QRCode to edit)"
   },
   "pop_get_new": {
-  	"message": "You've got a new QRCode"
+    "message": "You've got a new QRCode"
   },
   "pop_edit_promp": {
-  	"message": "Edit QRCode content"
+    "message": "Edit QRCode content"
   },
   "pop_edit_tip": {
-  	"message": "(Don't type too much)"
+    "message": "(Don't type too much)"
   },
   "qr_make_btn": {
-  	"message": "GO!(Ctrl+Enter)"
+    "message": "GO!(Ctrl+Enter)"
   },
   "qr_make_mac_btn": {
     "message": "GO!(⌘+Enter)"
   },
   "pop_more_link": {
-  	"message": "more..."
+    "message": "more..."
   },
   "pop_text_toolong": {
     "message": "Too much words"

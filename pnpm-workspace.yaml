@@ -1,0 +1,11 @@
+minimumReleaseAgeExclude:
+  - shadcn@4.19.1
+auditConfig:
+  ignoreGhsas:
+    # The only published image-size release is still marked vulnerable. The
+    # transitive build-time dependency is patched below to reject zero/small
+    # ICNS, JXL, and HEIF entries that could otherwise stall the parser.
+    - GHSA-w3rx-r6r6-pgpr
+    - GHSA-5p2g-fcmc-qvqq
+patchedDependencies:
+  image-size@2.0.2: patches/image-size@2.0.2.patch

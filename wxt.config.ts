@@ -1,0 +1,23 @@
+import tailwindcss from '@tailwindcss/vite';
+import { defineConfig } from 'wxt';
+
+export default defineConfig({
+  modules: ['@wxt-dev/module-react'],
+  vite: () => ({
+    plugins: [tailwindcss()],
+  }),
+  manifest: {
+    name: '__MSG_appName__',
+    description: '__MSG_appDesc__',
+    default_locale: 'en',
+    permissions: ['activeTab', 'storage', 'declarativeNetRequestWithHostAccess'],
+    optional_host_permissions: ['http://*/*', 'https://*/*'],
+    action: {
+      default_title: '__MSG_actionTitle__',
+    },
+    options_ui: {
+      page: 'options.html',
+      open_in_tab: true,
+    },
+  },
+});

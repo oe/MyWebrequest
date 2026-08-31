@@ -1,0 +1,11 @@
+{
+  "appName": {
+    "message": "请求规则"
+  },
+  "appDesc": {
+    "message": "在本地创建、测试和管理浏览器请求规则。"
+  },
+  "actionTitle": {
+    "message": "打开请求规则"
+  }
+}
