@@ -1,13 +1,16 @@
 import { useMemo, useState } from 'react';
-import { PlusIcon, SearchIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
 import { Toaster } from '@/ui/components/sonner';
 import { TooltipProvider } from '@/ui/components/tooltip';
+import { useMigrationManager } from '@/ui/hooks/use-migration-manager';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
-import { AppSidebar } from '@/ui/rules/app-sidebar';
+import { MigrationPanel } from '@/ui/migration/migration-panel';
+import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
@@ -16,6 +19,8 @@ import { errorMessage } from '@/ui/lib/error-message';
 
 export function OptionsApp() {
   const manager = useRuleManager();
+  const migrationManager = useMigrationManager();
+  const [view, setView] = useState<OptionsView>('rules');
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
   const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
@@ -24,6 +29,10 @@ export function OptionsApp() {
     [manager.rules, manager.selectedId],
   );
   const hasRules = manager.rules.length > 0;
+  const migrationCount =
+    migrationManager.migration?.status === 'pending'
+      ? migrationManager.migration.bundle.report.items.length
+      : 0;
 
   const handleCreate = async () => {
     if (creating) return;
@@ -83,30 +92,65 @@ export function OptionsApp() {
             </span>
           </div>
           <div className="border-r px-3 max-[799px]:hidden">
-            <InputGroup>
-              <InputGroupAddon>
-                <SearchIcon />
-              </InputGroupAddon>
-              <InputGroupInput
-                aria-label="Search rules"
-                placeholder="Search rules"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              <InputGroupAddon align="inline-end">⌘K</InputGroupAddon>
-            </InputGroup>
+            {view === 'rules' ? (
+              <InputGroup>
+                <InputGroupAddon>
+                  <SearchIcon />
+                </InputGroupAddon>
+                <InputGroupInput
+                  aria-label="Search rules"
+                  placeholder="Search rules"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                />
+                <InputGroupAddon align="inline-end">⌘K</InputGroupAddon>
+              </InputGroup>
+            ) : (
+              <p className="px-2 text-sm font-medium">Review preserved legacy data</p>
+            )}
           </div>
-          <div className="flex justify-end px-4 max-[799px]:px-3">
-            <Button disabled={creating} onClick={() => void handleCreate()}>
-              <PlusIcon data-icon="inline-start" />
-              {creating ? 'Creating…' : 'New rule'}
+          <div className="flex justify-end gap-2 px-4 max-[799px]:px-3">
+            <Button
+              className="min-[800px]:hidden"
+              variant="outline"
+              aria-label={view === 'rules' ? 'Open legacy migration' : 'Open rules'}
+              onClick={() => setView(view === 'rules' ? 'migration' : 'rules')}
+            >
+              {view === 'rules' ? <ArchiveRestoreIcon /> : <ListFilterIcon />}
+              <span className="max-[479px]:sr-only">{view === 'rules' ? 'Migration' : 'Rules'}</span>
+              {view === 'rules' && migrationCount > 0 ? (
+                <Badge variant="warning">{migrationCount}</Badge>
+              ) : null}
             </Button>
+            {view === 'rules' ? (
+              <Button disabled={creating} onClick={() => void handleCreate()}>
+                <PlusIcon data-icon="inline-start" />
+                {creating ? 'Creating…' : 'New rule'}
+              </Button>
+            ) : null}
           </div>
         </header>
 
         <div className="grid min-h-0 grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-1">
-          <AppSidebar />
-          {hasRules ? (
+          <AppSidebar view={view} migrationCount={migrationCount} onViewChange={setView} />
+          {view === 'migration' ? (
+            <MigrationPanel
+              key={`${migrationManager.migration?.bundle.report.sourceFingerprint ?? 'none'}:${migrationManager.migration?.status ?? 'none'}`}
+              migration={migrationManager.migration}
+              importPreview={migrationManager.importPreview}
+              detection={migrationManager.detection}
+              detectedFingerprint={migrationManager.detectedFingerprint}
+              loading={migrationManager.loading}
+              busy={migrationManager.busy}
+              error={migrationManager.error}
+              onPreviewImport={migrationManager.previewLegacyImport}
+              onConfirmImport={migrationManager.confirmImportPreview}
+              onCancelImport={migrationManager.cancelImportPreview}
+              onApply={(selectedIds) => migrationManager.applySelected(manager.state!, selectedIds)}
+              onRollback={() => migrationManager.rollback(manager.state!)}
+              onStateCommitted={manager.adoptState}
+            />
+          ) : hasRules ? (
             <>
               <div className={cn(selectedRule && 'max-[799px]:hidden')}>
                 <RuleList

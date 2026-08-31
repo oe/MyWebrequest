@@ -69,6 +69,32 @@ describe('migration application', () => {
     expect(result.state.order).toEqual([selectedId]);
   });
 
+  it('unlocks a review candidate only after the user explicitly selects it', async () => {
+    const migration = await pendingMigration();
+    const reviewItem = migration.bundle.report.items.find(
+      (item) => item.outcome === 'review-required' && item.candidateRule,
+    );
+    expect(reviewItem).toBeDefined();
+    if (!reviewItem) return;
+
+    const result = await applyMigration(
+      createEmptyState(),
+      migration,
+      [reviewItem.id],
+      { reconcile: vi.fn(async () => undefined), commit: vi.fn(async () => undefined) },
+      appliedAt,
+    );
+
+    expect(result.state.rules[reviewItem.id]).toMatchObject({
+      enabled: false,
+      migrationState: 'none',
+    });
+    expect(result.migration.bundle.report.items.find((item) => item.id === reviewItem.id)).toMatchObject({
+      outcome: 'review-required',
+      candidateRule: { migrationState: 'review-required' },
+    });
+  });
+
   it('is idempotent after the same migration has been applied', async () => {
     const migration = await pendingMigration();
     const ports = { reconcile: vi.fn(async () => undefined), commit: vi.fn(async () => undefined) };

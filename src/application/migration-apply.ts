@@ -55,7 +55,7 @@ function mergeSelectedRules(
     if (!['automatic', 'review-required'].includes(item.outcome)) {
       throw new Error(`Unsafe migration item cannot be applied: ${item.id}`);
     }
-    return [{ ...item.candidateRule, enabled: false }];
+    return [{ ...item.candidateRule, enabled: false, migrationState: 'none' as const }];
   });
 
   const rules = { ...state.rules };

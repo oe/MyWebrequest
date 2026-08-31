@@ -45,6 +45,17 @@ export function useRuleManager() {
     }
   }, []);
 
+  const adoptState = useCallback(
+    async (nextState: StoredState) => {
+      setState(nextState);
+      setSelectedId((currentId) =>
+        currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
+      );
+      await refreshRuntimeState(nextState);
+    },
+    [refreshRuntimeState],
+  );
+
   useEffect(() => {
     let cancelled = false;
     void loadState().then(async (loaded) => {
@@ -62,13 +73,9 @@ export function useRuleManager() {
   useEffect(
     () =>
       subscribeToState((nextState) => {
-        setState(nextState);
-        setSelectedId((currentId) =>
-          currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
-        );
-        void refreshRuntimeState(nextState);
+        void adoptState(nextState);
       }),
-    [refreshRuntimeState],
+    [adoptState],
   );
 
   useEffect(() => {
@@ -82,10 +89,9 @@ export function useRuleManager() {
     async (nextState: StoredState) => {
       if (!state) return;
       await commitRuleState(state, nextState, { reconcile: reconcileDynamicRules, save: saveState });
-      setState(nextState);
-      await refreshRuntimeState(nextState);
+      await adoptState(nextState);
     },
-    [refreshRuntimeState, state],
+    [adoptState, state],
   );
 
   const saveRule = useCallback(
@@ -162,6 +168,7 @@ export function useRuleManager() {
   );
 
   return {
+    adoptState,
     addRule,
     deleteRule,
     loading,
