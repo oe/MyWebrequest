@@ -23,6 +23,17 @@ CI runs the same command on Node.js 24 and uploads the four archives plus `SHA25
 workflow artifact. Use that artifact for installed-browser testing and store submissions so the tested
 package and submitted package are identical.
 
+## Pre-certification evidence
+
+These checks reduce risk but do not satisfy any installed-browser matrix row:
+
+- 2026-09-01: the production options UI switched among all six release languages, retained the selected
+  language after reload, supported arrow-key rule navigation, and produced no console warning or error in
+  the local browser-rendered smoke test.
+- 2026-09-01: Firefox 154.0.1 accepted `dist/firefox-mv3` as the temporary add-on
+  `mywebrequest@evecalm.com` in a clean headless profile. This proves loadability only; DNR actions,
+  permissions, surfaces, and background lifecycle still require the matrix below.
+
 ## 2. Installed-browser matrix
 
 Run each scenario on the current stable browser and one supported older release.
