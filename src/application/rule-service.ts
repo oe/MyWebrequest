@@ -1,25 +1,8 @@
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { stableDnrId } from '@/domain/rules/model';
+import { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
-export function permissionOriginsFromMatch(value: string): string[] {
-  if (value.startsWith('||')) {
-    const host = value.slice(2).replace(/\^.*$/, '').replace(/^\*\./, '');
-    return host ? [`*://*.${host}/*`] : [];
-  }
-
-  const normalized = value
-    .replace(/^\^/, '')
-    .replace(/\\\//g, '/')
-    .replace(/\\\./g, '.')
-    .replace(/^https\?:/, 'https:');
-
-  try {
-    const url = new URL(normalized.replace(/[(*].*$/, ''));
-    return [`${url.protocol}//${url.hostname}/*`];
-  } catch {
-    return [];
-  }
-}
+export { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
 export function createRule(origin?: string): Rule {
   const now = new Date().toISOString();

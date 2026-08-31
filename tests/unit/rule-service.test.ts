@@ -8,6 +8,11 @@ describe('rule service', () => {
     expect(permissionOriginsFromMatch('https://api.example.com/v1/*')).toEqual(['https://api.example.com/*']);
   });
 
+  it('preserves legacy match-pattern schemes and wildcard subdomains', () => {
+    expect(permissionOriginsFromMatch('*://*.example.com/*')).toEqual(['*://*.example.com/*']);
+    expect(permissionOriginsFromMatch('http://example.com/*')).toEqual(['http://example.com/*']);
+  });
+
   it('creates a disabled site-scoped rule', () => {
     const rule = createRule('https://docs.example.com');
     expect(rule.enabled).toBe(false);

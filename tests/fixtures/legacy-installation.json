@@ -1,0 +1,53 @@
+{
+  "block": ["*://ads.example.com/*"],
+  "hsts": ["http://insecure.example.com/*", "*://mixed.example.com/*"],
+  "hotlink": ["*://images.example.com/*"],
+  "log": ["*://api.example.com/*"],
+  "custom": {
+    "https://api.example.com/v1/*": {
+      "url": "https://api.example.com/v1/*",
+      "reg": "^https:\\/\\/api\\.example\\.com\\/v1\\/([^/?]+)\\/([^?]*)",
+      "matchUrl": "https://api.example.com/v1/{version}/{*path}",
+      "redirectUrl": "https://local.example/{version}/{path}",
+      "hasQs": false,
+      "params": ["version", "path"],
+      "qsParams": {}
+    },
+    "https://search.example.com/*": {
+      "url": "https://search.example.com/*",
+      "reg": "^https:\\/\\/search\\.example\\.com\\/(?:\\?(.*))?",
+      "matchUrl": "https://search.example.com/?q={term}",
+      "redirectUrl": "https://destination.example/search?q={term}",
+      "hasQs": true,
+      "params": [],
+      "qsParams": { "q": "term" }
+    },
+    "https://docs.example.com/*": {
+      "url": "https://docs.example.com/*",
+      "reg": "^https:\\/\\/docs\\.example\\.com\\/([^/?]+)",
+      "matchUrl": "https://docs.example.com/{section}",
+      "redirectUrl": "https://archive.example/{u}",
+      "hasQs": false,
+      "params": ["section"],
+      "qsParams": {}
+    }
+  },
+  "gsearch": ["*://www.google.com/url*"],
+  "gstatic": ["http://ajax.googleapis.com/*"],
+  "onoff": {
+    "block": true,
+    "hsts": true,
+    "hotlink": false,
+    "log": true,
+    "custom": true,
+    "gsearch": true,
+    "gstatic": false
+  },
+  "config": {
+    "iconStyle": "grey",
+    "demo-custom-rule-showed": true
+  },
+  "future-key": {
+    "html": "<img src=x onerror=alert(1)>"
+  }
+}
