@@ -8,6 +8,7 @@ import { Toaster } from '@/ui/components/sonner';
 import { TooltipProvider } from '@/ui/components/tooltip';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 import { AppSidebar } from '@/ui/rules/app-sidebar';
+import { EmptyRules } from '@/ui/rules/empty-rules';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
 import { cn } from '@/ui/lib/utils';
@@ -19,6 +20,7 @@ export function OptionsApp() {
     () => manager.rules.find((rule) => rule.id === manager.selectedId) ?? null,
     [manager.rules, manager.selectedId],
   );
+  const hasRules = manager.rules.length > 0;
 
   if (manager.loading || !manager.state) {
     return (
@@ -70,40 +72,48 @@ export function OptionsApp() {
 
         <div className="grid min-h-0 grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-1">
           <AppSidebar />
-          <div className={cn(selectedRule && 'max-[799px]:hidden')}>
-            <RuleList
-              query={query}
-              rules={manager.rules}
-              selectedId={manager.selectedId}
-              statuses={manager.statuses}
-              onQueryChange={setQuery}
-              onSelect={manager.setSelectedId}
-              onToggle={(id, enabled) => {
-                void manager.toggleRule(id, enabled).then((granted) => {
-                  if (enabled && !granted) toast.warning('Rule enabled, but it still needs host permission.');
-                });
-              }}
-            />
-          </div>
-          {selectedRule ? (
-            <RuleEditor
-              key={`${selectedRule.id}:${selectedRule.updatedAt}`}
-              rule={selectedRule}
-              status={manager.statuses[selectedRule.id] ?? 'disabled'}
-              hasPermission={manager.permissions[selectedRule.id] === true}
-              onBack={() => manager.setSelectedId(null)}
-              onDelete={manager.deleteRule}
-              onSave={manager.saveRule}
-            />
-          ) : (
-            <section className="hidden place-items-center p-8 text-center min-[800px]:grid">
-              <div className="flex max-w-sm flex-col gap-2">
-                <h1 className="text-xl font-semibold">Select a rule</h1>
-                <p className="text-sm text-muted-foreground">
-                  Choose a rule from the list or create a new one to start editing.
-                </p>
+          {hasRules ? (
+            <>
+              <div className={cn(selectedRule && 'max-[799px]:hidden')}>
+                <RuleList
+                  query={query}
+                  rules={manager.rules}
+                  selectedId={manager.selectedId}
+                  statuses={manager.statuses}
+                  onQueryChange={setQuery}
+                  onSelect={manager.setSelectedId}
+                  onToggle={(id, enabled) => {
+                    void manager.toggleRule(id, enabled).then((granted) => {
+                      if (enabled && !granted) {
+                        toast.warning('Rule enabled, but it still needs host permission.');
+                      }
+                    });
+                  }}
+                />
               </div>
-            </section>
+              {selectedRule ? (
+                <RuleEditor
+                  key={`${selectedRule.id}:${selectedRule.updatedAt}`}
+                  rule={selectedRule}
+                  status={manager.statuses[selectedRule.id] ?? 'disabled'}
+                  hasPermission={manager.permissions[selectedRule.id] === true}
+                  onBack={() => manager.setSelectedId(null)}
+                  onDelete={manager.deleteRule}
+                  onSave={manager.saveRule}
+                />
+              ) : (
+                <section className="hidden place-items-center p-8 text-center min-[800px]:grid">
+                  <div className="flex max-w-sm flex-col gap-2">
+                    <h1 className="text-xl font-semibold">Select a rule</h1>
+                    <p className="text-sm text-muted-foreground">
+                      Choose a rule from the list or create a new one to start editing.
+                    </p>
+                  </div>
+                </section>
+              )}
+            </>
+          ) : (
+            <EmptyRules onCreate={() => void manager.addRule()} />
           )}
         </div>
       </main>
