@@ -2,7 +2,6 @@
 .DS_Store
 node_modules/
 app.zip
-.output/
 .wxt/
 coverage/
 dist/

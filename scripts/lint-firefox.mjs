@@ -9,7 +9,7 @@ const validatorNode = process.env.WEB_EXT_NODE || process.execPath;
 const args = [
   "lint",
   "--source-dir",
-  ".output/firefox-mv3",
+  "dist/firefox-mv3",
   "--output=json",
   "--boring",
 ];

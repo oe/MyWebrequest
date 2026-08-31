@@ -26,7 +26,7 @@ pnpm install
 pnpm dev
 ```
 
-Load `.output/chrome-mv3-dev` as an unpacked extension when developing against Chrome.
+Load `dist/chrome-mv3-dev` as an unpacked extension when developing against Chrome.
 
 Run the complete local quality gate with:
 
@@ -43,4 +43,4 @@ pnpm build:firefox
 pnpm build:browsers
 ```
 
-Artifacts are written to `.output/chrome-mv3`, `.output/edge-mv3`, and `.output/firefox-mv3`.
+Artifacts are written to `dist/chrome-mv3`, `dist/edge-mv3`, and `dist/firefox-mv3`.

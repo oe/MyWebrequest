@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
   globalIgnores([
-    '.output',
+    'dist',
     '.wxt',
     'coverage',
     'node_modules',

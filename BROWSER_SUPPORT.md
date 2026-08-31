@@ -5,12 +5,12 @@ Last updated: 2026-08-31
 
 ## Current matrix
 
-| Target         | Manifest | Build output          | Current evidence                                       | Release status |
-| -------------- | -------- | --------------------- | ------------------------------------------------------ | -------------- |
-| Chrome         | MV3      | `.output/chrome-mv3`  | Build, shared unit tests, browser-rendered UI QA       | Not certified  |
-| Microsoft Edge | MV3      | `.output/edge-mv3`    | Build parity with the Chromium target                  | Not certified  |
-| Firefox        | MV3      | `.output/firefox-mv3` | Build plus strict `web-ext` report allowlist           | Not certified  |
-| Safari         | TBD      | None                  | WXT feasibility only; no Xcode conversion or API spike | Deferred       |
+| Target         | Manifest | Build output       | Current evidence                                       | Release status |
+| -------------- | -------- | ------------------ | ------------------------------------------------------ | -------------- |
+| Chrome         | MV3      | `dist/chrome-mv3`  | Build, shared unit tests, browser-rendered UI QA       | Not certified  |
+| Microsoft Edge | MV3      | `dist/edge-mv3`    | Build parity with the Chromium target                  | Not certified  |
+| Firefox        | MV3      | `dist/firefox-mv3` | Build plus strict `web-ext` report allowlist           | Not certified  |
+| Safari         | TBD      | None               | WXT feasibility only; no Xcode conversion or API spike | Deferred       |
 
 `Not certified` means the artifact exists but has not yet passed installed-extension E2E on that browser.
 It must not be presented as store-ready.
