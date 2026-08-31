@@ -160,6 +160,17 @@ function matchResultText(result: MatchResult, t: Translate): string {
   return result.result;
 }
 
+function exampleUrlForRule(rule: Rule): string {
+  const { kind, value } = rule.condition.url;
+  if (kind === 'url-filter' && value.startsWith('||')) {
+    const host = value.slice(2).replace(/\^.*$/, '');
+    if (host) return `https://${host}/`;
+  }
+  if (kind === 'wildcard') return value.replaceAll('*', 'sample');
+  if (value.startsWith('http://') || value.startsWith('https://')) return value.replaceAll('*', 'sample');
+  return 'https://example.com/';
+}
+
 export function RuleEditor({
   diagnostics,
   hasPermission,
@@ -174,10 +185,7 @@ export function RuleEditor({
   ruleIndex,
 }: RuleEditorProps) {
   const { t } = useI18n();
-  const initialTestUrl =
-    rule.id === 'mirror-api-local'
-      ? 'https://api.example.com/v1/users'
-      : rule.condition.url.value.replace('*', 'sample');
+  const initialTestUrl = exampleUrlForRule(rule);
   const [draft, setDraft] = useState(rule);
   const [advanced, setAdvanced] = useState(false);
   const [testUrl, setTestUrl] = useState(initialTestUrl);
@@ -190,6 +198,7 @@ export function RuleEditor({
   const [deleting, setDeleting] = useState(false);
   const [copying, setCopying] = useState(false);
   const [regexRuntimeError, setRegexRuntimeError] = useState<string | null>(null);
+  const [permissionOpen, setPermissionOpen] = useState(false);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
   const draftFingerprint = useMemo(() => JSON.stringify(draft), [draft]);
@@ -230,7 +239,7 @@ export function RuleEditor({
     setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, testUrl) });
   };
 
-  const handleSave = async () => {
+  const performSave = async () => {
     if (!validation.valid || saving) return;
     setSaving(true);
     try {
@@ -253,6 +262,16 @@ export function RuleEditor({
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSave = () => {
+    const permissionScopeChanged =
+      JSON.stringify(draft.permissionOrigins) !== JSON.stringify(rule.permissionOrigins);
+    if (draft.enabled && (!hasPermission || permissionScopeChanged) && draft.permissionOrigins.length > 0) {
+      setPermissionOpen(true);
+      return;
+    }
+    void performSave();
   };
 
   const handleDelete = async () => {
@@ -802,7 +821,7 @@ export function RuleEditor({
           <Button
             className="max-[479px]:w-full"
             disabled={readOnly || !validation.valid || saving || deleting}
-            onClick={() => void handleSave()}
+            onClick={handleSave}
           >
             {saving ? t('saving') : t('saveChanges')}
           </Button>
@@ -821,6 +840,32 @@ export function RuleEditor({
             </DialogClose>
             <Button variant="destructive" disabled={deleting} onClick={() => void handleDelete()}>
               {deleting ? t('deleting') : t('deleteRule')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={permissionOpen} onOpenChange={(open) => !saving && setPermissionOpen(open)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t('permissionRequestTitle', { name: draft.name })}</DialogTitle>
+            <DialogDescription>{t('permissionRequestDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border bg-muted/35 p-3">
+            <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
+            <p className="font-mono text-sm break-all">{draft.permissionOrigins.join(', ')}</p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" disabled={saving} onClick={() => setPermissionOpen(false)}>
+              {t('cancel')}
+            </Button>
+            <Button
+              disabled={saving}
+              onClick={() => {
+                setPermissionOpen(false);
+                void performSave();
+              }}
+            >
+              {saving ? t('saving') : t('requestAccess')}
             </Button>
           </DialogFooter>
         </DialogContent>

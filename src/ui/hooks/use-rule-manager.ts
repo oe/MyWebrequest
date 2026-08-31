@@ -155,7 +155,7 @@ export function useRuleManager() {
         };
       }
       const permissionGranted =
-        !rule.enabled || permissions[rule.id] === true || (await requestRulePermission(rule));
+        !rule.enabled || (await hasRulePermission(rule)) || (await requestRulePermission(rule));
       await persist(nextState);
       return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
     },

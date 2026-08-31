@@ -158,6 +158,11 @@ export const en = {
   headerHelp: 'Remove or set up to 20 allowed request headers.',
   hostAccessGranted: 'Host access granted',
   hostAccessRequired: 'Host access required',
+  permissionRequestTitle: 'Allow “{name}” to access this site?',
+  permissionRequestDescription:
+    'The browser will ask for only the website access needed to apply this rule. Rules and request data remain on this device.',
+  permissionRequestScope: 'Requested website access',
+  requestAccess: 'Continue to browser prompt',
   concreteHostHelp: 'Use a concrete HTTP or HTTPS host so the extension can request narrow access.',
   testRule: 'Test rule',
   testRuleDescription: 'Preview the match and result without sending a network request.',

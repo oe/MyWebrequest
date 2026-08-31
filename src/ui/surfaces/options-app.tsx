@@ -2,6 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import type { Rule } from '@/domain/rules/model';
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import {
@@ -37,6 +38,7 @@ export function OptionsApp() {
   const [creating, setCreating] = useState(false);
   const [editorDirty, setEditorDirty] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
+  const [pendingPermissionRule, setPendingPermissionRule] = useState<Rule | null>(null);
   const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
   const pendingNavigation = useRef<(() => void) | null>(null);
   const selectedRule = useMemo(
@@ -90,7 +92,7 @@ export function OptionsApp() {
     }
   };
 
-  const handleToggle = async (id: string, enabled: boolean) => {
+  const performToggle = async (id: string, enabled: boolean) => {
     if (pendingRuleIds.has(id)) return;
     setPendingRuleIds((current) => new Set(current).add(id));
     try {
@@ -113,6 +115,15 @@ export function OptionsApp() {
         return next;
       });
     }
+  };
+
+  const handleToggle = (id: string, enabled: boolean) => {
+    const rule = manager.state?.rules[id];
+    if (enabled && rule && manager.permissions[id] !== true && rule.permissionOrigins.length > 0) {
+      setPendingPermissionRule(rule);
+      return;
+    }
+    void performToggle(id, enabled);
   };
 
   if (manager.loading || !manager.state) {
@@ -249,7 +260,7 @@ export function OptionsApp() {
                   quota={manager.quota}
                   onQueryChange={setQuery}
                   onSelect={(id) => requestNavigation(() => manager.setSelectedId(id))}
-                  onToggle={(id, enabled) => void handleToggle(id, enabled)}
+                  onToggle={handleToggle}
                 />
               </div>
               {selectedRule ? (
@@ -298,6 +309,41 @@ export function OptionsApp() {
             </Button>
             <Button variant="destructive" onClick={discardAndContinue}>
               {t('discardChanges')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <Dialog
+        open={Boolean(pendingPermissionRule)}
+        onOpenChange={(open) => {
+          if (!open) setPendingPermissionRule(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {t('permissionRequestTitle', { name: pendingPermissionRule?.name ?? '' })}
+            </DialogTitle>
+            <DialogDescription>{t('permissionRequestDescription')}</DialogDescription>
+          </DialogHeader>
+          <div className="rounded-lg border bg-muted/35 p-3">
+            <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
+            <p className="font-mono text-sm break-all">
+              {pendingPermissionRule?.permissionOrigins.join(', ')}
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPendingPermissionRule(null)}>
+              {t('cancel')}
+            </Button>
+            <Button
+              onClick={() => {
+                const rule = pendingPermissionRule;
+                setPendingPermissionRule(null);
+                if (rule) void performToggle(rule.id, true);
+              }}
+            >
+              {t('requestAccess')}
             </Button>
           </DialogFooter>
         </DialogContent>
