@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { sampleRules } from '@/domain/rules/fixtures';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import {
+  checkRuleRegexSupport,
   getInstalledDynamicRuleIds,
   reconcileDynamicRules,
   subscribeToPermissionChanges,
@@ -26,7 +27,11 @@ function eventMock() {
   };
 }
 
-function installBrowserMock(options: { installedIds: number[]; permitted: boolean }) {
+function installBrowserMock(options: {
+  installedIds: number[];
+  permitted: boolean;
+  regexSupported?: boolean;
+}) {
   const onAdded = eventMock();
   const onRemoved = eventMock();
   const updateDynamicRules = vi.fn(async () => undefined);
@@ -34,6 +39,10 @@ function installBrowserMock(options: { installedIds: number[]; permitted: boolea
   vi.stubGlobal('browser', {
     declarativeNetRequest: {
       getDynamicRules: vi.fn(async () => options.installedIds.map((id) => ({ id }))),
+      isRegexSupported: vi.fn(async () => ({
+        isSupported: options.regexSupported ?? true,
+        reason: options.regexSupported === false ? 'memoryLimitExceeded' : undefined,
+      })),
       updateDynamicRules,
     },
     permissions: {
@@ -117,5 +126,28 @@ describe('rule runtime reconciliation', () => {
   it('reports the exact installed dynamic rule IDs', async () => {
     installBrowserMock({ installedIds: [101, 202], permitted: true });
     await expect(getInstalledDynamicRuleIds()).resolves.toEqual(new Set([101, 202]));
+  });
+
+  it('uses the browser DNR engine to reject an unsupported wildcard expression', async () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    installBrowserMock({ installedIds: [], permitted: true, regexSupported: false });
+
+    await expect(checkRuleRegexSupport(rule)).resolves.toEqual({
+      isSupported: false,
+      reason: 'memoryLimitExceeded',
+    });
+  });
+
+  it('does not install rules whose regular expression is unsupported by the browser', async () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    const runtime = installBrowserMock({ installedIds: [], permitted: true, regexSupported: false });
+
+    await reconcileDynamicRules(stateWith(rule));
+
+    expect(runtime.updateDynamicRules).toHaveBeenCalledWith({ removeRuleIds: [], addRules: [] });
   });
 });

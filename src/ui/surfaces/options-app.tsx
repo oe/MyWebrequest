@@ -93,8 +93,14 @@ export function OptionsApp() {
     if (pendingRuleIds.has(id)) return;
     setPendingRuleIds((current) => new Set(current).add(id));
     try {
-      const granted = await manager.toggleRule(id, enabled);
-      if (enabled && !granted) {
+      const result = await manager.toggleRule(id, enabled);
+      if (enabled && !result.quotaAvailable) {
+        toast.error(t('quotaExceeded'));
+      } else if (enabled && !result.cycleFree) {
+        toast.error(t('redirectCycleBlocked'));
+      } else if (enabled && !result.regexSupported) {
+        toast.error(t('regexUnsupported', { reason: result.regexReason ?? t('unknownReason') }));
+      } else if (enabled && !result.permissionGranted) {
         toast.warning(t('enabledNeedsPermission'));
       }
     } catch (error) {
@@ -236,6 +242,7 @@ export function OptionsApp() {
                   selectedId={manager.selectedId}
                   statuses={manager.statuses}
                   pendingIds={pendingRuleIds}
+                  quota={manager.quota}
                   onQueryChange={setQuery}
                   onSelect={(id) => requestNavigation(() => manager.setSelectedId(id))}
                   onToggle={(id, enabled) => void handleToggle(id, enabled)}
@@ -247,6 +254,7 @@ export function OptionsApp() {
                   rule={selectedRule}
                   status={manager.statuses[selectedRule.id] ?? 'disabled'}
                   hasPermission={manager.permissions[selectedRule.id] === true}
+                  diagnostics={manager.diagnostics[selectedRule.id] ?? []}
                   ruleIndex={manager.state.order.indexOf(selectedRule.id)}
                   onBack={() => requestNavigation(() => manager.setSelectedId(null))}
                   onCopy={manager.copyRule}

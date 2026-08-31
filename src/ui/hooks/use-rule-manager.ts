@@ -9,6 +9,7 @@ import {
   upsertRule,
 } from '@/application/rule-service';
 import { commitRuleState } from '@/application/rule-transaction';
+import { analyzeRuleState, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
 import type { RuleImportMode } from '@/application/rule-backup';
@@ -19,6 +20,7 @@ import {
   type RuleImportRecovery,
 } from '@/infrastructure/rule-import-recovery';
 import {
+  checkRuleRegexSupport,
   getInstalledDynamicRuleIds,
   hasRulePermission,
   reconcileDynamicRules,
@@ -117,11 +119,45 @@ export function useRuleManager() {
   const saveRule = useCallback(
     async (rule: Rule) => {
       const current = stateRef.current;
-      if (!current) return { permissionGranted: false };
+      if (!current) {
+        return {
+          permissionGranted: false,
+          regexSupported: false,
+          quotaAvailable: false,
+          cycleFree: false,
+        };
+      }
+      const nextState = upsertRule(current, rule);
+      if (getRuleQuotaUsage(nextState).remaining < 0) {
+        return {
+          permissionGranted: permissions[rule.id] === true,
+          regexSupported: true,
+          quotaAvailable: false,
+          cycleFree: true,
+        };
+      }
+      if (analyzeRuleState(nextState)[rule.id]?.some((item) => item.code === 'redirect-cycle')) {
+        return {
+          permissionGranted: permissions[rule.id] === true,
+          regexSupported: true,
+          quotaAvailable: true,
+          cycleFree: false,
+        };
+      }
+      const regexSupport = await checkRuleRegexSupport(rule);
+      if (rule.enabled && !regexSupport.isSupported) {
+        return {
+          permissionGranted: permissions[rule.id] === true,
+          regexSupported: false,
+          regexReason: regexSupport.reason,
+          quotaAvailable: true,
+          cycleFree: true,
+        };
+      }
       const permissionGranted =
         !rule.enabled || permissions[rule.id] === true || (await requestRulePermission(rule));
-      await persist(upsertRule(current, rule));
-      return { permissionGranted };
+      await persist(nextState);
+      return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
     },
     [permissions, persist],
   );
@@ -129,14 +165,55 @@ export function useRuleManager() {
   const toggleRule = useCallback(
     async (id: string, enabled: boolean) => {
       const current = stateRef.current;
-      if (!current) return false;
+      if (!current) {
+        return {
+          permissionGranted: false,
+          regexSupported: false,
+          quotaAvailable: false,
+          cycleFree: false,
+        };
+      }
       const rule = current.rules[id];
-      if (!rule) return false;
+      if (!rule) {
+        return {
+          permissionGranted: false,
+          regexSupported: false,
+          quotaAvailable: false,
+          cycleFree: false,
+        };
+      }
       const nextRule = { ...rule, enabled };
+      const nextState = upsertRule(current, nextRule);
+      if (getRuleQuotaUsage(nextState).remaining < 0) {
+        return {
+          permissionGranted: permissions[id] === true,
+          regexSupported: true,
+          quotaAvailable: false,
+          cycleFree: true,
+        };
+      }
+      if (analyzeRuleState(nextState)[id]?.some((item) => item.code === 'redirect-cycle')) {
+        return {
+          permissionGranted: permissions[id] === true,
+          regexSupported: true,
+          quotaAvailable: true,
+          cycleFree: false,
+        };
+      }
+      const regexSupport = await checkRuleRegexSupport(nextRule);
+      if (enabled && !regexSupport.isSupported) {
+        return {
+          permissionGranted: permissions[id] === true,
+          regexSupported: false,
+          regexReason: regexSupport.reason,
+          quotaAvailable: true,
+          cycleFree: true,
+        };
+      }
       const permissionGranted =
         !enabled || permissions[id] === true || (await requestRulePermission(nextRule));
-      await persist(upsertRule(current, nextRule));
-      return permissionGranted;
+      await persist(nextState);
+      return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
     },
     [permissions, persist],
   );
@@ -238,14 +315,19 @@ export function useRuleManager() {
     [installedRuleIds, permissions, rules, runtimeError, state?.settings.globallyPaused],
   );
 
+  const diagnostics = useMemo(() => (state ? analyzeRuleState(state) : {}), [state]);
+  const quota = useMemo(() => (state ? getRuleQuotaUsage(state) : null), [state]);
+
   return {
     adoptState,
     addRule,
     copyRule,
     deleteRule,
+    diagnostics,
     loading,
     importRecovery,
     permissions,
+    quota,
     replaceStateFromImport,
     restoreImportRecovery,
     rules,

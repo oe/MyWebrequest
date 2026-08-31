@@ -6,13 +6,23 @@ import {
   CopyIcon,
   EllipsisIcon,
   KeyRoundIcon,
+  PlusIcon,
   PlayIcon,
   Trash2Icon,
+  XIcon,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { permissionOriginsFromMatch } from '@/application/rule-service';
-import type { Rule, RuleAction, RuleStatus } from '@/domain/rules/model';
+import {
+  RESOURCE_TYPES,
+  type HeaderOperation,
+  type ResourceType,
+  type Rule,
+  type RuleAction,
+  type RuleStatus,
+} from '@/domain/rules/model';
+import type { RuleDiagnostic } from '@/domain/rules/diagnostics';
 import { matchRule, type MatchResult } from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
@@ -47,12 +57,14 @@ import {
 } from '@/ui/components/select';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
+import { Textarea } from '@/ui/components/textarea';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { StatusBadge } from './status-badge';
 
 type RuleEditorProps = {
   hasPermission: boolean;
+  diagnostics: RuleDiagnostic[];
   rule: Rule;
   status: RuleStatus;
   onBack: () => void;
@@ -60,9 +72,51 @@ type RuleEditorProps = {
   onDelete: (id: string) => Promise<void>;
   onDirtyChange: (dirty: boolean) => void;
   onRestore: (rule: Rule, index: number) => Promise<void>;
-  onSave: (rule: Rule) => Promise<{ permissionGranted: boolean }>;
+  onSave: (rule: Rule) => Promise<{
+    permissionGranted: boolean;
+    regexSupported: boolean;
+    regexReason?: string | undefined;
+    quotaAvailable: boolean;
+    cycleFree: boolean;
+  }>;
   ruleIndex: number;
 };
+
+const REQUEST_METHODS = ['connect', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put'] as const;
+
+function resourceTypeLabel(type: ResourceType, t: Translate): string {
+  const keys = {
+    main_frame: 'resourceMainFrame',
+    sub_frame: 'resourceSubFrame',
+    stylesheet: 'resourceStylesheet',
+    script: 'resourceScript',
+    image: 'resourceImage',
+    font: 'resourceFont',
+    object: 'resourceObject',
+    xmlhttprequest: 'resourceXmlHttpRequest',
+    ping: 'resourcePing',
+    media: 'resourceMedia',
+    websocket: 'resourceWebSocket',
+    other: 'resourceOther',
+  } as const;
+  return t(keys[type]);
+}
+
+function toggleValue<T>(values: T[] | undefined, value: T): T[] {
+  const current = values ?? [];
+  return current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
+}
+
+function parseInitiatorDomains(value: string): string[] {
+  return [
+    ...new Set(
+      value
+        .split(/[\s,]+/)
+        .map((domain) => domain.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
 
 function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleAction {
   if (kind === current.kind) return current;
@@ -88,6 +142,7 @@ function validationMessage(issue: ValidationIssue, t: Translate): string {
     'redirect-self': 'validationRedirectSelf',
     'capture-match-required': 'validationCaptureMatch',
     'capture-index-invalid': 'validationCaptureIndex',
+    'initiator-domain-invalid': 'validationInitiatorDomain',
     'header-name-invalid': 'validationHeaderName',
     'header-forbidden': 'validationHeaderForbidden',
   } as const;
@@ -106,6 +161,7 @@ function matchResultText(result: MatchResult, t: Translate): string {
 }
 
 export function RuleEditor({
+  diagnostics,
   hasPermission,
   rule,
   status,
@@ -130,6 +186,7 @@ export function RuleEditor({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [copying, setCopying] = useState(false);
+  const [regexRuntimeError, setRegexRuntimeError] = useState<string | null>(null);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(rule), [draft, rule]);
@@ -137,6 +194,9 @@ export function RuleEditor({
   const matchError = validation.errors.find((issue) => issue.field === 'match');
   const destinationError = validation.errors.find((issue) => issue.field === 'destination');
   const headerError = validation.errors.find((issue) => issue.field === 'headers');
+  const initiatorError = validation.errors.find((issue) => issue.field === 'initiators');
+  const headerOperationCount =
+    draft.action.kind === 'modify-request-headers' ? draft.action.operations.length : 0;
 
   useEffect(() => {
     onDirtyChange(dirty);
@@ -153,6 +213,7 @@ export function RuleEditor({
   }, [dirty, onDirtyChange]);
 
   const updateMatch = (value: string) => {
+    setRegexRuntimeError(null);
     setDraft((current) => ({
       ...current,
       condition: { ...current.condition, url: { ...current.condition.url, value } },
@@ -166,7 +227,15 @@ export function RuleEditor({
     setSaving(true);
     try {
       const result = await onSave(draft);
-      if (draft.enabled && !result.permissionGranted) {
+      if (!result.quotaAvailable) {
+        toast.error(t('quotaExceeded'));
+      } else if (!result.cycleFree) {
+        toast.error(t('redirectCycleBlocked'));
+      } else if (!result.regexSupported) {
+        const message = t('regexUnsupported', { reason: result.regexReason ?? t('unknownReason') });
+        setRegexRuntimeError(message);
+        toast.error(message);
+      } else if (draft.enabled && !result.permissionGranted) {
         toast.warning(t('permissionDenied'));
       } else {
         toast.success(t(draft.enabled ? 'ruleSavedApplied' : 'ruleSaved'));
@@ -281,6 +350,20 @@ export function RuleEditor({
               <AlertDescription>{t('unsupportedRuleDescription')}</AlertDescription>
             </Alert>
           ) : null}
+          {diagnostics.some((item) => item.code === 'priority-conflict') ? (
+            <Alert variant="warning">
+              <CircleAlertIcon />
+              <AlertTitle>{t('priorityConflictTitle')}</AlertTitle>
+              <AlertDescription>{t('priorityConflictDescription')}</AlertDescription>
+            </Alert>
+          ) : null}
+          {diagnostics.some((item) => item.code === 'redirect-cycle') ? (
+            <Alert variant="destructive">
+              <CircleAlertIcon />
+              <AlertTitle>{t('redirectCycleTitle')}</AlertTitle>
+              <AlertDescription>{t('redirectCycleDescription')}</AlertDescription>
+            </Alert>
+          ) : null}
 
           <FieldGroup>
             <Field>
@@ -292,18 +375,88 @@ export function RuleEditor({
                 onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
               />
             </Field>
-            <Field data-invalid={Boolean(matchError)}>
+            <Field>
+              <FieldLabel htmlFor="rule-match-kind">{t('matchType')}</FieldLabel>
+              <Select
+                value={draft.condition.url.kind}
+                disabled={readOnly}
+                onValueChange={(kind) => {
+                  setRegexRuntimeError(null);
+                  setDraft((current) => ({
+                    ...current,
+                    condition: {
+                      ...current.condition,
+                      url: {
+                        kind: kind as Rule['condition']['url']['kind'],
+                        value: current.condition.url.value,
+                      },
+                    },
+                  }));
+                }}
+              >
+                <SelectTrigger id="rule-match-kind" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="url-filter">{t('urlFilter')}</SelectItem>
+                    <SelectItem value="wildcard">{t('wildcard')}</SelectItem>
+                    <SelectItem value="regex">{t('regularExpression')}</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field data-invalid={Boolean(matchError || regexRuntimeError)}>
               <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
               <Input
                 id="rule-match"
                 className="font-mono"
                 value={draft.condition.url.value}
                 disabled={readOnly}
-                aria-invalid={Boolean(matchError)}
+                aria-invalid={Boolean(matchError || regexRuntimeError)}
                 onChange={(event) => updateMatch(event.target.value)}
               />
-              <FieldDescription>{t('matchHelp')}</FieldDescription>
+              <FieldDescription>
+                {t(
+                  draft.condition.url.kind === 'url-filter'
+                    ? 'urlFilterHelp'
+                    : draft.condition.url.kind === 'wildcard'
+                      ? 'wildcardHelp'
+                      : 'regexHelp',
+                )}
+              </FieldDescription>
               {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
+              {regexRuntimeError ? <FieldError>{regexRuntimeError}</FieldError> : null}
+            </Field>
+            <Field>
+              <FieldLabel>{t('resourceTypes')}</FieldLabel>
+              <div className="flex flex-wrap gap-2" role="group" aria-label={t('resourceTypes')}>
+                {RESOURCE_TYPES.map((type) => {
+                  const selected = draft.condition.resourceTypes?.includes(type) ?? false;
+                  return (
+                    <Button
+                      key={type}
+                      type="button"
+                      size="sm"
+                      variant={selected ? 'secondary' : 'outline'}
+                      aria-pressed={selected}
+                      disabled={readOnly}
+                      onClick={() =>
+                        setDraft((current) => ({
+                          ...current,
+                          condition: {
+                            ...current.condition,
+                            resourceTypes: toggleValue(current.condition.resourceTypes, type),
+                          },
+                        }))
+                      }
+                    >
+                      {resourceTypeLabel(type, t)}
+                    </Button>
+                  );
+                })}
+              </div>
+              <FieldDescription>{t('resourceTypesHelp')}</FieldDescription>
             </Field>
             <Field>
               <FieldLabel htmlFor="rule-action">{t('action')}</FieldLabel>
@@ -353,22 +506,140 @@ export function RuleEditor({
             ) : null}
             {draft.action.kind === 'modify-request-headers' ? (
               <Field data-invalid={Boolean(headerError)}>
-                <FieldLabel htmlFor="rule-header">{t('requestHeader')}</FieldLabel>
-                <Input
-                  id="rule-header"
-                  value={draft.action.operations[0]?.header ?? ''}
-                  disabled={readOnly}
-                  aria-invalid={Boolean(headerError)}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      action: {
-                        kind: 'modify-request-headers',
-                        operations: [{ header: event.target.value, operation: 'remove' }],
-                      },
-                    }))
-                  }
-                />
+                <FieldLabel>{t('requestHeader')}</FieldLabel>
+                <div className="flex flex-col gap-3">
+                  {draft.action.operations.map((operation, index) => (
+                    <div
+                      key={index}
+                      className="grid grid-cols-[130px_minmax(0,1fr)_auto] gap-2 max-sm:grid-cols-[110px_minmax(0,1fr)_auto]"
+                    >
+                      <Select
+                        value={operation.operation}
+                        disabled={readOnly}
+                        onValueChange={(value) => {
+                          const next: HeaderOperation = {
+                            header: operation.header,
+                            operation: value as HeaderOperation['operation'],
+                            ...(value === 'set' ? { value: operation.value ?? '' } : {}),
+                          };
+                          setDraft((current) => ({
+                            ...current,
+                            action:
+                              current.action.kind === 'modify-request-headers'
+                                ? {
+                                    ...current.action,
+                                    operations: current.action.operations.map((item, itemIndex) =>
+                                      itemIndex === index ? next : item,
+                                    ),
+                                  }
+                                : current.action,
+                          }));
+                        }}
+                      >
+                        <SelectTrigger aria-label={t('headerOperation')}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectGroup>
+                            <SelectItem value="remove">{t('removeHeader')}</SelectItem>
+                            <SelectItem value="set">{t('setHeader')}</SelectItem>
+                          </SelectGroup>
+                        </SelectContent>
+                      </Select>
+                      <Input
+                        value={operation.header}
+                        disabled={readOnly}
+                        aria-label={t('requestHeader')}
+                        aria-invalid={Boolean(headerError)}
+                        onChange={(event) =>
+                          setDraft((current) => ({
+                            ...current,
+                            action:
+                              current.action.kind === 'modify-request-headers'
+                                ? {
+                                    ...current.action,
+                                    operations: current.action.operations.map((item, itemIndex) =>
+                                      itemIndex === index ? { ...item, header: event.target.value } : item,
+                                    ),
+                                  }
+                                : current.action,
+                          }))
+                        }
+                      />
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        disabled={readOnly || headerOperationCount === 1}
+                        aria-label={t('removeHeaderOperation', { index: index + 1 })}
+                        onClick={() =>
+                          setDraft((current) => ({
+                            ...current,
+                            action:
+                              current.action.kind === 'modify-request-headers'
+                                ? {
+                                    ...current.action,
+                                    operations: current.action.operations.filter(
+                                      (_, itemIndex) => itemIndex !== index,
+                                    ),
+                                  }
+                                : current.action,
+                          }))
+                        }
+                      >
+                        <XIcon />
+                      </Button>
+                      {operation.operation === 'set' ? (
+                        <Input
+                          className="col-start-2"
+                          value={operation.value ?? ''}
+                          disabled={readOnly}
+                          aria-label={t('headerValue')}
+                          placeholder={t('headerValue')}
+                          onChange={(event) =>
+                            setDraft((current) => ({
+                              ...current,
+                              action:
+                                current.action.kind === 'modify-request-headers'
+                                  ? {
+                                      ...current.action,
+                                      operations: current.action.operations.map((item, itemIndex) =>
+                                        itemIndex === index ? { ...item, value: event.target.value } : item,
+                                      ),
+                                    }
+                                  : current.action,
+                            }))
+                          }
+                        />
+                      ) : null}
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    className="self-start"
+                    size="sm"
+                    variant="outline"
+                    disabled={readOnly || draft.action.operations.length >= 20}
+                    onClick={() =>
+                      setDraft((current) => ({
+                        ...current,
+                        action:
+                          current.action.kind === 'modify-request-headers'
+                            ? {
+                                ...current.action,
+                                operations: [
+                                  ...current.action.operations,
+                                  { header: '', operation: 'remove' },
+                                ],
+                              }
+                            : current.action,
+                      }))
+                    }
+                  >
+                    <PlusIcon />
+                    {t('addHeaderOperation')}
+                  </Button>
+                </div>
                 <FieldDescription>{t('headerHelp')}</FieldDescription>
                 {headerError ? <FieldError>{validationMessage(headerError, t)}</FieldError> : null}
               </Field>
@@ -431,6 +702,57 @@ export function RuleEditor({
 
           {advanced ? (
             <FieldGroup>
+              <Field>
+                <FieldLabel>{t('requestMethods')}</FieldLabel>
+                <div className="flex flex-wrap gap-2" role="group" aria-label={t('requestMethods')}>
+                  {REQUEST_METHODS.map((method) => {
+                    const selected = draft.condition.requestMethods?.includes(method) ?? false;
+                    return (
+                      <Button
+                        key={method}
+                        type="button"
+                        size="sm"
+                        variant={selected ? 'secondary' : 'outline'}
+                        aria-pressed={selected}
+                        disabled={readOnly}
+                        onClick={() =>
+                          setDraft((current) => ({
+                            ...current,
+                            condition: {
+                              ...current.condition,
+                              requestMethods: toggleValue(current.condition.requestMethods, method),
+                            },
+                          }))
+                        }
+                      >
+                        {method.toUpperCase()}
+                      </Button>
+                    );
+                  })}
+                </div>
+                <FieldDescription>{t('requestMethodsHelp')}</FieldDescription>
+              </Field>
+              <Field data-invalid={Boolean(initiatorError)}>
+                <FieldLabel htmlFor="rule-initiators">{t('initiatorDomains')}</FieldLabel>
+                <Textarea
+                  id="rule-initiators"
+                  className="font-mono"
+                  value={draft.condition.initiatorDomains?.join('\n') ?? ''}
+                  disabled={readOnly}
+                  aria-invalid={Boolean(initiatorError)}
+                  onChange={(event) =>
+                    setDraft((current) => ({
+                      ...current,
+                      condition: {
+                        ...current.condition,
+                        initiatorDomains: parseInitiatorDomains(event.target.value),
+                      },
+                    }))
+                  }
+                />
+                <FieldDescription>{t('initiatorDomainsHelp')}</FieldDescription>
+                {initiatorError ? <FieldError>{validationMessage(initiatorError, t)}</FieldError> : null}
+              </Field>
               <Field>
                 <FieldLabel htmlFor="rule-priority">{t('priority')}</FieldLabel>
                 <Input

@@ -86,4 +86,59 @@ describe('compileDnrRule', () => {
     });
     expect(result.ok).toBe(false);
   });
+
+  it('compiles advanced conditions and both request-header operations', () => {
+    const base = sampleRules[2];
+    expect(base).toBeDefined();
+    if (!base) return;
+
+    const result = compileDnrRule({
+      ...base,
+      priority: 42,
+      condition: {
+        ...base.condition,
+        requestMethods: ['get', 'post'],
+        initiatorDomains: ['app.example.com'],
+      },
+      action: {
+        kind: 'modify-request-headers',
+        operations: [
+          { header: 'Referer', operation: 'remove' },
+          { header: 'X-Debug-Mode', operation: 'set', value: 'enabled' },
+        ],
+      },
+    });
+
+    expect(result).toMatchObject({
+      ok: true,
+      rule: {
+        priority: 42,
+        condition: {
+          resourceTypes: ['image'],
+          requestMethods: ['get', 'post'],
+          initiatorDomains: ['app.example.com'],
+        },
+        action: {
+          type: 'modifyHeaders',
+          requestHeaders: [
+            { header: 'Referer', operation: 'remove' },
+            { header: 'X-Debug-Mode', operation: 'set', value: 'enabled' },
+          ],
+        },
+      },
+    });
+  });
+
+  it('rejects initiator domains containing a scheme or path', () => {
+    const base = sampleRules[1];
+    expect(base).toBeDefined();
+    if (!base) return;
+
+    const result = compileDnrRule({
+      ...base,
+      condition: { ...base.condition, initiatorDomains: ['https://app.example.com/path'] },
+    });
+
+    expect(result.ok).toBe(false);
+  });
 });

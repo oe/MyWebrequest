@@ -2,7 +2,7 @@ import type { Rule, RuleStatus } from './model';
 import { ruleSchema } from './schema';
 
 export type ValidationIssue = {
-  field: 'name' | 'match' | 'destination' | 'headers' | 'permission' | 'rule';
+  field: 'name' | 'match' | 'initiators' | 'destination' | 'headers' | 'permission' | 'rule';
   code:
     | 'schema-invalid'
     | 'regex-invalid'
@@ -12,6 +12,7 @@ export type ValidationIssue = {
     | 'redirect-self'
     | 'capture-match-required'
     | 'capture-index-invalid'
+    | 'initiator-domain-invalid'
     | 'header-name-invalid'
     | 'header-forbidden';
   message: string;
@@ -45,6 +46,8 @@ const forbiddenRequestHeaders = new Set([
 ]);
 
 const headerNamePattern = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
+const domainPattern =
+  /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)(?:\.(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?))*$/i;
 
 export function validateRule(rule: Rule): ValidationResult {
   const errors: ValidationIssue[] = [];
@@ -80,6 +83,17 @@ export function validateRule(rule: Rule): ValidationResult {
       code: 'wildcard-without-star',
       message: 'This wildcard rule contains no wildcard and behaves like an exact match.',
     });
+  }
+
+  for (const domain of rule.condition.initiatorDomains ?? []) {
+    if (!domainPattern.test(domain)) {
+      errors.push({
+        field: 'initiators',
+        code: 'initiator-domain-invalid',
+        message: `“${domain}” is not a valid initiator domain.`,
+        value: domain,
+      });
+    }
   }
 
   if (rule.action.kind === 'redirect') {

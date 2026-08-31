@@ -1,6 +1,7 @@
 import { ChevronRightIcon, SearchIcon } from 'lucide-react';
 
 import type { Rule, RuleStatus } from '@/domain/rules/model';
+import type { RuleQuotaUsage } from '@/domain/rules/diagnostics';
 import { Badge } from '@/ui/components/badge';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
 import { ScrollArea } from '@/ui/components/scroll-area';
@@ -15,6 +16,7 @@ type RuleListProps = {
   rules: Rule[];
   selectedId: string | null;
   statuses: Record<string, RuleStatus>;
+  quota: RuleQuotaUsage | null;
   onQueryChange: (query: string) => void;
   onSelect: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
@@ -38,6 +40,7 @@ export function RuleList({
   rules,
   selectedId,
   statuses,
+  quota,
   onQueryChange,
   onSelect,
   onToggle,
@@ -155,6 +158,14 @@ export function RuleList({
           </div>
         ) : null}
       </ScrollArea>
+      {quota ? (
+        <div className="flex items-center justify-between gap-3 border-t px-4 py-2 text-xs text-muted-foreground">
+          <span>{t('quotaUsage')}</span>
+          <span className="font-mono tabular-nums">
+            {quota.used.toLocaleString()} / {quota.limit.toLocaleString()}
+          </span>
+        </div>
+      ) : null}
     </section>
   );
 }
