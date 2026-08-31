@@ -85,7 +85,7 @@
   --glass: oklch(1 0 0 / 68%);
   --glass-strong: oklch(1 0 0 / 82%);
   --glass-edge: oklch(1 0 0 / 78%);
-  --glass-shadow: oklch(0.18 0.02 250 / 10%);
+  --glass-shadow: oklch(0.18 0.02 250 / 7%);
 }
 
 .dark {
@@ -123,7 +123,7 @@
   --glass: oklch(0.22 0.01 250 / 62%);
   --glass-strong: oklch(0.2 0.01 250 / 82%);
   --glass-edge: oklch(1 0 0 / 14%);
-  --glass-shadow: oklch(0 0 0 / 34%);
+  --glass-shadow: oklch(0 0 0 / 24%);
 }
 
 @layer base {
@@ -158,7 +158,7 @@
     border-color: color-mix(in oklch, var(--border), var(--glass-edge) 38%);
     box-shadow:
       inset 0 1px 0 var(--glass-edge),
-      0 10px 30px var(--glass-shadow);
+      0 6px 20px var(--glass-shadow);
   }
 
   [data-material='glass-sidebar'] {
@@ -176,7 +176,7 @@
     background-color: var(--glass-strong);
     box-shadow:
       inset 0 1px 0 var(--glass-edge),
-      0 -8px 26px var(--glass-shadow);
+      0 -5px 18px var(--glass-shadow);
   }
 
   [data-slot='dialog-content'],
@@ -188,7 +188,7 @@
     border: 1px solid color-mix(in oklch, var(--border), var(--glass-edge) 42%);
     box-shadow:
       inset 0 1px 0 var(--glass-edge),
-      0 18px 54px var(--glass-shadow);
+      0 14px 40px var(--glass-shadow);
   }
 
   [data-slot='button']:active:not(:disabled),
