@@ -25,7 +25,11 @@ Every legacy item receives an explicit outcome:
 
 ## 3. Legacy sources
 
-The master branch stores JSON-encoded values under extension `localStorage` keys:
+The legacy MV2/CoffeeScript implementation was removed from the active working tree after this inventory
+was documented. Commit `e100dbf` is the final pre-cleanup snapshot for migration archaeology; legacy code
+must not be copied back into the runtime or build.
+
+Legacy releases stored JSON-encoded values under extension `localStorage` keys:
 
 - `block`
 - `hsts`

@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ArrowUpRightIcon, CirclePauseIcon, KeyRoundIcon, ListFilterIcon, PlusIcon, ShieldCheckIcon } from 'lucide-react';
+import {
+  ArrowUpRightIcon,
+  CirclePauseIcon,
+  KeyRoundIcon,
+  ListFilterIcon,
+  PlusIcon,
+  ShieldCheckIcon,
+} from 'lucide-react';
 
 import { Alert, AlertDescription, AlertTitle } from '@/src/ui/components/alert';
 import { Badge } from '@/src/ui/components/badge';
@@ -36,7 +43,10 @@ export function App() {
   }, []);
 
   const scopedRules = useMemo(
-    () => manager.rules.filter((rule) => rule.permissionOrigins.some((permission) => permission.includes(origin.replace(/^https?:\/\//, '')))),
+    () =>
+      manager.rules.filter((rule) =>
+        rule.permissionOrigins.some((permission) => permission.includes(origin.replace(/^https?:\/\//, ''))),
+      ),
     [manager.rules, origin],
   );
 
@@ -66,9 +76,15 @@ export function App() {
 
           <Alert variant={paused ? 'warning' : 'success'}>
             {paused ? <CirclePauseIcon /> : <ShieldCheckIcon />}
-            <AlertTitle>{paused ? 'All rules are paused' : `${scopedRules.length} rule${scopedRules.length === 1 ? '' : 's'} for this site`}</AlertTitle>
+            <AlertTitle>
+              {paused
+                ? 'All rules are paused'
+                : `${scopedRules.length} rule${scopedRules.length === 1 ? '' : 's'} for this site`}
+            </AlertTitle>
             <AlertDescription>
-              {paused ? 'Resume to let enabled rules affect requests again.' : 'Rules stay on this device and run through Manifest V3.'}
+              {paused
+                ? 'Resume to let enabled rules affect requests again.'
+                : 'Rules stay on this device and run through Manifest V3.'}
             </AlertDescription>
           </Alert>
 

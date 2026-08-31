@@ -1,9 +1,5 @@
-.output/
 .wxt/
 coverage/
+dist/
 node_modules/
-background/
-common/
-options/
-popup/
 pnpm-lock.yaml

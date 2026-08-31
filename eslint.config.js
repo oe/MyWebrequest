@@ -11,10 +11,6 @@ export default defineConfig([
     '.wxt',
     'coverage',
     'node_modules',
-    'background',
-    'common',
-    'options',
-    'popup',
   ]),
   {
     files: ['**/*.{ts,tsx}'],

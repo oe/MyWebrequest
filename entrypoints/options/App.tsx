@@ -35,9 +35,16 @@ export function App() {
           data-material="glass-bar"
           className="relative grid grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] items-center border-b max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-[1fr_auto]"
         >
-          <div className="flex h-full items-center border-r px-5 max-[1049px]:justify-center max-[1049px]:px-0 max-[799px]:border-r-0 max-[799px]:justify-start max-[799px]:px-4">
-            <span className="text-lg font-semibold tracking-tight max-[1049px]:hidden max-[799px]:inline">Request Rules</span>
-            <span className="hidden text-base font-semibold max-[1049px]:inline max-[799px]:hidden" aria-label="Request Rules">RR</span>
+          <div className="flex h-full items-center border-r px-5 max-[1049px]:justify-center max-[1049px]:px-0 max-[799px]:justify-start max-[799px]:border-r-0 max-[799px]:px-4">
+            <span className="text-lg font-semibold tracking-tight max-[1049px]:hidden max-[799px]:inline">
+              Request Rules
+            </span>
+            <span
+              className="hidden text-base font-semibold max-[1049px]:inline max-[799px]:hidden"
+              aria-label="Request Rules"
+            >
+              RR
+            </span>
           </div>
           <div className="border-r px-3 max-[799px]:hidden">
             <InputGroup>
@@ -92,7 +99,9 @@ export function App() {
             <section className="hidden place-items-center p-8 text-center min-[800px]:grid">
               <div className="flex max-w-sm flex-col gap-2">
                 <h1 className="text-xl font-semibold">Select a rule</h1>
-                <p className="text-sm text-muted-foreground">Choose a rule from the list or create a new one to start editing.</p>
+                <p className="text-sm text-muted-foreground">
+                  Choose a rule from the list or create a new one to start editing.
+                </p>
               </div>
             </section>
           )}
