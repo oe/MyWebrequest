@@ -18,6 +18,7 @@ import { TooltipProvider } from '@/ui/components/tooltip';
 import { useMigrationManager } from '@/ui/hooks/use-migration-manager';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 import { useI18n } from '@/ui/i18n';
+import { LanguageMenu } from '@/ui/i18n/language-menu';
 import { DataPanel } from '@/ui/data/data-panel';
 import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
@@ -81,7 +82,7 @@ export function OptionsApp() {
     if (creating) return;
     setCreating(true);
     try {
-      await manager.addRule();
+      await manager.addRule(undefined, t('untitledRule'));
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {
@@ -130,7 +131,7 @@ export function OptionsApp() {
           className="relative grid grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] items-center border-b max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-[1fr_auto]"
         >
           <div className="flex h-full items-center border-r px-5 max-[1049px]:justify-center max-[1049px]:px-0 max-[799px]:justify-start max-[799px]:border-r-0 max-[799px]:px-4">
-            <span className="text-lg font-semibold tracking-tight max-[1049px]:hidden max-[799px]:inline">
+            <span className="text-lg font-semibold tracking-tight max-[1049px]:hidden max-[799px]:inline max-[479px]:sr-only">
               {t('appName')}
             </span>
             <span
@@ -161,6 +162,9 @@ export function OptionsApp() {
             )}
           </div>
           <div className="flex justify-end gap-2 px-4 max-[799px]:px-3">
+            <div className="min-[800px]:hidden">
+              <LanguageMenu />
+            </div>
             {view === 'rules' ? (
               <>
                 <Button
@@ -203,7 +207,7 @@ export function OptionsApp() {
           </div>
         </header>
 
-        <div className="grid min-h-0 grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-1">
+        <div className="grid min-h-0 min-w-0 grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-1">
           <AppSidebar
             view={view}
             migrationCount={migrationCount}

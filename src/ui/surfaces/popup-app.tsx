@@ -81,7 +81,7 @@ export function PopupApp() {
     if (creating) return;
     setCreating(true);
     try {
-      await manager.addRule(origin);
+      await manager.addRule(origin, t('untitledRule'));
       await openRuleManager();
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));

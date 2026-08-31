@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from 'react';
 import { ChevronRightIcon, SearchIcon } from 'lucide-react';
 
 import type { Rule, RuleStatus } from '@/domain/rules/model';
@@ -70,6 +71,27 @@ export function RuleList({
     ),
   );
 
+  const handleRuleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    const listRegion = event.currentTarget.closest('section');
+    const buttons = listRegion
+      ? [...listRegion.querySelectorAll<HTMLButtonElement>('button[data-rule-select]')]
+      : [];
+    const currentIndex = buttons.indexOf(event.currentTarget);
+    if (currentIndex < 0 || buttons.length === 0) return;
+    event.preventDefault();
+    const nextIndex =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? buttons.length - 1
+          : (currentIndex + (event.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+    const next = buttons[nextIndex];
+    next?.focus();
+    const nextId = next?.dataset.ruleSelect;
+    if (nextId) onSelect(nextId);
+  };
+
   return (
     <section
       aria-label={t('rules')}
@@ -118,9 +140,11 @@ export function RuleList({
                     >
                       <button
                         type="button"
+                        data-rule-select={rule.id}
                         aria-current={selected ? 'true' : undefined}
                         className="flex min-w-0 items-center gap-3 self-stretch px-5 text-left outline-none focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:ring-inset"
                         onClick={() => onSelect(rule.id)}
+                        onKeyDown={handleRuleKeyDown}
                       >
                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                           <span className="truncate text-sm font-medium">{rule.name}</span>

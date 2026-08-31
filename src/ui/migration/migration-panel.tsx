@@ -138,9 +138,9 @@ function MigrationItemRow({
     >
       <div className="min-w-0 space-y-2">
         <div className="flex flex-wrap items-center gap-2">
-          <h3 id={`${item.id}-title`} className="truncate text-sm font-medium">
+          <h2 id={`${item.id}-title`} className="truncate text-sm font-medium">
             {item.sourceLocator}
-          </h3>
+          </h2>
           <Badge variant={config.variant}>{t(config.label)}</Badge>
           {item.enabledIntent ? <Badge variant="outline">{t('previouslyEnabled')}</Badge> : null}
         </div>

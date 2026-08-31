@@ -219,10 +219,10 @@ export function useRuleManager() {
   );
 
   const addRule = useCallback(
-    async (origin?: string) => {
+    async (origin?: string, name?: string) => {
       const current = stateRef.current;
       if (!current) return;
-      const rule = createRule(origin);
+      const rule = createRule(origin, name);
       await persist(upsertRule(current, rule));
       setSelectedId(rule.id);
     },

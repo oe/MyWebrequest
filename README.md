@@ -6,18 +6,23 @@ restrained translucent material layer.
 
 The active release objective and milestone gates are documented in [GOAL.md](GOAL.md).
 
-## Current milestone
+## Implemented baseline
 
 - Manifest V3 extension shell with optional host permissions
 - Split-pane rule manager and compact popup
-- Block, redirect, request-header, and HTTPS-upgrade rule models
-- URL matching, validation, DNR compilation, storage, and runtime reconciliation
-- Unit tests and production build checks
+- Block, redirect, request-header removal/set, and HTTPS-upgrade actions
+- Basic and advanced URL, resource, method, initiator-domain, priority, and regex conditions
+- Transactional storage/DNR reconciliation, browser regex checks, conflict/cycle diagnostics, and quota guard
+- Deterministic legacy migration with review, export, apply, and rollback
+- Checksummed rule backup, previewed merge/replace import, and automatic recovery snapshot
+- English, Simplified Chinese, Korean, Japanese, French, and Spanish UI and manifests
+- Keyboard, reduced-motion, contrast, responsive-layout, unit, artifact, and production build checks
 - Chrome, Edge, and Firefox Manifest V3 build targets
 
-Legacy migration, import/export, six-language localization, and real-browser extension E2E coverage remain planned
-before a production release. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
-[BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), and [MIGRATION.md](MIGRATION.md).
+Installed-extension permission/action/service-worker certification remains required before a production
+release or browser support claim. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
+[BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), [MIGRATION.md](MIGRATION.md), [PRIVACY.md](PRIVACY.md), and
+[STORE_LISTING.md](STORE_LISTING.md).
 
 ## Development
 

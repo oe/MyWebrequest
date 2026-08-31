@@ -181,7 +181,10 @@ export function RuleEditor({
   const [draft, setDraft] = useState(rule);
   const [advanced, setAdvanced] = useState(false);
   const [testUrl, setTestUrl] = useState(initialTestUrl);
-  const [testResult, setTestResult] = useState<MatchResult | null>(() => matchRule(rule, initialTestUrl));
+  const [testedDraft, setTestedDraft] = useState<{ fingerprint: string; result: MatchResult } | null>(() => ({
+    fingerprint: JSON.stringify(rule),
+    result: matchRule(rule, initialTestUrl),
+  }));
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -189,6 +192,8 @@ export function RuleEditor({
   const [regexRuntimeError, setRegexRuntimeError] = useState<string | null>(null);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
+  const draftFingerprint = useMemo(() => JSON.stringify(draft), [draft]);
+  const testResult = testedDraft?.fingerprint === draftFingerprint ? testedDraft.result : null;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(rule), [draft, rule]);
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
   const matchError = validation.errors.find((issue) => issue.field === 'match');
@@ -219,7 +224,10 @@ export function RuleEditor({
       condition: { ...current.condition, url: { ...current.condition.url, value } },
       permissionOrigins: permissionOriginsFromMatch(value),
     }));
-    setTestResult(null);
+  };
+
+  const runTest = () => {
+    setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, testUrl) });
   };
 
   const handleSave = async () => {
@@ -283,7 +291,7 @@ export function RuleEditor({
     <section
       aria-label={t('editRule', { name: rule.name })}
       data-material="glass-content"
-      className="flex min-h-0 flex-col"
+      className="flex min-h-0 min-w-0 flex-col"
     >
       <ScrollArea className="min-h-0 flex-1">
         <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6 lg:p-8">
@@ -670,19 +678,13 @@ export function RuleEditor({
                   id="test-url"
                   className="font-mono"
                   value={testUrl}
-                  onChange={(event) => {
-                    setTestUrl(event.target.value);
-                    setTestResult(null);
-                  }}
+                  onChange={(event) => setTestUrl(event.target.value)}
                   onKeyDown={(event) => {
-                    if (event.key === 'Enter') setTestResult(matchRule(draft, testUrl));
+                    if (event.key === 'Enter') runTest();
                   }}
                 />
                 <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    aria-label={t('testRule')}
-                    onClick={() => setTestResult(matchRule(draft, testUrl))}
-                  >
+                  <InputGroupButton aria-label={t('testRule')} onClick={runTest}>
                     <PlayIcon data-icon="inline-start" />
                     {t('test')}
                   </InputGroupButton>
@@ -775,20 +777,30 @@ export function RuleEditor({
 
       <footer
         data-material="glass-toolbar"
-        className="flex items-center justify-between gap-3 border-t p-4 lg:px-8"
+        className="flex items-center justify-between gap-3 border-t p-4 max-[479px]:grid max-[479px]:grid-cols-2 lg:px-8"
       >
-        <Button variant="destructive" disabled={readOnly} onClick={() => setDeleteOpen(true)}>
+        <Button
+          className="max-[479px]:w-full"
+          variant="destructive"
+          disabled={readOnly}
+          onClick={() => setDeleteOpen(true)}
+        >
           <Trash2Icon data-icon="inline-start" />
           {t('deleteRule')}
         </Button>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setAdvanced((value) => !value)}>
+        <div className="flex items-center gap-2 max-[479px]:contents">
+          <Button
+            className="max-[479px]:w-full"
+            variant="outline"
+            onClick={() => setAdvanced((value) => !value)}
+          >
             {t(advanced ? 'hideAdvanced' : 'advancedSettings')}
           </Button>
-          <Button variant="outline" onClick={() => setDraft(rule)}>
+          <Button className="max-[479px]:w-full" variant="outline" onClick={() => setDraft(rule)}>
             {t('cancel')}
           </Button>
           <Button
+            className="max-[479px]:w-full"
             disabled={readOnly || !validation.valid || saving || deleting}
             onClick={() => void handleSave()}
           >

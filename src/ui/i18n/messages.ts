@@ -54,6 +54,7 @@ export const en = {
   openRules: 'Open rules',
   migration: 'Migration',
   newRule: 'New rule',
+  untitledRule: 'Untitled rule',
   creating: 'Creating…',
   selectRule: 'Select a rule',
   selectRuleDescription: 'Choose a rule from the list or create a new one to start editing.',

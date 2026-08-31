@@ -4,7 +4,7 @@ import { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
 export { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
-export function createRule(origin?: string): Rule {
+export function createRule(origin?: string, name = 'Untitled rule'): Rule {
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
   const match = origin ? `${origin.replace(/\/$/, '')}/*` : 'https://example.com/*';
@@ -12,7 +12,7 @@ export function createRule(origin?: string): Rule {
     schemaVersion: 1,
     id,
     dnrId: stableDnrId(id),
-    name: 'Untitled rule',
+    name,
     enabled: false,
     priority: 1,
     condition: { url: { kind: 'wildcard', value: match } },

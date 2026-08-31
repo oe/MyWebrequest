@@ -25,7 +25,6 @@ const choices: Array<{ value: LocalePreference; label: string }> = [
 
 export function LanguageMenu() {
   const { preference, setPreference, t } = useI18n();
-  const current = choices.find((choice) => choice.value === preference);
 
   return (
     <DropdownMenu>
@@ -36,9 +35,7 @@ export function LanguageMenu() {
           aria-label={t('language')}
         >
           <LanguagesIcon data-icon="inline-start" />
-          <span className="truncate max-[1049px]:sr-only">
-            {preference === 'system' ? t('systemLanguage') : current?.label}
-          </span>
+          <span className="truncate max-[1049px]:sr-only">{t('language')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent side="right" align="end" className="w-52">
