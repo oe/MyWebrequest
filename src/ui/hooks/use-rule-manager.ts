@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { createRule, removeRule, updatePausedState, upsertRule } from '@/src/application/rule-service';
-import type { Rule, StoredState } from '@/src/domain/rules/model';
-import { deriveRuleStatus } from '@/src/domain/rules/validate';
+import { createRule, removeRule, updatePausedState, upsertRule } from '@/application/rule-service';
+import type { Rule, StoredState } from '@/domain/rules/model';
+import { deriveRuleStatus } from '@/domain/rules/validate';
 import {
   hasRulePermission,
   reconcileDynamicRules,
   requestRulePermission,
-} from '@/src/infrastructure/rule-runtime';
-import { loadState, saveState } from '@/src/infrastructure/rule-store';
+} from '@/infrastructure/rule-runtime';
+import { loadState, saveState } from '@/infrastructure/rule-store';
 
 type PermissionMap = Record<string, boolean>;
 

@@ -1,13 +1,13 @@
 import { ChevronRightIcon, SearchIcon } from 'lucide-react';
 
-import type { Rule, RuleStatus } from '@/src/domain/rules/model';
-import { actionLabel } from '@/src/domain/rules/model';
-import { Badge } from '@/src/ui/components/badge';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/src/ui/components/input-group';
-import { ScrollArea } from '@/src/ui/components/scroll-area';
-import { Separator } from '@/src/ui/components/separator';
-import { Switch } from '@/src/ui/components/switch';
-import { cn } from '@/src/ui/lib/utils';
+import type { Rule, RuleStatus } from '@/domain/rules/model';
+import { actionLabel } from '@/domain/rules/model';
+import { Badge } from '@/ui/components/badge';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
+import { ScrollArea } from '@/ui/components/scroll-area';
+import { Separator } from '@/ui/components/separator';
+import { Switch } from '@/ui/components/switch';
+import { cn } from '@/ui/lib/utils';
 import { StatusBadge } from './status-badge';
 
 type RuleListProps = {

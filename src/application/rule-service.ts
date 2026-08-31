@@ -1,5 +1,5 @@
-import type { Rule, StoredState } from '@/src/domain/rules/model';
-import { stableDnrId } from '@/src/domain/rules/model';
+import type { Rule, StoredState } from '@/domain/rules/model';
+import { stableDnrId } from '@/domain/rules/model';
 
 export function permissionOriginsFromMatch(value: string): string[] {
   if (value.startsWith('||')) {

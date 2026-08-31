@@ -10,12 +10,12 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { permissionOriginsFromMatch } from '@/src/application/rule-service';
-import type { Rule, RuleAction, RuleStatus } from '@/src/domain/rules/model';
-import { matchRule, type MatchResult } from '@/src/domain/rules/test-match';
-import { validateRule } from '@/src/domain/rules/validate';
-import { Alert, AlertDescription, AlertTitle } from '@/src/ui/components/alert';
-import { Button } from '@/src/ui/components/button';
+import { permissionOriginsFromMatch } from '@/application/rule-service';
+import type { Rule, RuleAction, RuleStatus } from '@/domain/rules/model';
+import { matchRule, type MatchResult } from '@/domain/rules/test-match';
+import { validateRule } from '@/domain/rules/validate';
+import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
+import { Button } from '@/ui/components/button';
 import {
   Dialog,
   DialogClose,
@@ -24,23 +24,18 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/src/ui/components/dialog';
+} from '@/ui/components/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/src/ui/components/dropdown-menu';
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/src/ui/components/field';
-import { Input } from '@/src/ui/components/input';
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from '@/src/ui/components/input-group';
-import { ScrollArea } from '@/src/ui/components/scroll-area';
+} from '@/ui/components/dropdown-menu';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/ui/components/field';
+import { Input } from '@/ui/components/input';
+import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/ui/components/input-group';
+import { ScrollArea } from '@/ui/components/scroll-area';
 import {
   Select,
   SelectContent,
@@ -48,9 +43,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/src/ui/components/select';
-import { Separator } from '@/src/ui/components/separator';
-import { Switch } from '@/src/ui/components/switch';
+} from '@/ui/components/select';
+import { Separator } from '@/ui/components/separator';
+import { Switch } from '@/ui/components/switch';
 import { StatusBadge } from './status-badge';
 
 type RuleEditorProps = {

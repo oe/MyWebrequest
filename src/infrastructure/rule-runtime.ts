@@ -1,5 +1,5 @@
-import { compileDnrRule } from '@/src/domain/rules/compile-dnr';
-import type { Rule, StoredState } from '@/src/domain/rules/model';
+import { compileDnrRule } from '@/domain/rules/compile-dnr';
+import type { Rule, StoredState } from '@/domain/rules/model';
 
 function hasExtensionRuntime(): boolean {
   return typeof browser !== 'undefined' && Boolean(browser.declarativeNetRequest && browser.permissions);

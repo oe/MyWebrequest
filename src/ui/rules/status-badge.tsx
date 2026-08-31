@@ -7,8 +7,8 @@ import {
   TriangleAlertIcon,
 } from 'lucide-react';
 
-import type { RuleStatus } from '@/src/domain/rules/model';
-import { Badge } from '@/src/ui/components/badge';
+import type { RuleStatus } from '@/domain/rules/model';
+import { Badge } from '@/ui/components/badge';
 
 const statusConfig: Record<
   RuleStatus,

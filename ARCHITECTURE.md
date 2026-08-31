@@ -35,15 +35,17 @@ quality gate. `latest` ranges are not permitted.
 ## 3. Repository target shape
 
 ```text
-entrypoints/
-  background.ts
-  popup/
-    index.html
-    App.tsx
-  options/
-    index.html
-    App.tsx
 src/
+  entrypoints/
+    background.ts
+    popup/
+      index.html
+      main.tsx
+      style.css
+    options/
+      index.html
+      main.tsx
+      style.css
   domain/
     rules/
       model.ts
@@ -68,8 +70,15 @@ src/
     legacy-local-storage.ts
   ui/
     components/
-    tokens/
-    i18n/
+    hooks/
+    rules/
+    surfaces/
+      options-app.tsx
+      popup-app.tsx
+    styles.css
+  public/
+    _locales/
+    icon/
 tests/
   fixtures/
   unit/
@@ -77,7 +86,10 @@ tests/
   e2e/
 ```
 
-WXT-generated directories and build output are ignored. Source code contains no generated manifest or compiled JavaScript.
+WXT uses `src/` as its source root. Entrypoints contain only browser/page bootstrap adapters; UI composition,
+application behavior, domain logic, infrastructure adapters, and copied extension assets all live beneath `src/`.
+WXT-generated directories and `dist/` build output are ignored. Source code contains no generated manifest or
+compiled JavaScript.
 
 ## 4. Layer responsibilities
 

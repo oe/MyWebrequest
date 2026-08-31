@@ -1,5 +1,5 @@
-import { reconcileDynamicRules } from '@/src/infrastructure/rule-runtime';
-import { loadState } from '@/src/infrastructure/rule-store';
+import { reconcileDynamicRules } from '@/infrastructure/rule-runtime';
+import { loadState } from '@/infrastructure/rule-store';
 
 async function reconcile(): Promise<void> {
   const state = await loadState();

@@ -8,13 +8,13 @@ import {
   ShieldCheckIcon,
 } from 'lucide-react';
 
-import { Alert, AlertDescription, AlertTitle } from '@/src/ui/components/alert';
-import { Badge } from '@/src/ui/components/badge';
-import { Button } from '@/src/ui/components/button';
-import { Separator } from '@/src/ui/components/separator';
-import { Switch } from '@/src/ui/components/switch';
-import { TooltipProvider } from '@/src/ui/components/tooltip';
-import { useRuleManager } from '@/src/ui/hooks/use-rule-manager';
+import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
+import { Badge } from '@/ui/components/badge';
+import { Button } from '@/ui/components/button';
+import { Separator } from '@/ui/components/separator';
+import { Switch } from '@/ui/components/switch';
+import { TooltipProvider } from '@/ui/components/tooltip';
+import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 
 function canUseExtensionTabs(): boolean {
   return typeof browser !== 'undefined' && Boolean(browser.tabs && browser.runtime?.id);
@@ -26,7 +26,7 @@ async function openRuleManager(): Promise<void> {
   }
 }
 
-export function App() {
+export function PopupApp() {
   const manager = useRuleManager();
   const [origin, setOrigin] = useState('https://api.example.com');
 

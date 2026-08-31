@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  createRule,
-  permissionOriginsFromMatch,
-  removeRule,
-  upsertRule,
-} from '@/src/application/rule-service';
-import { createEmptyState } from '@/src/domain/rules/fixtures';
+import { createRule, permissionOriginsFromMatch, removeRule, upsertRule } from '@/application/rule-service';
+import { createEmptyState } from '@/domain/rules/fixtures';
 
 describe('rule service', () => {
   it('derives a narrow optional permission from a concrete match', () => {

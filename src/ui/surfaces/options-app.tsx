@@ -2,17 +2,17 @@ import { useMemo, useState } from 'react';
 import { PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Button } from '@/src/ui/components/button';
-import { InputGroup, InputGroupAddon, InputGroupInput } from '@/src/ui/components/input-group';
-import { Toaster } from '@/src/ui/components/sonner';
-import { TooltipProvider } from '@/src/ui/components/tooltip';
-import { useRuleManager } from '@/src/ui/hooks/use-rule-manager';
-import { AppSidebar } from '@/src/ui/rules/app-sidebar';
-import { RuleEditor } from '@/src/ui/rules/rule-editor';
-import { RuleList } from '@/src/ui/rules/rule-list';
-import { cn } from '@/src/ui/lib/utils';
+import { Button } from '@/ui/components/button';
+import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
+import { Toaster } from '@/ui/components/sonner';
+import { TooltipProvider } from '@/ui/components/tooltip';
+import { useRuleManager } from '@/ui/hooks/use-rule-manager';
+import { AppSidebar } from '@/ui/rules/app-sidebar';
+import { RuleEditor } from '@/ui/rules/rule-editor';
+import { RuleList } from '@/ui/rules/rule-list';
+import { cn } from '@/ui/lib/utils';
 
-export function App() {
+export function OptionsApp() {
   const manager = useRuleManager();
   const [query, setQuery] = useState('');
   const selectedRule = useMemo(

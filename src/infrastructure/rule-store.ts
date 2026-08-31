@@ -1,6 +1,6 @@
-import { createEmptyState, createSampleState } from '@/src/domain/rules/fixtures';
-import type { StoredState } from '@/src/domain/rules/model';
-import { storedStateSchema } from '@/src/domain/rules/schema';
+import { createEmptyState, createSampleState } from '@/domain/rules/fixtures';
+import type { StoredState } from '@/domain/rules/model';
+import { storedStateSchema } from '@/domain/rules/schema';
 
 const STORAGE_KEY = 'requestRulesState';
 const PREVIEW_KEY = 'request-rules-preview-state';

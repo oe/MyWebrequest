@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { compileDnrRule } from '@/src/domain/rules/compile-dnr';
-import { sampleRules } from '@/src/domain/rules/fixtures';
+import { compileDnrRule } from '@/domain/rules/compile-dnr';
+import { sampleRules } from '@/domain/rules/fixtures';
 
 describe('compileDnrRule', () => {
   it('compiles a wildcard redirect to a DNR regex substitution', () => {

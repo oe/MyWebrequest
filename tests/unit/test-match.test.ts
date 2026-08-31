@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
-import { sampleRules } from '@/src/domain/rules/fixtures';
-import { matchRule, wildcardToRegExpSource } from '@/src/domain/rules/test-match';
+import { sampleRules } from '@/domain/rules/fixtures';
+import { matchRule, wildcardToRegExpSource } from '@/domain/rules/test-match';
 
 describe('matchRule', () => {
   it('captures a wildcard and produces the redirect preview', () => {

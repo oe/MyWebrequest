@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
-import { App } from './App';
+import { PopupApp } from '@/ui/surfaces/popup-app';
 import './style.css';
 
 const root = document.getElementById('root');
@@ -12,6 +12,6 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    <PopupApp />
   </StrictMode>,
 );

@@ -1,8 +1,8 @@
 import { ArrowDownUpIcon, KeyRoundIcon, ListFilterIcon, SettingsIcon, ShieldCheckIcon } from 'lucide-react';
 
-import { Button } from '@/src/ui/components/button';
-import { Separator } from '@/src/ui/components/separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/src/ui/components/tooltip';
+import { Button } from '@/ui/components/button';
+import { Separator } from '@/ui/components/separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
 
 const items = [
   { label: 'Rules', icon: ListFilterIcon, active: true },
