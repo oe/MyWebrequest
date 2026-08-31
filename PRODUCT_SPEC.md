@@ -3,7 +3,8 @@
 Status: Approved baseline; implementation in progress  
 Last updated: 2026-08-31  
 Owners: Product and engineering  
-Related documents: [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
+Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md),
+[DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
 ## 1. Product definition
 
@@ -87,7 +88,7 @@ It is not a general browser utility, an ad blocker, a request recorder, or a rep
 - Chrome action popup for current-site status and quick entry.
 - Full-page options UI as the primary rule manager.
 - First-run or upgrade migration flow inside the options UI.
-- English and Simplified Chinese from the first release.
+- English, Simplified Chinese, Korean, Japanese, French, and Spanish from the first release.
 - Shared Chrome, Edge, and Firefox Manifest V3 builds, with a separate release gate for each browser.
 
 ### Deferred beyond V1
@@ -196,6 +197,8 @@ It is not a general browser utility, an ad blocker, a request recorder, or a rep
 - Respect zoom, text scaling, high contrast, and `prefers-reduced-motion`.
 - Use semantic controls and announcements for validation, save, and permission results.
 - Externalize all user-visible strings and design for Chinese text expansion.
+- Use English as the complete fallback catalog and fail CI when any release locale is missing a key.
+- Use browser locale by default and allow a persisted in-product language override.
 
 ## 9. V1 acceptance criteria
 

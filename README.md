@@ -4,6 +4,8 @@ A local-first browser extension for creating, testing, and managing request rule
 uses Manifest V3, WXT, React, TypeScript, Tailwind CSS, and shadcn's default `radix-nova` style with a
 restrained translucent material layer.
 
+The active release objective and milestone gates are documented in [GOAL.md](GOAL.md).
+
 ## Current milestone
 
 - Manifest V3 extension shell with optional host permissions
@@ -13,7 +15,7 @@ restrained translucent material layer.
 - Unit tests and production build checks
 - Chrome, Edge, and Firefox Manifest V3 build targets
 
-Legacy migration, import/export, localization, and real-browser extension E2E coverage remain planned
+Legacy migration, import/export, six-language localization, and real-browser extension E2E coverage remain planned
 before a production release. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
 [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), and [MIGRATION.md](MIGRATION.md).
 

@@ -1,6 +1,6 @@
 # My Webrequest Legacy Migration Plan
 
-Status: Planned after the modern rule-manager baseline  
+Status: Required V1 workstream
 Last updated: 2026-08-31  
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
@@ -117,6 +117,8 @@ The migration UI shows the original match, original destination template, genera
 - Check new storage before attempting legacy access.
 - Read legacy data once through the validated migration adapter.
 - Never mutate legacy storage during detection.
+- Prefer automatic detection from an extension page on a same-ID update; use JSON import as the fallback
+  when the legacy origin is inaccessible.
 
 ### Stage B: Parse
 
