@@ -1,9 +1,17 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/ui/components/dialog';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
 import { Toaster } from '@/ui/components/sonner';
 import { TooltipProvider } from '@/ui/components/tooltip';
@@ -26,7 +34,10 @@ export function OptionsApp() {
   const [view, setView] = useState<OptionsView>('rules');
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [editorDirty, setEditorDirty] = useState(false);
+  const [discardOpen, setDiscardOpen] = useState(false);
   const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
+  const pendingNavigation = useRef<(() => void) | null>(null);
   const selectedRule = useMemo(
     () => manager.rules.find((rule) => rule.id === manager.selectedId) ?? null,
     [manager.rules, manager.selectedId],
@@ -36,6 +47,35 @@ export function OptionsApp() {
     migrationManager.migration?.status === 'pending'
       ? migrationManager.migration.bundle.report.items.length
       : 0;
+
+  const handleDirtyChange = useCallback((dirty: boolean) => {
+    setEditorDirty(dirty);
+  }, []);
+
+  const requestNavigation = useCallback(
+    (action: () => void) => {
+      if (!editorDirty) {
+        action();
+        return;
+      }
+      pendingNavigation.current = action;
+      setDiscardOpen(true);
+    },
+    [editorDirty],
+  );
+
+  const keepEditing = () => {
+    pendingNavigation.current = null;
+    setDiscardOpen(false);
+  };
+
+  const discardAndContinue = () => {
+    const action = pendingNavigation.current;
+    pendingNavigation.current = null;
+    setEditorDirty(false);
+    setDiscardOpen(false);
+    action?.();
+  };
 
   const handleCreate = async () => {
     if (creating) return;
@@ -121,7 +161,7 @@ export function OptionsApp() {
                   className="min-[800px]:hidden"
                   variant="outline"
                   aria-label={t('openMigration')}
-                  onClick={() => setView('migration')}
+                  onClick={() => requestNavigation(() => setView('migration'))}
                 >
                   <ArchiveRestoreIcon />
                   <span className="max-[479px]:sr-only">{t('migration')}</span>
@@ -131,7 +171,7 @@ export function OptionsApp() {
                   className="min-[800px]:hidden"
                   variant="outline"
                   aria-label={t('dataManagement')}
-                  onClick={() => setView('data')}
+                  onClick={() => requestNavigation(() => setView('data'))}
                 >
                   <DatabaseBackupIcon />
                   <span className="sr-only">{t('dataManagement')}</span>
@@ -142,14 +182,14 @@ export function OptionsApp() {
                 className="min-[800px]:hidden"
                 variant="outline"
                 aria-label={t('openRules')}
-                onClick={() => setView('rules')}
+                onClick={() => requestNavigation(() => setView('rules'))}
               >
                 <ListFilterIcon />
                 <span className="max-[479px]:sr-only">{t('rules')}</span>
               </Button>
             )}
             {view === 'rules' ? (
-              <Button disabled={creating} onClick={() => void handleCreate()}>
+              <Button disabled={creating} onClick={() => requestNavigation(() => void handleCreate())}>
                 <PlusIcon data-icon="inline-start" />
                 {creating ? t('creating') : t('newRule')}
               </Button>
@@ -158,7 +198,11 @@ export function OptionsApp() {
         </header>
 
         <div className="grid min-h-0 grid-cols-[220px_minmax(320px,420px)_minmax(0,1fr)] max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-1">
-          <AppSidebar view={view} migrationCount={migrationCount} onViewChange={setView} />
+          <AppSidebar
+            view={view}
+            migrationCount={migrationCount}
+            onViewChange={(nextView) => requestNavigation(() => setView(nextView))}
+          />
           {view === 'migration' ? (
             <MigrationPanel
               key={`${migrationManager.migration?.bundle.report.sourceFingerprint ?? 'none'}:${migrationManager.migration?.status ?? 'none'}`}
@@ -193,7 +237,7 @@ export function OptionsApp() {
                   statuses={manager.statuses}
                   pendingIds={pendingRuleIds}
                   onQueryChange={setQuery}
-                  onSelect={manager.setSelectedId}
+                  onSelect={(id) => requestNavigation(() => manager.setSelectedId(id))}
                   onToggle={(id, enabled) => void handleToggle(id, enabled)}
                 />
               </div>
@@ -203,8 +247,12 @@ export function OptionsApp() {
                   rule={selectedRule}
                   status={manager.statuses[selectedRule.id] ?? 'disabled'}
                   hasPermission={manager.permissions[selectedRule.id] === true}
-                  onBack={() => manager.setSelectedId(null)}
+                  ruleIndex={manager.state.order.indexOf(selectedRule.id)}
+                  onBack={() => requestNavigation(() => manager.setSelectedId(null))}
+                  onCopy={manager.copyRule}
                   onDelete={manager.deleteRule}
+                  onDirtyChange={handleDirtyChange}
+                  onRestore={manager.undoDeleteRule}
                   onSave={manager.saveRule}
                 />
               ) : (
@@ -221,6 +269,27 @@ export function OptionsApp() {
           )}
         </div>
       </main>
+      <Dialog
+        open={discardOpen}
+        onOpenChange={(open) => {
+          if (!open) keepEditing();
+        }}
+      >
+        <DialogContent showCloseButton={false}>
+          <DialogHeader>
+            <DialogTitle>{t('unsavedTitle')}</DialogTitle>
+            <DialogDescription>{t('unsavedDescription')}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={keepEditing}>
+              {t('keepEditing')}
+            </Button>
+            <Button variant="destructive" onClick={discardAndContinue}>
+              {t('discardChanges')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <Toaster position="bottom-right" richColors />
     </TooltipProvider>
   );

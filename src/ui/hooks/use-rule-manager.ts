@@ -1,6 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { createRule, removeRule, updatePausedState, upsertRule } from '@/application/rule-service';
+import {
+  createRule,
+  duplicateRule,
+  removeRule,
+  restoreRule,
+  updatePausedState,
+  upsertRule,
+} from '@/application/rule-service';
 import { commitRuleState } from '@/application/rule-transaction';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
@@ -31,6 +38,7 @@ export function useRuleManager() {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [importRecovery, setImportRecovery] = useState<RuleImportRecovery | null>(null);
+  const stateRef = useRef<StoredState | null>(null);
 
   const refreshRuntimeState = useCallback(async (nextState: StoredState) => {
     try {
@@ -55,6 +63,7 @@ export function useRuleManager() {
 
   const adoptState = useCallback(
     async (nextState: StoredState) => {
+      stateRef.current = nextState;
       setState(nextState);
       setSelectedId((currentId) =>
         currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
@@ -69,6 +78,7 @@ export function useRuleManager() {
     void Promise.all([loadState(), loadRuleImportRecovery()]).then(async ([loaded, recovery]) => {
       if (cancelled) return;
       setState(loaded);
+      stateRef.current = loaded;
       setImportRecovery(recovery);
       setSelectedId(loaded.order[0] ?? null);
       await refreshRuntimeState(loaded);
@@ -96,81 +106,109 @@ export function useRuleManager() {
 
   const persist = useCallback(
     async (nextState: StoredState) => {
-      if (!state) return;
-      await commitRuleState(state, nextState, { reconcile: reconcileDynamicRules, save: saveState });
+      const previousState = stateRef.current;
+      if (!previousState) return;
+      await commitRuleState(previousState, nextState, { reconcile: reconcileDynamicRules, save: saveState });
       await adoptState(nextState);
     },
-    [adoptState, state],
+    [adoptState],
   );
 
   const saveRule = useCallback(
     async (rule: Rule) => {
-      if (!state) return { permissionGranted: false };
+      const current = stateRef.current;
+      if (!current) return { permissionGranted: false };
       const permissionGranted =
         !rule.enabled || permissions[rule.id] === true || (await requestRulePermission(rule));
-      await persist(upsertRule(state, rule));
+      await persist(upsertRule(current, rule));
       return { permissionGranted };
     },
-    [permissions, persist, state],
+    [permissions, persist],
   );
 
   const toggleRule = useCallback(
     async (id: string, enabled: boolean) => {
-      if (!state) return false;
-      const rule = state.rules[id];
+      const current = stateRef.current;
+      if (!current) return false;
+      const rule = current.rules[id];
       if (!rule) return false;
       const nextRule = { ...rule, enabled };
       const permissionGranted =
         !enabled || permissions[id] === true || (await requestRulePermission(nextRule));
-      await persist(upsertRule(state, nextRule));
+      await persist(upsertRule(current, nextRule));
       return permissionGranted;
     },
-    [permissions, persist, state],
+    [permissions, persist],
   );
 
   const addRule = useCallback(
     async (origin?: string) => {
-      if (!state) return;
+      const current = stateRef.current;
+      if (!current) return;
       const rule = createRule(origin);
-      await persist(upsertRule(state, rule));
+      await persist(upsertRule(current, rule));
       setSelectedId(rule.id);
     },
-    [persist, state],
+    [persist],
   );
 
   const deleteRule = useCallback(
     async (id: string) => {
-      if (!state) return;
-      const next = removeRule(state, id);
+      const current = stateRef.current;
+      if (!current) return;
+      const next = removeRule(current, id);
       await persist(next);
       setSelectedId(next.order[0] ?? null);
     },
-    [persist, state],
+    [persist],
+  );
+
+  const copyRule = useCallback(
+    async (id: string, name: string) => {
+      const current = stateRef.current;
+      const source = current?.rules[id];
+      if (!current || !source) return;
+      const duplicated = duplicateRule(current, source, name);
+      await persist(duplicated.state);
+    },
+    [persist],
+  );
+
+  const undoDeleteRule = useCallback(
+    async (rule: Rule, index: number) => {
+      const current = stateRef.current;
+      if (!current) return;
+      await persist(restoreRule(current, rule, index));
+      setSelectedId(rule.id);
+    },
+    [persist],
   );
 
   const setGloballyPaused = useCallback(
     async (paused: boolean) => {
-      if (!state) return;
-      await persist(updatePausedState(state, paused));
+      const current = stateRef.current;
+      if (!current) return;
+      await persist(updatePausedState(current, paused));
     },
-    [persist, state],
+    [persist],
   );
 
   const replaceStateFromImport = useCallback(
     async (nextState: StoredState, mode: RuleImportMode) => {
-      if (!state) return;
+      const current = stateRef.current;
+      if (!current) return;
       if (mode === 'replace') {
         const recovery: RuleImportRecovery = {
           version: 1,
           createdAt: new Date().toISOString(),
-          state,
+          state: current,
         };
         await saveRuleImportRecovery(recovery);
         setImportRecovery(recovery);
       }
       await persist(nextState);
     },
-    [persist, state],
+    [persist],
   );
 
   const restoreImportRecovery = useCallback(async () => {
@@ -203,6 +241,7 @@ export function useRuleManager() {
   return {
     adoptState,
     addRule,
+    copyRule,
     deleteRule,
     loading,
     importRecovery,
@@ -217,5 +256,6 @@ export function useRuleManager() {
     state,
     statuses,
     toggleRule,
+    undoDeleteRule,
   };
 }

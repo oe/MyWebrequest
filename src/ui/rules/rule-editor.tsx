@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeftIcon,
   CheckCircle2Icon,
   CircleAlertIcon,
+  CopyIcon,
   EllipsisIcon,
   KeyRoundIcon,
   PlayIcon,
@@ -55,8 +56,12 @@ type RuleEditorProps = {
   rule: Rule;
   status: RuleStatus;
   onBack: () => void;
+  onCopy: (id: string, name: string) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
+  onDirtyChange: (dirty: boolean) => void;
+  onRestore: (rule: Rule, index: number) => Promise<void>;
   onSave: (rule: Rule) => Promise<{ permissionGranted: boolean }>;
+  ruleIndex: number;
 };
 
 function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleAction {
@@ -100,7 +105,18 @@ function matchResultText(result: MatchResult, t: Translate): string {
   return result.result;
 }
 
-export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSave }: RuleEditorProps) {
+export function RuleEditor({
+  hasPermission,
+  rule,
+  status,
+  onBack,
+  onCopy,
+  onDelete,
+  onDirtyChange,
+  onRestore,
+  onSave,
+  ruleIndex,
+}: RuleEditorProps) {
   const { t } = useI18n();
   const initialTestUrl =
     rule.id === 'mirror-api-local'
@@ -113,12 +129,28 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [copying, setCopying] = useState(false);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
+  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(rule), [draft, rule]);
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
   const matchError = validation.errors.find((issue) => issue.field === 'match');
   const destinationError = validation.errors.find((issue) => issue.field === 'destination');
   const headerError = validation.errors.find((issue) => issue.field === 'headers');
+
+  useEffect(() => {
+    onDirtyChange(dirty);
+    const preventClose = (event: BeforeUnloadEvent) => {
+      if (!dirty) return;
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', preventClose);
+    return () => {
+      window.removeEventListener('beforeunload', preventClose);
+      onDirtyChange(false);
+    };
+  }, [dirty, onDirtyChange]);
 
   const updateMatch = (value: string) => {
     setDraft((current) => ({
@@ -152,11 +184,29 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
     try {
       await onDelete(rule.id);
       setDeleteOpen(false);
-      toast.success(t('ruleDeleted'));
+      toast.success(t('ruleDeleted'), {
+        action: {
+          label: t('undo'),
+          onClick: () => void onRestore(rule, ruleIndex).catch(() => toast.error(t('undoDeleteError'))),
+        },
+      });
     } catch (error) {
       toast.error(errorMessage(error, t('ruleDeleteError')));
     } finally {
       setDeleting(false);
+    }
+  };
+
+  const handleCopy = async () => {
+    if (copying) return;
+    setCopying(true);
+    try {
+      await onCopy(rule.id, t('copyOfRule', { name: rule.name }));
+      toast.success(t('ruleDuplicated'));
+    } catch {
+      toast.error(t('ruleDuplicateError'));
+    } finally {
+      setCopying(false);
     }
   };
 
@@ -203,6 +253,10 @@ export function RuleEditor({ hasPermission, rule, status, onBack, onDelete, onSa
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-44">
                   <DropdownMenuGroup>
+                    <DropdownMenuItem disabled={copying} onSelect={() => void handleCopy()}>
+                      <CopyIcon />
+                      {t('duplicateRule')}
+                    </DropdownMenuItem>
                     <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
                       <Trash2Icon />
                       {t('deleteRule')}

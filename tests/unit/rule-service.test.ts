@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { createRule, permissionOriginsFromMatch, removeRule, upsertRule } from '@/application/rule-service';
+import {
+  createRule,
+  duplicateRule,
+  permissionOriginsFromMatch,
+  removeRule,
+  restoreRule,
+  upsertRule,
+} from '@/application/rule-service';
 import { createEmptyState } from '@/domain/rules/fixtures';
 
 describe('rule service', () => {
@@ -29,5 +36,20 @@ describe('rule service', () => {
     const removed = removeRule(added, rule.id);
     expect(removed.order).toEqual([]);
     expect(removed.rules[rule.id]).toBeUndefined();
+  });
+
+  it('duplicates disabled with a fresh rule identity and restores deletion at its original position', () => {
+    const original = createRule('https://docs.example.com');
+    const initial = upsertRule(createEmptyState(), original);
+    const duplicated = duplicateRule(initial, original, 'Copy of docs rule');
+
+    expect(duplicated.rule).toMatchObject({ name: 'Copy of docs rule', enabled: false });
+    expect(duplicated.rule.id).not.toBe(original.id);
+    expect(duplicated.rule.dnrId).not.toBe(original.dnrId);
+
+    const removed = removeRule(duplicated.state, original.id);
+    const restored = restoreRule(removed, original, 1);
+    expect(restored.order[1]).toBe(original.id);
+    expect(restored.rules[original.id]).toEqual(original);
   });
 });
