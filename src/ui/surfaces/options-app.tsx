@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ArchiveRestoreIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Badge } from '@/ui/components/badge';
@@ -10,6 +10,7 @@ import { TooltipProvider } from '@/ui/components/tooltip';
 import { useMigrationManager } from '@/ui/hooks/use-migration-manager';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 import { useI18n } from '@/ui/i18n';
+import { DataPanel } from '@/ui/data/data-panel';
 import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
@@ -108,22 +109,45 @@ export function OptionsApp() {
                 <InputGroupAddon align="inline-end">⌘K</InputGroupAddon>
               </InputGroup>
             ) : (
-              <p className="px-2 text-sm font-medium">{t('reviewLegacyData')}</p>
+              <p className="px-2 text-sm font-medium">
+                {t(view === 'migration' ? 'reviewLegacyData' : 'dataIntro')}
+              </p>
             )}
           </div>
           <div className="flex justify-end gap-2 px-4 max-[799px]:px-3">
-            <Button
-              className="min-[800px]:hidden"
-              variant="outline"
-              aria-label={t(view === 'rules' ? 'openMigration' : 'openRules')}
-              onClick={() => setView(view === 'rules' ? 'migration' : 'rules')}
-            >
-              {view === 'rules' ? <ArchiveRestoreIcon /> : <ListFilterIcon />}
-              <span className="max-[479px]:sr-only">{t(view === 'rules' ? 'migration' : 'rules')}</span>
-              {view === 'rules' && migrationCount > 0 ? (
-                <Badge variant="warning">{migrationCount}</Badge>
-              ) : null}
-            </Button>
+            {view === 'rules' ? (
+              <>
+                <Button
+                  className="min-[800px]:hidden"
+                  variant="outline"
+                  aria-label={t('openMigration')}
+                  onClick={() => setView('migration')}
+                >
+                  <ArchiveRestoreIcon />
+                  <span className="max-[479px]:sr-only">{t('migration')}</span>
+                  {migrationCount > 0 ? <Badge variant="warning">{migrationCount}</Badge> : null}
+                </Button>
+                <Button
+                  className="min-[800px]:hidden"
+                  variant="outline"
+                  aria-label={t('dataManagement')}
+                  onClick={() => setView('data')}
+                >
+                  <DatabaseBackupIcon />
+                  <span className="sr-only">{t('dataManagement')}</span>
+                </Button>
+              </>
+            ) : (
+              <Button
+                className="min-[800px]:hidden"
+                variant="outline"
+                aria-label={t('openRules')}
+                onClick={() => setView('rules')}
+              >
+                <ListFilterIcon />
+                <span className="max-[479px]:sr-only">{t('rules')}</span>
+              </Button>
+            )}
             {view === 'rules' ? (
               <Button disabled={creating} onClick={() => void handleCreate()}>
                 <PlusIcon data-icon="inline-start" />
@@ -152,6 +176,8 @@ export function OptionsApp() {
               onRollback={() => migrationManager.rollback(manager.state!)}
               onStateCommitted={manager.adoptState}
             />
+          ) : view === 'data' ? (
+            <DataPanel state={manager.state} onCommit={manager.replaceState} />
           ) : hasRules ? (
             <>
               <div className={cn(selectedRule && 'max-[799px]:hidden')}>

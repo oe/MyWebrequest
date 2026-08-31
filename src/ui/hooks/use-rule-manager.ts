@@ -173,6 +173,7 @@ export function useRuleManager() {
     deleteRule,
     loading,
     permissions,
+    replaceState: persist,
     rules,
     saveRule,
     selectedId,

@@ -53,11 +53,39 @@ export const ruleSchema = z.object({
   updatedAt: z.string().datetime(),
 });
 
-export const storedStateSchema = z.object({
-  schemaVersion: z.literal(1),
-  rules: z.record(z.string(), ruleSchema),
-  order: z.array(z.string()),
-  settings: z.object({
-    globallyPaused: z.boolean(),
-  }),
-});
+export const storedStateSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    rules: z.record(z.string(), ruleSchema),
+    order: z.array(z.string()),
+    settings: z.object({
+      globallyPaused: z.boolean(),
+    }),
+  })
+  .superRefine((state, context) => {
+    const ruleIds = Object.keys(state.rules);
+    const orderedIds = new Set(state.order);
+    if (orderedIds.size !== state.order.length) {
+      context.addIssue({ code: 'custom', path: ['order'], message: 'Rule order IDs must be unique.' });
+    }
+    if (
+      ruleIds.length !== state.order.length ||
+      ruleIds.some((id) => !orderedIds.has(id)) ||
+      state.order.some((id) => !state.rules[id])
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['order'],
+        message: 'Rule order must contain every stored rule exactly once.',
+      });
+    }
+    for (const [id, rule] of Object.entries(state.rules)) {
+      if (rule.id !== id) {
+        context.addIssue({ code: 'custom', path: ['rules', id, 'id'], message: 'Rule keys must match IDs.' });
+      }
+    }
+    const dnrIds = ruleIds.map((id) => state.rules[id]?.dnrId).filter((id): id is number => id !== undefined);
+    if (new Set(dnrIds).size !== dnrIds.length) {
+      context.addIssue({ code: 'custom', path: ['rules'], message: 'Dynamic rule IDs must be unique.' });
+    }
+  });

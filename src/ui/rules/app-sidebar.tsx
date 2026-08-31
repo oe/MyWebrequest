@@ -1,4 +1,4 @@
-import { ArchiveRestoreIcon, ListFilterIcon, ShieldCheckIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, ShieldCheckIcon } from 'lucide-react';
 
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
@@ -7,7 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip
 import { useI18n } from '@/ui/i18n';
 import { LanguageMenu } from '@/ui/i18n/language-menu';
 
-export type OptionsView = 'rules' | 'migration';
+export type OptionsView = 'rules' | 'migration' | 'data';
 
 type AppSidebarProps = {
   view: OptionsView;
@@ -20,6 +20,7 @@ export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarPro
   const items = [
     { id: 'rules', label: t('rules'), icon: ListFilterIcon },
     { id: 'migration', label: t('legacyMigration'), icon: ArchiveRestoreIcon },
+    { id: 'data', label: t('dataManagement'), icon: DatabaseBackupIcon },
   ] as const;
   return (
     <aside
