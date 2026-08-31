@@ -8,8 +8,9 @@ import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/in
 import { ScrollArea } from '@/ui/components/scroll-area';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
-import { useI18n, type Translate } from '@/ui/i18n';
+import { useI18n } from '@/ui/i18n';
 import { cn } from '@/ui/lib/utils';
+import { localizedActionLabel, ruleMatchesQuery } from './filter-rules';
 import { StatusBadge } from './status-badge';
 
 type RuleListProps = {
@@ -23,18 +24,6 @@ type RuleListProps = {
   onToggle: (id: string, enabled: boolean) => void;
   pendingIds?: ReadonlySet<string>;
 };
-
-function localizedActionLabel(action: Rule['action'], t: Translate): string {
-  return t(
-    action.kind === 'block'
-      ? 'actionBlockShort'
-      : action.kind === 'redirect'
-        ? 'actionRedirectShort'
-        : action.kind === 'upgrade-scheme'
-          ? 'actionUpgradeShort'
-          : 'actionHeaderShort',
-  );
-}
 
 export function RuleList({
   query,
@@ -64,12 +53,7 @@ export function RuleList({
     { label: t('needsReviewSection'), statuses: ['review-required', 'unsupported'] },
     { label: t('removedSection'), statuses: ['removed'] },
   ];
-  const normalizedQuery = query.trim().toLowerCase();
-  const filtered = rules.filter((rule) =>
-    [rule.name, localizedActionLabel(rule.action, t), rule.condition.url.value].some((value) =>
-      value.toLowerCase().includes(normalizedQuery),
-    ),
-  );
+  const filtered = rules.filter((rule) => ruleMatchesQuery(rule, query, t));
 
   const handleRuleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;

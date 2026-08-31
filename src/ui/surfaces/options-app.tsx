@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -25,6 +25,7 @@ import { DataPanel } from '@/ui/data/data-panel';
 import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
+import { ruleMatchesQuery } from '@/ui/rules/filter-rules';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
 import { cn } from '@/ui/lib/utils';
@@ -41,6 +42,7 @@ export function OptionsApp() {
   const [discardOpen, setDiscardOpen] = useState(false);
   const [pendingPermissionRule, setPendingPermissionRule] = useState<Rule | null>(null);
   const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
+  const searchInput = useRef<HTMLInputElement>(null);
   const pendingNavigation = useRef<(() => void) | null>(null);
   const selectedRule = useMemo(
     () => manager.rules.find((rule) => rule.id === manager.selectedId) ?? null,
@@ -55,6 +57,16 @@ export function OptionsApp() {
   const handleDirtyChange = useCallback((dirty: boolean) => {
     setEditorDirty(dirty);
   }, []);
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (view !== 'rules' || (!event.metaKey && !event.ctrlKey) || event.key.toLowerCase() !== 'k') return;
+      event.preventDefault();
+      searchInput.current?.focus();
+    };
+    window.addEventListener('keydown', focusSearch);
+    return () => window.removeEventListener('keydown', focusSearch);
+  }, [view]);
 
   const requestNavigation = useCallback(
     (action: () => void) => {
@@ -79,6 +91,17 @@ export function OptionsApp() {
     setEditorDirty(false);
     setDiscardOpen(false);
     action?.();
+  };
+
+  const handleQueryChange = (nextQuery: string) => {
+    if (selectedRule && !ruleMatchesQuery(selectedRule, nextQuery, t)) {
+      requestNavigation(() => {
+        setQuery(nextQuery);
+        manager.setSelectedId(null);
+      });
+      return;
+    }
+    setQuery(nextQuery);
   };
 
   const handleCreate = async () => {
@@ -165,12 +188,15 @@ export function OptionsApp() {
                   <SearchIcon />
                 </InputGroupAddon>
                 <InputGroupInput
+                  ref={searchInput}
                   aria-label={t('searchRules')}
                   placeholder={t('searchRules')}
                   value={query}
-                  onChange={(event) => setQuery(event.target.value)}
+                  onChange={(event) => handleQueryChange(event.target.value)}
                 />
-                <InputGroupAddon align="inline-end">⌘K</InputGroupAddon>
+                <InputGroupAddon align="inline-end">
+                  <kbd aria-hidden="true">⌘K</kbd>
+                </InputGroupAddon>
               </InputGroup>
             ) : (
               <p className="px-2 text-sm font-medium">
@@ -264,7 +290,7 @@ export function OptionsApp() {
                   statuses={manager.statuses}
                   pendingIds={pendingRuleIds}
                   quota={manager.quota}
-                  onQueryChange={setQuery}
+                  onQueryChange={handleQueryChange}
                   onSelect={(id) => requestNavigation(() => manager.setSelectedId(id))}
                   onToggle={handleToggle}
                 />
