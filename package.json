@@ -35,7 +35,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "security:audit": "node scripts/verify-image-size-patch.mjs && pnpm audit --audit-level high",
+    "security:audit": "node scripts/audit-security.mjs",
     "audit:store-metadata": "node scripts/audit-store-metadata.mjs",
     "audit:store-assets": "node scripts/audit-store-assets.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",

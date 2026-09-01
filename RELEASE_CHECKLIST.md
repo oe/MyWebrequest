@@ -144,6 +144,11 @@ partial historical checks remain pre-certification evidence.
   hashes and full commit SHA; publishes a readable workflow summary; and uploads the JSON with the release
   candidates. Unit tests reject both an unexpected browser version and checksum drift. This makes a future
   green run durable evidence rather than relying on a transient status badge.
+- 2026-09-02: the security gate now performs a second audit with its GHSA allowlist removed. It requires the
+  complete lockfile to contain exactly the two known build-only `image-size@2.0.2` infinite-loop advisories,
+  requires their dependency paths to remain unbundled development tooling, and first executes malformed ICNS,
+  JXL, and HEIF probes against the installed patched code. Any new advisory, dependency-boundary drift, changed
+  allowlist, missing patch, or upstream replacement causes the release gate to fail for explicit review.
 - 2026-09-02: each exact checksummed Chrome, Edge, and Firefox release archive produced its own three-image
   1280x800 store set: rule manager, bounded permission explanation, and checksum-verified safe import preview.
   The capture used isolated Chromium 151, installed Edge 152.0.4191.53, and declared-floor Firefox 142.0.
