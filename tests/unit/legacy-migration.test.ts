@@ -34,7 +34,7 @@ describe('legacy migration', () => {
     expect(block?.candidateRule).toMatchObject({
       enabled: false,
       migrationState: 'none',
-      permissionOrigins: ['*://ads.example.com/*'],
+      permissionOrigins: ['http://ads.example.com/*', 'https://ads.example.com/*'],
       action: { kind: 'block' },
     });
     expect(block?.candidateRule && compileDnrRule(block.candidateRule).ok).toBe(true);

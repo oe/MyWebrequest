@@ -95,14 +95,20 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   snapshot. One-click recovery restored the exact original counts and active-state baselines: Chrome returned
   to three rules with two active, and Edge and Firefox each returned to four rules with two active. No recovery
   banner remained afterward.
+- Chrome 152.0.7977.65 exposed a real permission-request defect during the installed cross-origin test: the
+  initial `*://*.localhost/*` initiator pattern was rejected because the manifest declares scheme-specific
+  optional host permissions. Runtime permission normalization now expands wildcard schemes into bounded HTTP
+  and HTTPS patterns, including legacy rules already stored with `*://`. The rebuilt Chrome, Edge 152.0.4191.53,
+  and Firefox 154.0.1 artifacts each explained and requested exactly `http://*.localhost/*`,
+  `http://127.0.0.1/*`, and `https://*.localhost/*`. Their native prompts described localhost access, both
+  fixture rules became active after the grant, a cross-origin XHR redirect preserved the wildcard capture as
+  `/target/captured-value`, and the independent header request arrived with
+  `X-MWR-Cross-Origin: cross-origin-pass`.
 
 ## Remaining compatibility work
 
 - Repeat the installed-extension matrix on the supported older browser releases.
-- Verify regex substitution, cross-origin subresource redirect, and cross-origin request-header
-  modification independently on each browser.
-- Certify the implemented initiator-origin permission model for cross-origin subresource redirects and
-  header changes; navigation-only rules request only the request URL origin.
+- Verify regex substitution independently on each browser.
 - Add capability checks around regex support, match testing, rule quotas, and any API whose browser support
   differs.
 - Run Chrome Web Store, Edge Add-ons, and AMO packaging validators in CI before enabling a release job.
@@ -120,7 +126,9 @@ disabled merge, replace-time snapshot creation, and one-click recovery. Chromium
 gate. A test-only manifest with only the local request and initiator fixture origins additionally proves real
 cross-origin wildcard capture redirects and request-header modification. Because that harness bypasses the
 native optional-permission prompt, it is not evidence that a branded Chrome, Edge, or Firefox row has passed
-its installed-browser or store certification.
+its installed-browser or store certification. For manual installed-browser rechecks, run
+`pnpm fixture:cross-origin` and import `tests/fixtures/cross-origin-permission-rules.json` as a temporary
+replace-state fixture, then restore the automatically captured snapshot when the test is complete.
 
 ## Release gate
 

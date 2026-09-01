@@ -2,6 +2,11 @@ import type { Rule } from './model';
 
 const navigationResourceTypes = new Set(['main_frame', 'sub_frame']);
 
+function permissionPatterns(scheme: string, host: string): string[] {
+  if (scheme === '*') return [`http://${host}/*`, `https://${host}/*`];
+  return [`${scheme}://${host}/*`];
+}
+
 function normalizeMatchPatternHost(scheme: string, host: string): string | null {
   if (host === '*') return host;
 
@@ -18,7 +23,7 @@ function normalizeMatchPatternHost(scheme: string, host: string): string | null 
 export function permissionOriginsFromMatch(value: string): string[] {
   if (value.startsWith('||')) {
     const host = value.slice(2).replace(/\^.*$/, '').replace(/^\*\./, '');
-    return host ? [`*://*.${host}/*`] : [];
+    return host ? permissionPatterns('*', `*.${host}`) : [];
   }
 
   const matchPattern = /^(\*|https?):\/\/([^/]+)(?:\/|$)/.exec(value);
@@ -31,7 +36,7 @@ export function permissionOriginsFromMatch(value: string): string[] {
       !host.includes('{') &&
       (host === '*' || !host.includes('*') || host.startsWith('*.'))
     ) {
-      return [`${scheme}://${host}/*`];
+      return permissionPatterns(scheme, host);
     }
   }
 
@@ -58,10 +63,13 @@ export function requiresInitiatorPermission(rule: Rule): boolean {
 export function requiredPermissionOrigins(rule: Rule): string[] {
   if (rule.action.kind === 'block' || rule.action.kind === 'upgrade-scheme') return [];
 
-  const origins = [...rule.permissionOrigins];
+  // Older stored rules may still contain Chrome-style `*://` patterns. They
+  // remain valid match patterns, but cannot be requested from our manifest's
+  // scheme-specific optional host permissions, so normalize them at runtime.
+  const origins = rule.permissionOrigins.flatMap(permissionOriginsFromMatch);
   if (requiresInitiatorPermission(rule)) {
     for (const domain of rule.condition.initiatorDomains ?? []) {
-      origins.push(`*://*.${domain.toLowerCase()}/*`);
+      origins.push(...permissionPatterns('*', `*.${domain.toLowerCase()}`));
     }
   }
   return [...new Set(origins)].sort();

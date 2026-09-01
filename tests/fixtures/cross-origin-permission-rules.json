@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 1,
+  "rules": {
+    "manual-cross-origin-redirect": {
+      "schemaVersion": 1,
+      "id": "manual-cross-origin-redirect",
+      "dnrId": 1911001,
+      "name": "Cross-origin redirect probe",
+      "enabled": false,
+      "priority": 10,
+      "condition": {
+        "url": {
+          "kind": "wildcard",
+          "value": "http://127.0.0.1:4185/redirect/*"
+        },
+        "resourceTypes": ["xmlhttprequest"],
+        "initiatorDomains": ["localhost"]
+      },
+      "action": {
+        "kind": "redirect",
+        "target": "http://localhost:4185/target/$1"
+      },
+      "permissionOrigins": ["http://127.0.0.1/*"],
+      "migrationState": "none",
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "updatedAt": "2026-09-02T00:00:00.000Z"
+    },
+    "manual-cross-origin-header": {
+      "schemaVersion": 1,
+      "id": "manual-cross-origin-header",
+      "dnrId": 1911002,
+      "name": "Cross-origin header probe",
+      "enabled": false,
+      "priority": 10,
+      "condition": {
+        "url": {
+          "kind": "wildcard",
+          "value": "http://127.0.0.1:4185/headers*"
+        },
+        "resourceTypes": ["xmlhttprequest"],
+        "initiatorDomains": ["localhost"]
+      },
+      "action": {
+        "kind": "modify-request-headers",
+        "operations": [
+          {
+            "header": "X-MWR-Cross-Origin",
+            "operation": "set",
+            "value": "cross-origin-pass"
+          }
+        ]
+      },
+      "permissionOrigins": ["http://127.0.0.1/*"],
+      "migrationState": "none",
+      "createdAt": "2026-09-02T00:00:00.000Z",
+      "updatedAt": "2026-09-02T00:00:00.000Z"
+    }
+  },
+  "order": ["manual-cross-origin-redirect", "manual-cross-origin-header"],
+  "settings": {
+    "globallyPaused": false
+  }
+}

@@ -24,8 +24,15 @@ describe('rule service', () => {
     ]);
   });
 
-  it('preserves legacy match-pattern schemes and wildcard subdomains', () => {
-    expect(permissionOriginsFromMatch('*://*.example.com/*')).toEqual(['*://*.example.com/*']);
+  it('expands wildcard schemes into requestable optional host patterns', () => {
+    expect(permissionOriginsFromMatch('*://*.example.com/*')).toEqual([
+      'http://*.example.com/*',
+      'https://*.example.com/*',
+    ]);
+    expect(permissionOriginsFromMatch('||example.com^')).toEqual([
+      'http://*.example.com/*',
+      'https://*.example.com/*',
+    ]);
     expect(permissionOriginsFromMatch('http://example.com/*')).toEqual(['http://example.com/*']);
   });
 
@@ -42,8 +49,10 @@ describe('rule service', () => {
     expect(redirect).toBeDefined();
     if (!redirect) return;
 
-    expect(requiredPermissionOrigins(redirect)).toEqual([
-      '*://*.app.example.com/*',
+    expect(requiredPermissionOrigins({ ...redirect, permissionOrigins: ['*://api.example.com/*'] })).toEqual([
+      'http://*.app.example.com/*',
+      'http://api.example.com/*',
+      'https://*.app.example.com/*',
       'https://api.example.com/*',
     ]);
   });

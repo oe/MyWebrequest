@@ -204,7 +204,7 @@ async function extensionWithFixtureHostAccess(): Promise<{
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
     host_permissions?: string[];
   };
-  manifest.host_permissions = ['http://127.0.0.1/*', '*://*.localhost/*'];
+  manifest.host_permissions = ['http://127.0.0.1/*', 'http://*.localhost/*', 'https://*.localhost/*'];
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
   return { directory, extensionPath };
@@ -473,8 +473,9 @@ test('permission previews stay bounded and cancel without changing runtime state
     }),
   ).toBeVisible();
   const requestedOrigins = permissionDialog.getByRole('list', { name: 'Requested website access' });
-  await expect(requestedOrigins.getByRole('listitem')).toHaveCount(2);
-  await expect(requestedOrigins.getByText('*://*.app.example/*', { exact: true })).toBeVisible();
+  await expect(requestedOrigins.getByRole('listitem')).toHaveCount(3);
+  await expect(requestedOrigins.getByText('http://*.app.example/*', { exact: true })).toBeVisible();
+  await expect(requestedOrigins.getByText('https://*.app.example/*', { exact: true })).toBeVisible();
   await expect(requestedOrigins.getByText('https://api.example/*', { exact: true })).toBeVisible();
   await permissionDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
 
@@ -548,7 +549,7 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
 
     expect(
       await worker.evaluate(async () => (await chrome.permissions.getAll()).origins?.sort() ?? []),
-    ).toEqual(['*://*.localhost/*', 'http://127.0.0.1/*']);
+    ).toEqual(['http://*.localhost/*', 'http://127.0.0.1/*', 'https://*.localhost/*']);
 
     const initiator = await context.newPage();
     await initiator.goto(`http://localhost:${port}/app`);

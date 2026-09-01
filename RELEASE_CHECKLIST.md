@@ -101,6 +101,13 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   and preserved the original active rules; same-file replacement disabled all imported rules and created the
   pre-replace recovery snapshot. One-click recovery restored Chrome to its exact three-rule/two-active baseline
   and Edge and Firefox to their exact four-rule/two-active baselines, with the recovery marker cleared.
+- 2026-09-02: installed Chrome 152.0.7977.65 revealed that requesting the generated
+  `*://*.localhost/*` initiator pattern was rejected as outside the manifest's optional permissions. Wildcard
+  schemes are now normalized into separate HTTP and HTTPS patterns at request time, including for existing
+  stored rules. Rebuilt Chrome, Edge 152.0.4191.53, and Firefox 154.0.1 each showed exactly
+  `http://*.localhost/*`, `http://127.0.0.1/*`, and `https://*.localhost/*` before its native localhost-access
+  prompt. After allowing access, all three produced `/target/captured-value` through the real cross-origin XHR
+  redirect and `header:cross-origin-pass` through the independent request-header fixture.
 
 ## 2. Installed-browser matrix
 
@@ -113,8 +120,8 @@ Run each scenario on the current stable browser and one supported older release.
 | Block rule works without host access             | ✓      | ✓    | ✓       |
 | HTTPS-upgrade rule works without host access     | ✓      | ✓    | ✓       |
 | Navigation redirect grant, refusal, and re-grant | ✓      | ✓    | ✓       |
-| Subresource redirect requests initiator access   | ☐      | ☐    | ☐       |
-| Request-header rule requests initiator access    | ☐      | ☐    | ☐       |
+| Subresource redirect requests initiator access   | ✓      | ✓    | ✓       |
+| Request-header rule requests initiator access    | ✓      | ✓    | ✓       |
 | Permission revocation removes affected DNR rules | ✓      | ✓    | ✓       |
 | Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |

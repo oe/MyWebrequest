@@ -12,6 +12,7 @@
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox --mv3",
+    "fixture:cross-origin": "node scripts/run-cross-origin-fixture.mjs",
     "e2e:chromium": "pnpm build:chrome && playwright test",
     "build": "pnpm build:chrome",
     "build:chrome": "wxt build -b chrome --mv3",

@@ -55,7 +55,9 @@ function installBrowserMock(options: {
     permissions: {
       contains: vi.fn(async () => options.permitted),
       getAll: vi.fn(async () => ({
-        origins: options.permitted ? ['*://*.app.example.com/*', 'https://api.example.com/*'] : [],
+        origins: options.permitted
+          ? ['http://*.app.example.com/*', 'https://*.app.example.com/*', 'https://api.example.com/*']
+          : [],
       })),
       request: vi.fn(async () => options.permitted),
       onAdded,
@@ -180,7 +182,7 @@ describe('rule runtime reconciliation', () => {
     await expect(requestRulePermission(rule)).resolves.toBe(true);
 
     const expected = {
-      origins: ['*://*.app.example.com/*', 'https://api.example.com/*'],
+      origins: ['http://*.app.example.com/*', 'https://*.app.example.com/*', 'https://api.example.com/*'],
     };
     expect(runtime.getAll).toHaveBeenCalledOnce();
     expect(runtime.request).toHaveBeenCalledWith(expected);
