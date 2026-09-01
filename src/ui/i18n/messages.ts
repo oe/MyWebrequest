@@ -1,5 +1,5 @@
 export const en = {
-  appName: 'Request Rules',
+  appName: 'My Webrequest',
   loading: 'Loading…',
   loadingRules: 'Loading request rules…',
   rules: 'Rules',
@@ -7,6 +7,7 @@ export const en = {
   primaryNavigation: 'Primary navigation',
   localOnly: 'Manifest V3 · Local only',
   language: 'Language',
+  settings: 'Settings',
   systemLanguage: 'Follow browser language',
   languageChangeError: 'The language preference could not be saved.',
   dataManagement: 'Backup & restore',

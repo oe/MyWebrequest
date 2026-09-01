@@ -1,4 +1,4 @@
-# My Webrequest 2 Design Brief
+# My Webrequest Design Brief
 
 Status: Direction selected and implemented as the V1 UI baseline  
 Last updated: 2026-08-31  
@@ -24,9 +24,10 @@ A user should be able to answer these questions within seconds:
 
 The UI should feel trustworthy, precise, calm, and fast. It should not resemble an ad-blocker dashboard, marketing site, generic admin template, or terminal emulator.
 
-## 3. Working visual label and mock data
+## 3. Product label and mock data
 
-Use `Request Rules` as the temporary product label in visual concepts. It is not an approved rename.
+Use `My Webrequest` as the product label. `Request Rules` may be used only as descriptive copy, never as
+the extension name.
 
 Use realistic mock rules:
 

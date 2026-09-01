@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import type { Rule } from '@/domain/rules/model';
@@ -23,11 +23,13 @@ import { useI18n } from '@/ui/i18n';
 import { LanguageMenu } from '@/ui/i18n/language-menu';
 import { DataPanel } from '@/ui/data/data-panel';
 import { MigrationPanel } from '@/ui/migration/migration-panel';
+import { shouldShowMigrationNavigation } from '@/ui/migration/migration-navigation';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
 import { ruleMatchesQuery } from '@/ui/rules/filter-rules';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
+import { SettingsMenu } from '@/ui/settings/settings-menu';
 import { cn } from '@/ui/lib/utils';
 import { errorMessage } from '@/ui/lib/error-message';
 
@@ -53,6 +55,10 @@ export function OptionsApp() {
     migrationManager.migration?.status === 'pending'
       ? migrationManager.migration.bundle.report.items.length
       : 0;
+  const showMigrationNavigation = shouldShowMigrationNavigation(
+    migrationManager.detection,
+    migrationManager.loading,
+  );
 
   const handleDirtyChange = useCallback((dirty: boolean) => {
     setEditorDirty(dirty);
@@ -210,25 +216,26 @@ export function OptionsApp() {
             </div>
             {view === 'rules' ? (
               <>
-                <Button
-                  className="min-[800px]:hidden"
-                  variant="outline"
-                  aria-label={t('openMigration')}
-                  onClick={() => requestNavigation(() => setView('migration'))}
-                >
-                  <ArchiveRestoreIcon />
-                  <span className="max-[479px]:sr-only">{t('migration')}</span>
-                  {migrationCount > 0 ? <Badge variant="warning">{migrationCount}</Badge> : null}
-                </Button>
-                <Button
-                  className="min-[800px]:hidden"
-                  variant="outline"
-                  aria-label={t('dataManagement')}
-                  onClick={() => requestNavigation(() => setView('data'))}
-                >
-                  <DatabaseBackupIcon />
-                  <span className="sr-only">{t('dataManagement')}</span>
-                </Button>
+                {showMigrationNavigation ? (
+                  <Button
+                    className="min-[800px]:hidden"
+                    variant="outline"
+                    aria-label={t('openMigration')}
+                    onClick={() => requestNavigation(() => setView('migration'))}
+                  >
+                    <ArchiveRestoreIcon />
+                    <span className="max-[479px]:sr-only">{t('migration')}</span>
+                    {migrationCount > 0 ? <Badge variant="warning">{migrationCount}</Badge> : null}
+                  </Button>
+                ) : null}
+                <div className="min-[800px]:hidden">
+                  <SettingsMenu
+                    compact
+                    migrationCount={migrationCount}
+                    onOpenData={() => requestNavigation(() => setView('data'))}
+                    onOpenMigration={() => requestNavigation(() => setView('migration'))}
+                  />
+                </div>
               </>
             ) : (
               <Button
@@ -254,6 +261,7 @@ export function OptionsApp() {
           <AppSidebar
             view={view}
             migrationCount={migrationCount}
+            showMigration={showMigrationNavigation}
             onViewChange={(nextView) => requestNavigation(() => setView(nextView))}
           />
           {view === 'migration' ? (

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "요청 규칙" },
+  "appName": { "message": "My Webrequest" },
   "appDesc": { "message": "브라우저 요청 규칙을 기기에서 만들고 테스트하고 관리합니다." },
-  "actionTitle": { "message": "요청 규칙 열기" }
+  "actionTitle": { "message": "My Webrequest 열기" }
 }

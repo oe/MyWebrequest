@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "Reglas de solicitud" },
+  "appName": { "message": "My Webrequest" },
   "appDesc": { "message": "Crea, prueba y controla localmente las reglas de solicitud del navegador." },
-  "actionTitle": { "message": "Abrir reglas de solicitud" }
+  "actionTitle": { "message": "Abrir My Webrequest" }
 }

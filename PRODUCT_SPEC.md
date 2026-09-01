@@ -1,4 +1,4 @@
-# My Webrequest 2 Product Specification
+# My Webrequest Product Specification
 
 Status: Approved baseline; implementation in progress  
 Last updated: 2026-09-01  
@@ -8,7 +8,8 @@ Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGR
 
 ## 1. Product definition
 
-My Webrequest 2 is a local-first Chrome extension for developers and advanced users who need to create, test, enable, and manage request-handling rules without editing raw extension manifests or DNR JSON.
+My Webrequest is a local-first browser extension for developers and advanced users who need to create,
+test, enable, and manage request-handling rules without editing raw extension manifests or DNR JSON.
 
 The extension has one purpose:
 
@@ -16,7 +17,8 @@ The extension has one purpose:
 
 It is not a general browser utility, an ad blocker, a request recorder, or a replacement for Chrome DevTools.
 
-`My Webrequest 2` is a working product name. Renaming is outside the V1 implementation decision unless explicitly approved.
+`My Webrequest` is the established product name. It must not be replaced by a descriptive feature label
+unless explicitly approved.
 
 ## 2. Users and jobs
 

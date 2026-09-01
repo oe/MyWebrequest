@@ -4,7 +4,7 @@ Last updated: 2026-09-01
 
 ## Name
 
-My Webrequest — Request Rules
+My Webrequest
 
 ## Single-purpose statement
 

@@ -1,13 +1,14 @@
 import type { Messages } from './messages';
 
 const zhCN = {
-  appName: '请求规则',
+  appName: 'My Webrequest',
   loading: '正在加载…',
   loadingRules: '正在加载请求规则…',
   rules: '规则',
   legacyMigration: '旧版迁移',
   primaryNavigation: '主导航',
   localOnly: 'Manifest V3 · 仅本地处理',
+  settings: '设置',
   searchRules: '搜索规则',
   reviewLegacyData: '检查已保留的旧版数据',
   openMigration: '打开旧版迁移',
@@ -293,13 +294,14 @@ const zhCN = {
 } satisfies Messages;
 
 const ko = {
-  appName: '요청 규칙',
+  appName: 'My Webrequest',
   loading: '불러오는 중…',
   loadingRules: '요청 규칙을 불러오는 중…',
   rules: '규칙',
   legacyMigration: '레거시 마이그레이션',
   primaryNavigation: '기본 탐색',
   localOnly: 'Manifest V3 · 로컬 전용',
+  settings: '설정',
   searchRules: '규칙 검색',
   reviewLegacyData: '보존된 레거시 데이터 검토',
   openMigration: '레거시 마이그레이션 열기',
@@ -597,13 +599,14 @@ const ko = {
 } satisfies Messages;
 
 const ja = {
-  appName: 'リクエストルール',
+  appName: 'My Webrequest',
   loading: '読み込み中…',
   loadingRules: 'リクエストルールを読み込み中…',
   rules: 'ルール',
   legacyMigration: '旧版データの移行',
   primaryNavigation: 'メインナビゲーション',
   localOnly: 'Manifest V3 · ローカルのみ',
+  settings: '設定',
   searchRules: 'ルールを検索',
   reviewLegacyData: '保持された旧版データを確認',
   openMigration: '旧版データの移行を開く',
@@ -899,13 +902,14 @@ const ja = {
 } satisfies Messages;
 
 const fr = {
-  appName: 'Règles de requête',
+  appName: 'My Webrequest',
   loading: 'Chargement…',
   loadingRules: 'Chargement des règles…',
   rules: 'Règles',
   legacyMigration: 'Migration héritée',
   primaryNavigation: 'Navigation principale',
   localOnly: 'Manifest V3 · Local uniquement',
+  settings: 'Paramètres',
   searchRules: 'Rechercher des règles',
   reviewLegacyData: 'Examiner les anciennes données conservées',
   openMigration: 'Ouvrir la migration',
@@ -1216,13 +1220,14 @@ const fr = {
 } satisfies Messages;
 
 const es = {
-  appName: 'Reglas de solicitud',
+  appName: 'My Webrequest',
   loading: 'Cargando…',
   loadingRules: 'Cargando reglas…',
   rules: 'Reglas',
   legacyMigration: 'Migración anterior',
   primaryNavigation: 'Navegación principal',
   localOnly: 'Manifest V3 · Solo local',
+  settings: 'Configuración',
   searchRules: 'Buscar reglas',
   reviewLegacyData: 'Revisar datos anteriores conservados',
   openMigration: 'Abrir migración anterior',

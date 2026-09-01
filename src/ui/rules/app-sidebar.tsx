@@ -1,4 +1,4 @@
-import { ArchiveRestoreIcon, DatabaseBackupIcon, ListFilterIcon, ShieldCheckIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, ListFilterIcon, ShieldCheckIcon } from 'lucide-react';
 
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
@@ -6,21 +6,24 @@ import { Separator } from '@/ui/components/separator';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/ui/components/tooltip';
 import { useI18n } from '@/ui/i18n';
 import { LanguageMenu } from '@/ui/i18n/language-menu';
+import { SettingsMenu } from '@/ui/settings/settings-menu';
 
 export type OptionsView = 'rules' | 'migration' | 'data';
 
 type AppSidebarProps = {
   view: OptionsView;
   migrationCount: number;
+  showMigration: boolean;
   onViewChange: (view: OptionsView) => void;
 };
 
-export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarProps) {
+export function AppSidebar({ view, migrationCount, showMigration, onViewChange }: AppSidebarProps) {
   const { t } = useI18n();
   const items = [
     { id: 'rules', label: t('rules'), icon: ListFilterIcon },
-    { id: 'migration', label: t('legacyMigration'), icon: ArchiveRestoreIcon },
-    { id: 'data', label: t('dataManagement'), icon: DatabaseBackupIcon },
+    ...(showMigration
+      ? ([{ id: 'migration', label: t('legacyMigration'), icon: ArchiveRestoreIcon }] as const)
+      : []),
   ] as const;
   return (
     <aside
@@ -62,6 +65,11 @@ export function AppSidebar({ view, migrationCount, onViewChange }: AppSidebarPro
       </nav>
       <div className="mt-auto flex w-full flex-col gap-3">
         <LanguageMenu />
+        <SettingsMenu
+          migrationCount={migrationCount}
+          onOpenData={() => onViewChange('data')}
+          onOpenMigration={() => onViewChange('migration')}
+        />
         <Separator />
         <div className="flex items-center gap-2 px-2 text-xs text-muted-foreground max-[1049px]:justify-center max-[1049px]:px-0">
           <ShieldCheckIcon className="size-4" aria-hidden="true" />
