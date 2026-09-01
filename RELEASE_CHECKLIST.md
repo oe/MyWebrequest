@@ -118,9 +118,10 @@ partial historical checks remain pre-certification evidence.
   902 regex rules and 4,500 of 4,502 total rules in stored order, and retained all 4,500 rules after an add-on
   reload. The same run denied, granted, revoked, and re-granted the bounded optional-host prompt, verified DNR
   removal and restoration without changing the stored enabled state, preserved a wildcard capture through a
-  cross-origin redirect, and modified a real outgoing request header. Chromium 121 is a native x86 CI gate;
-  local emulation on this Apple Silicon host is not counted because the old Chrome binary crashes in its
-  emulated GPU process.
+  cross-origin redirect, and modified a real outgoing request header. All six locales, keyboard focus, reduced
+  motion, 200% zoom reflow, checksummed backup export/import, popup pause/resume, storage synchronization, and
+  DNR synchronization also passed in Firefox 142. Chromium 121 is a native x86 CI gate; local emulation on
+  this Apple Silicon host is not counted because the old Chrome binary crashes in its emulated GPU process.
 - 2026-09-02: an isolated production Chromium profile proved deterministic enforcement at both safety
   boundaries: 900 of 902 regex-backed rules and 4,500 of 4,502 total dynamic rules were installed in stored
   order. A separate same-path, same-extension-ID browser restart upgraded a V0.8-shaped fixture to the current
@@ -173,7 +174,7 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | HTTPS upgrade works without host access        | ☐          | ☐        | ✓           |
 | Redirect/header permission lifecycle           | ☐          | ☐        | ✓           |
 | Cross-origin capture and header modification   | ☐          | ☐        | ✓           |
-| Popup, storage, backup, locales, accessibility | ☐          | ☐        | ☐           |
+| Popup, storage, backup, locales, accessibility | ☐          | ☐        | ✓           |
 | Legacy migration lifecycle                     | ☐          | N/A      | N/A         |
 
 ## 3. Store validation

@@ -218,6 +218,40 @@ async function pollExtension(script, expected, timeout = 30_000) {
   );
 }
 
+const webdriverElementKey = 'element-6066-11e4-a52e-4f735466cecf';
+
+async function findElement(using, value, index) {
+  const elements = await command('POST', `/session/${sessionId}/elements`, { using, value });
+  if (index !== undefined) {
+    const elementId = elements[index]?.[webdriverElementKey];
+    if (!elementId) throw new Error(`Firefox could not find element ${using}=${value} at index ${index}.`);
+    return elementId;
+  }
+  for (const element of elements) {
+    const elementId = element[webdriverElementKey];
+    if (
+      elementId &&
+      (await command('GET', `/session/${sessionId}/element/${elementId}/displayed`)) === true
+    ) {
+      return elementId;
+    }
+  }
+  throw new Error(`Firefox could not find a visible element ${using}=${value}.`);
+}
+
+async function clickElement(using, value, index) {
+  const elementId = await findElement(using, value, index);
+  await command('POST', `/session/${sessionId}/element/${elementId}/click`, {});
+}
+
+async function sendElementKey(using, value, key, index) {
+  const elementId = await findElement(using, value, index);
+  await command('POST', `/session/${sessionId}/element/${elementId}/value`, {
+    text: key,
+    value: [key],
+  });
+}
+
 const permissionProbeOrigins = [
   'http://127.0.0.1/*',
   'http://*.localhost/*',
@@ -246,13 +280,7 @@ async function decideFixturePermission(allow) {
      done(true);`,
     [permissionProbeOrigins],
   );
-  const permissionButton = await command('POST', `/session/${sessionId}/element`, {
-    using: 'css selector',
-    value: '#firefox-floor-permission-probe',
-  });
-  const permissionElementId = permissionButton['element-6066-11e4-a52e-4f735466cecf'];
-  if (!permissionElementId) throw new Error('Firefox did not expose the permission probe button.');
-  await command('POST', `/session/${sessionId}/element/${permissionElementId}/click`, {});
+  await clickElement('css selector', '#firefox-floor-permission-probe');
 
   await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
   let prompt;
@@ -320,6 +348,7 @@ try {
             'datareporting.healthreport.uploadEnabled': false,
             'datareporting.policy.dataSubmissionEnabled': false,
             'toolkit.telemetry.enabled': false,
+            'ui.prefersReducedMotion': 1,
           },
         },
       },
@@ -327,6 +356,7 @@ try {
   });
   sessionId = session.sessionId;
   await command('POST', `/session/${sessionId}/timeouts`, { implicit: 0, pageLoad: 8_000, script: 30_000 });
+  await command('POST', `/session/${sessionId}/window/rect`, { width: 1280, height: 900 });
 
   const addonId = await command('POST', `/session/${sessionId}/moz/addon/install`, {
     path: artifact,
@@ -337,19 +367,267 @@ try {
   }
 
   await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
-  const optionsUrl = await executeAsync(
+  const extensionUrls = await executeAsync(
     `const done = arguments[arguments.length - 1];
      try {
-       done(WebExtensionPolicy.getByID(${JSON.stringify(addonId)}).getURL('options.html'));
+       const policy = WebExtensionPolicy.getByID(${JSON.stringify(addonId)});
+       done({ options: policy.getURL('options.html'), popup: policy.getURL('popup.html') });
      } catch (error) {
        done({ error: String(error) });
      }`,
   );
-  if (typeof optionsUrl !== 'string' || !optionsUrl.startsWith('moz-extension://')) {
-    throw new Error(`Could not resolve the installed options URL: ${JSON.stringify(optionsUrl)}`);
+  if (
+    typeof extensionUrls?.options !== 'string' ||
+    !extensionUrls.options.startsWith('moz-extension://') ||
+    typeof extensionUrls?.popup !== 'string' ||
+    !extensionUrls.popup.startsWith('moz-extension://')
+  ) {
+    throw new Error(`Could not resolve the installed extension URLs: ${JSON.stringify(extensionUrls)}`);
   }
+  const optionsUrl = extensionUrls.options;
+  const popupUrl = extensionUrls.popup;
   await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
   await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
+
+  await pollExtension(
+    `({
+       appName: document.body?.innerText.includes('My Webrequest') ?? false,
+       lang: document.documentElement.lang,
+       title: document.title,
+     })`,
+    { appName: true, lang: 'en', title: 'My Webrequest' },
+  );
+  const accessibilityState = await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     const header = document.querySelector('[data-material="glass-bar"]');
+     const settings = document.querySelector('button[aria-label="Settings"]');
+     const transitionDurations = settings
+       ? getComputedStyle(settings).transitionDuration.split(',').map((duration) => Number.parseFloat(duration))
+       : [];
+     done({
+       reducedMotion: matchMedia('(prefers-reduced-motion: reduce)').matches,
+       transitionSeconds: transitionDurations.length ? Math.max(...transitionDurations) : null,
+       hasLegacyEntry: document.body.innerText.includes('Legacy migration'),
+       hasHeader: Boolean(header),
+       hasSettings: Boolean(settings),
+     });`,
+  );
+  if (
+    accessibilityState.reducedMotion !== true ||
+    accessibilityState.transitionSeconds === null ||
+    accessibilityState.transitionSeconds > 0.001 ||
+    accessibilityState.hasLegacyEntry ||
+    !accessibilityState.hasHeader ||
+    !accessibilityState.hasSettings
+  ) {
+    throw new Error(`Firefox options accessibility smoke failed: ${JSON.stringify(accessibilityState)}`);
+  }
+
+  await sendElementKey('css selector', 'button[aria-label="Settings"]', '\uE007');
+  await pollExtension(
+    `({
+       backup: document.body.innerText.includes('Backup & restore'),
+       legacy: document.body.innerText.includes('Legacy migration'),
+     })`,
+    { backup: true, legacy: false },
+  );
+  await sendElementKey(
+    'xpath',
+    `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`,
+    '\uE00C',
+  );
+  await pollExtension(
+    `document.activeElement?.getAttribute('aria-label') ?? null`,
+    'Settings',
+  );
+
+  const localeLabels = {
+    en: 'Settings',
+    'zh-CN': '设置',
+    ko: '설정',
+    ja: '設定',
+    fr: 'Paramètres',
+    es: 'Configuración',
+  };
+  for (const [locale, settingsLabel] of Object.entries(localeLabels)) {
+    const localeStored = await executeAsync(
+      `const locale = arguments[0];
+       const done = arguments[arguments.length - 1];
+       browser.storage.local.set({ 'ui.locale': locale }).then(() => done(true), (error) => done({ error: String(error) }));`,
+      [locale],
+    );
+    if (localeStored?.error) throw new Error(localeStored.error);
+    await pollExtension(
+      `({
+         lang: document.documentElement.lang,
+         settings: document.querySelector('button[aria-label=${JSON.stringify(settingsLabel)}]') !== null,
+       })`,
+      { lang: locale, settings: true },
+    );
+  }
+  await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     browser.storage.local.set({ 'ui.locale': 'en' }).then(() => done(true), (error) => done({ error: String(error) }));`,
+  );
+  await pollExtension(`document.documentElement.lang`, 'en');
+
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
+  const zoomApplied = await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     try {
+       ZoomManager.setZoomForBrowser(gBrowser.selectedBrowser, 2);
+       done(ZoomManager.getZoomForBrowser(gBrowser.selectedBrowser));
+     } catch (error) {
+       done({ error: String(error) });
+     }`,
+  );
+  if (zoomApplied !== 2) throw new Error(`Firefox could not apply 200% zoom: ${JSON.stringify(zoomApplied)}`);
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
+  await pollExtension(
+    `({
+       clientWidth: document.documentElement.clientWidth,
+       noHorizontalOverflow: document.documentElement.scrollWidth === document.documentElement.clientWidth,
+     })`,
+    { clientWidth: 640, noHorizontalOverflow: true },
+  );
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
+  await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     ZoomManager.setZoomForBrowser(gBrowser.selectedBrowser, 1);
+     done(ZoomManager.getZoomForBrowser(gBrowser.selectedBrowser));`,
+  );
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
+
+  await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     const now = new Date().toISOString();
+     const rule = {
+       schemaVersion: 1,
+       id: 'firefox-floor-backup-source',
+       dnrId: 1920001,
+       name: 'Firefox floor backup source',
+       enabled: true,
+       priority: 10,
+       condition: {
+         url: { kind: 'wildcard', value: 'https://backup-source.example/*' },
+         resourceTypes: ['main_frame'],
+       },
+       action: { kind: 'block' },
+       permissionOrigins: [],
+       migrationState: 'none',
+       createdAt: now,
+       updatedAt: now,
+     };
+     browser.storage.local.set({
+       requestRulesState: {
+         schemaVersion: 1,
+         rules: { [rule.id]: rule },
+         order: [rule.id],
+         settings: { globallyPaused: false },
+       },
+     }).then(() => done(true), (error) => done({ error: String(error) }));`,
+  );
+  await clickElement('css selector', 'button[aria-label="Settings"]');
+  await clickElement('xpath', `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`);
+  await pollExtension(`document.body.innerText.includes('Export backup')`, true);
+  await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     const original = URL.createObjectURL.bind(URL);
+     window.__mwrOriginalCreateObjectURL = original;
+     URL.createObjectURL = (blob) => {
+       void blob.text().then((text) => { window.__mwrExportedBackup = text; });
+       return original(blob);
+     };
+     done(true);`,
+  );
+  await clickElement('xpath', `//button[normalize-space(.)='Export backup']`);
+  let exportedBackupText;
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    exportedBackupText = await executeAsync(
+      `const done = arguments[arguments.length - 1];
+       done(window.__mwrExportedBackup ?? null);`,
+    );
+    if (typeof exportedBackupText === 'string') break;
+    await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  }
+  if (typeof exportedBackupText !== 'string') {
+    throw new Error('Firefox backup export did not produce JSON.');
+  }
+  const exportedBackup = JSON.parse(exportedBackupText);
+  if (
+    exportedBackup.format !== 'my-webrequest-rules' ||
+    exportedBackup.version !== 1 ||
+    exportedBackup.state?.order?.[0] !== 'firefox-floor-backup-source' ||
+    !/^[a-f0-9]{64}$/.test(exportedBackup.checksum ?? '')
+  ) {
+    throw new Error(`Firefox backup export was malformed: ${exportedBackupText}`);
+  }
+
+  await executeAsync(
+    `const done = arguments[arguments.length - 1];
+     const now = new Date().toISOString();
+     const rule = {
+       schemaVersion: 1,
+       id: 'firefox-floor-backup-current',
+       dnrId: 1920002,
+       name: 'Firefox floor backup current',
+       enabled: false,
+       priority: 10,
+       condition: {
+         url: { kind: 'wildcard', value: 'https://backup-current.example/*' },
+         resourceTypes: ['main_frame'],
+       },
+       action: { kind: 'block' },
+       permissionOrigins: [],
+       migrationState: 'none',
+       createdAt: now,
+       updatedAt: now,
+     };
+     browser.storage.local.set({
+       requestRulesState: {
+         schemaVersion: 1,
+         rules: { [rule.id]: rule },
+         order: [rule.id],
+         settings: { globallyPaused: false },
+       },
+     }).then(() => done(true), (error) => done({ error: String(error) }));`,
+  );
+  const stagedBackup = await executeAsync(
+    `const text = arguments[0];
+     const done = arguments[arguments.length - 1];
+     const input = document.querySelector('input[type="file"]');
+     if (!input) return done({ error: 'Backup input is missing.' });
+     const transfer = new DataTransfer();
+     transfer.items.add(new File([text], 'firefox-floor-backup.json', { type: 'application/json' }));
+     input.files = transfer.files;
+     input.dispatchEvent(new Event('change', { bubbles: true }));
+     done(true);`,
+    [exportedBackupText],
+  );
+  if (stagedBackup?.error) throw new Error(stagedBackup.error);
+  await pollExtension(
+    `({
+       preview: document.body.innerText.includes('Import preview'),
+       verified: document.body.innerText.includes('Checksum verified'),
+     })`,
+    { preview: true, verified: true },
+  );
+  await clickElement('xpath', `//button[normalize-space(.)='Apply import']`);
+  await pollExtension(
+    `(() => {
+       const state = browser.storage.local.get('requestRulesState');
+       return state.then(({ requestRulesState }) => ({
+         enabled: requestRulesState.rules['firefox-floor-backup-source']?.enabled,
+         order: [...requestRulesState.order].sort(),
+       }));
+     })()`,
+    {
+      enabled: false,
+      order: ['firefox-floor-backup-current', 'firefox-floor-backup-source'],
+    },
+  );
+  await clickElement('xpath', `//button[normalize-space(.)='Rules']`);
+  await pollExtension(`document.body.innerText.includes('Firefox floor backup source')`, true);
 
   const extensionHandle = await command('GET', `/session/${sessionId}/window`);
   const testWindow = await command('POST', `/session/${sessionId}/window/new`, { type: 'tab' });
@@ -598,6 +876,40 @@ try {
     },
   );
 
+  const popupWindow = await command('POST', `/session/${sessionId}/window/new`, { type: 'tab' });
+  await command('POST', `/session/${sessionId}/window`, { handle: popupWindow.handle });
+  await command('POST', `/session/${sessionId}/url`, { url: popupUrl });
+  await pollExtension(
+    `({
+       appName: document.body?.innerText.includes('My Webrequest') ?? false,
+       lang: document.documentElement.lang,
+       pauseControl: document.querySelector('[role="switch"][aria-label="Pause all rules"]') !== null,
+       title: document.title,
+     })`,
+    { appName: true, lang: 'en', pauseControl: true, title: 'My Webrequest' },
+  );
+  await clickElement('css selector', '[role="switch"][aria-label="Pause all rules"]');
+  await pollExtension(
+    `({
+       dynamicCount: (await browser.declarativeNetRequest.getDynamicRules()).length,
+       paused: (await browser.storage.local.get('requestRulesState')).requestRulesState.settings.globallyPaused,
+     })`,
+    { dynamicCount: 0, paused: true },
+  );
+  await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+  await pollExtension(`document.body.innerText.includes('Paused')`, true);
+  await command('POST', `/session/${sessionId}/window`, { handle: popupWindow.handle });
+  await clickElement('css selector', '[role="switch"][aria-label="Pause all rules"]');
+  await pollExtension(
+    `({
+       ids: (await browser.declarativeNetRequest.getDynamicRules()).map((rule) => rule.id).sort(),
+       paused: (await browser.storage.local.get('requestRulesState')).requestRulesState.settings.globallyPaused,
+     })`,
+    { ids: [1_930_003, 1_930_004], paused: false },
+  );
+  await command('DELETE', `/session/${sessionId}/window`);
+  await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+
   const installQuotaState = async (count, kind) => {
     const result = await executeAsync(
       `const count = arguments[0];
@@ -676,7 +988,7 @@ try {
   await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 4_500, 60_000);
 
   console.log(
-    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, hostless block and HTTPS upgrade, permission denial/grant/revocation/re-grant, cross-origin redirect/header enforcement, 900 regex rules, 4,500 total rules, and add-on reload recovery.`,
+    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, six locales, keyboard/reduced-motion/200% zoom accessibility, verified backup export/import, popup storage synchronization, hostless block and HTTPS upgrade, permission denial/grant/revocation/re-grant, cross-origin redirect/header enforcement, 900 regex rules, 4,500 total rules, and add-on reload recovery.`,
   );
 } catch (error) {
   if (driverLogs) console.error(driverLogs);

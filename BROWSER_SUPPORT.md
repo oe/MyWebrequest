@@ -121,8 +121,9 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   rules after `browser.runtime.reload()`. Its real optional-host prompt was denied, granted, revoked, and
   granted again; DNR rules followed each permission transition without disabling stored rules. With the
   bounded fixture origins granted, a cross-origin wildcard redirect preserved `$1` and a request-header rule
-  modified the outgoing request. Popup, locale, accessibility, and backup scenarios at this floor remain
-  pending.
+  modified the outgoing request. The same exact package rendered all six locales, preserved keyboard focus,
+  honored reduced motion, reflowed without horizontal overflow at 200% zoom, exported and safely re-imported
+  a checksummed backup, and synchronized pause/resume state between the popup, options page, storage, and DNR.
 - The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
   extension suite. Local execution on this Apple Silicon host is not usable as certification: the
   old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
@@ -141,7 +142,8 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 
 ## Remaining compatibility work
 
-- Complete the remaining installed-extension scenarios at Chromium 121, Edge 121, and Firefox 142.
+- Complete the remaining installed-extension scenarios at Chromium 121 and Edge 121; the Firefox 142 matrix
+  is automated.
 - Repeat the isolated quota-boundary smoke on Edge 121.
 - Run a signed upgrade from the previous public Chrome artifact with the production store ID.
 - Submit the checksummed artifacts to Chrome Web Store, Edge Add-ons, and AMO portal validation; AMO package
