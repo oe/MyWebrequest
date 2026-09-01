@@ -80,6 +80,15 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   reload. At exactly 200% browser zoom, all three targets exposed the compact navigation/detail layout and
   kept language, Settings, rule, and form controls reachable. The Settings-only legacy-migration entry also
   remained reachable and reported no detected legacy source. Zoom was reset to 100% after verification.
+- 2026-09-02: Chrome 152.0.7977.65 imported the representative legacy JSON through the native file chooser.
+  Its installed UI classified all 20 items as 2 automatic, 3 review-required, 4 unsupported, and 11 removed-
+  feature items; exported the full raw snapshot and unknown key; kept active rules unchanged before apply;
+  added only the two automatic candidates disabled; and restored the exact original three-rule baseline with
+  the pre-migration rollback. Afterward, migration again disappeared from primary navigation but remained
+  available under Settings.
+- 2026-09-02: after the installed-browser evidence updates, `pnpm release:package` passed again with 23 test
+  files, 111 unit tests, 9 Chromium extension tests, browser artifact audits, AMO lint, and byte-for-byte
+  reproducibility for all four release archives.
 
 ## 2. Installed-browser matrix
 
@@ -97,7 +106,7 @@ Run each scenario on the current stable browser and one supported older release.
 | Permission revocation removes affected DNR rules | ✓      | ✓    | ✓       |
 | Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
-| Legacy migration review/export/apply/rollback    | ☐      | ☐    | ☐       |
+| Legacy migration review/export/apply/rollback    | ✓      | ☐    | ☐       |
 | Backup merge/replace and recovery snapshot       | ☐      | ☐    | ☐       |
 | Six locales pass keyboard and 200% zoom smoke    | ✓      | ✓    | ✓       |
 

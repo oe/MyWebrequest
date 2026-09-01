@@ -74,6 +74,13 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   At exactly 200% browser zoom, each target changed to the compact navigation/detail layout without losing
   the language, Settings, rule, or form controls. The Settings-only legacy-migration entry remained reachable
   and correctly reported that no legacy source was detected. Zoom was reset to 100% after each proof.
+- Chrome 152.0.7977.65 imported the representative legacy JSON through the installed extension. The preview
+  classified all 20 source items as 2 automatic, 3 review-required, 4 unsupported, and 11 removed-feature
+  items, retained the unknown raw key in the exported report, and did not alter active rules before apply.
+  Applying the two automatic candidates added them disabled without requesting permission or disturbing the
+  three-rule baseline. The one-click pre-migration rollback then removed those candidates and restored the
+  exact original three rules and active statuses. Once no pending migration remained, the migration entry was
+  again absent from primary navigation and remained available under Settings.
 
 ## Remaining compatibility work
 
