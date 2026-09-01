@@ -3,13 +3,13 @@
 import http from 'node:http';
 import https from 'node:https';
 import { execFile } from 'node:child_process';
-import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Duplex } from 'node:stream';
 import { promisify } from 'node:util';
 
-import type { BrowserContext, Page } from '@playwright/test';
+import { chromium, type BrowserContext, type Page } from '@playwright/test';
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
@@ -190,6 +190,68 @@ async function close(server: http.Server): Promise<void> {
   });
   server.closeAllConnections();
   await closed;
+}
+
+async function extensionWithFixtureHostAccess(): Promise<{
+  directory: string;
+  extensionPath: string;
+}> {
+  const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-e2e-extension-'));
+  const extensionPath = join(directory, 'extension');
+  await cp(join(process.cwd(), 'dist/chrome-mv3'), extensionPath, { recursive: true });
+
+  const manifestPath = join(extensionPath, 'manifest.json');
+  const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
+    host_permissions?: string[];
+  };
+  manifest.host_permissions = ['http://127.0.0.1/*', '*://*.localhost/*'];
+  await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+
+  return { directory, extensionPath };
+}
+
+function crossOriginRules(port: number): Rule[] {
+  return [
+    {
+      schemaVersion: 1,
+      id: 'e2e-cross-origin-redirect',
+      dnrId: 1_900_005,
+      name: 'Cross-origin regex redirect',
+      enabled: true,
+      priority: 20,
+      condition: {
+        url: { kind: 'wildcard', value: `http://127.0.0.1:${port}/redirect/*` },
+        resourceTypes: ['xmlhttprequest'],
+        initiatorDomains: ['localhost'],
+      },
+      action: { kind: 'redirect', target: `http://localhost:${port}/target/$1` },
+      permissionOrigins: ['http://127.0.0.1/*'],
+      migrationState: 'none',
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      schemaVersion: 1,
+      id: 'e2e-cross-origin-header',
+      dnrId: 1_900_006,
+      name: 'Cross-origin request header',
+      enabled: true,
+      priority: 10,
+      condition: {
+        url: { kind: 'wildcard', value: `http://127.0.0.1:${port}/headers*` },
+        resourceTypes: ['xmlhttprequest'],
+        initiatorDomains: ['localhost'],
+      },
+      action: {
+        kind: 'modify-request-headers',
+        operations: [{ header: 'X-E2E-Test', operation: 'set', value: 'cross-origin-pass' }],
+      },
+      permissionOrigins: ['http://127.0.0.1/*'],
+      migrationState: 'none',
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
 }
 
 async function stopExtensionServiceWorker(
@@ -425,6 +487,94 @@ test('permission previews stay bounded and cancel without changing runtime state
     };
   });
   expect(runtime).toEqual({ enabled: [false, false], origins: [], dynamicRules: [] });
+});
+
+test('fixture-granted origins prove cross-origin redirect substitution and request headers', async () => {
+  let unmatchedRedirectHits = 0;
+  let redirectedPath = '';
+  let receivedHeader = '';
+  const server = http.createServer((request, response) => {
+    response.setHeader('access-control-allow-origin', '*');
+    response.setHeader('content-type', 'text/plain');
+
+    if (request.url?.startsWith('/redirect/')) {
+      unmatchedRedirectHits += 1;
+      response.end('redirect-rule-missed');
+      return;
+    }
+    if (request.url?.startsWith('/target/')) {
+      redirectedPath = request.url;
+      response.end(`redirected:${request.url}`);
+      return;
+    }
+    if (request.url?.startsWith('/headers')) {
+      receivedHeader = String(request.headers['x-e2e-test'] ?? '');
+      response.end(`header:${receivedHeader}`);
+      return;
+    }
+
+    response.end('initiator-ready');
+  });
+  const port = await listen(server);
+  const fixtureExtension = await extensionWithFixtureHostAccess();
+  let context: BrowserContext | undefined;
+
+  try {
+    context = await chromium.launchPersistentContext('', {
+      channel: 'chromium',
+      headless: true,
+      args: [
+        `--disable-extensions-except=${fixtureExtension.extensionPath}`,
+        `--load-extension=${fixtureExtension.extensionPath}`,
+      ],
+    });
+    let [worker] = context.serviceWorkers();
+    worker ??= await context.waitForEvent('serviceworker');
+
+    const rules = crossOriginRules(port);
+    await worker.evaluate(
+      async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+      stateWith(rules),
+    );
+    await expect
+      .poll(() =>
+        worker.evaluate(async () =>
+          (await chrome.declarativeNetRequest.getDynamicRules())
+            .map((rule) => rule.id)
+            .sort((left, right) => left - right),
+        ),
+      )
+      .toEqual(rules.map((rule) => rule.dnrId).sort((left, right) => left - right));
+
+    expect(
+      await worker.evaluate(async () => (await chrome.permissions.getAll()).origins?.sort() ?? []),
+    ).toEqual(['*://*.localhost/*', 'http://127.0.0.1/*']);
+
+    const initiator = await context.newPage();
+    await initiator.goto(`http://localhost:${port}/app`);
+    const result = await initiator.evaluate(async (fixturePort) => {
+      const redirect = await fetch(`http://127.0.0.1:${fixturePort}/redirect/captured-value`);
+      const header = await fetch(`http://127.0.0.1:${fixturePort}/headers?probe=1`);
+      return {
+        redirect: await redirect.text(),
+        redirectUrl: redirect.url,
+        header: await header.text(),
+      };
+    }, port);
+
+    expect(result).toEqual({
+      redirect: 'redirected:/target/captured-value',
+      redirectUrl: `http://localhost:${port}/target/captured-value`,
+      header: 'header:cross-origin-pass',
+    });
+    expect(unmatchedRedirectHits).toBe(0);
+    expect(redirectedPath).toBe('/target/captured-value');
+    expect(receivedHeader).toBe('cross-origin-pass');
+  } finally {
+    await context?.close();
+    await close(server);
+    await rm(fixtureExtension.directory, { force: true, recursive: true });
+  }
 });
 
 test('legacy localStorage is reviewed, exported, applied disabled, and rolled back', async ({

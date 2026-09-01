@@ -81,7 +81,10 @@ honors reduced motion, restores keyboard focus, and proves bounded permission pr
 granting origins or changing runtime state. It also covers representative legacy `localStorage`
 detection/report export/disabled application/complete rollback and verifies checksummed backup export, safe
 disabled merge, replace-time snapshot creation, and one-click recovery. Chromium automation is a regression
-gate, not evidence that a branded Chrome, Edge, or Firefox row has passed its store or installed-browser certification.
+gate. A test-only manifest with only the local request and initiator fixture origins additionally proves real
+cross-origin wildcard capture redirects and request-header modification. Because that harness bypasses the
+native optional-permission prompt, it is not evidence that a branded Chrome, Edge, or Firefox row has passed
+its installed-browser or store certification.
 
 ## Release gate
 

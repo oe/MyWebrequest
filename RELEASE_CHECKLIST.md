@@ -62,6 +62,10 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   `http://example.com/` on HTTP, then upgraded the same fresh HTTP navigation to a secure HTTPS page after
   enabling the installed extension's `http://example.com/*` HTTPS-upgrade rule. No host access was requested,
   and the temporary rule was disabled after each browser proof.
+- 2026-09-02: the isolated Chromium suite added a ninth test that loads the production extension through a
+  test-only manifest with only the two local fixture origins granted. It proves a real cross-origin wildcard
+  capture redirect, exact `$1` substitution, initiator scoping, and request-header modification. The complete
+  nine-test suite passed; the test-only grant deliberately does not satisfy the native permission-prompt rows.
 
 ## 2. Installed-browser matrix
 

@@ -339,11 +339,15 @@ popup-driven pause/resume synchronization,
 DNR continuity after forced service-worker termination and event-driven restart, a real host-permission-free
 HTTP-to-HTTPS upgrade against an isolated TLS fixture, keyboard switching and persistence for all six locales,
 compact-layout overflow protection, forced-color/reduced-motion fallbacks, keyboard focus restoration, and
-bounded permission preview/cancel behavior for navigation and cross-site subresource rules. It also covers the complete legacy `localStorage`
+bounded permission preview/cancel behavior for navigation and cross-site subresource rules. A separate
+test-only manifest grants only the two local fixture origins and proves real cross-origin wildcard capture
+redirect substitution plus request-header modification from the declared initiator. It also covers the
+complete legacy `localStorage`
 review/export/disabled-apply/rollback path, including unsupported and removed raw source data, plus checksummed
 rule backup export, disabled merge, replace-time snapshot capture, and exact recovery from the production UI.
-This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and Firefox remain separate
-installed-browser release rows because their extension distribution and permission surfaces differ.
+The test-only host grant bypasses the native optional-permission prompt, so this automated Chromium gate is
+pre-certification evidence; branded Chrome, Edge, and Firefox remain separate installed-browser release rows
+because their extension distribution and permission surfaces differ.
 
 ## 14. CI and release
 
