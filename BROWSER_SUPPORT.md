@@ -153,6 +153,10 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   runtime size. Chrome and Edge also have audited 440x280 promotional tiles, and Edge has a native 300x300
   listing logo. Artifact audit now requires the exact icon matrix in every generated manifest; store-asset
   audit verifies the canonical SVG, each PNG's dimensions, and every asset checksum.
+- Paste-ready store metadata now covers the same six locales as the extension. Each locale includes a
+  manifest-synchronized short description, a 250-10,000 character detailed description, privacy and
+  permission summaries, three screenshot captions, and focused search terms. Browser-neutral descriptions
+  are forbidden from mentioning migration; the separately audited migration note names Chrome explicitly.
 
 ## Remaining compatibility work
 

@@ -145,6 +145,11 @@ partial historical checks remain pre-certification evidence.
   at 16px and adds restrained blue-glass depth at larger sizes. The generated 16/32/48/96/128 runtime matrix,
   Edge 300x300 listing logo, and Chrome/Edge 440x280 promotional tiles passed visual review and deterministic
   dimension/hash audit. The browser packages expose the complete icon matrix in their generated manifests.
+- 2026-09-02: store metadata was completed for English, Simplified Chinese, Korean, Japanese, French, and
+  Spanish. Every locale has a manifest-synchronized short description, an Edge-safe 250-10,000 character
+  detailed description, permission/privacy summaries, three screenshot captions, and focused search terms.
+  The shared descriptions fail preflight if they mention browser-specific migration, while the separate
+  migration paragraph must explicitly name Chrome and is never used for Edge Add-ons or AMO.
 
 ## 2. Installed-browser matrix
 
@@ -201,6 +206,8 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Package accepted by the store portal                           | ☐                | ☐            | ☐   |
 | Permission disclosure matches the generated manifest           | ✓                | ✓            | ✓   |
 | Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
+| Six localized descriptions and screenshot captions             | ✓                | ✓            | ✓   |
+| Legacy migration copy is limited to the Chrome listing         | ✓                | ✓            | ✓   |
 | Screenshots come from the exact checksummed release artifact   | ✓                | ✓            | ✓   |
 | Original store icon and generated runtime icon matrix          | ✓                | ✓            | ✓   |
 | Audited 440x280 promotional tile                               | ✓                | ✓            | N/A |

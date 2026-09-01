@@ -28,9 +28,16 @@ Rules and settings remain on the device. The extension contains no analytics, ac
 remote code, or product-owned network service. Website access is optional and requested only for the
 specific origins required when a user enables a rule.
 
+Export a checksum-protected JSON backup, preview a safe merge or full replacement before applying it, and
+recover the previous state after a replacement. The interface supports six languages, keyboard navigation,
+reduced motion, increased contrast, and responsive layouts.
+
+## Chrome-only migration note
+
 Chrome users upgrading from the legacy My Webrequest release can review old data through a deterministic
 migration report. Unsupported or removed behavior remains exportable and is never silently activated or
-discarded. Edge and Firefox do not show migration controls because no legacy release existed there.
+discarded. Do not append this paragraph to Edge or Firefox listings because neither browser had a legacy
+release.
 
 ## Permission disclosure
 

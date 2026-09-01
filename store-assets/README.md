@@ -4,6 +4,11 @@ The committed screenshots under `screenshots/<browser>/` are 1280x800, full-blee
 extension UI. Each browser set tells the same three-part product story: rule management, the bounded
 website-access explanation, and verified backup import preview.
 
+`listing/<locale>.json` contains paste-ready store metadata for English, Simplified Chinese, Korean,
+Japanese, French, and Spanish. The shared descriptions intentionally contain no browser-specific migration
+claim. Only `chromeLegacyMigrationNote` may be appended to the Chrome listing; it must never be copied to
+Edge Add-ons or AMO.
+
 The canonical original icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
 16/32/48/96/128px PNG matrix, Edge's 300px listing logo, and Chrome/Edge 440x280 promotional tiles. The
 branching route remains recognizable at toolbar size; the larger lens and restrained translucent material
