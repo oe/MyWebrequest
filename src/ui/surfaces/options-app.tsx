@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import type { Rule } from '@/domain/rules/model';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
+import { supportsLegacyMigration } from '@/infrastructure/browser-capabilities';
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import {
@@ -37,7 +38,8 @@ import { errorMessage } from '@/ui/lib/error-message';
 export function OptionsApp() {
   const { t } = useI18n();
   const manager = useRuleManager();
-  const migrationManager = useMigrationManager();
+  const migrationAvailable = supportsLegacyMigration();
+  const migrationManager = useMigrationManager(migrationAvailable);
   const [view, setView] = useState<OptionsView>('rules');
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
@@ -56,11 +58,13 @@ export function OptionsApp() {
     migrationManager.migration?.status === 'pending'
       ? migrationManager.migration.bundle.report.items.length
       : 0;
-  const showMigrationNavigation = shouldShowMigrationNavigation(
-    migrationManager.detection,
-    migrationManager.loading,
-    migrationManager.migration?.status ?? null,
-  );
+  const showMigrationNavigation =
+    migrationAvailable &&
+    shouldShowMigrationNavigation(
+      migrationManager.detection,
+      migrationManager.loading,
+      migrationManager.migration?.status ?? null,
+    );
 
   const handleDirtyChange = useCallback((dirty: boolean) => {
     setEditorDirty(dirty);
@@ -236,6 +240,7 @@ export function OptionsApp() {
                   <SettingsMenu
                     compact
                     migrationCount={migrationCount}
+                    showMigration={migrationAvailable}
                     onOpenData={() => requestNavigation(() => setView('data'))}
                     onOpenMigration={() => requestNavigation(() => setView('migration'))}
                   />
@@ -265,10 +270,11 @@ export function OptionsApp() {
           <AppSidebar
             view={view}
             migrationCount={migrationCount}
+            migrationAvailable={migrationAvailable}
             showMigration={showMigrationNavigation}
             onViewChange={(nextView) => requestNavigation(() => setView(nextView))}
           />
-          {view === 'migration' ? (
+          {view === 'migration' && migrationAvailable ? (
             <MigrationPanel
               key={`${migrationManager.migration?.bundle.report.sourceFingerprint ?? 'none'}:${migrationManager.migration?.status ?? 'none'}`}
               migration={migrationManager.migration}

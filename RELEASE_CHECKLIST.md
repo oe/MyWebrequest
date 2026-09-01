@@ -55,10 +55,10 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
   popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and
   permission refusal/revocation/re-grant. This is current-version runtime evidence, not store certification.
-- 2026-09-01: after reloading the current unpacked artifact in all three installed browsers, the browser
-  extension details and options page consistently showed `My Webrequest`. With no legacy source detected,
-  primary navigation omitted migration while Settings retained the explicit legacy-migration entry. Existing
-  active DNR rules and their permission status remained visible after reload.
+- 2026-09-01: after reloading the then-current unpacked artifact in all three installed browsers, the browser
+  extension details and options page consistently showed `My Webrequest`. Existing active DNR rules and their
+  permission status remained visible after reload. The migration menu behavior from this checkpoint was later
+  superseded by the Chrome-only migration decision.
 - 2026-09-02: Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 each kept a control request to
   `http://example.com/` on HTTP, then upgraded the same fresh HTTP navigation to a secure HTTPS page after
   enabling the installed extension's `http://example.com/*` HTTPS-upgrade rule. No host access was requested,
@@ -78,8 +78,9 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   keyboard-switched through English, Simplified Chinese, Korean, Japanese, French, and Spanish. Localized
   navigation and rule controls rendered in every language, and the restored English selection survived
   reload. At exactly 200% browser zoom, all three targets exposed the compact navigation/detail layout and
-  kept language, Settings, rule, and form controls reachable. The Settings-only legacy-migration entry also
-  remained reachable and reported no detected legacy source. Zoom was reset to 100% after verification.
+  kept language, Settings, rule, and form controls reachable. At this checkpoint the Settings-only migration
+  entry was still present in every target; the later Chrome-only product decision supersedes that behavior.
+  Zoom was reset to 100% after verification.
 - 2026-09-02: Chrome 152.0.7977.65 imported the representative legacy JSON through the native file chooser.
   Its installed UI classified all 20 items as 2 automatic, 3 review-required, 4 unsupported, and 11 removed-
   feature items; exported the full raw snapshot and unknown key; kept active rules unchanged before apply;
@@ -89,6 +90,12 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
 - 2026-09-02: after the installed-browser evidence updates, `pnpm release:package` passed again with 23 test
   files, 111 unit tests, 9 Chromium extension tests, browser artifact audits, AMO lint, and byte-for-byte
   reproducibility for all four release archives.
+- 2026-09-02: the migration feature was scoped to Chrome because no legacy Edge or Firefox release existed.
+  After rebuilding and reloading the unpacked artifacts, Chrome Settings retained both `Backup & restore`
+  and `Legacy migration`; Edge 152.0.4191.53 and Firefox 154.0.1 Settings each exposed only `Backup & restore`.
+  Migration was absent from both non-Chrome primary navigation surfaces, and their four-rule states were
+  unchanged. The complete release-package gate passed with 24 test files, 113 unit tests, 9 Chromium
+  extension tests, browser artifact audits, AMO lint, and byte-for-byte reproducibility for all four archives.
 
 ## 2. Installed-browser matrix
 
@@ -106,13 +113,17 @@ Run each scenario on the current stable browser and one supported older release.
 | Permission revocation removes affected DNR rules | ✓      | ✓    | ✓       |
 | Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
-| Legacy migration review/export/apply/rollback    | ✓      | ☐    | ☐       |
+| Legacy migration review/export/apply/rollback    | ✓      | N/A  | N/A     |
 | Backup merge/replace and recovery snapshot       | ☐      | ☐    | ☐       |
 | Six locales pass keyboard and 200% zoom smoke    | ✓      | ✓    | ✓       |
 
 For redirects and request-header rules, verify both the matched request origin and explicit initiator
 origins appear in the product explanation before the browser prompt. A rule must never be shown as active
 when either permission is missing.
+
+Legacy migration is N/A for Edge and Firefox because no legacy version was published for either browser.
+Their release artifacts must omit migration from primary navigation and Settings and must not scan legacy
+page storage.
 
 ## 3. Store validation
 

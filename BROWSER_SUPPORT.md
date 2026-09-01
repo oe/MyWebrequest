@@ -20,6 +20,9 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 
 - Keep one domain model and DNR compiler. Browser-specific behavior belongs in infrastructure adapters or
   the browser-aware manifest function, never in React components.
+- Offer legacy detection, JSON import, review, apply, and rollback only in the Chrome artifact. The legacy
+  extension had no Edge or Firefox release, so those targets do not scan for old data and omit migration
+  from both primary navigation and Settings.
 - Force Firefox to Manifest V3 (`-b firefox --mv3`) so all current targets share the DNR architecture.
   WXT otherwise defaults Firefox builds to Manifest V2.
 - Keep installation host access empty and request narrow origins at runtime with
@@ -44,9 +47,8 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Firefox 154.0.1: temporary install from `dist/firefox-mv3`; all-resource block including top-level
   navigation; request-header permission requested from the originating click; pause/resume; popup/options
   synchronization; background reload recovery. Header fixture received `X-E2E-Test: firefox-pass`.
-- Chrome, Edge, and Firefox were reloaded again after the product-name and migration-navigation update.
-  Each installed extension exposed `My Webrequest`, omitted migration from primary navigation when no legacy
-  source existed, retained migration under Settings, and preserved the existing active-rule state.
+- Chrome, Edge, and Firefox were reloaded again after the product-name and initial migration-navigation
+  update. Each installed extension exposed `My Webrequest` and preserved the existing active-rule state.
 - The current Firefox 154 schema was checked locally after a runtime rejection showed that `webbundle`
   was not accepted. Firefox's all-resource expansion is therefore limited to the values accepted by that
   installed schema and excludes `webbundle` and `webtransport`.
@@ -72,8 +74,9 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   keyboard through English, Simplified Chinese, Korean, Japanese, French, and Spanish. Each localized shell
   rendered its translated navigation and rule controls, and English persisted after a browser-page reload.
   At exactly 200% browser zoom, each target changed to the compact navigation/detail layout without losing
-  the language, Settings, rule, or form controls. The Settings-only legacy-migration entry remained reachable
-  and correctly reported that no legacy source was detected. Zoom was reset to 100% after each proof.
+  the language, Settings, rule, or form controls. At this checkpoint the Settings-only legacy-migration entry
+  was still present in every build; the later Chrome-only product decision supersedes that behavior. Zoom was
+  reset to 100% after each proof.
 - Chrome 152.0.7977.65 imported the representative legacy JSON through the installed extension. The preview
   classified all 20 source items as 2 automatic, 3 review-required, 4 unsupported, and 11 removed-feature
   items, retained the unknown raw key in the exported report, and did not alter active rules before apply.
@@ -81,6 +84,10 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   three-rule baseline. The one-click pre-migration rollback then removed those candidates and restored the
   exact original three rules and active statuses. Once no pending migration remained, the migration entry was
   again absent from primary navigation and remained available under Settings.
+- After the Chrome-only migration scope was applied, the rebuilt unpacked artifacts were reloaded in all
+  three browsers. Chrome retained `Backup & restore` and `Legacy migration` in Settings. Edge 152.0.4191.53
+  and Firefox 154.0.1 each exposed only `Backup & restore`; neither showed migration in primary navigation or
+  Settings, while their existing four-rule state remained intact.
 
 ## Remaining compatibility work
 

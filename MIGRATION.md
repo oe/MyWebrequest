@@ -8,6 +8,10 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITE
 
 The migration may reduce legacy behavior where Chrome MV3 cannot express it, but it must never silently discard, enable, broaden, or alter a user's rule.
 
+This workstream is Chrome-only. The legacy extension was never released for Edge or Firefox, so those
+artifacts do not expose migration UI or run legacy-data detection. Their normal backup import remains
+available for portable current-format rule data.
+
 Every legacy item receives an explicit outcome:
 
 - `automatic`: same intended effect can be represented safely.

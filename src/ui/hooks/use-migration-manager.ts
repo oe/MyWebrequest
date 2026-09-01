@@ -22,17 +22,18 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-export function useMigrationManager() {
+export function useMigrationManager(enabled = true) {
   const { t } = useI18n();
   const [migration, setMigration] = useState<StoredMigration | null>(null);
   const [importPreview, setImportPreview] = useState<StoredMigration | null>(null);
   const [detection, setDetection] = useState<LegacyMigrationDetection['kind']>('none');
   const [detectedFingerprint, setDetectedFingerprint] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) return;
     let cancelled = false;
     void detectAndStageLegacyMigration()
       .then((result) => {
@@ -50,7 +51,7 @@ export function useMigrationManager() {
     return () => {
       cancelled = true;
     };
-  }, [t]);
+  }, [enabled, t]);
 
   const previewLegacyImport = useCallback(
     async (text: string) => {

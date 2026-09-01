@@ -13,11 +13,18 @@ export type OptionsView = 'rules' | 'migration' | 'data';
 type AppSidebarProps = {
   view: OptionsView;
   migrationCount: number;
+  migrationAvailable: boolean;
   showMigration: boolean;
   onViewChange: (view: OptionsView) => void;
 };
 
-export function AppSidebar({ view, migrationCount, showMigration, onViewChange }: AppSidebarProps) {
+export function AppSidebar({
+  view,
+  migrationCount,
+  migrationAvailable,
+  showMigration,
+  onViewChange,
+}: AppSidebarProps) {
   const { t } = useI18n();
   const items = [
     { id: 'rules', label: t('rules'), icon: ListFilterIcon },
@@ -67,6 +74,7 @@ export function AppSidebar({ view, migrationCount, showMigration, onViewChange }
         <LanguageMenu />
         <SettingsMenu
           migrationCount={migrationCount}
+          showMigration={migrationAvailable}
           onOpenData={() => onViewChange('data')}
           onOpenMigration={() => onViewChange('migration')}
         />

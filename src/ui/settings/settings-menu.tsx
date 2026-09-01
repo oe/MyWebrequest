@@ -16,6 +16,7 @@ import { cn } from '@/ui/lib/utils';
 type SettingsMenuProps = {
   compact?: boolean;
   migrationCount: number;
+  showMigration: boolean;
   onOpenData: () => void;
   onOpenMigration: () => void;
 };
@@ -23,6 +24,7 @@ type SettingsMenuProps = {
 export function SettingsMenu({
   compact = false,
   migrationCount,
+  showMigration,
   onOpenData,
   onOpenMigration,
 }: SettingsMenuProps) {
@@ -51,15 +53,17 @@ export function SettingsMenu({
             <DatabaseBackupIcon />
             {t('dataManagement')}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={onOpenMigration}>
-            <ArchiveRestoreIcon />
-            {t('legacyMigration')}
-            {migrationCount > 0 ? (
-              <Badge className="ml-auto" variant="warning">
-                {migrationCount > 99 ? '99+' : migrationCount}
-              </Badge>
-            ) : null}
-          </DropdownMenuItem>
+          {showMigration ? (
+            <DropdownMenuItem onSelect={onOpenMigration}>
+              <ArchiveRestoreIcon />
+              {t('legacyMigration')}
+              {migrationCount > 0 ? (
+                <Badge className="ml-auto" variant="warning">
+                  {migrationCount > 99 ? '99+' : migrationCount}
+                </Badge>
+              ) : null}
+            </DropdownMenuItem>
+          ) : null}
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
