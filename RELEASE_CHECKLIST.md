@@ -74,6 +74,12 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   targeted revocation preserved its independent `127.0.0.1` header rule. Edge's global site-access revocation
   also downgraded that header rule until its origin was re-granted, while its hostless block rule stayed
   active. Both temporary redirect rules were left disabled after the proof.
+- 2026-09-02: the installed options UI in Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 was
+  keyboard-switched through English, Simplified Chinese, Korean, Japanese, French, and Spanish. Localized
+  navigation and rule controls rendered in every language, and the restored English selection survived
+  reload. At exactly 200% browser zoom, all three targets exposed the compact navigation/detail layout and
+  kept language, Settings, rule, and form controls reachable. The Settings-only legacy-migration entry also
+  remained reachable and reported no detected legacy source. Zoom was reset to 100% after verification.
 
 ## 2. Installed-browser matrix
 
@@ -93,7 +99,7 @@ Run each scenario on the current stable browser and one supported older release.
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
 | Legacy migration review/export/apply/rollback    | ☐      | ☐    | ☐       |
 | Backup merge/replace and recovery snapshot       | ☐      | ☐    | ☐       |
-| Six locales pass keyboard and 200% zoom smoke    | ☐      | ☐    | ☐       |
+| Six locales pass keyboard and 200% zoom smoke    | ✓      | ✓    | ✓       |
 
 For redirects and request-header rules, verify both the matched request origin and explicit initiator
 origins appear in the product explanation before the browser prompt. A rule must never be shown as active

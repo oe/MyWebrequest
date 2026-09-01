@@ -68,6 +68,12 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   `127.0.0.1` header rule active. Edge's global site-access revocation also downgraded that header rule until
   its separate origin was re-granted, while its hostless block rule remained active throughout. The temporary
   redirect rules were left saved but disabled after verification.
+- The installed options UI in Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 was switched by
+  keyboard through English, Simplified Chinese, Korean, Japanese, French, and Spanish. Each localized shell
+  rendered its translated navigation and rule controls, and English persisted after a browser-page reload.
+  At exactly 200% browser zoom, each target changed to the compact navigation/detail layout without losing
+  the language, Settings, rule, or form controls. The Settings-only legacy-migration entry remained reachable
+  and correctly reported that no legacy source was detected. Zoom was reset to 100% after each proof.
 
 ## Remaining compatibility work
 
