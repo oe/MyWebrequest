@@ -114,9 +114,12 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   fixture rules became active after the grant, a cross-origin XHR redirect preserved the wildcard capture as
   `/target/captured-value`, and the independent header request arrived with
   `X-MWR-Cross-Origin: cross-origin-pass`.
-- Firefox 142.0 accepted the final `dist/firefox-mv3` artifact as a temporary MV3 add-on in a clean profile.
-  This proves the declared installation floor and manifest schema are compatible; the full Firefox 142 DNR
-  runtime matrix remains pending.
+- Firefox 142.0 accepted the exact release ZIP as temporary add-on `mywebrequest@evecalm.com` in a clean,
+  isolated GeckoDriver profile. The production adapter blocked a real local navigation without host access,
+  upgraded a real HTTP navigation to the local HTTPS fixture while host origins remained empty, installed
+  exactly 900 of 902 regex-backed rules and 4,500 of 4,502 total rules in stored order, then kept all 4,500
+  rules after `browser.runtime.reload()`. Permission-prompt, cross-origin, popup, locale, and backup scenarios
+  at this floor remain pending.
 - The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
   extension suite. Local execution on this Apple Silicon host is not usable as certification: the
   old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
@@ -135,10 +138,11 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 
 ## Remaining compatibility work
 
-- Repeat the installed-extension matrix at the declared minimums (Chromium 121 and Firefox 142).
-- Repeat the isolated quota-boundary smoke on Edge and Firefox at their declared floors.
+- Complete the remaining installed-extension scenarios at Chromium 121, Edge 121, and Firefox 142.
+- Repeat the isolated quota-boundary smoke on Edge 121.
 - Run a signed upgrade from the previous public Chrome artifact with the production store ID.
-- Run Chrome Web Store, Edge Add-ons, and AMO packaging validators in CI before enabling a release job.
+- Submit the checksummed artifacts to Chrome Web Store, Edge Add-ons, and AMO portal validation; AMO package
+  lint and cross-store metadata preflight are already automated.
 - Decide whether Safari's conversion, Xcode signing, DNR behavior, and store maintenance cost justify a
   fourth target after the three-browser evidence is stable.
 
@@ -179,3 +183,5 @@ supported older release:
 - [MDN: declarativeNetRequest.isRegexSupported](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/declarativeNetRequest/isRegexSupported)
 - [MDN: browser_specific_settings](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/browser_specific_settings)
 - [MDN: optional_host_permissions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/optional_host_permissions)
+- [Mozilla: GeckoDriver supported platforms](https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html)
+- [Mozilla: GeckoDriver system-access flag](https://firefox-source-docs.mozilla.org/testing/geckodriver/Flags.html)

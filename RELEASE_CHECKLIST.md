@@ -25,9 +25,10 @@ CI runs the same command on Node.js 24 and uploads the four archives plus `SHA25
 workflow artifact. Use that artifact for installed-browser testing and store submissions so the tested
 package and submitted package are identical.
 
-## Pre-certification evidence
+## Evidence log
 
-These checks reduce risk but do not satisfy any installed-browser matrix row:
+Only evidence explicitly reflected in the matrices below satisfies a release row. Build-only, static, or
+partial historical checks remain pre-certification evidence.
 
 - 2026-09-01: the production options UI switched among all six release languages, retained the selected
   language after reload, supported arrow-key rule navigation, and produced no console warning or error in
@@ -111,9 +112,12 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
 - 2026-09-02: Firefox 142.0 accepted the final `dist/firefox-mv3` package as a temporary MV3 add-on in a clean
   profile. The repository gate now passes with 24 test files, 114 unit tests, 11 isolated Chromium extension
   tests, store metadata preflight, all browser artifact audits, AMO lint, and byte-for-byte reproducible
-  archives. Firefox 142 runtime
-  scenarios beyond installation remain unchecked. Chromium 121 is now a native x86 CI gate; local emulation
-  on this Apple Silicon host is not counted because the old Chrome binary crashes in its emulated GPU process.
+  archives. A pinned GeckoDriver 0.37.1 run then installed the exact release ZIP as
+  `mywebrequest@evecalm.com`, opened its production options page, proved a real hostless navigation block,
+  upgraded a real HTTP navigation to HTTPS while granted host origins remained empty, enforced exactly 900 of
+  902 regex rules and 4,500 of 4,502 total rules in stored order, and retained all 4,500 rules after an add-on
+  reload. Chromium 121 is a native x86 CI gate; local emulation on this Apple Silicon host is not counted
+  because the old Chrome binary crashes in its emulated GPU process.
 - 2026-09-02: an isolated production Chromium profile proved deterministic enforcement at both safety
   boundaries: 900 of 902 regex-backed rules and 4,500 of 4,502 total dynamic rules were installed in stored
   order. A separate same-path, same-extension-ID browser restart upgraded a V0.8-shaped fixture to the current
@@ -125,8 +129,7 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
 
 ## 2. Installed-browser matrix
 
-Run each scenario on the current stable browser and at the declared installation floor: Chromium 121 for
-Chrome/Edge and Firefox 142. A newer browser passing does not certify the floor.
+The first table records current-stable evidence only.
 
 | Scenario                                         | Chrome | Edge | Firefox |
 | ------------------------------------------------ | ------ | ---- | ------- |
@@ -152,15 +155,35 @@ Legacy migration is N/A for Edge and Firefox because no legacy version was publi
 Their release artifacts must omit migration from primary navigation and Settings and must not scan legacy
 page storage.
 
+### Declared-floor matrix
+
+A newer browser passing does not certify these rows. Chromium and Edge use version 121; Firefox uses 142.
+
+| Scenario                                       | Chrome 121 | Edge 121 | Firefox 142 |
+| ---------------------------------------------- | ---------- | -------- | ----------- |
+| Exact release artifact installs                | ☐          | ☐        | ✓           |
+| Install has no required host access            | ☐          | ☐        | ✓           |
+| Production options page opens                  | ☐          | ☐        | ✓           |
+| Hostless block affects a real request          | ☐          | ☐        | ✓           |
+| Regex and total quota boundaries converge      | ☐          | ☐        | ✓           |
+| Background/add-on reload reconciles DNR        | ☐          | ☐        | ✓           |
+| HTTPS upgrade works without host access        | ☐          | ☐        | ✓           |
+| Redirect/header permission lifecycle           | ☐          | ☐        | ☐           |
+| Cross-origin capture and header modification   | ☐          | ☐        | ☐           |
+| Popup, storage, backup, locales, accessibility | ☐          | ☐        | ☐           |
+| Legacy migration lifecycle                     | ☐          | N/A      | N/A         |
+
 ## 3. Store validation
 
-| Gate                                                         | Chrome Web Store | Edge Add-ons | AMO |
-| ------------------------------------------------------------ | ---------------- | ------------ | --- |
-| Package accepted by validator                                | ☐                | ☐            | ☐   |
-| Permission disclosure matches the generated manifest         | ☐                | ☐            | ☐   |
-| Privacy statement matches runtime and contains no telemetry  | ☐                | ☐            | ☐   |
-| Screenshots come from the exact checksummed release artifact | ☐                | ☐            | ☐   |
-| Upgrade from the previous public version preserves data      | ☐                | ☐            | ☐   |
+| Gate                                                           | Chrome Web Store | Edge Add-ons | AMO |
+| -------------------------------------------------------------- | ---------------- | ------------ | --- |
+| Local package and metadata preflight                           | ✓                | ✓            | ✓   |
+| AMO-compatible package lint                                    | N/A              | N/A          | ✓   |
+| Package accepted by the store portal                           | ☐                | ☐            | ☐   |
+| Permission disclosure matches the generated manifest           | ✓                | ✓            | ✓   |
+| Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
+| Screenshots come from the exact checksummed release artifact   | ☐                | ☐            | ☐   |
+| Signed upgrade from the previous public version preserves data | ☐                | N/A          | N/A |
 
 ## 4. Sign-off record
 

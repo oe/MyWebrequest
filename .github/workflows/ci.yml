@@ -43,9 +43,11 @@ jobs:
             MWR_CHROMIUM_HEADED=1 \
             MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/chrome-linux64/chrome" \
             pnpm e2e:chromium:run
-      - name: Verify Firefox installation floor
+      - name: Verify Firefox installation and runtime floor
         run: |
           floor_version=$(jq -r .firefoxMinimum browser-support.json)
+          driver_version=$(jq -r .geckodriverVersion browser-support.json)
+          driver_checksum=$(jq -r .geckodriverLinux64Sha256 browser-support.json)
           floor_dir="$RUNNER_TEMP/firefox-floor"
           mkdir -p "$floor_dir"
           curl -fL --retry 3 \
@@ -53,6 +55,14 @@ jobs:
             "https://archive.mozilla.org/pub/firefox/releases/$floor_version/linux-x86_64/en-US/firefox-$floor_version.tar.xz"
           tar -xJf "$floor_dir/firefox.tar.xz" -C "$floor_dir"
           MWR_FIREFOX_EXECUTABLE_PATH="$floor_dir/firefox/firefox" pnpm verify:firefox-floor
+          curl -fL --retry 3 \
+            -o "$floor_dir/geckodriver.tar.gz" \
+            "https://github.com/mozilla/geckodriver/releases/download/v$driver_version/geckodriver-v$driver_version-linux64.tar.gz"
+          echo "$driver_checksum  $floor_dir/geckodriver.tar.gz" | sha256sum --check --strict
+          tar -xzf "$floor_dir/geckodriver.tar.gz" -C "$floor_dir"
+          MWR_FIREFOX_EXECUTABLE_PATH="$floor_dir/firefox/firefox" \
+            MWR_GECKODRIVER_PATH="$floor_dir/geckodriver" \
+            pnpm verify:firefox-runtime
       - uses: actions/upload-artifact@v4
         with:
           name: browser-release-candidates-${{ github.sha }}
