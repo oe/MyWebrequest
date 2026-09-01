@@ -33,4 +33,12 @@ describe('rule operational status', () => {
 
     expect(deriveRuleStatus(activeRule, false, { runtimeError: true })).toBe('runtime-error');
   });
+
+  it('surfaces deterministic conflict and quota decisions before permission state', () => {
+    expect(activeRule).toBeDefined();
+    if (!activeRule) return;
+
+    expect(deriveRuleStatus(activeRule, false, { conflicted: true })).toBe('conflicted');
+    expect(deriveRuleStatus(activeRule, false, { quotaBlocked: true })).toBe('quota-blocked');
+  });
 });

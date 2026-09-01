@@ -1,4 +1,5 @@
 import { compileDnrRule } from '@/domain/rules/compile-dnr';
+import { createRuleRuntimePlan } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { wildcardToRegExpSource } from '@/domain/rules/test-match';
@@ -99,9 +100,10 @@ async function replaceDynamicRules(state: StoredState): Promise<void> {
   let addRules: Browser.declarativeNetRequest.Rule[] = [];
 
   if (!state.settings.globallyPaused) {
+    const plan = createRuleRuntimePlan(state);
     const candidates = state.order.flatMap((id) => {
       const rule = state.rules[id];
-      return rule?.enabled && rule.migrationState === 'none' ? [rule] : [];
+      return rule && plan.installableRuleIds.has(id) ? [rule] : [];
     });
     const compiled = await Promise.all(
       candidates.map(async (rule) => {

@@ -79,6 +79,7 @@ type RuleEditorProps = {
     regexReason?: string | undefined;
     quotaAvailable: boolean;
     cycleFree: boolean;
+    priorityConflictFree: boolean;
   }>;
   ruleIndex: number;
 };
@@ -257,6 +258,8 @@ export function RuleEditor({
         toast.error(t('quotaExceeded'));
       } else if (!result.cycleFree) {
         toast.error(t('redirectCycleBlocked'));
+      } else if (!result.priorityConflictFree) {
+        toast.error(t('priorityConflictBlocked'));
       } else if (!result.regexSupported) {
         const message = t('regexUnsupported', { reason: result.regexReason ?? t('unknownReason') });
         setRegexRuntimeError(message);

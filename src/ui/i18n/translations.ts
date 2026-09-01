@@ -45,6 +45,8 @@ const zhCN = {
   statusPermission: '需要权限',
   statusNotApplied: '未应用',
   statusRuntimeError: '运行时错误',
+  statusConflicted: '规则冲突',
+  statusQuotaBlocked: '超出配额',
   statusInvalid: '无效',
   statusUnsupported: '不支持',
   statusNeedsReview: '需要检查',
@@ -71,6 +73,7 @@ const zhCN = {
   unsupportedRuleDescription: '原始数据仍可导出。不再需要迁移记录时可以将其删除。',
   priorityConflictTitle: '相同条件的优先级冲突',
   priorityConflictDescription: '另一条已启用规则具有相同条件和优先级。请调整其中一条的优先级以确保结果明确。',
+  priorityConflictBlocked: '规则未启用，因为另一条已启用规则具有相同的条件和优先级。',
   redirectCycleTitle: '检测到重定向循环',
   redirectCycleDescription: '这条已启用规则参与了本地重定向循环。再次启用前请修改匹配条件或目标地址。',
   redirectCycleBlocked: '规则未启用，因为它会形成重定向循环。',
@@ -338,6 +341,8 @@ const ko = {
   statusPermission: '권한 필요',
   statusNotApplied: '적용되지 않음',
   statusRuntimeError: '런타임 오류',
+  statusConflicted: '규칙 충돌',
+  statusQuotaBlocked: '할당량 초과',
   statusInvalid: '잘못됨',
   statusUnsupported: '지원되지 않음',
   statusNeedsReview: '검토 필요',
@@ -367,6 +372,7 @@ const ko = {
   priorityConflictTitle: '동일 조건 우선순위 충돌',
   priorityConflictDescription:
     '다른 활성 규칙의 조건과 우선순위가 같습니다. 결과가 명확하도록 한 규칙의 우선순위를 조정하세요.',
+  priorityConflictBlocked: '다른 활성 규칙의 조건과 우선순위가 같아서 이 규칙을 활성화하지 않았습니다.',
   redirectCycleTitle: '리디렉션 순환 감지됨',
   redirectCycleDescription:
     '이 활성 규칙이 로컬 리디렉션 순환에 포함됩니다. 다시 활성화하기 전에 조건이나 대상을 변경하세요.',
@@ -643,6 +649,8 @@ const ja = {
   statusPermission: '権限が必要',
   statusNotApplied: '未適用',
   statusRuntimeError: '実行時エラー',
+  statusConflicted: 'ルール競合',
+  statusQuotaBlocked: '上限超過',
   statusInvalid: '無効な設定',
   statusUnsupported: '未対応',
   statusNeedsReview: '要確認',
@@ -671,6 +679,8 @@ const ja = {
   priorityConflictTitle: '同一条件の優先度が競合しています',
   priorityConflictDescription:
     '別の有効なルールが同じ条件と優先度を持っています。結果を確定するため、どちらかの優先度を変更してください。',
+  priorityConflictBlocked:
+    '同じ条件と優先度を持つ別の有効なルールがあるため、このルールを有効にしませんでした。',
   redirectCycleTitle: 'リダイレクト循環を検出しました',
   redirectCycleDescription:
     'この有効なルールはローカルのリダイレクト循環に含まれます。再度有効にする前に条件または移行先を変更してください。',
@@ -947,6 +957,8 @@ const fr = {
   statusPermission: 'Autorisation requise',
   statusNotApplied: 'Non appliquée',
   statusRuntimeError: 'Erreur d’exécution',
+  statusConflicted: 'Conflit',
+  statusQuotaBlocked: 'Quota dépassé',
   statusInvalid: 'Invalide',
   statusUnsupported: 'Non prise en charge',
   statusNeedsReview: 'À vérifier',
@@ -976,6 +988,8 @@ const fr = {
   priorityConflictTitle: 'Conflit de priorité à conditions identiques',
   priorityConflictDescription:
     'Une autre règle activée possède les mêmes conditions et la même priorité. Modifiez une priorité pour rendre le résultat déterministe.',
+  priorityConflictBlocked:
+    'La règle n’a pas été activée, car une autre règle possède les mêmes conditions et la même priorité.',
   redirectCycleTitle: 'Boucle de redirection détectée',
   redirectCycleDescription:
     'Cette règle activée participe à une boucle de redirection locale. Modifiez une correspondance ou une destination avant de la réactiver.',
@@ -1264,6 +1278,8 @@ const es = {
   statusPermission: 'Requiere permiso',
   statusNotApplied: 'No aplicada',
   statusRuntimeError: 'Error de ejecución',
+  statusConflicted: 'Conflicto',
+  statusQuotaBlocked: 'Cuota superada',
   statusInvalid: 'No válida',
   statusUnsupported: 'No compatible',
   statusNeedsReview: 'Requiere revisión',
@@ -1293,6 +1309,8 @@ const es = {
   priorityConflictTitle: 'Conflicto de prioridad con las mismas condiciones',
   priorityConflictDescription:
     'Otra regla activada tiene las mismas condiciones y prioridad. Cambia una prioridad para que el resultado sea determinista.',
+  priorityConflictBlocked:
+    'La regla no se activó porque otra regla tiene las mismas condiciones y prioridad.',
   redirectCycleTitle: 'Se detectó un ciclo de redirección',
   redirectCycleDescription:
     'Esta regla activada participa en un ciclo de redirección local. Cambia una coincidencia o destino antes de volver a activarla.',

@@ -26,6 +26,8 @@ const statusConfig: Record<
   'needs-permission': { label: 'statusPermission', icon: KeyRoundIcon, variant: 'warning' },
   'not-applied': { label: 'statusNotApplied', icon: CircleDashedIcon, variant: 'warning' },
   'runtime-error': { label: 'statusRuntimeError', icon: TriangleAlertIcon, variant: 'destructive' },
+  conflicted: { label: 'statusConflicted', icon: TriangleAlertIcon, variant: 'destructive' },
+  'quota-blocked': { label: 'statusQuotaBlocked', icon: CircleOffIcon, variant: 'warning' },
   invalid: { label: 'statusInvalid', icon: TriangleAlertIcon, variant: 'destructive' },
   unsupported: { label: 'statusUnsupported', icon: BanIcon, variant: 'destructive' },
   'review-required': { label: 'statusNeedsReview', icon: TriangleAlertIcon, variant: 'warning' },

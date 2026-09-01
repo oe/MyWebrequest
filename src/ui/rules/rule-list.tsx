@@ -46,6 +46,8 @@ export function RuleList({
         'needs-permission',
         'not-applied',
         'runtime-error',
+        'conflicted',
+        'quota-blocked',
         'disabled',
         'invalid',
       ],

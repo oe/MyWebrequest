@@ -131,6 +131,8 @@ export function OptionsApp() {
         toast.error(t('quotaExceeded'));
       } else if (enabled && !result.cycleFree) {
         toast.error(t('redirectCycleBlocked'));
+      } else if (enabled && !result.priorityConflictFree) {
+        toast.error(t('priorityConflictBlocked'));
       } else if (enabled && !result.regexSupported) {
         toast.error(t('regexUnsupported', { reason: result.regexReason ?? t('unknownReason') }));
       } else if (enabled && !result.permissionGranted) {
@@ -184,7 +186,7 @@ export function OptionsApp() {
               className="hidden text-base font-semibold max-[1049px]:inline max-[799px]:hidden"
               aria-label={t('appName')}
             >
-              RR
+              MW
             </span>
           </div>
           <div className="border-r px-3 max-[799px]:hidden">

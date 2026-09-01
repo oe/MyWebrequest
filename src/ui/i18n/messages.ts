@@ -85,6 +85,8 @@ export const en = {
   statusPermission: 'Permission',
   statusNotApplied: 'Not applied',
   statusRuntimeError: 'Runtime error',
+  statusConflicted: 'Conflict',
+  statusQuotaBlocked: 'Quota limit',
   statusInvalid: 'Invalid',
   statusUnsupported: 'Unsupported',
   statusNeedsReview: 'Needs review',
@@ -114,6 +116,8 @@ export const en = {
   priorityConflictTitle: 'Same-condition priority conflict',
   priorityConflictDescription:
     'Another enabled rule has the same conditions and priority. Raise or lower one priority to make the result deterministic.',
+  priorityConflictBlocked:
+    'The rule was not enabled because another enabled rule has the same conditions and priority.',
   redirectCycleTitle: 'Redirect cycle detected',
   redirectCycleDescription:
     'This enabled rule participates in a local redirect cycle. Change a match or destination before enabling it again.',

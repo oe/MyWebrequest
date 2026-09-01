@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { analyzeRuleState, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
+import { analyzeRuleState, createRuleRuntimePlan, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
 import { sampleRules } from '@/domain/rules/fixtures';
 import type { Rule, StoredState } from '@/domain/rules/model';
 
@@ -71,5 +71,48 @@ describe('rule diagnostics', () => {
     const invalid = { ...redirect, condition: invalidCondition };
 
     expect(getRuleQuotaUsage(stateWith([active, review, invalid]))).toMatchObject({ used: 1, limit: 4_500 });
+  });
+
+  it('excludes every conflicting rule before allocating deterministic quota slots', () => {
+    const base = sampleRules[1];
+    expect(base).toBeDefined();
+    if (!base) return;
+    const conflict = { ...base, id: 'conflict', dnrId: 4100 };
+    const firstSafe = {
+      ...base,
+      id: 'first-safe',
+      dnrId: 4101,
+      condition: { ...base.condition, url: { kind: 'url-filter' as const, value: '||first.example^' } },
+    };
+    const overflow = {
+      ...base,
+      id: 'overflow',
+      dnrId: 4102,
+      condition: { ...base.condition, url: { kind: 'url-filter' as const, value: '||overflow.example^' } },
+    };
+
+    const plan = createRuleRuntimePlan(stateWith([base, conflict, firstSafe, overflow]), 1);
+
+    expect(plan.conflictedRuleIds).toEqual(new Set([base.id, conflict.id]));
+    expect(plan.installableRuleIds).toEqual(new Set([firstSafe.id]));
+    expect(plan.quotaBlockedRuleIds).toEqual(new Set([overflow.id]));
+  });
+
+  it('bounds related conflict evidence for oversized imported groups', () => {
+    const base = sampleRules[1];
+    expect(base).toBeDefined();
+    if (!base) return;
+    const conflicts = Array.from({ length: 30 }, (_, index): Rule => ({
+      ...base,
+      id: `bulk-conflict-${index}`,
+      dnrId: 5_000 + index,
+    }));
+
+    const diagnostics = analyzeRuleState(stateWith(conflicts));
+
+    expect(Object.keys(diagnostics)).toHaveLength(30);
+    expect(
+      Object.values(diagnostics).every((items) => items.every((item) => item.relatedRuleIds.length <= 20)),
+    ).toBe(true);
   });
 });

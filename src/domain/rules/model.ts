@@ -61,6 +61,8 @@ export type RuleStatus =
   | 'needs-permission'
   | 'not-applied'
   | 'runtime-error'
+  | 'conflicted'
+  | 'quota-blocked'
   | 'invalid'
   | 'unsupported'
   | 'review-required'

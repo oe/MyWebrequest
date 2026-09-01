@@ -11,11 +11,12 @@ import {
   subscribeToPermissionChanges,
 } from '@/infrastructure/rule-runtime';
 
-function stateWith(rule: Rule, globallyPaused = false): StoredState {
+function stateWith(ruleOrRules: Rule | Rule[], globallyPaused = false): StoredState {
+  const rules = Array.isArray(ruleOrRules) ? ruleOrRules : [ruleOrRules];
   return {
     schemaVersion: 1,
-    rules: { [rule.id]: rule },
-    order: [rule.id],
+    rules: Object.fromEntries(rules.map((rule) => [rule.id, rule])),
+    order: rules.map((rule) => rule.id),
     settings: { globallyPaused },
   };
 }
@@ -36,7 +37,11 @@ function installBrowserMock(options: {
 }) {
   const onAdded = eventMock();
   const onRemoved = eventMock();
-  const updateDynamicRules = vi.fn(async () => undefined);
+  const updateDynamicRules = vi.fn(
+    async (update: { removeRuleIds?: number[]; addRules?: Array<{ id: number }> }) => {
+      void update;
+    },
+  );
 
   vi.stubGlobal('browser', {
     declarativeNetRequest: {
@@ -226,5 +231,44 @@ describe('rule runtime reconciliation', () => {
     await reconcileDynamicRules(stateWith(rule));
 
     expect(runtime.updateDynamicRules).toHaveBeenCalledWith({ removeRuleIds: [], addRules: [] });
+  });
+
+  it('removes every same-condition priority conflict instead of leaving browser precedence ambiguous', async () => {
+    const base = sampleRules[1];
+    expect(base).toBeDefined();
+    if (!base) return;
+    const conflict = { ...base, id: 'runtime-conflict', dnrId: 6001 };
+    const runtime = installBrowserMock({ installedIds: [base.dnrId, conflict.dnrId], permitted: true });
+
+    await reconcileDynamicRules(stateWith([base, conflict]));
+
+    expect(runtime.updateDynamicRules).toHaveBeenCalledWith({
+      removeRuleIds: [base.dnrId, conflict.dnrId],
+      addRules: [],
+    });
+  });
+
+  it('installs only the deterministic internal quota allocation from oversized stored state', async () => {
+    const base = sampleRules[1];
+    expect(base).toBeDefined();
+    if (!base) return;
+    const rules = Array.from({ length: 4_501 }, (_, index): Rule => ({
+      ...base,
+      id: `quota-${index}`,
+      dnrId: 10_000 + index,
+      condition: {
+        ...base.condition,
+        url: { kind: 'url-filter', value: `||quota-${index}.example^` },
+      },
+    }));
+    const runtime = installBrowserMock({ installedIds: [], permitted: true });
+
+    await reconcileDynamicRules(stateWith(rules));
+
+    const update = runtime.updateDynamicRules.mock.calls[0]?.[0];
+    const addRules = update?.addRules ?? [];
+    expect(addRules).toHaveLength(4_500);
+    expect(addRules.at(0)?.id).toBe(10_000);
+    expect(addRules.at(-1)?.id).toBe(14_499);
   });
 });

@@ -180,6 +180,8 @@ type RuleRuntimeState = {
   globallyPaused?: boolean | undefined;
   isInstalled?: boolean | null | undefined;
   runtimeError?: boolean | undefined;
+  conflicted?: boolean | undefined;
+  quotaBlocked?: boolean | undefined;
 };
 
 export function deriveRuleStatus(
@@ -194,6 +196,8 @@ export function deriveRuleStatus(
   if (!rule.enabled) return 'disabled';
   if (runtimeState.globallyPaused) return 'paused';
   if (runtimeState.runtimeError) return 'runtime-error';
+  if (runtimeState.conflicted) return 'conflicted';
+  if (runtimeState.quotaBlocked) return 'quota-blocked';
   if (!hasPermission) return 'needs-permission';
   if (runtimeState.isInstalled === false) return 'not-applied';
   return 'active';

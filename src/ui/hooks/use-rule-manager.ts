@@ -14,7 +14,7 @@ import {
   synchronizeRuleRuntimeSnapshot,
   type RuleRuntimeSnapshot,
 } from '@/application/rule-runtime-snapshot';
-import { analyzeRuleState, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
+import { analyzeRuleState, createRuleRuntimePlan, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus } from '@/domain/rules/validate';
 import type { RuleImportMode } from '@/application/rule-backup';
@@ -146,23 +146,36 @@ export function useRuleManager() {
           regexSupported: false,
           quotaAvailable: false,
           cycleFree: false,
+          priorityConflictFree: false,
         };
       }
       const nextState = upsertRule(current, rule);
-      if (getRuleQuotaUsage(nextState).remaining < 0) {
+      if (rule.enabled && getRuleQuotaUsage(nextState).remaining < 0) {
         return {
           permissionGranted: permissions[rule.id] === true,
           regexSupported: true,
           quotaAvailable: false,
           cycleFree: true,
+          priorityConflictFree: true,
         };
       }
-      if (analyzeRuleState(nextState)[rule.id]?.some((item) => item.code === 'redirect-cycle')) {
+      const nextDiagnostics = analyzeRuleState(nextState)[rule.id] ?? [];
+      if (nextDiagnostics.some((item) => item.code === 'redirect-cycle')) {
         return {
           permissionGranted: permissions[rule.id] === true,
           regexSupported: true,
           quotaAvailable: true,
           cycleFree: false,
+          priorityConflictFree: true,
+        };
+      }
+      if (nextDiagnostics.some((item) => item.code === 'priority-conflict')) {
+        return {
+          permissionGranted: permissions[rule.id] === true,
+          regexSupported: true,
+          quotaAvailable: true,
+          cycleFree: true,
+          priorityConflictFree: false,
         };
       }
       // Firefox requires permissions.request() to be invoked in the same user
@@ -178,10 +191,17 @@ export function useRuleManager() {
           regexReason: regexSupport.reason,
           quotaAvailable: true,
           cycleFree: true,
+          priorityConflictFree: true,
         };
       }
       await persist(nextState);
-      return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
+      return {
+        permissionGranted,
+        regexSupported: true,
+        quotaAvailable: true,
+        cycleFree: true,
+        priorityConflictFree: true,
+      };
     },
     [permissions, persist],
   );
@@ -195,6 +215,7 @@ export function useRuleManager() {
           regexSupported: false,
           quotaAvailable: false,
           cycleFree: false,
+          priorityConflictFree: false,
         };
       }
       const rule = current.rules[id];
@@ -204,24 +225,37 @@ export function useRuleManager() {
           regexSupported: false,
           quotaAvailable: false,
           cycleFree: false,
+          priorityConflictFree: false,
         };
       }
       const nextRule = { ...rule, enabled };
       const nextState = upsertRule(current, nextRule);
-      if (getRuleQuotaUsage(nextState).remaining < 0) {
+      if (enabled && getRuleQuotaUsage(nextState).remaining < 0) {
         return {
           permissionGranted: permissions[id] === true,
           regexSupported: true,
           quotaAvailable: false,
           cycleFree: true,
+          priorityConflictFree: true,
         };
       }
-      if (analyzeRuleState(nextState)[id]?.some((item) => item.code === 'redirect-cycle')) {
+      const nextDiagnostics = analyzeRuleState(nextState)[id] ?? [];
+      if (nextDiagnostics.some((item) => item.code === 'redirect-cycle')) {
         return {
           permissionGranted: permissions[id] === true,
           regexSupported: true,
           quotaAvailable: true,
           cycleFree: false,
+          priorityConflictFree: true,
+        };
+      }
+      if (nextDiagnostics.some((item) => item.code === 'priority-conflict')) {
+        return {
+          permissionGranted: permissions[id] === true,
+          regexSupported: true,
+          quotaAvailable: true,
+          cycleFree: true,
+          priorityConflictFree: false,
         };
       }
       // Keep the permission request inside the originating click gesture for
@@ -236,10 +270,17 @@ export function useRuleManager() {
           regexReason: regexSupport.reason,
           quotaAvailable: true,
           cycleFree: true,
+          priorityConflictFree: true,
         };
       }
       await persist(nextState);
-      return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
+      return {
+        permissionGranted,
+        regexSupported: true,
+        quotaAvailable: true,
+        cycleFree: true,
+        priorityConflictFree: true,
+      };
     },
     [permissions, persist],
   );
@@ -326,6 +367,8 @@ export function useRuleManager() {
     [state],
   );
 
+  const diagnostics = useMemo(() => (state ? analyzeRuleState(state) : {}), [state]);
+  const runtimePlan = useMemo(() => (state ? createRuleRuntimePlan(state) : null), [state]);
   const statuses = useMemo(
     () =>
       Object.fromEntries(
@@ -335,13 +378,14 @@ export function useRuleManager() {
             globallyPaused: state?.settings.globallyPaused,
             isInstalled: installedRuleIds?.has(rule.dnrId),
             runtimeError,
+            conflicted: runtimePlan?.conflictedRuleIds.has(rule.id),
+            quotaBlocked: runtimePlan?.quotaBlockedRuleIds.has(rule.id),
           }),
         ]),
       ),
-    [installedRuleIds, permissions, rules, runtimeError, state?.settings.globallyPaused],
+    [installedRuleIds, permissions, rules, runtimeError, runtimePlan, state?.settings.globallyPaused],
   );
 
-  const diagnostics = useMemo(() => (state ? analyzeRuleState(state) : {}), [state]);
   const quota = useMemo(() => (state ? getRuleQuotaUsage(state) : null), [state]);
 
   return {

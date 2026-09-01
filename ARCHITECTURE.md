@@ -225,6 +225,9 @@ Responsibilities:
 - Use `testMatchOutcome` for the editor's URL test when available.
 - Calculate rule safety class and quota usage.
 - Reject self-redirect and known multi-rule cycles.
+- Exclude every member of a same-condition priority conflict instead of relying on browser precedence.
+- Allocate the internal 4,500-rule safety quota deterministically from stored rule order. Missing permissions or
+  unsupported regex syntax do not reshuffle quota ownership during a lifecycle event.
 - Return typed errors; never catch-and-ignore compiler failures.
 
 Compiler output is snapshot-tested. A change to compiled DNR JSON requires explicit test review.
