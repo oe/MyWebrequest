@@ -193,8 +193,8 @@ export function deriveRuleStatus(
   if (!validateRule(rule).valid) return 'invalid';
   if (!rule.enabled) return 'disabled';
   if (runtimeState.globallyPaused) return 'paused';
-  if (!hasPermission) return 'needs-permission';
   if (runtimeState.runtimeError) return 'runtime-error';
+  if (!hasPermission) return 'needs-permission';
   if (runtimeState.isInstalled === false) return 'not-applied';
   return 'active';
 }

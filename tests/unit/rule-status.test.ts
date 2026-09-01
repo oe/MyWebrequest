@@ -26,4 +26,11 @@ describe('rule operational status', () => {
 
     expect(deriveRuleStatus(activeRule, true, { runtimeError: true })).toBe('runtime-error');
   });
+
+  it('does not mislabel an unknown permission snapshot as a denied permission after a runtime failure', () => {
+    expect(activeRule).toBeDefined();
+    if (!activeRule) return;
+
+    expect(deriveRuleStatus(activeRule, false, { runtimeError: true })).toBe('runtime-error');
+  });
 });
