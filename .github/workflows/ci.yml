@@ -1,6 +1,7 @@
 name: Quality gate
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [master]
@@ -42,6 +43,7 @@ jobs:
           extension_archive=$(find dist -maxdepth 1 -name '*-chrome.zip' -print -quit)
           mkdir -p "$floor_dir/extension"
           unzip -q "$extension_archive" -d "$floor_dir/extension"
+          "$floor_dir/chrome-linux64/chrome" --version | tee "$RUNNER_TEMP/chrome-floor-version.txt"
           xvfb-run -a env \
             MWR_CHROMIUM_HEADED=1 \
             MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/chrome-linux64/chrome" \
@@ -61,6 +63,7 @@ jobs:
           dpkg-deb --extract "$floor_dir/edge.deb" "$floor_dir/browser"
           extension_archive=$(find dist -maxdepth 1 -name '*-edge.zip' -print -quit)
           unzip -q "$extension_archive" -d "$floor_dir/extension"
+          "$floor_dir/browser/opt/microsoft/msedge/msedge" --version | tee "$RUNNER_TEMP/edge-floor-version.txt"
           xvfb-run -a env \
             MWR_CHROMIUM_HEADED=1 \
             MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/browser/opt/microsoft/msedge/msedge" \
@@ -78,6 +81,7 @@ jobs:
             -o "$floor_dir/firefox.tar.xz" \
             "https://archive.mozilla.org/pub/firefox/releases/$floor_version/linux-x86_64/en-US/firefox-$floor_version.tar.xz"
           tar -xJf "$floor_dir/firefox.tar.xz" -C "$floor_dir"
+          "$floor_dir/firefox/firefox" --version | tee "$RUNNER_TEMP/firefox-floor-version.txt"
           MWR_FIREFOX_EXECUTABLE_PATH="$floor_dir/firefox/firefox" pnpm verify:firefox-floor
           curl -fL --retry 3 \
             -o "$floor_dir/geckodriver.tar.gz" \
@@ -87,11 +91,18 @@ jobs:
           MWR_FIREFOX_EXECUTABLE_PATH="$floor_dir/firefox/firefox" \
             MWR_GECKODRIVER_PATH="$floor_dir/geckodriver" \
             pnpm verify:firefox-runtime
+      - name: Write native x86 browser floor certification
+        run: |
+          MWR_CHROME_OBSERVED_VERSION="$(cat "$RUNNER_TEMP/chrome-floor-version.txt")" \
+          MWR_EDGE_OBSERVED_VERSION="$(cat "$RUNNER_TEMP/edge-floor-version.txt")" \
+          MWR_FIREFOX_OBSERVED_VERSION="$(cat "$RUNNER_TEMP/firefox-floor-version.txt")" \
+            node scripts/write-floor-certification.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: browser-release-candidates-${{ github.sha }}
           path: |
             dist/*.zip
             dist/SHA256SUMS
+            dist/browser-floor-certification.json
           if-no-files-found: error
           retention-days: 14

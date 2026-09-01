@@ -21,9 +21,12 @@ This runs the complete repository gate, creates Chrome, Edge, Firefox, and Firef
 `dist/SHA256SUMS`, and rebuilds all four archives to prove byte-for-byte reproducibility. Do not modify an
 archive after recording its checksum.
 
-CI runs the same command on Node.js 24 and uploads the four archives plus `SHA256SUMS` as one immutable
-workflow artifact. Use that artifact for installed-browser testing and store submissions so the tested
-package and submitted package are identical.
+CI runs the same command on Node.js 24. After every declared-floor browser suite passes on native Linux x86-64,
+it writes `browser-floor-certification.json` with the commit, workflow run, observed browser versions, artifact
+filenames, and verified SHA-256 values. CI uploads that record with the four archives and `SHA256SUMS` as one
+immutable workflow artifact. Use that artifact for installed-browser testing and store submissions so the
+tested package and submitted package are identical. The report generator refuses non-Linux/non-x86 runners,
+wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
 
@@ -134,7 +137,13 @@ partial historical checks remain pre-certification evidence.
   repository. CI now verifies the repository SHA-256, extracts that browser without installing it, and runs
   the exact Edge release archive through the shared Chromium matrix with Chrome-only migration tests skipped
   by design. The target-aware runner passed nine applicable scenarios on installed Edge 152.0.4191.53; the
-  Edge 121 rows stay unchecked until native x86 CI produces the corresponding evidence.
+  Edge 121 rows stay unchecked until native x86 CI produces the corresponding evidence. A fresh local download
+  on 2026-09-02 reconfirmed both package version and the pinned SHA-256 before the CI run was requested.
+- 2026-09-02: the native x86 CI gate gained a fail-closed certification record. It records only after Chrome
+  121, Edge 121, and Firefox 142 suites all pass; binds their observed versions to the exact release archive
+  hashes and full commit SHA; publishes a readable workflow summary; and uploads the JSON with the release
+  candidates. Unit tests reject both an unexpected browser version and checksum drift. This makes a future
+  green run durable evidence rather than relying on a transient status badge.
 - 2026-09-02: each exact checksummed Chrome, Edge, and Firefox release archive produced its own three-image
   1280x800 store set: rule manager, bounded permission explanation, and checksum-verified safe import preview.
   The capture used isolated Chromium 151, installed Edge 152.0.4191.53, and declared-floor Firefox 142.0.
@@ -229,6 +238,9 @@ Record one row per artifact in the release issue or changelog:
 | Browser | Version tested | Artifact filename | SHA-256 | Tested at | Evidence link | Result |
 | ------- | -------------- | ----------------- | ------- | --------- | ------------- | ------ |
 |         |                |                   |         |           |               |        |
+
+For the declared-floor rows, use the uploaded `browser-floor-certification.json` run URL and values. Do not
+copy versions or hashes from an untrusted log line or reconstruct a certification record locally.
 
 Release only browser rows that have passed both sections 2 and 3. Keep failed or untested targets in the
 build matrix as experimental and do not advertise them as supported.
