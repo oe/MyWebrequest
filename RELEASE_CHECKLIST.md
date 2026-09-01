@@ -2,7 +2,7 @@
 
 Status: Node 24 package gate and current-browser runtime pass recorded; older-release, full matrix, and
 store certification pending
-Last updated: 2026-09-01
+Last updated: 2026-09-02
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
 test date, and evidence for every completed row.
@@ -58,6 +58,10 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   extension details and options page consistently showed `My Webrequest`. With no legacy source detected,
   primary navigation omitted migration while Settings retained the explicit legacy-migration entry. Existing
   active DNR rules and their permission status remained visible after reload.
+- 2026-09-02: Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 each kept a control request to
+  `http://example.com/` on HTTP, then upgraded the same fresh HTTP navigation to a secure HTTPS page after
+  enabling the installed extension's `http://example.com/*` HTTPS-upgrade rule. No host access was requested,
+  and the temporary rule was disabled after each browser proof.
 
 ## 2. Installed-browser matrix
 
@@ -68,7 +72,7 @@ Run each scenario on the current stable browser and one supported older release.
 | Clean install has no required host access        | ✓      | ✓    | ✓       |
 | Popup and options open with no console errors    | ✓      | ✓    | ✓       |
 | Block rule works without host access             | ✓      | ✓    | ✓       |
-| HTTPS-upgrade rule works without host access     | ☐      | ☐    | ☐       |
+| HTTPS-upgrade rule works without host access     | ✓      | ✓    | ✓       |
 | Navigation redirect grant, refusal, and re-grant | ✓      | ☐    | ☐       |
 | Subresource redirect requests initiator access   | ☐      | ☐    | ☐       |
 | Request-header rule requests initiator access    | ☐      | ☐    | ☐       |

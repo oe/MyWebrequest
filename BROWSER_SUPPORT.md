@@ -1,13 +1,13 @@
 # Browser Support Plan
 
 Status: Current-browser runtime certification complete; older-release and store certification pending
-Last updated: 2026-09-01
+Last updated: 2026-09-02
 
 ## Current matrix
 
 | Target         | Manifest | Build output       | Current evidence                                                  | Release status            |
 | -------------- | -------- | ------------------ | ----------------------------------------------------------------- | ------------------------- |
-| Chrome         | MV3      | `dist/chrome-mv3`  | Chrome 151 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
+| Chrome         | MV3      | `dist/chrome-mv3`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
 | Microsoft Edge | MV3      | `dist/edge-mv3`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
 | Firefox        | MV3      | `dist/firefox-mv3` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
 | Safari         | TBD      | None               | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
@@ -51,12 +51,20 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   was not accepted. Firefox's all-resource expansion is therefore limited to the values accepted by that
   installed schema and excludes `webbundle` and `webtransport`.
 
+## 2026-09-02 installed-extension evidence
+
+- Chrome 152.0.7977.65, Microsoft Edge 152.0.4191.53, and Firefox 154.0.1 each kept the control request
+  `http://example.com/` on HTTP and reported it as not secure before the test rule was enabled.
+- The same enabled `http://example.com/*` HTTPS-upgrade rule then converted a fresh HTTP navigation to a
+  secure HTTPS page in all three installed browsers without requesting host access. The temporary rule was
+  disabled after each proof, leaving the pre-existing browser test rules unchanged.
+
 ## Remaining compatibility work
 
 - Repeat the installed-extension matrix on the supported older browser releases.
 - Complete permission refusal/revocation and redirect coverage on Edge and Firefox.
-- Verify HTTPS upgrade, regex substitution, cross-origin subresource redirect, and cross-origin
-  request-header modification independently on each browser.
+- Verify regex substitution, cross-origin subresource redirect, and cross-origin request-header
+  modification independently on each browser.
 - Certify the implemented initiator-origin permission model for cross-origin subresource redirects and
   header changes; navigation-only rules request only the request URL origin.
 - Add capability checks around regex support, match testing, rule quotas, and any API whose browser support
