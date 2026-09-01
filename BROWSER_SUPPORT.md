@@ -5,12 +5,12 @@ Last updated: 2026-09-02
 
 ## Current matrix
 
-| Target         | Manifest | Build output       | Current evidence                                                  | Release status            |
-| -------------- | -------- | ------------------ | ----------------------------------------------------------------- | ------------------------- |
-| Chrome         | MV3      | `dist/chrome-mv3`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
-| Microsoft Edge | MV3      | `dist/edge-mv3`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
-| Firefox        | MV3      | `dist/firefox-mv3` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
-| Safari         | TBD      | None               | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
+| Target         | Manifest | Minimum | Build output       | Current evidence                                                  | Release status            |
+| -------------- | -------- | ------- | ------------------ | ----------------------------------------------------------------- | ------------------------- |
+| Chrome         | MV3      | 121     | `dist/chrome-mv3`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
+| Microsoft Edge | MV3      | 121     | `dist/edge-mv3`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
+| Firefox        | MV3      | 142     | `dist/firefox-mv3` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
+| Safari         | TBD      | TBD     | None               | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
 
 `Current runtime certified` means the unpacked artifact passed the recorded local installed-extension
 checks on the listed browser version. It does not mean store-ready: the older-release matrix, remaining
@@ -25,6 +25,11 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   from both primary navigation and Settings.
 - Force Firefox to Manifest V3 (`-b firefox --mv3`) so all current targets share the DNR architecture.
   WXT otherwise defaults Firefox builds to Manifest V2.
+- Declare Chromium 121 and Firefox 142 as explicit installation floors. Chromium 121 provides the current
+  safe/unsafe dynamic-rule quota model. Firefox 142 excludes the documented Firefox 132-and-earlier defect
+  where persisted dynamic rules could stop applying after restart and is the first Firefox-for-Android
+  release whose schema accepts AMO's required `data_collection_permissions` declaration (desktop support
+  arrived in Firefox 140).
 - Keep installation host access empty and request narrow origins at runtime with
   `optional_host_permissions`.
 - Use `declarativeNetRequest` so safe block and HTTPS-upgrade rules need no host access. Redirect and
@@ -35,6 +40,11 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   internal `dangerouslySetInnerHTML` implementation; this project does not call that API.
 - Treat backdrop blur as enhancement only. The UI has solid fallbacks and does not depend on WebKit-only
   visual behavior.
+- Keep a portable internal ceiling of 4,500 enabled dynamic rules, below Firefox's 5,000-rule ceiling and
+  Chromium's 5,000 unsafe-rule ceiling. Keep a separate 900-rule ceiling for wildcard/regex-backed rules,
+  below the browsers' 1,000 regex-rule quota. The runtime asks each browser's `isRegexSupported()` API before
+  enabling a pattern and sets `requireCapturing` when a redirect uses capture references. The editor's local
+  match preview is advisory; the browser engine remains authoritative.
 
 ## 2026-09-01 installed-extension evidence
 
@@ -104,13 +114,19 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   fixture rules became active after the grant, a cross-origin XHR redirect preserved the wildcard capture as
   `/target/captured-value`, and the independent header request arrived with
   `X-MWR-Cross-Origin: cross-origin-pass`.
+- Firefox 142.0 accepted the final `dist/firefox-mv3` artifact as a temporary MV3 add-on in a clean profile.
+  This proves the declared installation floor and manifest schema are compatible; the full Firefox 142 DNR
+  runtime matrix remains pending.
+- The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
+  nine-test extension suite. Local execution on this Apple Silicon host is not usable as certification: the
+  old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
+  Chrome's GPU process. A native x86 CI pass is still required before the Chromium floor is certified.
 
 ## Remaining compatibility work
 
-- Repeat the installed-extension matrix on the supported older browser releases.
+- Repeat the installed-extension matrix at the declared minimums (Chromium 121 and Firefox 142).
 - Verify regex substitution independently on each browser.
-- Add capability checks around regex support, match testing, rule quotas, and any API whose browser support
-  differs.
+- Add explicit installed-browser quota-boundary smoke tests without filling the user's normal profile.
 - Run Chrome Web Store, Edge Add-ons, and AMO packaging validators in CI before enabling a release job.
 - Decide whether Safari's conversion, Xcode signing, DNR behavior, and store maintenance cost justify a
   fourth target after the three-browser evidence is stable.
@@ -146,5 +162,8 @@ supported older release:
 - [WXT: Targeting different browsers](https://wxt.dev/guide/essentials/target-different-browsers)
 - [WXT: Browser-aware manifest configuration](https://wxt.dev/guide/essentials/config/manifest)
 - [MDN: declarativeNetRequest](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/declarativeNetRequest)
-- [MDN: optional_host_permissions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/optional_host_permissions)
+- [Chrome: declarativeNetRequest quotas and regex support](https://developer.chrome.com/docs/extensions/reference/api/declarativeNetRequest)
+- [Chrome: minimum_chrome_version](https://developer.chrome.com/docs/extensions/reference/manifest/minimum-chrome-version)
+- [MDN: declarativeNetRequest.isRegexSupported](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/declarativeNetRequest/isRegexSupported)
 - [MDN: browser_specific_settings](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/browser_specific_settings)
+- [MDN: optional_host_permissions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/optional_host_permissions)

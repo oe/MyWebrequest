@@ -1,0 +1,5 @@
+{
+  "chromiumMinimum": "121",
+  "chromeForTestingFloor": "121.0.6167.184",
+  "firefoxMinimum": "142.0"
+}

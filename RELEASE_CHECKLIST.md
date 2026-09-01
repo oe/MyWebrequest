@@ -108,10 +108,16 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   `http://*.localhost/*`, `http://127.0.0.1/*`, and `https://*.localhost/*` before its native localhost-access
   prompt. After allowing access, all three produced `/target/captured-value` through the real cross-origin XHR
   redirect and `header:cross-origin-pass` through the independent request-header fixture.
+- 2026-09-02: Firefox 142.0 accepted the final `dist/firefox-mv3` package as a temporary MV3 add-on in a clean
+  profile. The repository gate also passed with 24 test files, 114 unit tests, 9 isolated Chromium extension
+  tests, all browser artifact audits, AMO lint, and byte-for-byte reproducible archives. Firefox 142 runtime
+  scenarios beyond installation remain unchecked. Chromium 121 is now a native x86 CI gate; local emulation
+  on this Apple Silicon host is not counted because the old Chrome binary crashes in its emulated GPU process.
 
 ## 2. Installed-browser matrix
 
-Run each scenario on the current stable browser and one supported older release.
+Run each scenario on the current stable browser and at the declared installation floor: Chromium 121 for
+Chrome/Edge and Firefox 142. A newer browser passing does not certify the floor.
 
 | Scenario                                         | Chrome | Edge | Firefox |
 | ------------------------------------------------ | ------ | ---- | ------- |

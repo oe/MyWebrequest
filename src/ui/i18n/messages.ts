@@ -71,6 +71,7 @@ export const en = {
   noMatchingRules: 'No matching rules',
   noMatchingRulesDescription: 'Try a different name, action, or URL.',
   quotaUsage: 'Enabled rules',
+  regexQuotaUsage: 'Regex-backed rules',
   quotaExceeded: 'The internal safety limit for enabled rules has been reached.',
   invalidRuleCannotEnable: 'Fix this rule before enabling it.',
   enableRule: 'Enable {name}',

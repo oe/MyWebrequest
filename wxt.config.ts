@@ -1,6 +1,8 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'wxt';
 
+import browserSupport from './browser-support.json';
+
 export default defineConfig({
   srcDir: 'src',
   publicDir: 'src/public',
@@ -19,6 +21,9 @@ export default defineConfig({
     name: '__MSG_appName__',
     description: '__MSG_appDesc__',
     default_locale: 'en',
+    ...(browser === 'chrome' || browser === 'edge'
+      ? { minimum_chrome_version: browserSupport.chromiumMinimum }
+      : {}),
     permissions: ['activeTab', 'storage', 'declarativeNetRequest'],
     optional_host_permissions: ['http://*/*', 'https://*/*'],
     action: {
@@ -33,6 +38,7 @@ export default defineConfig({
           browser_specific_settings: {
             gecko: {
               id: 'mywebrequest@evecalm.com',
+              strict_min_version: browserSupport.firefoxMinimum,
               data_collection_permissions: {
                 required: ['none'],
               },

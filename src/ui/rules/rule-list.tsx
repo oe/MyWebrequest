@@ -169,11 +169,19 @@ export function RuleList({
         ) : null}
       </ScrollArea>
       {quota ? (
-        <div className="flex items-center justify-between gap-3 border-t px-4 py-2 text-xs text-muted-foreground">
-          <span>{t('quotaUsage')}</span>
-          <span className="font-mono tabular-nums">
-            {quota.used.toLocaleString()} / {quota.limit.toLocaleString()}
-          </span>
+        <div className="grid gap-1 border-t px-4 py-2 text-xs text-muted-foreground">
+          <div className="flex items-center justify-between gap-3">
+            <span>{t('quotaUsage')}</span>
+            <span className="font-mono tabular-nums">
+              {quota.used.toLocaleString()} / {quota.limit.toLocaleString()}
+            </span>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <span>{t('regexQuotaUsage')}</span>
+            <span className="font-mono tabular-nums">
+              {quota.regexUsed.toLocaleString()} / {quota.regexLimit.toLocaleString()}
+            </span>
+          </div>
         </div>
       ) : null}
     </section>

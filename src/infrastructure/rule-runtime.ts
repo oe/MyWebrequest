@@ -52,7 +52,8 @@ export async function checkRuleRegexSupport(rule: Rule): Promise<RegexSupportRes
     rule.condition.url.kind === 'wildcard'
       ? wildcardToRegExpSource(rule.condition.url.value)
       : rule.condition.url.value;
-  const result = await browser.declarativeNetRequest.isRegexSupported({ regex });
+  const requireCapturing = rule.action.kind === 'redirect' && /\$[1-9]/.test(rule.action.target);
+  const result = await browser.declarativeNetRequest.isRegexSupported({ regex, requireCapturing });
   return result.isSupported
     ? { isSupported: true }
     : { isSupported: false, reason: result.reason ?? 'unsupportedSyntax' };

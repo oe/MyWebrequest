@@ -150,15 +150,6 @@ export function useRuleManager() {
         };
       }
       const nextState = upsertRule(current, rule);
-      if (rule.enabled && getRuleQuotaUsage(nextState).remaining < 0) {
-        return {
-          permissionGranted: permissions[rule.id] === true,
-          regexSupported: true,
-          quotaAvailable: false,
-          cycleFree: true,
-          priorityConflictFree: true,
-        };
-      }
       const nextDiagnostics = analyzeRuleState(nextState)[rule.id] ?? [];
       if (nextDiagnostics.some((item) => item.code === 'redirect-cycle')) {
         return {
@@ -176,6 +167,15 @@ export function useRuleManager() {
           quotaAvailable: true,
           cycleFree: true,
           priorityConflictFree: false,
+        };
+      }
+      if (rule.enabled && createRuleRuntimePlan(nextState).quotaBlockedRuleIds.has(rule.id)) {
+        return {
+          permissionGranted: permissions[rule.id] === true,
+          regexSupported: true,
+          quotaAvailable: false,
+          cycleFree: true,
+          priorityConflictFree: true,
         };
       }
       // Firefox requires permissions.request() to be invoked in the same user
@@ -230,15 +230,6 @@ export function useRuleManager() {
       }
       const nextRule = { ...rule, enabled };
       const nextState = upsertRule(current, nextRule);
-      if (enabled && getRuleQuotaUsage(nextState).remaining < 0) {
-        return {
-          permissionGranted: permissions[id] === true,
-          regexSupported: true,
-          quotaAvailable: false,
-          cycleFree: true,
-          priorityConflictFree: true,
-        };
-      }
       const nextDiagnostics = analyzeRuleState(nextState)[id] ?? [];
       if (nextDiagnostics.some((item) => item.code === 'redirect-cycle')) {
         return {
@@ -256,6 +247,15 @@ export function useRuleManager() {
           quotaAvailable: true,
           cycleFree: true,
           priorityConflictFree: false,
+        };
+      }
+      if (enabled && createRuleRuntimePlan(nextState).quotaBlockedRuleIds.has(id)) {
+        return {
+          permissionGranted: permissions[id] === true,
+          regexSupported: true,
+          quotaAvailable: false,
+          cycleFree: true,
+          priorityConflictFree: true,
         };
       }
       // Keep the permission request inside the originating click gesture for

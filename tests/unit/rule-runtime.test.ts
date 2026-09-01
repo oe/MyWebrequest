@@ -37,6 +37,10 @@ function installBrowserMock(options: {
 }) {
   const onAdded = eventMock();
   const onRemoved = eventMock();
+  const isRegexSupported = vi.fn(async () => ({
+    isSupported: options.regexSupported ?? true,
+    reason: options.regexSupported === false ? 'memoryLimitExceeded' : undefined,
+  }));
   const updateDynamicRules = vi.fn(
     async (update: { removeRuleIds?: number[]; addRules?: Array<{ id: number }> }) => {
       void update;
@@ -46,10 +50,7 @@ function installBrowserMock(options: {
   vi.stubGlobal('browser', {
     declarativeNetRequest: {
       getDynamicRules: vi.fn(async () => options.installedIds.map((id) => ({ id }))),
-      isRegexSupported: vi.fn(async () => ({
-        isSupported: options.regexSupported ?? true,
-        reason: options.regexSupported === false ? 'memoryLimitExceeded' : undefined,
-      })),
+      isRegexSupported,
       updateDynamicRules,
     },
     permissions: {
@@ -68,6 +69,7 @@ function installBrowserMock(options: {
   return {
     onAdded,
     onRemoved,
+    isRegexSupported,
     updateDynamicRules,
     getAll: browser.permissions.getAll,
     request: browser.permissions.request,
@@ -216,11 +218,15 @@ describe('rule runtime reconciliation', () => {
     const rule = sampleRules[0];
     expect(rule).toBeDefined();
     if (!rule) return;
-    installBrowserMock({ installedIds: [], permitted: true, regexSupported: false });
+    const runtime = installBrowserMock({ installedIds: [], permitted: true, regexSupported: false });
 
     await expect(checkRuleRegexSupport(rule)).resolves.toEqual({
       isSupported: false,
       reason: 'memoryLimitExceeded',
+    });
+    expect(runtime.isRegexSupported).toHaveBeenCalledWith({
+      regex: '^https://api\\.example\\.com/v1/(.*)$',
+      requireCapturing: true,
     });
   });
 

@@ -15,7 +15,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -28,7 +28,31 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium --no-shell
+      - run: pnpm exec playwright install-deps firefox
       - run: pnpm release:package
+      - name: Verify Chromium installation floor
+        run: |
+          floor_version=$(jq -r .chromeForTestingFloor browser-support.json)
+          floor_dir="$RUNNER_TEMP/chrome-floor"
+          mkdir -p "$floor_dir"
+          curl -fL --retry 3 \
+            -o "$floor_dir/chrome.zip" \
+            "https://storage.googleapis.com/chrome-for-testing-public/$floor_version/linux64/chrome-linux64.zip"
+          unzip -q "$floor_dir/chrome.zip" -d "$floor_dir"
+          xvfb-run -a env \
+            MWR_CHROMIUM_HEADED=1 \
+            MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/chrome-linux64/chrome" \
+            pnpm e2e:chromium:run
+      - name: Verify Firefox installation floor
+        run: |
+          floor_version=$(jq -r .firefoxMinimum browser-support.json)
+          floor_dir="$RUNNER_TEMP/firefox-floor"
+          mkdir -p "$floor_dir"
+          curl -fL --retry 3 \
+            -o "$floor_dir/firefox.tar.xz" \
+            "https://archive.mozilla.org/pub/firefox/releases/$floor_version/linux-x86_64/en-US/firefox-$floor_version.tar.xz"
+          tar -xJf "$floor_dir/firefox.tar.xz" -C "$floor_dir"
+          MWR_FIREFOX_EXECUTABLE_PATH="$floor_dir/firefox/firefox" pnpm verify:firefox-floor
       - uses: actions/upload-artifact@v4
         with:
           name: browser-release-candidates-${{ github.sha }}

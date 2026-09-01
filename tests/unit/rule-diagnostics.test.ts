@@ -73,6 +73,40 @@ describe('rule diagnostics', () => {
     expect(getRuleQuotaUsage(stateWith([active, review, invalid]))).toMatchObject({ used: 1, limit: 4_500 });
   });
 
+  it('tracks and deterministically limits regex-backed rules below the browser quota', () => {
+    const base = sampleRules[0];
+    const safe = sampleRules[1];
+    expect(base).toBeDefined();
+    expect(safe).toBeDefined();
+    if (!base || !safe) return;
+    const firstRegex = { ...base, id: 'first-regex', dnrId: 4201 };
+    const overflowRegex = {
+      ...base,
+      id: 'overflow-regex',
+      dnrId: 4202,
+      condition: {
+        ...base.condition,
+        url: { kind: 'regex' as const, value: '^https://overflow\\.example/(.*)$' },
+      },
+    };
+    const urlFilter = {
+      ...safe,
+      id: 'url-filter',
+      dnrId: 4203,
+      condition: { ...safe.condition, url: { kind: 'url-filter' as const, value: '||safe.example^' } },
+    };
+    const state = stateWith([firstRegex, overflowRegex, urlFilter]);
+
+    expect(getRuleQuotaUsage(state)).toMatchObject({
+      regexUsed: 2,
+      regexLimit: 900,
+      regexRemaining: 898,
+    });
+    const plan = createRuleRuntimePlan(state, 4_500, 1);
+    expect(plan.installableRuleIds).toEqual(new Set([firstRegex.id, urlFilter.id]));
+    expect(plan.quotaBlockedRuleIds).toEqual(new Set([overflowRegex.id]));
+  });
+
   it('excludes every conflicting rule before allocating deterministic quota slots', () => {
     const base = sampleRules[1];
     expect(base).toBeDefined();

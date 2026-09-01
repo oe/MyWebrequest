@@ -6,6 +6,7 @@ const targets = ['chrome-mv3', 'edge-mv3', 'firefox-mv3'];
 const expectedPermissions = ['activeTab', 'declarativeNetRequest', 'storage'];
 const expectedOptionalHosts = ['http://*/*', 'https://*/*'];
 const expectedLocales = ['en', 'es', 'fr', 'ja', 'ko', 'zh_CN'];
+const browserSupport = JSON.parse(readFileSync(join(process.cwd(), 'browser-support.json'), 'utf8'));
 
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
@@ -27,6 +28,25 @@ for (const target of targets) {
   assert.equal(manifest.host_permissions, undefined, `${target} must not request install-time hosts.`);
   assert.equal(manifest.content_scripts, undefined, `${target} must not inject content scripts.`);
   assert.equal(manifest.externally_connectable, undefined, `${target} must not expose external messaging.`);
+  if (target === 'firefox-mv3') {
+    assert.equal(
+      manifest.browser_specific_settings?.gecko?.strict_min_version,
+      browserSupport.firefoxMinimum,
+      'Firefox must support both reliable dynamic rules and the required data-collection manifest key.',
+    );
+    assert.equal(manifest.minimum_chrome_version, undefined, 'Firefox must not contain Chromium metadata.');
+  } else {
+    assert.equal(
+      manifest.minimum_chrome_version,
+      browserSupport.chromiumMinimum,
+      `${target} must declare the certified Chromium DNR baseline.`,
+    );
+    assert.equal(
+      manifest.browser_specific_settings,
+      undefined,
+      `${target} must not contain Firefox-only metadata.`,
+    );
+  }
   assert.deepEqual(locales, expectedLocales, `${target} does not contain the six release locales.`);
   assert.ok(
     files.every((file) => !file.endsWith('.map')),

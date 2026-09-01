@@ -9,14 +9,14 @@ import { join } from 'node:path';
 import type { Duplex } from 'node:stream';
 import { promisify } from 'node:util';
 
-import { chromium, type BrowserContext, type Page } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import type { RuleImportRecovery } from '@/infrastructure/rule-import-recovery';
 import { createTranslator, supportedLocales, type AppLocale } from '@/ui/i18n/core';
 
-import { expect, test } from './extension.fixture';
+import { expect, launchChromiumExtensionContext, test } from './extension.fixture';
 import legacyFixture from '../fixtures/legacy-installation.json' with { type: 'json' };
 
 const now = '2026-09-01T00:00:00.000Z';
@@ -519,16 +519,12 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
   const port = await listen(server);
   const fixtureExtension = await extensionWithFixtureHostAccess();
   let context: BrowserContext | undefined;
+  let closeContext: (() => Promise<void>) | undefined;
 
   try {
-    context = await chromium.launchPersistentContext('', {
-      channel: 'chromium',
-      headless: true,
-      args: [
-        `--disable-extensions-except=${fixtureExtension.extensionPath}`,
-        `--load-extension=${fixtureExtension.extensionPath}`,
-      ],
-    });
+    const launched = await launchChromiumExtensionContext(fixtureExtension.extensionPath);
+    context = launched.context;
+    closeContext = launched.close;
     let [worker] = context.serviceWorkers();
     worker ??= await context.waitForEvent('serviceworker');
 
@@ -572,7 +568,7 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
     expect(redirectedPath).toBe('/target/captured-value');
     expect(receivedHeader).toBe('cross-origin-pass');
   } finally {
-    await context?.close();
+    await closeContext?.();
     await close(server);
     await rm(fixtureExtension.directory, { force: true, recursive: true });
   }
