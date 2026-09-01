@@ -332,6 +332,13 @@ UI state must be derived from stored rule, grant state, compiler result, and ins
 - Import, migrate, and roll back fixture data.
 - Verify popup, options, keyboard, theme, and language surfaces.
 
+The repository runs a Playwright Chromium extension suite in the default quality gate. It launches the
+production `dist/chrome-mv3` build in an isolated persistent profile and currently proves clean-install
+permissions, options/settings navigation, real DNR blocking, popup-driven pause/resume synchronization,
+and DNR continuity after forced service-worker termination and event-driven restart. This automated
+Chromium gate is pre-certification evidence; branded Chrome, Edge, and Firefox remain separate installed-
+browser release rows because their extension distribution and permission surfaces differ.
+
 ## 14. CI and release
 
 Required CI jobs:
@@ -339,7 +346,7 @@ Required CI jobs:
 1. Lockfile-enforced install.
 2. Format, lint, and strict typecheck.
 3. Unit and integration tests with coverage thresholds focused on domain/application code.
-4. Browser E2E against the supported Chrome/Chromium matrix.
+4. Automated Playwright Chromium extension E2E plus the installed-browser certification matrix.
 5. Production build.
 6. Generated manifest permission diff.
 7. Artifact content and remote-endpoint scan.

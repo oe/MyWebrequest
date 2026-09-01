@@ -36,6 +36,10 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
 - 2026-09-01: the complete `pnpm release:package` gate passed on Homebrew Node 24.20.0 with 22 test files
   and 103 tests. Chrome, Edge, Firefox, and Firefox-source archives passed artifact audits, AMO lint, and
   SHA-256 verification. The resulting archive hashes were identical to the preceding package run.
+- 2026-09-01: Playwright Chromium extension E2E became part of `pnpm check` and CI. Its isolated production-
+  build profile proves zero required host origins, the options/settings migration-navigation contract, real
+  DNR blocking against a local fixture, popup pause/resume synchronization, and DNR continuity after forced
+  service-worker termination and event-driven restart. It does not replace the branded-browser rows below.
 - 2026-09-01: the unpacked artifacts were exercised in Chrome 151.0.7922.174, Edge 152.0.0.0, and
   Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
   popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and

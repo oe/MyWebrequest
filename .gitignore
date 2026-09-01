@@ -5,4 +5,6 @@ app.zip
 .wxt/
 coverage/
 dist/
+playwright-report/
+test-results/
 web-ext.config.ts

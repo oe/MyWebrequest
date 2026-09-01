@@ -65,6 +65,11 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Decide whether Safari's conversion, Xcode signing, DNR behavior, and store maintenance cost justify a
   fourth target after the three-browser evidence is stable.
 
+The default repository gate also runs isolated Playwright Chromium extension E2E for clean-install
+permissions, UI navigation, live block DNR, popup/options synchronization, pause/resume, and forced worker
+restart. Chromium automation is a regression gate, not evidence that a branded Chrome, Edge, or Firefox row
+has passed its store or installed-browser certification.
+
 ## Release gate
 
 A browser becomes supported only after all of the following pass on its current stable release and one
