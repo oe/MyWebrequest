@@ -25,11 +25,11 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
   switching, legacy migration, and backup recovery
 - Chrome, Edge, and Firefox Manifest V3 build targets
 
-Installed-extension permission/action/service-worker certification remains required before a production
-release or browser support claim. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
-[BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), [MIGRATION.md](MIGRATION.md), [PRIVACY.md](PRIVACY.md), and
-[STORE_LISTING.md](STORE_LISTING.md). Use [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for installed-browser
-and store certification.
+The current stable-browser matrix and Firefox 142 floor are certified. Chrome 121, Edge 121, signed legacy
+upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md),
+[ARCHITECTURE.md](ARCHITECTURE.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), [MIGRATION.md](MIGRATION.md),
+[PRIVACY.md](PRIVACY.md), and [STORE_LISTING.md](STORE_LISTING.md). Use
+[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for installed-browser and store certification.
 
 ## Development
 
@@ -67,4 +67,6 @@ pnpm release:package
 ```
 
 The same command is the CI quality gate. Every successful run uploads the exact Chrome, Edge, Firefox,
-and Firefox source archives together with `SHA256SUMS` for installed-browser certification.
+and Firefox source archives together with `SHA256SUMS` for installed-browser certification. It also audits
+the committed browser-specific 1280x800 listing screenshots against those exact archive checksums. See
+[store-assets/README.md](store-assets/README.md) for capture and review instructions.

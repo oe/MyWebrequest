@@ -1,7 +1,7 @@
 # Release Checklist
 
-Status: Node 24 package gate and current-browser runtime pass recorded; older-release, full matrix, and
-store certification pending
+Status: Current-browser and Firefox 142 matrices plus listing assets complete; Chrome/Edge 121 and store
+portal certification pending
 Last updated: 2026-09-02
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
@@ -135,6 +135,12 @@ partial historical checks remain pre-certification evidence.
   the exact Edge release archive through the shared Chromium matrix with Chrome-only migration tests skipped
   by design. The target-aware runner passed nine applicable scenarios on installed Edge 152.0.4191.53; the
   Edge 121 rows stay unchecked until native x86 CI produces the corresponding evidence.
+- 2026-09-02: each exact checksummed Chrome, Edge, and Firefox release archive produced its own three-image
+  1280x800 store set: rule manager, bounded permission explanation, and checksum-verified safe import preview.
+  The capture used isolated Chromium 151, installed Edge 152.0.4191.53, and declared-floor Firefox 142.0.
+  A committed provenance manifest records archive/browser/image hashes, and `pnpm release:package` now rejects
+  missing, resized, modified, or stale screenshots. Visual review found no clipping, unexpected migration
+  entry, or target-specific rendering defect.
 
 ## 2. Installed-browser matrix
 
@@ -191,7 +197,7 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Package accepted by the store portal                           | ☐                | ☐            | ☐   |
 | Permission disclosure matches the generated manifest           | ✓                | ✓            | ✓   |
 | Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
-| Screenshots come from the exact checksummed release artifact   | ☐                | ☐            | ☐   |
+| Screenshots come from the exact checksummed release artifact   | ✓                | ✓            | ✓   |
 | Signed upgrade from the previous public version preserves data | ☐                | N/A          | N/A |
 
 ## 4. Sign-off record

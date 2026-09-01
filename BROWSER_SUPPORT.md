@@ -1,6 +1,6 @@
 # Browser Support Plan
 
-Status: Current-browser runtime certification complete; older-release and store certification pending
+Status: Current-browser and Firefox 142 certification complete; Chrome/Edge 121 and store portals pending
 Last updated: 2026-09-02
 
 ## Current matrix
@@ -144,14 +144,19 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Store metadata preflight now fails the repository gate if the product identity, six localized manifest
   messages, description bounds, permission disclosures, or local-only privacy statements drift apart. AMO's
   package validator remains automated; Chrome Web Store and Edge Add-ons acceptance still require submission.
+- Three 1280x800 screenshots were captured separately from each exact checksummed Chrome, Edge, and Firefox
+  release archive. They show the rule manager, the bounded website-access explanation, and a checksum-verified
+  safe import preview. The provenance manifest records the archive/browser/image hashes, and the release gate
+  now rejects screenshots that no longer match `dist/SHA256SUMS`. Chrome used isolated Chromium 151, Edge used
+  Edge 152.0.4191.53, and Firefox used the declared-floor Firefox 142.0.
 
 ## Remaining compatibility work
 
 - Obtain successful native x86 CI runs for the pinned Chrome 121 and Edge 121 matrices; Firefox 142 is already
   automated and locally certified.
 - Run a signed upgrade from the previous public Chrome artifact with the production store ID.
-- Submit the checksummed artifacts to Chrome Web Store, Edge Add-ons, and AMO portal validation; AMO package
-  lint and cross-store metadata preflight are already automated.
+- Submit the checksummed artifacts and audited screenshots to Chrome Web Store, Edge Add-ons, and AMO portal
+  validation; AMO package lint, cross-store metadata preflight, and screenshot provenance are automated.
 - Decide whether Safari's conversion, Xcode signing, DNR behavior, and store maintenance cost justify a
   fourth target after the three-browser evidence is stable.
 

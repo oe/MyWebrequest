@@ -8,6 +8,12 @@ export default defineConfig({
   publicDir: 'src/public',
   outDir: 'dist',
   modules: ['@wxt-dev/module-react'],
+  zip: {
+    // Store screenshots are submission metadata, not extension source. Keeping
+    // them out of AMO's source archive makes the review bundle smaller without
+    // changing the separately checksummed release assets.
+    excludeSources: ['store-assets/**'],
+  },
   vite: () => ({
     plugins: [tailwindcss()],
     build: {

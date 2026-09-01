@@ -28,12 +28,14 @@ Rules and settings remain on the device. The extension contains no analytics, ac
 remote code, or product-owned network service. Website access is optional and requested only for the
 specific origins required when a user enables a rule.
 
-Legacy My Webrequest data can be reviewed through a deterministic migration report. Unsupported or
-removed behavior remains exportable and is never silently activated or discarded.
+Chrome users upgrading from the legacy My Webrequest release can review old data through a deterministic
+migration report. Unsupported or removed behavior remains exportable and is never silently activated or
+discarded. Edge and Firefox do not show migration controls because no legacy release existed there.
 
 ## Permission disclosure
 
 The listing must use the explanations in [PRIVACY.md](PRIVACY.md) verbatim in meaning. Screenshots must
-show the actual popup, rule manager, permission explanation, migration review, and backup preview from the
-release artifact. Do not claim Chrome, Edge, or Firefox support until that browser's installed-extension
+show the actual rule manager, permission explanation, and backup entry point from each browser's exact
+checksummed release artifact. A migration review image is Chrome-only and should be added only when it helps
+existing Chrome users. Do not claim Chrome, Edge, or Firefox support until that browser's installed-extension
 certification row in [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md) is complete.

@@ -1,0 +1,99 @@
+{
+  "schemaVersion": 1,
+  "viewport": {
+    "width": 1280,
+    "height": 800
+  },
+  "targets": {
+    "chrome": {
+      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
+      "sourceSha256": "146ce0b4b18cda5eecca409fb8a65d3449703759f856c1d5db42498d231fdc32",
+      "browserName": "Chromium",
+      "browserVersion": "151.0.7922.34",
+      "capturedAt": "2026-09-01T19:23:42.080Z",
+      "files": [
+        {
+          "path": "chrome/01-rules-overview.png",
+          "purpose": "Rule list, live status, quota, and editor",
+          "sha256": "297cfff044d7ce8bb3f906e93fe29cd0df611f796c03e5c347e2e9a65d9fa7d7",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "chrome/02-permission-explanation.png",
+          "purpose": "Bounded website-access explanation before browser prompt",
+          "sha256": "b96c9f85f3054f397f02f777422da4f082372e4522b225081019c236f4adf7d2",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "chrome/03-backup-restore.png",
+          "purpose": "Local checksummed backup and safe import entry point",
+          "sha256": "692150e4ca2eb2f06fbc1281afbe7b06943fd651870adae128d351b9923add2a",
+          "width": 1280,
+          "height": 800
+        }
+      ]
+    },
+    "edge": {
+      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
+      "sourceSha256": "611c096bd019e97ef7e8bd648a842b581ce578fe720bd3da9bb5c193e0d85757",
+      "browserName": "Microsoft Edge",
+      "browserVersion": "152.0.4191.53",
+      "capturedAt": "2026-09-01T19:23:43.821Z",
+      "files": [
+        {
+          "path": "edge/01-rules-overview.png",
+          "purpose": "Rule list, live status, quota, and editor",
+          "sha256": "297cfff044d7ce8bb3f906e93fe29cd0df611f796c03e5c347e2e9a65d9fa7d7",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "edge/02-permission-explanation.png",
+          "purpose": "Bounded website-access explanation before browser prompt",
+          "sha256": "b96c9f85f3054f397f02f777422da4f082372e4522b225081019c236f4adf7d2",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "edge/03-backup-restore.png",
+          "purpose": "Local checksummed backup and safe import entry point",
+          "sha256": "692150e4ca2eb2f06fbc1281afbe7b06943fd651870adae128d351b9923add2a",
+          "width": 1280,
+          "height": 800
+        }
+      ]
+    },
+    "firefox": {
+      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
+      "sourceSha256": "e335c1c8de689e06e1bccb4038130d190c7fcadf2f0d790fb9267c20ee40f4eb",
+      "browserName": "Firefox",
+      "browserVersion": "142.0",
+      "capturedAt": "2026-09-01T19:24:00.526Z",
+      "files": [
+        {
+          "path": "firefox/01-rules-overview.png",
+          "purpose": "Rule list, live status, quota, and editor",
+          "sha256": "9686f9486e03f3b68373bc2a76da8c2c5e54bced46f62c69d630d461b215507a",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/02-permission-explanation.png",
+          "purpose": "Bounded website-access explanation before browser prompt",
+          "sha256": "4fba895ac41818aef92dbae11510f0bcfae819246c8b97adf1f8d8017f369c9f",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/03-backup-restore.png",
+          "purpose": "Local checksummed backup and safe import entry point",
+          "sha256": "947ac9b057f619ab97aeed0cefb980da6545d3f2b3621a17dec7f7b8df414d98",
+          "width": 1280,
+          "height": 800
+        }
+      ]
+    }
+  }
+}
