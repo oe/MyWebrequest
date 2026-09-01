@@ -51,11 +51,33 @@ async function waitForWebDriver(port, child, getLogs) {
 }
 
 async function startFixtureServer() {
-  const hits = { blocked: 0, control: 0 };
+  const hits = {
+    blocked: 0,
+    control: 0,
+    redirectMisses: 0,
+    redirectedPath: '',
+    receivedHeader: '',
+  };
   const server = createHttpServer((request, response) => {
+    response.setHeader('access-control-allow-origin', '*');
+    response.setHeader('content-type', 'text/plain; charset=utf-8');
     if (request.url?.startsWith('/blocked')) hits.blocked += 1;
     if (request.url?.startsWith('/control')) hits.control += 1;
-    response.setHeader('content-type', 'text/plain; charset=utf-8');
+    if (request.url?.startsWith('/redirect/')) {
+      hits.redirectMisses += 1;
+      response.end('redirect-rule-missed');
+      return;
+    }
+    if (request.url?.startsWith('/target/')) {
+      hits.redirectedPath = request.url;
+      response.end(`redirected:${request.url}`);
+      return;
+    }
+    if (request.url?.startsWith('/headers')) {
+      hits.receivedHeader = String(request.headers['x-mwr-firefox'] ?? '');
+      response.end(`header:${hits.receivedHeader}`);
+      return;
+    }
     response.end(request.url ?? '/');
   });
   await new Promise((resolveListen, reject) => {
@@ -169,6 +191,16 @@ async function executeAsync(script, args = []) {
   return command('POST', `/session/${sessionId}/execute/async`, { script, args });
 }
 
+function stableJson(value) {
+  if (Array.isArray(value)) return value.map(stableJson);
+  if (!value || typeof value !== 'object') return value;
+  return Object.fromEntries(
+    Object.entries(value)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => [key, stableJson(child)]),
+  );
+}
+
 async function pollExtension(script, expected, timeout = 30_000) {
   const startedAt = Date.now();
   let actual;
@@ -178,11 +210,95 @@ async function pollExtension(script, expected, timeout = 30_000) {
        Promise.resolve().then(async () => (${script})).then(done, (error) => done({ error: String(error) }));`,
     );
     if (actual?.error) throw new Error(actual.error);
-    if (JSON.stringify(actual) === JSON.stringify(expected)) return;
+    if (JSON.stringify(stableJson(actual)) === JSON.stringify(stableJson(expected))) return;
     await new Promise((resolveWait) => setTimeout(resolveWait, 200));
   }
   throw new Error(
     `Firefox runtime state did not converge. Expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}.`,
+  );
+}
+
+const permissionProbeOrigins = [
+  'http://127.0.0.1/*',
+  'http://*.localhost/*',
+  'https://*.localhost/*',
+];
+
+async function decideFixturePermission(allow) {
+  await executeAsync(
+    `const origins = arguments[0];
+     const done = arguments[arguments.length - 1];
+     let button = document.querySelector('#firefox-floor-permission-probe');
+     if (!button) {
+       button = document.createElement('button');
+       button.id = 'firefox-floor-permission-probe';
+       button.textContent = 'Grant fixture access';
+       button.addEventListener('click', () => {
+         button.dataset.result = 'pending';
+         delete button.dataset.error;
+         browser.permissions.request({ origins }).then(
+           (granted) => { button.dataset.result = String(granted); },
+           (error) => { button.dataset.error = String(error); },
+         );
+       });
+       document.body.append(button);
+     }
+     done(true);`,
+    [permissionProbeOrigins],
+  );
+  const permissionButton = await command('POST', `/session/${sessionId}/element`, {
+    using: 'css selector',
+    value: '#firefox-floor-permission-probe',
+  });
+  const permissionElementId = permissionButton['element-6066-11e4-a52e-4f735466cecf'];
+  if (!permissionElementId) throw new Error('Firefox did not expose the permission probe button.');
+  await command('POST', `/session/${sessionId}/element/${permissionElementId}/click`, {});
+
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
+  let prompt;
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    prompt = await executeAsync(
+      `const done = arguments[arguments.length - 1];
+       const panel = document.querySelector('#notification-popup');
+       done({
+         panelState: panel?.state ?? null,
+         panelText: panel?.textContent ?? '',
+         buttons: [...document.querySelectorAll('#notification-popup button')]
+           .map((button) => button.label)
+           .filter(Boolean),
+         notifications: [...document.querySelectorAll('#notification-popup popupnotification')]
+           .map((item) => ({ id: item.id, name: item.getAttribute('name') })),
+       });`,
+    );
+    if (prompt.panelState === 'open' && prompt.notifications.length > 0) break;
+    await new Promise((resolveWait) => setTimeout(resolveWait, 100));
+  }
+  if (
+    prompt?.panelState !== 'open' ||
+    !prompt.panelText.includes('localhost') ||
+    !prompt.panelText.includes('127.0.0.1') ||
+    prompt.notifications[0]?.id !== 'addon-webext-permissions-notification' ||
+    prompt.notifications[0]?.name !== 'My Webrequest'
+  ) {
+    throw new Error(`Firefox permission prompt did not describe the bounded fixture origins: ${JSON.stringify(prompt)}`);
+  }
+
+  const actionLabel = allow ? 'Allow' : 'Deny';
+  const actionResult = await executeAsync(
+    `const actionLabel = arguments[0];
+     const done = arguments[arguments.length - 1];
+     const button = [...document.querySelectorAll('#notification-popup button')]
+       .find((candidate) => candidate.label === actionLabel);
+     if (!button) return done({ error: actionLabel + ' button is missing.' });
+     button.click();
+     done(true);`,
+    [actionLabel],
+  );
+  if (actionResult?.error) throw new Error(actionResult.error);
+  await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
+  await pollExtension(
+    `document.querySelector('#firefox-floor-permission-probe')?.dataset.result ?? null`,
+    String(allow),
   );
 }
 
@@ -328,6 +444,7 @@ try {
   if (!Array.isArray(grantedOrigins) || grantedOrigins.length !== 0) {
     throw new Error(`Firefox floor unexpectedly granted host access: ${JSON.stringify(grantedOrigins)}`);
   }
+
   await command('POST', `/session/${sessionId}/window`, { handle: testWindow.handle });
   await command('POST', `/session/${sessionId}/url`, {
     url: `http://127.0.0.1:${tlsFixture.port}/upgrade?probe=1`,
@@ -339,6 +456,147 @@ try {
   if (tlsFixture.upgradeHits !== 1)
     throw new Error('Firefox floor HTTPS fixture was not reached exactly once.');
   await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+
+  await executeAsync(
+    `const port = arguments[0];
+     const done = arguments[arguments.length - 1];
+     const now = new Date().toISOString();
+     const rules = [
+       {
+         schemaVersion: 1,
+         id: 'firefox-floor-cross-origin-redirect',
+         dnrId: 1930003,
+         name: 'Firefox floor cross-origin redirect',
+         enabled: true,
+         priority: 20,
+         condition: {
+           url: { kind: 'wildcard', value: 'http://127.0.0.1:' + port + '/redirect/*' },
+           resourceTypes: ['xmlhttprequest'],
+           initiatorDomains: ['localhost'],
+         },
+         action: { kind: 'redirect', target: 'http://localhost:' + port + '/target/$1' },
+         permissionOrigins: ['http://127.0.0.1/*'],
+         migrationState: 'none',
+         createdAt: now,
+         updatedAt: now,
+       },
+       {
+         schemaVersion: 1,
+         id: 'firefox-floor-cross-origin-header',
+         dnrId: 1930004,
+         name: 'Firefox floor cross-origin header',
+         enabled: true,
+         priority: 10,
+         condition: {
+           url: { kind: 'wildcard', value: 'http://127.0.0.1:' + port + '/headers*' },
+           resourceTypes: ['xmlhttprequest'],
+           initiatorDomains: ['localhost'],
+         },
+         action: {
+           kind: 'modify-request-headers',
+           operations: [{ header: 'X-MWR-Firefox', operation: 'set', value: 'cross-origin-pass' }],
+         },
+         permissionOrigins: ['http://127.0.0.1/*'],
+         migrationState: 'none',
+         createdAt: now,
+         updatedAt: now,
+       },
+     ];
+     browser.storage.local.set({
+       requestRulesState: {
+         schemaVersion: 1,
+         rules: Object.fromEntries(rules.map((rule) => [rule.id, rule])),
+         order: rules.map((rule) => rule.id),
+         settings: { globallyPaused: false },
+       },
+     }).then(() => done(true), (error) => done({ error: String(error) }));`,
+    [fixture.port],
+  );
+  await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 0);
+
+  await decideFixturePermission(false);
+  await pollExtension(
+    `({
+       ids: (await browser.declarativeNetRequest.getDynamicRules()).map((rule) => rule.id),
+       origins: (await browser.permissions.getAll()).origins?.sort() ?? [],
+     })`,
+    { ids: [], origins: [] },
+  );
+
+  await decideFixturePermission(true);
+  await pollExtension(
+    `({
+       ids: (await browser.declarativeNetRequest.getDynamicRules()).map((rule) => rule.id).sort(),
+       origins: (await browser.permissions.getAll()).origins?.sort() ?? [],
+     })`,
+    {
+      ids: [1_930_003, 1_930_004],
+      origins: ['http://*.localhost/*', 'http://127.0.0.1/*', 'https://*.localhost/*'],
+    },
+  );
+
+  await command('POST', `/session/${sessionId}/window`, { handle: testWindow.handle });
+  await command('POST', `/session/${sessionId}/url`, {
+    url: `http://localhost:${fixture.port}/app`,
+  });
+  const crossOriginResult = await executeAsync(
+    `const port = arguments[0];
+     const done = arguments[arguments.length - 1];
+     Promise.all([
+       fetch('http://127.0.0.1:' + port + '/redirect/captured-value'),
+       fetch('http://127.0.0.1:' + port + '/headers?probe=1'),
+     ]).then(async ([redirect, header]) => done({
+       redirect: await redirect.text(),
+       redirectUrl: redirect.url,
+       header: await header.text(),
+     }), (error) => done({ error: String(error) }));`,
+    [fixture.port],
+  );
+  const expectedCrossOriginResult = {
+    redirect: 'redirected:/target/captured-value',
+    redirectUrl: `http://localhost:${fixture.port}/target/captured-value`,
+    header: 'header:cross-origin-pass',
+  };
+  if (JSON.stringify(stableJson(crossOriginResult)) !== JSON.stringify(stableJson(expectedCrossOriginResult))) {
+    throw new Error(`Firefox cross-origin rules produced an unexpected result: ${JSON.stringify(crossOriginResult)}`);
+  }
+  if (
+    fixture.hits.redirectMisses !== 0 ||
+    fixture.hits.redirectedPath !== '/target/captured-value' ||
+    fixture.hits.receivedHeader !== 'cross-origin-pass'
+  ) {
+    throw new Error(`Firefox cross-origin fixtures were not modified as expected: ${JSON.stringify(fixture.hits)}`);
+  }
+
+  await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+  const removedOrigins = await executeAsync(
+    `const origins = arguments[0];
+     const done = arguments[arguments.length - 1];
+     browser.permissions.remove({ origins }).then(done, (error) => done({ error: String(error) }));`,
+    [permissionProbeOrigins],
+  );
+  if (removedOrigins !== true) throw new Error('Firefox did not revoke the fixture host access.');
+  await pollExtension(
+    `({
+       enabled: Object.values((await browser.storage.local.get('requestRulesState')).requestRulesState.rules)
+         .map((rule) => rule.enabled),
+       ids: (await browser.declarativeNetRequest.getDynamicRules()).map((rule) => rule.id),
+       origins: (await browser.permissions.getAll()).origins?.sort() ?? [],
+     })`,
+    { enabled: [true, true], ids: [], origins: [] },
+  );
+
+  await decideFixturePermission(true);
+  await pollExtension(
+    `({
+       ids: (await browser.declarativeNetRequest.getDynamicRules()).map((rule) => rule.id).sort(),
+       origins: (await browser.permissions.getAll()).origins?.sort() ?? [],
+     })`,
+    {
+      ids: [1_930_003, 1_930_004],
+      origins: ['http://*.localhost/*', 'http://127.0.0.1/*', 'https://*.localhost/*'],
+    },
+  );
 
   const installQuotaState = async (count, kind) => {
     const result = await executeAsync(
@@ -418,7 +676,7 @@ try {
   await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 4_500, 60_000);
 
   console.log(
-    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, hostless block and HTTPS upgrade, 900 regex rules, 4,500 total rules, and add-on reload recovery.`,
+    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, hostless block and HTTPS upgrade, permission denial/grant/revocation/re-grant, cross-origin redirect/header enforcement, 900 regex rules, 4,500 total rules, and add-on reload recovery.`,
   );
 } catch (error) {
   if (driverLogs) console.error(driverLogs);

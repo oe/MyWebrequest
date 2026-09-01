@@ -118,8 +118,11 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   isolated GeckoDriver profile. The production adapter blocked a real local navigation without host access,
   upgraded a real HTTP navigation to the local HTTPS fixture while host origins remained empty, installed
   exactly 900 of 902 regex-backed rules and 4,500 of 4,502 total rules in stored order, then kept all 4,500
-  rules after `browser.runtime.reload()`. Permission-prompt, cross-origin, popup, locale, and backup scenarios
-  at this floor remain pending.
+  rules after `browser.runtime.reload()`. Its real optional-host prompt was denied, granted, revoked, and
+  granted again; DNR rules followed each permission transition without disabling stored rules. With the
+  bounded fixture origins granted, a cross-origin wildcard redirect preserved `$1` and a request-header rule
+  modified the outgoing request. Popup, locale, accessibility, and backup scenarios at this floor remain
+  pending.
 - The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
   extension suite. Local execution on this Apple Silicon host is not usable as certification: the
   old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in

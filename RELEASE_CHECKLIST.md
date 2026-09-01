@@ -116,8 +116,11 @@ partial historical checks remain pre-certification evidence.
   `mywebrequest@evecalm.com`, opened its production options page, proved a real hostless navigation block,
   upgraded a real HTTP navigation to HTTPS while granted host origins remained empty, enforced exactly 900 of
   902 regex rules and 4,500 of 4,502 total rules in stored order, and retained all 4,500 rules after an add-on
-  reload. Chromium 121 is a native x86 CI gate; local emulation on this Apple Silicon host is not counted
-  because the old Chrome binary crashes in its emulated GPU process.
+  reload. The same run denied, granted, revoked, and re-granted the bounded optional-host prompt, verified DNR
+  removal and restoration without changing the stored enabled state, preserved a wildcard capture through a
+  cross-origin redirect, and modified a real outgoing request header. Chromium 121 is a native x86 CI gate;
+  local emulation on this Apple Silicon host is not counted because the old Chrome binary crashes in its
+  emulated GPU process.
 - 2026-09-02: an isolated production Chromium profile proved deterministic enforcement at both safety
   boundaries: 900 of 902 regex-backed rules and 4,500 of 4,502 total dynamic rules were installed in stored
   order. A separate same-path, same-extension-ID browser restart upgraded a V0.8-shaped fixture to the current
@@ -168,8 +171,8 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Regex and total quota boundaries converge      | ☐          | ☐        | ✓           |
 | Background/add-on reload reconciles DNR        | ☐          | ☐        | ✓           |
 | HTTPS upgrade works without host access        | ☐          | ☐        | ✓           |
-| Redirect/header permission lifecycle           | ☐          | ☐        | ☐           |
-| Cross-origin capture and header modification   | ☐          | ☐        | ☐           |
+| Redirect/header permission lifecycle           | ☐          | ☐        | ✓           |
+| Cross-origin capture and header modification   | ☐          | ☐        | ✓           |
 | Popup, storage, backup, locales, accessibility | ☐          | ☐        | ☐           |
 | Legacy migration lifecycle                     | ☐          | N/A      | N/A         |
 
