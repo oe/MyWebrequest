@@ -88,6 +88,13 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   three browsers. Chrome retained `Backup & restore` and `Legacy migration` in Settings. Edge 152.0.4191.53
   and Firefox 154.0.1 each exposed only `Backup & restore`; neither showed migration in primary navigation or
   Settings, while their existing four-rule state remained intact.
+- Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 each exported their installed rule state as a
+  checksummed JSON backup. Independent SHA-256 envelope verification passed for all three files. Importing the
+  same file in merge mode skipped every equivalent rule without changing rule count or active status. Replace
+  mode kept the same rule identities but disabled every imported rule and created a visible pre-replace
+  snapshot. One-click recovery restored the exact original counts and active-state baselines: Chrome returned
+  to three rules with two active, and Edge and Firefox each returned to four rules with two active. No recovery
+  banner remained afterward.
 
 ## Remaining compatibility work
 

@@ -96,6 +96,11 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   Migration was absent from both non-Chrome primary navigation surfaces, and their four-rule states were
   unchanged. The complete release-package gate passed with 24 test files, 113 unit tests, 9 Chromium
   extension tests, browser artifact audits, AMO lint, and byte-for-byte reproducibility for all four archives.
+- 2026-09-02: Chrome 152.0.7977.65, Edge 152.0.4191.53, and Firefox 154.0.1 each exported a real installed-state
+  backup whose envelope checksum passed an independent SHA-256 verification. Same-file merge was idempotent
+  and preserved the original active rules; same-file replacement disabled all imported rules and created the
+  pre-replace recovery snapshot. One-click recovery restored Chrome to its exact three-rule/two-active baseline
+  and Edge and Firefox to their exact four-rule/two-active baselines, with the recovery marker cleared.
 
 ## 2. Installed-browser matrix
 
@@ -114,7 +119,7 @@ Run each scenario on the current stable browser and one supported older release.
 | Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
 | Legacy migration review/export/apply/rollback    | ✓      | N/A  | N/A     |
-| Backup merge/replace and recovery snapshot       | ☐      | ☐    | ☐       |
+| Backup merge/replace and recovery snapshot       | ✓      | ✓    | ✓       |
 | Six locales pass keyboard and 200% zoom smoke    | ✓      | ✓    | ✓       |
 
 For redirects and request-header rules, verify both the matched request origin and explicit initiator
