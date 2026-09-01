@@ -1,0 +1,121 @@
+{
+  "version": "1.0",
+  "block": [
+    {
+      "id": "legacy-block-active",
+      "url": "*://ads.example.com/*",
+      "valid": true,
+      "enabled": true,
+      "createdAt": 1544600000000,
+      "updatedAt": 1544600000000
+    },
+    {
+      "id": "legacy-block-disabled",
+      "url": "https://quiet.example.com/*",
+      "valid": true,
+      "enabled": false,
+      "createdAt": 1544600000001,
+      "updatedAt": 1544600000001
+    }
+  ],
+  "hsts": [
+    {
+      "id": "legacy-hsts",
+      "url": "http://insecure.example.com/*",
+      "valid": true,
+      "enabled": true,
+      "createdAt": 1544600000002,
+      "updatedAt": 1544600000002
+    },
+    {
+      "id": "legacy-hsts-invalid",
+      "url": "http://review.example.com/*",
+      "valid": false,
+      "enabled": true,
+      "createdAt": 1544600000003,
+      "updatedAt": 1544600000003
+    }
+  ],
+  "hotlink": [
+    {
+      "id": "legacy-hotlink",
+      "url": "*://images.example.com/*",
+      "valid": true,
+      "enabled": true,
+      "createdAt": 1544600000004,
+      "updatedAt": 1544600000004
+    }
+  ],
+  "custom": [
+    {
+      "id": "legacy-custom-template",
+      "url": "https://api.example.com/v1/*",
+      "matchUrl": "https://api.example.com/v1/{version}/{*path}",
+      "redirectUrl": "https://local.example/{version}/{path}",
+      "useReg": false,
+      "valid": true,
+      "enabled": true,
+      "createdAt": 1544600000005,
+      "updatedAt": 1544600000005
+    },
+    {
+      "id": "legacy-custom-regex",
+      "url": "*://regex.example.com/*",
+      "matchUrl": "^https?://regex\\.example\\.com/(.*)$",
+      "redirectUrl": "https://destination.example/$1",
+      "useReg": true,
+      "valid": true,
+      "enabled": true,
+      "createdAt": 1544600000006,
+      "updatedAt": 1544600000006
+    }
+  ],
+  "log": [
+    {
+      "id": "legacy-log",
+      "url": "*://api.example.com/*",
+      "valid": true,
+      "enabled": true
+    }
+  ],
+  "cors": [],
+  "contextmenu": [
+    {
+      "id": "legacy-menu",
+      "title": "Copy selected text",
+      "contexts": ["selection"],
+      "documentUrlPatterns": "all_urls",
+      "action": "copy",
+      "content": "{selectedText}",
+      "valid": true,
+      "enabled": true
+    }
+  ],
+  "ua": [
+    {
+      "id": "legacy-ua",
+      "url": "*://mobile.example.com/*",
+      "ua": "Legacy Mobile UA",
+      "valid": true,
+      "enabled": true
+    }
+  ],
+  "ua-list": [{ "name": "Legacy phone", "ua": "Legacy Mobile UA" }],
+  "onoff": {
+    "block": true,
+    "hsts": true,
+    "hotlink": true,
+    "custom": true,
+    "log": true,
+    "cors": true,
+    "contextmenu": true,
+    "ua": true
+  },
+  "config": {
+    "iconStyle": "grey",
+    "ruleCatNeedTest": ["hsts"]
+  },
+  "future-sync-key": {
+    "preserved": true
+  }
+}

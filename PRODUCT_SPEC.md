@@ -80,7 +80,8 @@ unless explicitly approved.
 
 #### Legacy migration
 
-- Read the legacy `localStorage` format on update.
+- On Chrome only, read both the signed 0.12.11 `storage.sync` schema and older page `localStorage` without
+  mutating either source.
 - Classify every legacy item as automatic, changed, unsupported, or removed.
 - Require confirmation before enabling migrated rules.
 - Preserve original unsupported data in an exportable migration snapshot.

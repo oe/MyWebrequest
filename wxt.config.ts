@@ -30,6 +30,7 @@ export default defineConfig({
     ...(browser === 'chrome' || browser === 'edge'
       ? { minimum_chrome_version: browserSupport.chromiumMinimum }
       : {}),
+    ...(browser === 'chrome' ? { key: browserSupport.chromeLegacyPublicKey } : {}),
     permissions: ['activeTab', 'storage', 'declarativeNetRequest'],
     optional_host_permissions: ['http://*/*', 'https://*/*'],
     action: {

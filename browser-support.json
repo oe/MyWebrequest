@@ -1,6 +1,10 @@
 {
   "chromiumMinimum": "121",
   "chromeForTestingFloor": "121.0.6167.184",
+  "chromeLegacyVersion": "0.12.11",
+  "chromeLegacyExtensionId": "jaghnfjaikbcdliekgchjeeklkeceell",
+  "chromeLegacyPublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkpbaYiQkSTKPGN0Blx+UohH0JxQ7yTrm+8SLSyxRieSxZVTM512JD/L+J5+LE6LM6F/ggA6wojknXS7rsTpqgZ1T6MGWx291g+QVHcSFDO8SoadrVAQghkkeER8oPf98zxDWxEtSrqkKHTyMeEE9cbrzUNNz41gsvm7uy/NKGQfTxk7gbSXf37xMKybijwqyt6SOaEao36tKeBTGV9onNmnJBua66lIuy3BMC+kkdYLNLDkC4i5KauxRXYE0rXNU0hiEwJBs9CiSTSvGirnobOEszn6lWcbBAfxKt5oc/uU65/ambpB92bsCu/tFXJWo5EBEU5kIrMV5GecVTd2CzwIDAQAB",
+  "chromeLegacyCrxSha256": "77a52761f09dd8aaf71bcb5f16da220565c132dea4c18422fdf3292be4281e69",
   "edgeFloorPackageVersion": "121.0.2277.128-1",
   "edgeLinux64Sha256": "a286734c399d7656305a80ccab314f7db508993df9d7fa6d7dd971284b48efbb",
   "firefoxMinimum": "142.0",

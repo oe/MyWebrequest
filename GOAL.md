@@ -48,13 +48,16 @@ keys fail CI instead of falling back silently in production. Dates, counts, and 
 
 ## Legacy compatibility contract
 
-The final pre-cleanup implementation is preserved in Git at commit `e100dbf`. Its active data sources are
-JSON-encoded extension `localStorage` keys: `block`, `hsts`, `hotlink`, `log`, `custom`, `gsearch`,
-`gstatic`, `onoff`, and `config`.
+The pre-cleanup implementation is preserved in Git at commit `e100dbf`, while commit `9527c62` contains the
+signature-valid version 0.12.11 CRX and its source schema. That generation stores object-shaped rule arrays
+in `chrome.storage.sync`; older generations used JSON-encoded page `localStorage`. Known keys span `block`,
+`hsts`, `hotlink`, `log`, `custom`, `cors`, `contextmenu`, `ua`, `ua-list`, `gsearch`, `gstatic`, `onoff`,
+`config`, and `version`.
 
-Automatic migration is the preferred path for a same-extension-ID update. It runs from an extension page
-that can read the retained legacy `localStorage`, stages a report, and applies nothing until validation is
-complete. Versioned JSON import uses the same parser when automatic access is unavailable.
+Automatic migration is the preferred path for a same-extension-ID Chrome update. It reads sync and page
+storage without mutating either, deterministically merges non-overlapping rule collections, preserves
+conflicts for export, stages a report, and applies nothing until validation is complete. Versioned JSON
+import uses the same parser when automatic access is unavailable.
 
 | Legacy input          | V1 treatment                | Default outcome                                        |
 | --------------------- | --------------------------- | ------------------------------------------------------ |
@@ -65,6 +68,7 @@ complete. Versioned JSON import uses the same parser when automatic access is un
 | `gsearch` rules       | Ordinary redirect candidate | Review-required; disabled until equivalence is proven  |
 | `gstatic` rules       | Preserved legacy record     | Removed feature; obsolete destination is never enabled |
 | `log` rules           | Preserved legacy record     | Removed feature; request logging is not restored       |
+| CORS/context-menu/UA  | Preserved legacy record     | Removed feature; source remains exportable             |
 | `onoff`               | Per-rule enabled intent     | Preserved only after conversion and permission review  |
 | `config`              | Relevant preference mapping | Unsupported preferences retained in the snapshot       |
 | Unknown keys          | Raw migration snapshot      | Retained, never activated                              |

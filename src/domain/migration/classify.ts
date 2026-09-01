@@ -105,24 +105,27 @@ function createCandidate(
 }
 
 function classifySimpleRule(entry: LegacySourceEntry, enabledIntent: boolean, now: string): MigrationItem {
-  if (typeof entry.value !== 'string') {
+  const legacyRule = isRecord(entry.value) ? entry.value : null;
+  const url = typeof entry.value === 'string' ? entry.value : legacyRule?.url;
+  const itemEnabledIntent = enabledIntent && legacyRule?.enabled !== false;
+  if (typeof url !== 'string') {
     return makeItem(
       entry,
       'invalid',
       'expected-url-pattern',
-      'Legacy URL rules must be strings.',
-      enabledIntent,
+      'Legacy URL rules must be strings or objects containing a URL.',
+      itemEnabledIntent,
     );
   }
 
-  const permissionOrigins = permissionOriginsFromMatch(entry.value);
-  if (permissionOrigins.length === 0 || !/^(\*|https?):\/\/[^/]+\/.+/.test(entry.value)) {
+  const permissionOrigins = permissionOriginsFromMatch(url);
+  if (permissionOrigins.length === 0 || !/^(\*|https?):\/\/[^/]+\/.+/.test(url)) {
     return makeItem(
       entry,
       'invalid',
       'invalid-url-pattern',
       'The legacy URL pattern cannot be represented safely.',
-      enabledIntent,
+      itemEnabledIntent,
     );
   }
 
@@ -141,32 +144,44 @@ function classifySimpleRule(entry: LegacySourceEntry, enabledIntent: boolean, no
       'unsupported',
       'initiator-permission-unbounded',
       'The legacy header rule affected subresources from any site. Manifest V3 requires explicit initiator access, so the source is preserved for manual recreation with bounded initiator domains.',
-      enabledIntent,
+      itemEnabledIntent,
     );
   }
-  const reviewRequired = entry.key === 'hsts' && entry.value.startsWith('*://');
+  const reviewRequired = (entry.key === 'hsts' && url.startsWith('*://')) || legacyRule?.valid === false;
   const candidate = createCandidate(
     entry,
     now,
     action,
     reviewRequired ? 'review-required' : 'none',
-    enabledIntent,
-    { url: { kind: 'wildcard', value: entry.value } },
+    itemEnabledIntent,
+    { url: { kind: 'wildcard', value: url } },
     permissionOrigins,
   );
   const compiled = compileDnrRule(candidate);
   if (!compiled.ok) {
-    return makeItem(entry, 'unsupported', 'dnr-compilation-failed', compiled.errors.join(' '), enabledIntent);
+    return makeItem(
+      entry,
+      'unsupported',
+      'dnr-compilation-failed',
+      compiled.errors.join(' '),
+      itemEnabledIntent,
+    );
   }
 
   return makeItem(
     entry,
     reviewRequired ? 'review-required' : 'automatic',
-    reviewRequired ? 'scheme-scope-review' : 'equivalent-dnr-rule',
-    reviewRequired
-      ? 'The wildcard-scheme HTTPS rule needs review because MV3 upgrade behavior has a different scope.'
-      : 'The legacy behavior has an equivalent Manifest V3 rule.',
-    enabledIntent,
+    legacyRule?.valid === false
+      ? 'legacy-validity-review'
+      : reviewRequired
+        ? 'scheme-scope-review'
+        : 'equivalent-dnr-rule',
+    legacyRule?.valid === false
+      ? 'The legacy release marked this rule invalid. It can be represented in V1 but requires review.'
+      : reviewRequired
+        ? 'The wildcard-scheme HTTPS rule needs review because MV3 upgrade behavior has a different scope.'
+        : 'The legacy behavior has an equivalent Manifest V3 rule.',
+    itemEnabledIntent,
     candidate,
   );
 }
@@ -324,6 +339,7 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
       enabledIntent,
     );
   }
+  const itemEnabledIntent = enabledIntent && entry.value.enabled !== false;
   const matchUrl = entry.value.matchUrl;
   const redirectUrl = entry.value.redirectUrl;
   if (typeof matchUrl !== 'string' || typeof redirectUrl !== 'string') {
@@ -332,13 +348,23 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
       'invalid',
       'missing-custom-fields',
       'The Custom URL rule is missing its original match or redirect template.',
-      enabledIntent,
+      itemEnabledIntent,
+    );
+  }
+
+  if (entry.value.useReg === true) {
+    return makeItem(
+      entry,
+      'unsupported',
+      'javascript-regex-compatibility',
+      'The legacy rule used a JavaScript regular expression that cannot be assumed compatible with the browser DNR regex engine.',
+      itemEnabledIntent,
     );
   }
 
   const compiled = compileCustomRule(matchUrl, redirectUrl);
   if (!compiled.ok) {
-    return makeItem(entry, 'unsupported', compiled.reasonCode, compiled.explanation, enabledIntent);
+    return makeItem(entry, 'unsupported', compiled.reasonCode, compiled.explanation, itemEnabledIntent);
   }
 
   const candidate = createCandidate(
@@ -346,7 +372,7 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
     now,
     { kind: 'redirect', target: compiled.target },
     'review-required',
-    enabledIntent,
+    itemEnabledIntent,
     {
       url: { kind: 'regex', value: compiled.regex },
       resourceTypes: ['main_frame', 'sub_frame'],
@@ -360,7 +386,7 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
       'unsupported',
       'dnr-compilation-failed',
       dnrResult.errors.join(' '),
-      enabledIntent,
+      itemEnabledIntent,
     );
   }
 
@@ -371,7 +397,7 @@ function classifyCustomRule(entry: LegacySourceEntry, enabledIntent: boolean, no
     compiled.captureCount > 0
       ? 'The route is limited to navigations, and raw capture substitution may differ from legacy encoding behavior.'
       : 'The route is limited to top-level and frame navigations so it can use bounded Manifest V3 permissions.',
-    enabledIntent,
+    itemEnabledIntent,
     candidate,
   );
 }
@@ -381,7 +407,8 @@ function classifyEntry(
   intents: Record<string, boolean>,
   now: string,
 ): MigrationItem {
-  const enabledIntent = intents[entry.key] === true;
+  const enabledIntent =
+    intents[entry.key] === true && (!isRecord(entry.value) || entry.value.enabled !== false);
   if (ARRAY_RULE_KEYS.has(entry.key)) return classifySimpleRule(entry, enabledIntent, now);
   if (entry.key === 'custom') return classifyCustomRule(entry, enabledIntent, now);
   if (entry.key === 'gsearch') {
@@ -404,6 +431,25 @@ function classifyEntry(
       enabledIntent,
     );
   }
+  if (entry.key === 'cors' || entry.key === 'contextmenu' || entry.key === 'ua' || entry.key === 'ua-list') {
+    const reason = {
+      cors: ['global-cors-removed', 'The legacy global CORS override is intentionally not restored in V1.'],
+      contextmenu: [
+        'context-menu-actions-removed',
+        'The legacy programmable context-menu action is intentionally not restored in V1.',
+      ],
+      ua: [
+        'user-agent-override-removed',
+        'The legacy User-Agent override is intentionally not restored in V1.',
+      ],
+      'ua-list': [
+        'user-agent-presets-removed',
+        'The legacy User-Agent preset list is retained only in the exportable snapshot.',
+      ],
+    } as const;
+    const [reasonCode, explanation] = reason[entry.key];
+    return makeItem(entry, 'removed-feature', reasonCode, explanation, enabledIntent);
+  }
   if (entry.key === 'onoff') {
     return makeItem(
       entry,
@@ -419,6 +465,15 @@ function classifyEntry(
       'removed-feature',
       'legacy-preference-removed',
       'This legacy preference has no V1 runtime equivalent and remains in the exportable snapshot.',
+      false,
+    );
+  }
+  if (entry.key === 'version') {
+    return makeItem(
+      entry,
+      'removed-feature',
+      'legacy-data-version-consumed',
+      'The legacy data-version marker is recorded in the snapshot but has no V1 runtime behavior.',
       false,
     );
   }

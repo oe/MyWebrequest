@@ -150,6 +150,15 @@ partial historical checks remain pre-certification evidence.
   detailed description, permission/privacy summaries, three screenshot captions, and focused search terms.
   The shared descriptions fail preflight if they mention browser-specific migration, while the separate
   migration paragraph must explicitly name Chrome and is never used for Edge Add-ons or AMO.
+- 2026-09-02: repository history exposed a previously untested signed CRX2 artifact at commit `9527c62`.
+  Its valid embedded signature, version 0.12.11 manifest, storage source, and public key establish a stronger
+  migration baseline: the key derives Chrome ID `jaghnfjaikbcdliekgchjeeklkeceell`, and the release manifest
+  now retains that identity only for Chrome. The last signed source schema stores object-shaped rules in
+  `chrome.storage.sync`; V1 now reads sync plus older page `localStorage`, merges non-overlapping collections,
+  preserves explicit conflicts and removed features, and never mutates either source. Unit tests cover all
+  23 representative sync items, three disabled automatic candidates, export retention, application, and exact
+  rollback. A same-ID production-overlay E2E staged 24 items after adding an independent page-storage item.
+  This materially narrows but does not satisfy the outstanding store-signed upgrade row.
 
 ## 2. Installed-browser matrix
 

@@ -5,10 +5,58 @@ import { compileDnrRule } from '@/domain/rules/compile-dnr';
 import { parseLegacySource } from '@/domain/migration/parse-legacy';
 
 import fixture from '../fixtures/legacy-installation.json';
+import syncFixture from '../fixtures/legacy-0.12.11-sync.json';
 
 const now = '2026-08-31T00:00:00.000Z';
 
 describe('legacy migration', () => {
+  it('classifies the signed 0.12.11 storage.sync schema without dropping source items', async () => {
+    const bundle = await createMigrationBundle(syncFixture, 'legacy-chrome-storage', now);
+
+    expect(bundle.report.source).toBe('legacy-chrome-storage');
+    expect(bundle.report.summary).toEqual({
+      automatic: 3,
+      reviewRequired: 2,
+      unsupported: 3,
+      removedFeature: 15,
+      invalid: 0,
+    });
+    expect(bundle.report.items).toHaveLength(23);
+    expect(Object.keys(bundle.rawSnapshot).sort()).toEqual(Object.keys(syncFixture).sort());
+    expect(new Set(bundle.report.items.map((item) => item.id)).size).toBe(bundle.report.items.length);
+    const reimported = await createMigrationBundle(bundle.rawSnapshot, 'legacy-json-import', now);
+    expect(reimported.report.items.find((item) => item.sourceLocator === 'version')?.sourceValue).toBe('1.0');
+    expect(reimported.report.items.filter((item) => item.sourceKey === 'block')).toHaveLength(2);
+  });
+
+  it('preserves per-rule enabled intent and refuses legacy JavaScript regex activation', async () => {
+    const { report } = await createMigrationBundle(syncFixture, 'legacy-chrome-storage', now);
+    const byLocator = Object.fromEntries(report.items.map((item) => [item.sourceLocator, item]));
+
+    expect(byLocator['block[0]']).toMatchObject({ outcome: 'automatic', enabledIntent: true });
+    expect(byLocator['block[1]']).toMatchObject({ outcome: 'automatic', enabledIntent: false });
+    expect(byLocator['hsts[1]']).toMatchObject({
+      outcome: 'review-required',
+      enabledIntent: true,
+      reasonCode: 'legacy-validity-review',
+      candidateRule: { enabled: false, migrationState: 'review-required' },
+    });
+    expect(byLocator['custom[1]']).toMatchObject({
+      outcome: 'unsupported',
+      reasonCode: 'javascript-regex-compatibility',
+      enabledIntent: true,
+    });
+    expect(byLocator['contextmenu[0]']).toMatchObject({
+      outcome: 'removed-feature',
+      reasonCode: 'context-menu-actions-removed',
+    });
+    expect(byLocator['future-sync-key']).toMatchObject({
+      outcome: 'unsupported',
+      reasonCode: 'unknown-legacy-key',
+    });
+    expect(report.items.some((item) => item.candidateRule?.enabled)).toBe(false);
+  });
+
   it('represents every source item exactly once with deterministic outcomes', async () => {
     const bundle = await createMigrationBundle(fixture, 'legacy-json-import', now);
 

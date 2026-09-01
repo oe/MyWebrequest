@@ -15,7 +15,8 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 - Transactional storage/DNR reconciliation, browser regex checks, conflict/cycle diagnostics, and quota guard
 - Chrome-only deterministic legacy migration with review, export, apply, and rollback; its primary-navigation
   entry appears only while old data needs attention and remains available from Settings otherwise. Edge and
-  Firefox omit migration because neither browser had a legacy release
+  Firefox omit migration because neither browser had a legacy release. Chrome retains the signed 0.12.11
+  identity and reads its `storage.sync` schema plus older page `localStorage` without mutating either source
 - Checksummed rule backup, previewed merge/replace import, and automatic recovery snapshot
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish UI and manifests
 - Keyboard, reduced-motion, contrast, responsive-layout, unit, artifact, and production build checks

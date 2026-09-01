@@ -1,7 +1,7 @@
 # My Webrequest Legacy Migration Plan
 
-Status: Required V1 workstream
-Last updated: 2026-09-01  
+Status: Implemented and regression-tested; signed-store upgrade validation pending
+Last updated: 2026-09-02
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
 ## 1. Migration promise
@@ -20,12 +20,19 @@ Every legacy item receives an explicit outcome:
 - `removed-feature`: the old feature no longer exists.
 - `invalid`: the source data cannot be parsed safely.
 
-## 2. Preconditions
+## 2. Legacy identity evidence and remaining precondition
 
-- Automatic migration assumes the MV3 release updates the same Chrome Web Store extension ID.
-- Before implementation, verify whether disabled MV2 installations retain the extension origin and legacy `localStorage` through update.
-- If the extension ID changes or automatic legacy access is unavailable, JSON import becomes the supported path.
-- A production migration is not shipped until real anonymized legacy fixture shapes are captured from the current code and tests.
+- Repository commit `9527c62` contains a signed CRX2 artifact for version `0.12.11`. Its SHA-256 is
+  `77a52761f09dd8aaf71bcb5f16da220565c132dea4c18422fdf3292be4281e69`; its embedded RSA signature
+  verifies against its embedded public key.
+- That public key derives Chrome extension ID `jaghnfjaikbcdliekgchjeeklkeceell`. The Chrome-only MV3
+  manifest carries the same public key, and artifact preflight independently derives and checks the ID.
+- The same-ID upgrade E2E harness persists the `0.12.11` `storage.sync` fixture, overlays the production
+  build in the same profile, and proves that the MV3 options page stages the preserved data. This is
+  deterministic same-identity unpacked evidence, not a substitute for a Chrome Web Store signed update.
+- Final release still requires installing the actual previous public package and receiving the new signed
+  package through the production store ID. If the portal identity differs from the recorded signed CRX,
+  automatic access is unavailable and JSON import becomes the supported fallback.
 
 ## 3. Legacy sources
 
@@ -33,17 +40,27 @@ The legacy MV2/CoffeeScript implementation was removed from the active working t
 was documented. Commit `e100dbf` is the final pre-cleanup snapshot for migration archaeology; legacy code
 must not be copied back into the runtime or build.
 
-Legacy releases stored JSON-encoded values under extension `localStorage` keys:
+The final signed repository artifact stores current data in `chrome.storage.sync`. Its own migration code
+copied older page `localStorage` data into sync storage without deleting the page-storage source, so V1 reads
+both stores without mutating either. Sync data takes precedence; non-overlapping rule collections are merged,
+and conflicting page-storage values remain explicit exportable report items.
+
+Known legacy keys across both generations are:
 
 - `block`
 - `hsts`
 - `hotlink`
 - `log`
 - `custom`
+- `cors`
+- `contextmenu`
+- `ua`
+- `ua-list`
 - `gsearch`
 - `gstatic`
 - `onoff`
 - `config`
+- `version`
 
 Legacy imports may contain arbitrary additional keys. Unknown keys are retained in the raw snapshot but never copied into active storage.
 
@@ -52,7 +69,7 @@ Legacy imports may contain arbitrary additional keys. Unknown keys are retained 
 ```ts
 type MigrationReport = {
   migrationVersion: 1;
-  source: 'legacy-local-storage' | 'legacy-json-import';
+  source: 'legacy-local-storage' | 'legacy-chrome-storage' | 'legacy-json-import';
   sourceFingerprint: string;
   createdAt: string;
   items: MigrationItem[];
@@ -76,6 +93,9 @@ The report stores source text only in the bounded local migration snapshot. UI-f
 | `hsts`                       | Advanced upgrade-scheme action          | Automatic but surfaced as consolidated capability          |
 | `hotlink`                    | Preserved legacy record                 | Unsupported until bounded initiator domains are chosen     |
 | `custom`                     | Navigation-only fixed or regex redirect | Review required or unsupported per grammar                 |
+| `cors`                       | No target                               | Removed global response/request-header override            |
+| `contextmenu`                | No target                               | Removed programmable context-menu action                   |
+| `ua` / `ua-list`             | No target                               | Removed User-Agent override and preset data                |
 | `log`                        | No target                               | Removed feature                                            |
 | `gsearch`                    | Ordinary redirect preset                | Review required and disabled by default                    |
 | `gstatic`                    | No target                               | Removed feature; endpoint is obsolete                      |
@@ -119,7 +139,7 @@ The migration UI shows the original match, original destination template, genera
 
 - Check for a completed migration marker tied to a source fingerprint.
 - Check new storage before attempting legacy access.
-- Read legacy data once through the validated migration adapter.
+- Read `chrome.storage.sync` and page `localStorage` once through the validated Chrome-only adapters.
 - Never mutate legacy storage during detection.
 - Prefer automatic detection from an extension page on a same-ID update; use JSON import as the fallback
   when the legacy origin is inaccessible.
@@ -198,6 +218,8 @@ Fixtures must include:
 - Redirect loops and chains.
 - Invalid JSON, unknown keys, oversized values, and malicious HTML strings.
 - Import from both English and Chinese installations.
+- Object-shaped rule arrays and `storage.sync` settings from the signed `0.12.11` source schema.
+- Coexisting sync and page-storage collections, including deterministic conflicts.
 
 For every fixture, tests assert report counts, candidate rules, permission origins, default selection, and absence of silent loss.
 

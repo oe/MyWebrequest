@@ -6,14 +6,19 @@ export const LEGACY_KEYS = [
   'hotlink',
   'log',
   'custom',
+  'cors',
+  'contextmenu',
+  'ua',
+  'ua-list',
   'gsearch',
   'gstatic',
   'onoff',
   'config',
+  'version',
 ] as const;
 
 export type LegacyKey = (typeof LEGACY_KEYS)[number];
-export type MigrationSource = 'legacy-local-storage' | 'legacy-json-import';
+export type MigrationSource = 'legacy-local-storage' | 'legacy-chrome-storage' | 'legacy-json-import';
 export type MigrationOutcome =
   'automatic' | 'review-required' | 'unsupported' | 'removed-feature' | 'invalid';
 

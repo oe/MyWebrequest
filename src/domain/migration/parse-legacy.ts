@@ -7,8 +7,19 @@ import {
   type ParsedLegacySource,
 } from './model';
 
-const ARRAY_KEYS = new Set(['block', 'hsts', 'hotlink', 'log', 'gsearch', 'gstatic']);
-const OBJECT_KEYS = new Set(['custom', 'onoff', 'config']);
+const ARRAY_KEYS = new Set([
+  'block',
+  'hsts',
+  'hotlink',
+  'log',
+  'gsearch',
+  'gstatic',
+  'cors',
+  'contextmenu',
+  'ua',
+  'ua-list',
+]);
+const OBJECT_KEYS = new Set(['onoff', 'config']);
 const MAX_KEYS = 100;
 const MAX_KEY_BYTES = 1024 * 1024;
 const MAX_TOTAL_BYTES = 5 * 1024 * 1024;
@@ -34,8 +45,8 @@ function validateJsonValue(value: unknown, depth = 0): value is JsonValue {
   );
 }
 
-function rawValue(value: unknown): string | null {
-  if (typeof value === 'string') return value;
+function rawValue(value: unknown, typedSource = false): string | null {
+  if (typeof value === 'string' && !typedSource) return value;
   try {
     const serialized = JSON.stringify(value);
     return serialized === undefined ? null : serialized;
@@ -44,8 +55,9 @@ function rawValue(value: unknown): string | null {
   }
 }
 
-function parseKnownValue(key: string, value: unknown): { ok: true; value: unknown } | { ok: false } {
+function parseStoredValue(key: string, value: unknown): { ok: true; value: unknown } | { ok: false } {
   if (typeof value !== 'string') return { ok: true, value };
+  if (!(LEGACY_KEYS as readonly string[]).includes(key)) return { ok: true, value };
   try {
     return { ok: true, value: JSON.parse(value) };
   } catch {
@@ -59,6 +71,24 @@ function addEntries(
   entries: LegacySourceEntry[],
   issues: LegacyParseIssue[],
 ): void {
+  if (key === 'custom') {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => entries.push({ key, locator: `${key}[${index}]`, value: item }));
+      return;
+    }
+    if (!isRecord(value)) {
+      issues.push({ key, locator: key, code: 'invalid-shape', message: 'Expected an array or object.' });
+      return;
+    }
+    Object.keys(value)
+      .sort()
+      .forEach((property) => {
+        const item = value[property];
+        if (validateJsonValue(item)) entries.push({ key, locator: `${key}.${property}`, value: item });
+      });
+    return;
+  }
+
   if (ARRAY_KEYS.has(key)) {
     if (!Array.isArray(value)) {
       issues.push({ key, locator: key, code: 'invalid-shape', message: 'Expected an array.' });
@@ -97,15 +127,15 @@ export function parseLegacySource(
   const issues: LegacyParseIssue[] = [];
   let totalBytes = 0;
   const keys = Object.keys(input).sort();
+  const typedSource = source === 'legacy-chrome-storage';
 
   for (const key of keys) {
-    const raw = rawValue(input[key]);
+    const raw = rawValue(input[key], typedSource);
     if (raw === null) {
       fingerprintMaterial[key] = { $invalid: 'not-json-compatible' };
       continue;
     }
-    const known = (LEGACY_KEYS as readonly string[]).includes(key);
-    const parsed = known ? parseKnownValue(key, input[key]) : { ok: true as const, value: input[key] };
+    const parsed = typedSource ? { ok: true as const, value: input[key] } : parseStoredValue(key, input[key]);
     fingerprintMaterial[key] = parsed.ok && validateJsonValue(parsed.value) ? parsed.value : { $raw: raw };
   }
 
@@ -117,7 +147,7 @@ export function parseLegacySource(
       message: `The source contains more than ${MAX_KEYS} keys.`,
     });
     for (const key of keys.slice(MAX_KEYS)) {
-      const raw = rawValue(input[key]);
+      const raw = rawValue(input[key], typedSource);
       issues.push({
         key,
         locator: key,
@@ -129,7 +159,7 @@ export function parseLegacySource(
   }
 
   for (const key of keys.slice(0, MAX_KEYS)) {
-    const raw = rawValue(input[key]);
+    const raw = rawValue(input[key], typedSource);
     if (raw === null) {
       issues.push({ key, locator: key, code: 'invalid-shape', message: 'The value is not JSON-compatible.' });
       continue;
@@ -149,8 +179,7 @@ export function parseLegacySource(
     }
     rawSnapshot[key] = raw;
 
-    const known = (LEGACY_KEYS as readonly string[]).includes(key);
-    const parsed = known ? parseKnownValue(key, input[key]) : { ok: true as const, value: input[key] };
+    const parsed = typedSource ? { ok: true as const, value: input[key] } : parseStoredValue(key, input[key]);
     if (!parsed.ok) {
       issues.push({ key, locator: key, code: 'invalid-json', message: 'The stored JSON is invalid.' });
       continue;

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -14,6 +15,11 @@ const expectedIcons = {
   128: 'icon/128.png',
 };
 const browserSupport = JSON.parse(readFileSync(join(process.cwd(), 'browser-support.json'), 'utf8'));
+
+function extensionIdFromPublicKey(publicKey) {
+  const digest = createHash('sha256').update(Buffer.from(publicKey, 'base64')).digest().subarray(0, 16);
+  return [...digest].map((value) => String.fromCharCode(97 + (value >> 4), 97 + (value & 15))).join('');
+}
 
 function walk(directory) {
   return readdirSync(directory).flatMap((name) => {
@@ -43,6 +49,7 @@ for (const target of targets) {
       'Firefox must support both reliable dynamic rules and the required data-collection manifest key.',
     );
     assert.equal(manifest.minimum_chrome_version, undefined, 'Firefox must not contain Chromium metadata.');
+    assert.equal(manifest.key, undefined, 'Firefox must not inherit the legacy Chrome identity key.');
   } else {
     assert.equal(
       manifest.minimum_chrome_version,
@@ -54,6 +61,20 @@ for (const target of targets) {
       undefined,
       `${target} must not contain Firefox-only metadata.`,
     );
+    if (target === 'chrome-mv3') {
+      assert.equal(
+        manifest.key,
+        browserSupport.chromeLegacyPublicKey,
+        'Chrome must retain its signed V0 identity.',
+      );
+      assert.equal(
+        extensionIdFromPublicKey(manifest.key),
+        browserSupport.chromeLegacyExtensionId,
+        'Chrome public key does not derive the recorded legacy extension ID.',
+      );
+    } else {
+      assert.equal(manifest.key, undefined, 'Edge must not inherit the legacy Chrome identity key.');
+    }
   }
   assert.deepEqual(locales, expectedLocales, `${target} does not contain the six release locales.`);
   assert.ok(

@@ -23,6 +23,8 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Offer legacy detection, JSON import, review, apply, and rollback only in the Chrome artifact. The legacy
   extension had no Edge or Firefox release, so those targets do not scan for old data and omit migration
   from both primary navigation and Settings.
+- Preserve the signed legacy Chrome identity in the Chrome manifest only. The recorded public key derives
+  `jaghnfjaikbcdliekgchjeeklkeceell`; Edge and Firefox artifacts are audited to reject that key.
 - Force Firefox to Manifest V3 (`-b firefox --mv3`) so all current targets share the DNR architecture.
   WXT otherwise defaults Firefox builds to Manifest V2.
 - Declare Chrome/Edge 121 and Firefox 142 as explicit installation floors. Chromium 121 provides the current
@@ -157,6 +159,13 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   manifest-synchronized short description, a 250-10,000 character detailed description, privacy and
   permission summaries, three screenshot captions, and focused search terms. Browser-neutral descriptions
   are forbidden from mentioning migration; the separately audited migration note names Chrome explicitly.
+- Repository history contains a signature-valid CRX2 for version 0.12.11 at commit `9527c62`. Its source
+  schema uses `chrome.storage.sync`, not only page `localStorage`. The Chrome-only adapter now stages both
+  stores without mutation, merges non-overlapping rule collections, preserves conflicts as exportable items,
+  supports object-shaped legacy rules, and explicitly retains removed CORS/context-menu/User-Agent data.
+  A same-ID production-overlay E2E uses the CRX public key, asserts extension ID
+  `jaghnfjaikbcdliekgchjeeklkeceell`, preserves a representative 0.12.11 sync fixture, and stages all 24
+  resulting items with three safe candidates disabled. Store-signed upgrade validation remains pending.
 
 ## Remaining compatibility work
 

@@ -5,6 +5,7 @@ import { createMigrationBundle } from '@/application/migration-service';
 import { createEmptyState } from '@/domain/rules/fixtures';
 
 import fixture from '../fixtures/legacy-installation.json';
+import syncFixture from '../fixtures/legacy-0.12.11-sync.json';
 
 const stagedAt = '2026-08-31T01:00:00.000Z';
 const appliedAt = '2026-08-31T01:05:00.000Z';
@@ -23,6 +24,32 @@ describe('migration application', () => {
 
     expect(selectedItems).toHaveLength(2);
     expect(selectedItems.every((item) => item.outcome === 'automatic' && item.candidateRule)).toBe(true);
+  });
+
+  it('applies the 0.12.11 sync candidates disabled and rolls back without touching legacy source data', async () => {
+    const previous = createEmptyState();
+    const bundle = await createMigrationBundle(syncFixture, 'legacy-chrome-storage', stagedAt);
+    const migration = createPendingMigration(bundle, stagedAt);
+    const ports = { reconcile: vi.fn(async () => undefined), commit: vi.fn(async () => undefined) };
+
+    expect(migration.selectedItemIds).toHaveLength(3);
+    const applied = await applyMigration(previous, migration, migration.selectedItemIds, ports, appliedAt);
+    expect(applied.state.order).toHaveLength(3);
+    expect(Object.values(applied.state.rules)).toEqual([
+      expect.objectContaining({ enabled: false, action: { kind: 'block' } }),
+      expect.objectContaining({ enabled: false, action: { kind: 'block' } }),
+      expect.objectContaining({ enabled: false, action: { kind: 'upgrade-scheme' } }),
+    ]);
+    expect(applied.migration.bundle.rawSnapshot).toEqual(bundle.rawSnapshot);
+
+    const rolledBack = await rollbackMigration(
+      applied.state,
+      applied.migration,
+      ports,
+      '2026-08-31T01:10:00.000Z',
+    );
+    expect(rolledBack.state).toEqual(previous);
+    expect(rolledBack.migration.bundle.rawSnapshot).toEqual(bundle.rawSnapshot);
   });
 
   it('atomically merges selected rules without enabling them', async () => {

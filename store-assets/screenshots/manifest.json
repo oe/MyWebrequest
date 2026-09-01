@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
-      "sourceSha256": "5397fea22df86fc17429ad31a77e7d169170d07a7f6230e85488346efadac1b9",
+      "sourceSha256": "95690b44fb9e0148677ca251038d313d726a40a884fa1ddedaa5d5fe7f34ce76",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-01T19:32:32.925Z",
+      "capturedAt": "2026-09-01T20:00:26.265Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -37,10 +37,10 @@
     },
     "edge": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
-      "sourceSha256": "47e5036a68441956de0ee341e31e3ec1f0d721568e3efb192973ba2cd1787f21",
+      "sourceSha256": "26454a5cb51526d079189bca344ff43bc083600013415bb07d5d3c9807c43b68",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-01T19:32:34.477Z",
+      "capturedAt": "2026-09-01T20:00:27.813Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -67,10 +67,10 @@
     },
     "firefox": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
-      "sourceSha256": "9d5b21a15cef9126e098093c9e907d0bdf84ed8a0b694d20c8ffb235cb39e03c",
+      "sourceSha256": "4efa5368255a644108d793afe007f9d06ebc71947b2f70aca588aa14b3a1a32d",
       "browserName": "Firefox",
       "browserVersion": "142.0",
-      "capturedAt": "2026-09-01T19:33:15.578Z",
+      "capturedAt": "2026-09-01T20:00:37.822Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
@@ -82,7 +82,7 @@
         {
           "path": "firefox/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "4fba895ac41818aef92dbae11510f0bcfae819246c8b97adf1f8d8017f369c9f",
+          "sha256": "bd4a99e81be2569c5bb371991d47a14f17aa9ab5366a0ba162a1f3340344a11f",
           "width": 1280,
           "height": 800
         },

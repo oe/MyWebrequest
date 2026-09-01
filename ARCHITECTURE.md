@@ -115,7 +115,8 @@ compiled JavaScript.
 - Persists data in `chrome.storage.local`.
 - Applies DNR updates and reads DNR quota state.
 - Requests and checks optional host permissions.
-- Reads legacy `localStorage` only during migration.
+- On the Chrome target only, reads legacy `storage.sync` and page `localStorage` during migration; the
+  Edge and Firefox surfaces never invoke either adapter.
 
 ### UI
 
@@ -342,8 +343,8 @@ compact-layout overflow protection, forced-color/reduced-motion fallbacks, keybo
 bounded permission preview/cancel behavior for navigation and cross-site subresource rules. A separate
 test-only manifest grants only the two local fixture origins and proves real cross-origin wildcard capture
 redirect substitution plus request-header modification from the declared initiator. It also covers the
-complete legacy `localStorage`
-review/export/disabled-apply/rollback path, including unsupported and removed raw source data, plus checksummed
+complete legacy `storage.sync` plus page-`localStorage`
+review/export/disabled-apply/rollback paths, including unsupported and removed raw source data, plus checksummed
 rule backup export, disabled merge, replace-time snapshot capture, and exact recovery from the production UI.
 The test-only host grant bypasses the native optional-permission prompt, so this automated Chromium gate is
 pre-certification evidence; branded Chrome, Edge, and Firefox remain separate installed-browser release rows
@@ -367,5 +368,6 @@ Release is blocked by unused permissions, unexpected manifest changes, failed mi
 ## 15. Remaining verification before release
 
 - Extend the proven Playwright harness where native browser permission prompts can be controlled reliably.
-- Prove a signed same-extension-ID update from an actual prior release, not only injected legacy storage.
+- Complete the final store-delivered signed update from the actual previous public package. The local
+  same-ID overlay already uses the signature-valid 0.12.11 CRX public key and real sync schema.
 - Complete optional-origin grant, refusal, revocation, and re-grant certification on every target browser.

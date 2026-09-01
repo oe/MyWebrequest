@@ -10,6 +10,7 @@ import type { Duplex } from 'node:stream';
 import { promisify } from 'node:util';
 
 import type { BrowserContext, Page, Worker } from '@playwright/test';
+import browserSupport from '../../browser-support.json' with { type: 'json' };
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
@@ -17,6 +18,7 @@ import type { RuleImportRecovery } from '@/infrastructure/rule-import-recovery';
 import { createTranslator, supportedLocales, type AppLocale } from '@/ui/i18n/core';
 
 import { expect, findExtensionWorker, launchChromiumExtensionContext, test } from './extension.fixture';
+import legacySyncFixture from '../fixtures/legacy-0.12.11-sync.json' with { type: 'json' };
 import legacyFixture from '../fixtures/legacy-installation.json' with { type: 'json' };
 
 const now = '2026-09-01T00:00:00.000Z';
@@ -225,9 +227,9 @@ async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPat
         {
           manifest_version: 3,
           name: 'My Webrequest legacy upgrade fixture',
-          version: '0.8.0',
-          permissions: ['activeTab', 'storage', 'declarativeNetRequest'],
-          optional_host_permissions: ['http://*/*', 'https://*/*'],
+          version: browserSupport.chromeLegacyVersion,
+          key: browserSupport.chromeLegacyPublicKey,
+          permissions: ['storage'],
           background: { service_worker: 'legacy-background.js' },
           options_page: 'legacy-options.html',
         },
@@ -690,7 +692,7 @@ test('isolated profile enforces the regex and total dynamic-rule safety boundari
     .toEqual({ count: 4_500, first: dynamicRules[0]?.dnrId, last: dynamicRules[4_499]?.dnrId });
 });
 
-test('same-extension upgrade preserves legacy page storage and stages migration', async () => {
+test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', async () => {
   test.skip(browserTarget !== 'chrome', 'Legacy migration is intentionally Chrome-only.');
   const fixture = await legacyUpgradeFixture();
   const userDataDir = join(fixture.directory, 'profile');
@@ -700,14 +702,13 @@ test('same-extension upgrade preserves legacy page storage and stages migration'
     let [legacyWorker] = launched.context.serviceWorkers();
     legacyWorker ??= await launched.context.waitForEvent('serviceworker');
     const extensionId = new URL(legacyWorker.url()).host;
+    expect(extensionId).toBe(browserSupport.chromeLegacyExtensionId);
+    await legacyWorker.evaluate(async (source) => chrome.storage.sync.set(source), legacySyncFixture);
     const legacyOptions = await launched.context.newPage();
     await legacyOptions.goto(`chrome-extension://${extensionId}/legacy-options.html`);
-    await legacyOptions.evaluate((source) => {
-      for (const [key, value] of Object.entries(source)) {
-        localStorage.setItem(key, JSON.stringify(value));
-      }
-    }, legacyFixture);
-    expect(await legacyOptions.evaluate(() => localStorage.length)).toBe(Object.keys(legacyFixture).length);
+    await legacyOptions.evaluate(() => {
+      localStorage.setItem('future-local-key', JSON.stringify({ preserved: 'from-page-storage' }));
+    });
     await launched.close();
 
     await overlayProductionExtension(fixture.extensionPath);
@@ -720,16 +721,21 @@ test('same-extension upgrade preserves legacy page storage and stages migration'
     await options.goto(`chrome-extension://${extensionId}/options.html`);
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(
-      await options.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), 'future-key'),
-    ).toEqual(legacyFixture['future-key']);
+      await options.evaluate(() => JSON.parse(localStorage.getItem('future-local-key') ?? 'null')),
+    ).toEqual({
+      preserved: 'from-page-storage',
+    });
 
     const staged = (await productionWorker.evaluate(async () => {
       const stored = await chrome.storage.local.get('requestRulesMigration');
       return stored.requestRulesMigration;
     })) as StoredMigration;
     expect(staged.status).toBe('pending');
-    expect(staged.bundle.report.items).toHaveLength(20);
-    expect(staged.bundle.rawSnapshot['future-key']).toContain('onerror=alert(1)');
+    expect(staged.bundle.report.source).toBe('legacy-chrome-storage');
+    expect(staged.bundle.report.items).toHaveLength(24);
+    expect(staged.selectedItemIds).toHaveLength(3);
+    expect(staged.bundle.rawSnapshot.version).toBe('"1.0"');
+    expect(staged.bundle.rawSnapshot['future-local-key']).toContain('from-page-storage');
   } finally {
     await launched.close();
     await rm(fixture.directory, { force: true, recursive: true });

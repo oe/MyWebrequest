@@ -49,6 +49,35 @@ describe('legacy migration detection', () => {
     expect(set).not.toHaveBeenCalled();
   });
 
+  it('stages the last public Chrome sync schema before legacy page storage', async () => {
+    const set = vi.fn<(value: Record<string, unknown>) => Promise<void>>().mockResolvedValue(undefined);
+    vi.stubGlobal('browser', {
+      storage: {
+        local: { get: vi.fn(async () => ({})), set },
+        sync: {
+          get: vi.fn(async () => ({
+            version: '1.0',
+            block: [{ url: '*://sync.example/*', valid: true, enabled: true }],
+            onoff: { block: true },
+          })),
+        },
+      },
+    });
+
+    const result = await detectAndStageLegacyMigration(
+      storageMock({ block: '["*://local-only.example/*"]' }),
+      '2026-08-31T02:00:00.000Z',
+    );
+
+    expect(result.kind).toBe('staged');
+    if (result.kind !== 'staged') return;
+    expect(result.migration.bundle.report.source).toBe('legacy-chrome-storage');
+    expect(result.migration.bundle.report.items.map((item) => item.sourceLocator)).toEqual(
+      expect.arrayContaining(['block[0]', 'block[1]', 'onoff.block', 'version']),
+    );
+    expect(result.migration.bundle.report.items).toHaveLength(4);
+  });
+
   it('does not overwrite a staged migration when legacy source changes', async () => {
     const set = vi.fn<(value: Record<string, unknown>) => Promise<void>>().mockResolvedValue(undefined);
     vi.stubGlobal('browser', {

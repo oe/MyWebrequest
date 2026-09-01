@@ -43,7 +43,7 @@ const storedMigrationSchema = z
     bundle: z.object({
       report: z.object({
         migrationVersion: z.literal(1),
-        source: z.enum(['legacy-local-storage', 'legacy-json-import']),
+        source: z.enum(['legacy-local-storage', 'legacy-chrome-storage', 'legacy-json-import']),
         sourceFingerprint: z.string().regex(/^[a-f0-9]{64}$/),
         createdAt: z.string().datetime(),
         items: z.array(migrationItemSchema).max(10_101),
