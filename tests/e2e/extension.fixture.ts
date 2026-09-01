@@ -9,12 +9,13 @@ type ExtensionFixtures = {
 };
 
 export const test = base.extend<ExtensionFixtures>({
-  context: async ({ browserName }, run) => {
+  context: async ({ browserName, ignoreHTTPSErrors }, run) => {
     if (browserName !== 'chromium') throw new Error('Extension E2E requires Playwright Chromium.');
     const extensionPath = path.resolve(process.cwd(), 'dist/chrome-mv3');
     const context = await chromium.launchPersistentContext('', {
       channel: 'chromium',
       headless: true,
+      ignoreHTTPSErrors,
       args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
     });
 

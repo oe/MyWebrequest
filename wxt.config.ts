@@ -8,6 +8,12 @@ export default defineConfig({
   modules: ['@wxt-dev/module-react'],
   vite: () => ({
     plugins: [tailwindcss()],
+    build: {
+      // Chromium extension pages can report Vite's cross-origin modulepreload
+      // hints as cross-world resource mismatches. The chunks remain regular
+      // static module dependencies, so omit the redundant hint.
+      modulePreload: false,
+    },
   }),
   manifest: ({ browser }) => ({
     name: '__MSG_appName__',

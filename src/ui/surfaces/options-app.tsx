@@ -390,7 +390,7 @@ export function OptionsApp() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-      <Toaster position="bottom-right" richColors />
+      <Toaster position="top-right" offset={72} richColors />
     </TooltipProvider>
   );
 }

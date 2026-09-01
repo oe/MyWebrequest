@@ -1,18 +1,35 @@
 /// <reference types="chrome" />
 
 import http from 'node:http';
-import { readFile } from 'node:fs/promises';
+import https from 'node:https';
+import { execFile } from 'node:child_process';
+import { mkdtemp, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import type { Duplex } from 'node:stream';
+import { promisify } from 'node:util';
 
 import type { BrowserContext, Page } from '@playwright/test';
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import type { RuleImportRecovery } from '@/infrastructure/rule-import-recovery';
+import { createTranslator, supportedLocales, type AppLocale } from '@/ui/i18n/core';
 
 import { expect, test } from './extension.fixture';
 import legacyFixture from '../fixtures/legacy-installation.json' with { type: 'json' };
 
 const now = '2026-09-01T00:00:00.000Z';
+const execFileAsync = promisify(execFile);
+
+const languageChoices: Record<AppLocale, string> = {
+  en: 'English',
+  'zh-CN': '简体中文',
+  ko: '한국어',
+  ja: '日本語',
+  fr: 'Français',
+  es: 'Español',
+};
 
 function stateWith(rules: Rule[], globallyPaused = false): StoredState {
   return {
@@ -41,6 +58,56 @@ function blockRule(port: number): Rule {
     createdAt: now,
     updatedAt: now,
   };
+}
+
+function upgradeRule(port: number): Rule {
+  return {
+    schemaVersion: 1,
+    id: 'e2e-upgrade',
+    dnrId: 1_900_002,
+    name: 'E2E HTTPS upgrade probe',
+    enabled: true,
+    priority: 10,
+    condition: {
+      url: { kind: 'wildcard', value: `http://127.0.0.1:${port}/upgrade*` },
+      resourceTypes: ['main_frame'],
+    },
+    action: { kind: 'upgrade-scheme' },
+    permissionOrigins: [],
+    migrationState: 'none',
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+async function localTlsCredentials(): Promise<{ cert: string; key: string }> {
+  const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-e2e-tls-'));
+  const keyPath = join(directory, 'key.pem');
+  const certPath = join(directory, 'cert.pem');
+  try {
+    await execFileAsync('openssl', [
+      'req',
+      '-x509',
+      '-newkey',
+      'rsa:2048',
+      '-nodes',
+      '-sha256',
+      '-subj',
+      '/CN=127.0.0.1',
+      '-addext',
+      'subjectAltName=IP:127.0.0.1',
+      '-days',
+      '1',
+      '-keyout',
+      keyPath,
+      '-out',
+      certPath,
+    ]);
+    const [key, cert] = await Promise.all([readFile(keyPath, 'utf8'), readFile(certPath, 'utf8')]);
+    return { cert, key };
+  } finally {
+    await rm(directory, { force: true, recursive: true });
+  }
 }
 
 function backupRule(id: string, dnrId: number, url: string, enabled: boolean): Rule {
@@ -74,9 +141,11 @@ async function listen(server: http.Server): Promise<number> {
 }
 
 async function close(server: http.Server): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
+  const closed = new Promise<void>((resolve, reject) => {
     server.close((error) => (error ? reject(error) : resolve()));
   });
+  server.closeAllConnections();
+  await closed;
 }
 
 async function stopExtensionServiceWorker(
@@ -116,11 +185,13 @@ test('clean install exposes the product UI without required host access', async 
   expect(origins).toEqual([]);
 
   const options = await context.newPage();
-  const errors: string[] = [];
+  const consoleIssues: string[] = [];
   options.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() === 'error' || message.type() === 'warning') {
+      consoleIssues.push(`${message.type()}: ${message.text()}`);
+    }
   });
-  options.on('pageerror', (error) => errors.push(error.message));
+  options.on('pageerror', (error) => consoleIssues.push(`pageerror: ${error.message}`));
   await options.goto(`chrome-extension://${extensionId}/options.html`);
 
   await expect(options).toHaveTitle('My Webrequest');
@@ -131,7 +202,105 @@ test('clean install exposes the product UI without required host access', async 
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByRole('menuitem', { name: 'Legacy migration' })).toBeVisible();
-  expect(errors).toEqual([]);
+  expect(consoleIssues).toEqual([]);
+});
+
+test('all six locales switch by keyboard, persist, and fit the compact layout', async ({
+  context,
+  extensionId,
+}) => {
+  const options = await context.newPage();
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+  let currentLocale: AppLocale = 'en';
+  for (const nextLocale of supportedLocales) {
+    const current = createTranslator(currentLocale);
+    await options.getByRole('button', { name: current('language'), exact: true }).press('Enter');
+    await options
+      .getByRole('menuitemradio', { name: languageChoices[nextLocale], exact: true })
+      .press('Enter');
+
+    const next = createTranslator(nextLocale);
+    await expect(options.locator('html')).toHaveAttribute('lang', nextLocale);
+    await expect(options.getByRole('navigation', { name: next('primaryNavigation') })).toBeVisible();
+    await expect(options.getByRole('button', { name: next('settings'), exact: true })).toBeVisible();
+    currentLocale = nextLocale;
+  }
+
+  await options.reload();
+  const persisted = createTranslator('es');
+  await expect(options.locator('html')).toHaveAttribute('lang', 'es');
+  await expect(options.getByRole('button', { name: persisted('settings'), exact: true })).toBeVisible();
+
+  await options.setViewportSize({ width: 640, height: 900 });
+  await expect(options.getByRole('button', { name: persisted('language'), exact: true })).toBeVisible();
+  expect(
+    await options.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    })),
+  ).toEqual({ clientWidth: 640, scrollWidth: 640 });
+});
+
+test.describe('hostless HTTPS upgrade', () => {
+  test.use({ ignoreHTTPSErrors: true });
+
+  test('upgrades a real local navigation without requesting host access', async ({
+    context,
+    extensionId,
+    extensionWorker,
+  }) => {
+    const tls = await localTlsCredentials();
+    let upgradeHits = 0;
+    const sockets = new Set<Duplex>();
+    const server = https.createServer(tls, (request, response) => {
+      if (request.url?.startsWith('/upgrade')) upgradeHits += 1;
+      response.writeHead(200, { 'content-type': 'text/plain' });
+      response.end('upgrade-ok');
+    });
+    server.on('connection', (socket) => {
+      sockets.add(socket);
+      socket.once('close', () => sockets.delete(socket));
+    });
+    const port = await listen(server);
+    const rule = upgradeRule(port);
+
+    try {
+      await extensionWorker.evaluate(
+        async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+        stateWith([rule]),
+      );
+      await expect
+        .poll(() =>
+          extensionWorker.evaluate(
+            async (dnrId) =>
+              (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
+            rule.dnrId,
+          ),
+        )
+        .toBe(true);
+      expect(
+        await extensionWorker.evaluate(async () => (await chrome.permissions.getAll()).origins ?? []),
+      ).toEqual([]);
+
+      const options = await context.newPage();
+      await options.goto(`chrome-extension://${extensionId}/options.html`);
+      await expect(options.getByText('Active', { exact: true }).first()).toBeVisible();
+
+      const probe = await context.newPage();
+      const response = await probe.goto(`http://127.0.0.1:${port}/upgrade?probe=1`);
+      expect(response?.status()).toBe(200);
+      expect(new URL(probe.url()).protocol).toBe('https:');
+      await expect(probe.locator('body')).toHaveText('upgrade-ok');
+      expect(upgradeHits).toBe(1);
+      await probe.close();
+      await options.close();
+    } finally {
+      const closing = close(server);
+      for (const socket of sockets) socket.destroy();
+      await closing;
+    }
+  });
 });
 
 test('legacy localStorage is reviewed, exported, applied disabled, and rolled back', async ({
@@ -195,6 +364,9 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
       const stored = await extensionWorker.evaluate(async () =>
         chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
       );
+      if (!stored.requestRulesMigration || !stored.requestRulesState) {
+        return { status: 'waiting', rules: [] };
+      }
       return {
         status: (stored.requestRulesMigration as StoredMigration).status,
         rules: Object.values((stored.requestRulesState as StoredState).rules),
@@ -223,6 +395,9 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
       const stored = await extensionWorker.evaluate(async () =>
         chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
       );
+      if (!stored.requestRulesMigration || !stored.requestRulesState) {
+        return { status: 'waiting', ruleCount: -1 };
+      }
       return {
         status: (stored.requestRulesMigration as StoredMigration).status,
         ruleCount: Object.keys((stored.requestRulesState as StoredState).rules).length,
@@ -450,7 +625,6 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
     );
     expect(blockedPathHits).toBe(1);
   } finally {
-    server.closeAllConnections();
     await close(server);
   }
 });

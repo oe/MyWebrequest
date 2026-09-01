@@ -334,14 +334,15 @@ UI state must be derived from stored rule, grant state, compiler result, and ins
 
 The repository runs a Playwright Chromium extension suite in the default quality gate. It launches the
 production `dist/chrome-mv3` build in an isolated persistent profile and currently proves clean-install
-permissions, options/settings navigation, real DNR blocking, popup-driven pause/resume synchronization,
-DNR continuity after forced service-worker termination and event-driven restart, and the complete legacy
-`localStorage` review/export/disabled-apply/rollback path. Export assertions include unsupported and removed
-raw source data. It also exports and verifies a checksummed rule backup, proves merge imports are additive
-and disabled, proves replace imports capture the prior state automatically, and restores that snapshot from
-the production UI. This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and
-Firefox remain separate installed-browser release rows because their extension distribution and permission
-surfaces differ.
+permissions, warning/error-free options startup, options/settings navigation, real DNR blocking,
+popup-driven pause/resume synchronization,
+DNR continuity after forced service-worker termination and event-driven restart, a real host-permission-free
+HTTP-to-HTTPS upgrade against an isolated TLS fixture, keyboard switching and persistence for all six locales,
+and compact-layout overflow protection. It also covers the complete legacy `localStorage`
+review/export/disabled-apply/rollback path, including unsupported and removed raw source data, plus checksummed
+rule backup export, disabled merge, replace-time snapshot capture, and exact recovery from the production UI.
+This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and Firefox remain separate
+installed-browser release rows because their extension distribution and permission surfaces differ.
 
 ## 14. CI and release
 

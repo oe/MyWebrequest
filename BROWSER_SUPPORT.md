@@ -67,11 +67,12 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 
 The default repository gate also runs isolated Playwright Chromium extension E2E for clean-install
 permissions, UI navigation, live block DNR, popup/options synchronization, pause/resume, and forced worker
-restart. It also covers representative legacy `localStorage` detection, report export, disabled application,
-and complete rollback without dropping unsupported raw data. It additionally verifies checksummed backup
-export, safe disabled merge, replace-time snapshot creation, and one-click recovery. Chromium automation is
-a regression gate, not evidence that a branded Chrome, Edge, or Firefox row has passed its store or
-installed-browser certification.
+restart. A local TLS fixture proves real HTTP-to-HTTPS upgrade without host access. The suite keyboard-switches
+all six locales, verifies persistence and compact-layout overflow, covers representative legacy `localStorage`
+detection/report export/disabled application/complete rollback, and verifies checksummed backup export, safe
+disabled merge, replace-time snapshot creation, and one-click recovery. Chromium automation is a regression
+gate, not evidence that a branded Chrome, Edge, or Firefox row has passed its store or installed-browser
+certification.
 
 ## Release gate
 
