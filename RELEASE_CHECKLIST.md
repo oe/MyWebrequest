@@ -41,8 +41,10 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   DNR blocking against a local fixture, popup pause/resume synchronization, and DNR continuity after forced
   service-worker termination and event-driven restart. It also injects the representative old-version
   `localStorage` fixture, verifies all 20 classified items and the raw unknown-key export, applies only the
-  two automatic candidates disabled, and restores the empty pre-migration snapshot. It does not replace the
-  branded-browser rows below.
+  two automatic candidates disabled, and restores the empty pre-migration snapshot. The same suite now
+  verifies a checksummed production backup download, additive merge with imported rules disabled, full
+  replacement with an automatic pre-replace snapshot, and exact recovery from that snapshot. It does not
+  replace the branded-browser rows below.
 - 2026-09-01: the unpacked artifacts were exercised in Chrome 151.0.7922.174, Edge 152.0.0.0, and
   Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
   popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and

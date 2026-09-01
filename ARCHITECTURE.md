@@ -25,7 +25,7 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 | UI              | React for popup/options only                         | Existing team familiarity and component/state needs without putting React in the worker |
 | Styling         | Tailwind CSS v4 plus shadcn `radix-nova` tokens      | Local CSS variables and utilities, no runtime CSS-in-JS                                 |
 | Unit tests      | Vitest                                               | Fast pure-domain and component tests                                                    |
-| E2E             | Playwright Chromium or Puppeteer after a spike       | Real extension installation and service-worker testing                                  |
+| E2E             | Playwright Chromium                                  | Real extension installation, downloads, storage, DNR, and service-worker testing        |
 | Validation      | Versioned JSON Schema with a typed runtime validator | Treat imports and legacy data as untrusted                                              |
 | CI              | GitHub Actions on Node 24                            | Typecheck, lint, unit, per-browser E2E, build, artifact and store-validator audit       |
 
@@ -337,7 +337,9 @@ production `dist/chrome-mv3` build in an isolated persistent profile and current
 permissions, options/settings navigation, real DNR blocking, popup-driven pause/resume synchronization,
 DNR continuity after forced service-worker termination and event-driven restart, and the complete legacy
 `localStorage` review/export/disabled-apply/rollback path. Export assertions include unsupported and removed
-raw source data. This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and
+raw source data. It also exports and verifies a checksummed rule backup, proves merge imports are additive
+and disabled, proves replace imports capture the prior state automatically, and restores that snapshot from
+the production UI. This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and
 Firefox remain separate installed-browser release rows because their extension distribution and permission
 surfaces differ.
 
@@ -359,7 +361,7 @@ Release is blocked by unused permissions, unexpected manifest changes, failed mi
 ## 15. Implementation spikes before committing
 
 - Prove WXT's current stable release against Node 24, Chrome MV3, popup, options, and service worker.
-- Choose Playwright or Puppeteer based on reliable extension and worker-restart E2E behavior.
+- Extend the proven Playwright harness to the remaining DNR and permission scenarios.
 - Prove automatic access to legacy `localStorage` for a same-ID MV3 update and decide whether `offscreen` is necessary.
 - Prove optional-origin grant behavior for redirect and request-header DNR actions.
 - Build a small compatibility corpus for the old Custom URL grammar before finalizing the V1 rule schema.
