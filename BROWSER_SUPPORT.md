@@ -44,6 +44,9 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Firefox 154.0.1: temporary install from `dist/firefox-mv3`; all-resource block including top-level
   navigation; request-header permission requested from the originating click; pause/resume; popup/options
   synchronization; background reload recovery. Header fixture received `X-E2E-Test: firefox-pass`.
+- Chrome, Edge, and Firefox were reloaded again after the product-name and migration-navigation update.
+  Each installed extension exposed `My Webrequest`, omitted migration from primary navigation when no legacy
+  source existed, retained migration under Settings, and preserved the existing active-rule state.
 - The current Firefox 154 schema was checked locally after a runtime rejection showed that `webbundle`
   was not accepted. Firefox's all-resource expansion is therefore limited to the values accepted by that
   installed schema and excludes `webbundle` and `webtransport`.

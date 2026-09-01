@@ -1,6 +1,7 @@
 # Release Checklist
 
-Status: Current-browser runtime pass recorded; older-release, full matrix, and store certification pending
+Status: Node 24 package gate and current-browser runtime pass recorded; older-release, full matrix, and
+store certification pending
 Last updated: 2026-09-01
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
@@ -32,10 +33,17 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   the local browser-rendered smoke test.
 - 2026-09-01: Firefox 154.0.1 accepted `dist/firefox-mv3` as the temporary add-on
   `mywebrequest@evecalm.com` in a clean headless profile.
+- 2026-09-01: the complete `pnpm release:package` gate passed on Homebrew Node 24.20.0 with 22 test files
+  and 103 tests. Chrome, Edge, Firefox, and Firefox-source archives passed artifact audits, AMO lint, and
+  SHA-256 verification. The resulting archive hashes were identical to the preceding package run.
 - 2026-09-01: the unpacked artifacts were exercised in Chrome 151.0.7922.174, Edge 152.0.0.0, and
   Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
   popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and
   permission refusal/revocation/re-grant. This is current-version runtime evidence, not store certification.
+- 2026-09-01: after reloading the current unpacked artifact in all three installed browsers, the browser
+  extension details and options page consistently showed `My Webrequest`. With no legacy source detected,
+  primary navigation omitted migration while Settings retained the explicit legacy-migration entry. Existing
+  active DNR rules and their permission status remained visible after reload.
 
 ## 2. Installed-browser matrix
 
