@@ -238,3 +238,16 @@
     box-shadow: none;
   }
 }
+
+@media (forced-colors: active) {
+  [data-material^='glass-'],
+  [data-slot='dialog-content'],
+  [data-slot='dropdown-menu-content'],
+  [data-slot='select-content'] {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background-color: Canvas;
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+}

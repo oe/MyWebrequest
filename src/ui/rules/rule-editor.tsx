@@ -61,6 +61,7 @@ import { Switch } from '@/ui/components/switch';
 import { Textarea } from '@/ui/components/textarea';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
+import { PermissionScope } from './permission-scope';
 import { StatusBadge } from './status-badge';
 
 type RuleEditorProps = {
@@ -883,10 +884,7 @@ export function RuleEditor({
             <DialogTitle>{t('permissionRequestTitle', { name: draft.name })}</DialogTitle>
             <DialogDescription>{t('permissionRequestDescription')}</DialogDescription>
           </DialogHeader>
-          <div className="rounded-lg border bg-muted/35 p-3">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
-            <p className="font-mono text-sm break-all">{requiredOrigins.join(', ')}</p>
-          </div>
+          <PermissionScope label={t('permissionRequestScope')} origins={requiredOrigins} />
           <DialogFooter>
             <Button variant="outline" disabled={saving} onClick={() => setPermissionOpen(false)}>
               {t('cancel')}

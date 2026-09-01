@@ -80,6 +80,50 @@ function upgradeRule(port: number): Rule {
   };
 }
 
+function permissionRules(): Rule[] {
+  return [
+    {
+      schemaVersion: 1,
+      id: 'e2e-navigation-redirect',
+      dnrId: 1_900_003,
+      name: 'Navigation redirect permission',
+      enabled: false,
+      priority: 10,
+      condition: {
+        url: { kind: 'wildcard', value: 'https://matched.example/*' },
+        resourceTypes: ['main_frame'],
+        initiatorDomains: ['ignored.example'],
+      },
+      action: { kind: 'redirect', target: 'https://destination.example/' },
+      permissionOrigins: ['https://matched.example/*'],
+      migrationState: 'none',
+      createdAt: now,
+      updatedAt: now,
+    },
+    {
+      schemaVersion: 1,
+      id: 'e2e-subresource-header',
+      dnrId: 1_900_004,
+      name: 'Subresource header permission',
+      enabled: false,
+      priority: 10,
+      condition: {
+        url: { kind: 'wildcard', value: 'https://api.example/*' },
+        resourceTypes: ['xmlhttprequest'],
+        initiatorDomains: ['app.example'],
+      },
+      action: {
+        kind: 'modify-request-headers',
+        operations: [{ header: 'X-E2E-Test', operation: 'set', value: 'permission-scope' }],
+      },
+      permissionOrigins: ['https://api.example/*'],
+      migrationState: 'none',
+      createdAt: now,
+      updatedAt: now,
+    },
+  ];
+}
+
 async function localTlsCredentials(): Promise<{ cert: string; key: string }> {
   const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-e2e-tls-'));
   const keyPath = join(directory, 'key.pem');
@@ -242,6 +286,36 @@ test('all six locales switch by keyboard, persist, and fit the compact layout', 
   ).toEqual({ clientWidth: 640, scrollWidth: 640 });
 });
 
+test('forced colors, reduced motion, and keyboard focus remain usable', async ({ context, extensionId }) => {
+  const options = await context.newPage();
+  await options.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+  const settings = options.getByRole('button', { name: 'Settings', exact: true });
+  await settings.press('Enter');
+  await expect(options.getByRole('menuitem', { name: 'Backup & restore' })).toBeVisible();
+  await options.keyboard.press('Escape');
+  await expect(settings).toBeFocused();
+
+  const mediaStyles = await options.evaluate(() => {
+    const header = document.querySelector<HTMLElement>('[data-material="glass-bar"]');
+    const settingsButton = document.querySelector<HTMLElement>('button[aria-label="Settings"]');
+    if (!header || !settingsButton) throw new Error('Accessibility fixtures are missing.');
+    const headerStyle = getComputedStyle(header);
+    const buttonStyle = getComputedStyle(settingsButton);
+    return {
+      backdropFilter: headerStyle.backdropFilter,
+      boxShadow: headerStyle.boxShadow,
+      transitionDuration: buttonStyle.transitionDuration,
+    };
+  });
+  expect(mediaStyles.backdropFilter).toBe('none');
+  expect(mediaStyles.boxShadow).toBe('none');
+  expect(
+    Math.max(...mediaStyles.transitionDuration.split(',').map((duration) => Number.parseFloat(duration))),
+  ).toBeLessThanOrEqual(0.001);
+});
+
 test.describe('hostless HTTPS upgrade', () => {
   test.use({ ignoreHTTPSErrors: true });
 
@@ -301,6 +375,56 @@ test.describe('hostless HTTPS upgrade', () => {
       await closing;
     }
   });
+});
+
+test('permission previews stay bounded and cancel without changing runtime state', async ({
+  context,
+  extensionId,
+  extensionWorker,
+}) => {
+  const [navigationRule, subresourceRule] = permissionRules();
+  if (!navigationRule || !subresourceRule) throw new Error('Permission fixtures are incomplete.');
+  await extensionWorker.evaluate(
+    async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+    stateWith([navigationRule, subresourceRule]),
+  );
+
+  const options = await context.newPage();
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+  await options.getByRole('switch', { name: `Enable ${navigationRule.name}` }).click();
+  let permissionDialog = options.getByRole('dialog');
+  await expect(
+    permissionDialog.getByRole('heading', {
+      name: `Allow “${navigationRule.name}” to access this site?`,
+    }),
+  ).toBeVisible();
+  await expect(permissionDialog.getByText('https://matched.example/*', { exact: true })).toBeVisible();
+  await expect(permissionDialog.getByText(/ignored\.example/)).toHaveCount(0);
+  await permissionDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  await options.getByRole('switch', { name: `Enable ${subresourceRule.name}` }).click();
+  permissionDialog = options.getByRole('dialog');
+  await expect(
+    permissionDialog.getByRole('heading', {
+      name: `Allow “${subresourceRule.name}” to access this site?`,
+    }),
+  ).toBeVisible();
+  const requestedOrigins = permissionDialog.getByRole('list', { name: 'Requested website access' });
+  await expect(requestedOrigins.getByRole('listitem')).toHaveCount(2);
+  await expect(requestedOrigins.getByText('*://*.app.example/*', { exact: true })).toBeVisible();
+  await expect(requestedOrigins.getByText('https://api.example/*', { exact: true })).toBeVisible();
+  await permissionDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
+
+  const runtime = await extensionWorker.evaluate(async () => {
+    const stored = await chrome.storage.local.get('requestRulesState');
+    return {
+      enabled: Object.values((stored.requestRulesState as StoredState).rules).map((rule) => rule.enabled),
+      origins: (await chrome.permissions.getAll()).origins ?? [],
+      dynamicRules: await chrome.declarativeNetRequest.getDynamicRules(),
+    };
+  });
+  expect(runtime).toEqual({ enabled: [false, false], origins: [], dynamicRules: [] });
 });
 
 test('legacy localStorage is reviewed, exported, applied disabled, and rolled back', async ({
@@ -380,6 +504,11 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
       ],
     });
   await expect(options.getByText('Applied', { exact: true }).first()).toBeVisible();
+  await expect(
+    options
+      .getByRole('navigation', { name: 'Primary navigation' })
+      .getByRole('button', { name: 'Legacy migration' }),
+  ).toHaveCount(0);
   await expect
     .poll(() => extensionWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
     .toEqual([]);

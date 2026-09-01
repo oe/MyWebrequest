@@ -338,7 +338,8 @@ permissions, warning/error-free options startup, options/settings navigation, re
 popup-driven pause/resume synchronization,
 DNR continuity after forced service-worker termination and event-driven restart, a real host-permission-free
 HTTP-to-HTTPS upgrade against an isolated TLS fixture, keyboard switching and persistence for all six locales,
-and compact-layout overflow protection. It also covers the complete legacy `localStorage`
+compact-layout overflow protection, forced-color/reduced-motion fallbacks, keyboard focus restoration, and
+bounded permission preview/cancel behavior for navigation and cross-site subresource rules. It also covers the complete legacy `localStorage`
 review/export/disabled-apply/rollback path, including unsupported and removed raw source data, plus checksummed
 rule backup export, disabled merge, replace-time snapshot capture, and exact recovery from the production UI.
 This automated Chromium gate is pre-certification evidence; branded Chrome, Edge, and Firefox remain separate
@@ -359,10 +360,8 @@ Required CI jobs:
 
 Release is blocked by unused permissions, unexpected manifest changes, failed migration fixtures, or any unreviewed network endpoint.
 
-## 15. Implementation spikes before committing
+## 15. Remaining verification before release
 
-- Prove WXT's current stable release against Node 24, Chrome MV3, popup, options, and service worker.
-- Extend the proven Playwright harness to the remaining DNR and permission scenarios.
-- Prove automatic access to legacy `localStorage` for a same-ID MV3 update and decide whether `offscreen` is necessary.
-- Prove optional-origin grant behavior for redirect and request-header DNR actions.
-- Build a small compatibility corpus for the old Custom URL grammar before finalizing the V1 rule schema.
+- Extend the proven Playwright harness where native browser permission prompts can be controlled reliably.
+- Prove a signed same-extension-ID update from an actual prior release, not only injected legacy storage.
+- Complete optional-origin grant, refusal, revocation, and re-grant certification on every target browser.

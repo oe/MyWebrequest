@@ -27,6 +27,7 @@ import { shouldShowMigrationNavigation } from '@/ui/migration/migration-navigati
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
 import { ruleMatchesQuery } from '@/ui/rules/filter-rules';
+import { PermissionScope } from '@/ui/rules/permission-scope';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
 import { SettingsMenu } from '@/ui/settings/settings-menu';
@@ -58,6 +59,7 @@ export function OptionsApp() {
   const showMigrationNavigation = shouldShowMigrationNavigation(
     migrationManager.detection,
     migrationManager.loading,
+    migrationManager.migration?.status ?? null,
   );
 
   const handleDirtyChange = useCallback((dirty: boolean) => {
@@ -368,12 +370,10 @@ export function OptionsApp() {
             </DialogTitle>
             <DialogDescription>{t('permissionRequestDescription')}</DialogDescription>
           </DialogHeader>
-          <div className="rounded-lg border bg-muted/35 p-3">
-            <p className="mb-1 text-xs font-medium text-muted-foreground">{t('permissionRequestScope')}</p>
-            <p className="font-mono text-sm break-all">
-              {pendingPermissionRule ? requiredPermissionOrigins(pendingPermissionRule).join(', ') : ''}
-            </p>
-          </div>
+          <PermissionScope
+            label={t('permissionRequestScope')}
+            origins={pendingPermissionRule ? requiredPermissionOrigins(pendingPermissionRule) : []}
+          />
           <DialogFooter>
             <Button variant="outline" onClick={() => setPendingPermissionRule(null)}>
               {t('cancel')}

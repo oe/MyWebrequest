@@ -163,3 +163,5 @@ The selected refinement adds a restrained Apple-like material system without cha
 architecture: translucent structural chrome, stronger edge highlights, system-font preference, immediate
 press feedback, and solid fallbacks for reduced transparency or increased contrast. Glass is reserved for
 the header, sidebar, popup, overlays, and persistent editor toolbar; form content remains calm and legible.
+System forced-color mode removes blur and decorative shadows entirely and returns structural surfaces to
+system canvas and text colors.

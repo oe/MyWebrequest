@@ -33,20 +33,23 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   the local browser-rendered smoke test.
 - 2026-09-01: Firefox 154.0.1 accepted `dist/firefox-mv3` as the temporary add-on
   `mywebrequest@evecalm.com` in a clean headless profile.
-- 2026-09-01: the complete `pnpm release:package` gate passed on Homebrew Node 24.20.0 with 22 test files
-  and 103 tests. Chrome, Edge, Firefox, and Firefox-source archives passed artifact audits, AMO lint, and
+- 2026-09-01: the complete `pnpm release:package` gate passed on Homebrew Node 24.20.0 with 23 test files
+  and 111 tests. Chrome, Edge, Firefox, and Firefox-source archives passed artifact audits, AMO lint, and
   SHA-256 verification. The resulting archive hashes were identical to the preceding package run.
 - 2026-09-01: Playwright Chromium extension E2E became part of `pnpm check` and CI. Its isolated production-
   build profile proves zero required host origins, warning/error-free options startup, the options/settings
   migration-navigation contract, real DNR blocking against a local fixture, a real HTTP-to-HTTPS upgrade
   against an isolated TLS fixture with no host grant, popup pause/resume synchronization, and DNR continuity
   after forced service-worker termination and event-driven restart. It keyboard-switches all six locales,
-  verifies persistence and compact-layout overflow, injects the representative old-version `localStorage`
-  fixture, verifies all 20 classified items and the raw unknown-key export, applies only the two automatic
-  candidates disabled, and restores the empty pre-migration snapshot without notification overlays blocking
-  the recovery action. The same suite verifies a checksummed production backup download, additive merge with
-  imported rules disabled, full replacement with an automatic pre-replace snapshot, and exact recovery from
-  that snapshot. It does not replace the branded-browser rows below.
+  verifies persistence and compact-layout overflow, forced-color and reduced-motion fallbacks, and keyboard
+  focus restoration. Navigation and cross-site subresource rules expose only their bounded required origins;
+  cancelling leaves storage, permissions, and DNR untouched. The suite also injects the representative
+  old-version `localStorage` fixture, verifies all 20 classified items and the raw unknown-key export, applies
+  only the two automatic candidates disabled, and restores the empty pre-migration snapshot without
+  notification overlays blocking the recovery action. The migration entry leaves primary navigation after
+  the pending work is applied but stays reachable from Settings. It verifies a checksummed production backup download,
+  additive merge with imported rules disabled, full replacement with an automatic pre-replace snapshot, and
+  exact recovery from that snapshot. It does not replace the branded-browser rows below.
 - 2026-09-01: the unpacked artifacts were exercised in Chrome 151.0.7922.174, Edge 152.0.0.0, and
   Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
   popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and
