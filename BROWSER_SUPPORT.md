@@ -25,7 +25,7 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   from both primary navigation and Settings.
 - Force Firefox to Manifest V3 (`-b firefox --mv3`) so all current targets share the DNR architecture.
   WXT otherwise defaults Firefox builds to Manifest V2.
-- Declare Chromium 121 and Firefox 142 as explicit installation floors. Chromium 121 provides the current
+- Declare Chrome/Edge 121 and Firefox 142 as explicit installation floors. Chromium 121 provides the current
   safe/unsafe dynamic-rule quota model. Firefox 142 excludes the documented Firefox 132-and-earlier defect
   where persisted dynamic rules could stop applying after restart and is the first Firefox-for-Android
   release whose schema accepts AMO's required `data_collection_permissions` declaration (desktop support
@@ -124,10 +124,15 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   modified the outgoing request. The same exact package rendered all six locales, preserved keyboard focus,
   honored reduced motion, reflowed without horizontal overflow at 200% zoom, exported and safely re-imported
   a checksummed backup, and synchronized pause/resume state between the popup, options page, storage, and DNR.
-- The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
-  extension suite. Local execution on this Apple Silicon host is not usable as certification: the
-  old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
+- The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the exact
+  Chrome release archive. Local execution on this Apple Silicon host is not usable as certification: the old
+  arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
   Chrome's GPU process. A native x86 CI pass is still required before the Chromium floor is certified.
+- Microsoft's official Linux package repository still serves Edge Stable `121.0.2277.128-1`. CI now pins its
+  repository SHA-256, extracts it without installation, loads the exact Edge release archive, and runs the
+  shared nine-scenario Chromium matrix; the two Chrome-only migration scenarios are explicitly skipped. Edge
+  152.0.4191.53 passed that target-aware exact-archive runner locally. Edge 121 remains uncertified until the
+  native x86 CI job reports success.
 - An isolated Chromium profile installed exactly the first 900 of 902 valid regex-backed rules and exactly the
   first 4,500 of 4,502 valid dynamic rules. This exercises the production browser adapter and confirms both
   deterministic internal ceilings without touching any normal browser profile.
@@ -142,9 +147,8 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 
 ## Remaining compatibility work
 
-- Complete the remaining installed-extension scenarios at Chromium 121 and Edge 121; the Firefox 142 matrix
-  is automated.
-- Repeat the isolated quota-boundary smoke on Edge 121.
+- Obtain successful native x86 CI runs for the pinned Chrome 121 and Edge 121 matrices; Firefox 142 is already
+  automated and locally certified.
 - Run a signed upgrade from the previous public Chrome artifact with the production store ID.
 - Submit the checksummed artifacts to Chrome Web Store, Edge Add-ons, and AMO portal validation; AMO package
   lint and cross-store metadata preflight are already automated.
@@ -190,3 +194,4 @@ supported older release:
 - [MDN: optional_host_permissions](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/optional_host_permissions)
 - [Mozilla: GeckoDriver supported platforms](https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html)
 - [Mozilla: GeckoDriver system-access flag](https://firefox-source-docs.mozilla.org/testing/geckodriver/Flags.html)
+- [Microsoft: official Edge Linux package archive](https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/)

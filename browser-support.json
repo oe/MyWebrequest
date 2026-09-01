@@ -1,6 +1,8 @@
 {
   "chromiumMinimum": "121",
   "chromeForTestingFloor": "121.0.6167.184",
+  "edgeFloorPackageVersion": "121.0.2277.128-1",
+  "edgeLinux64Sha256": "a286734c399d7656305a80ccab314f7db508993df9d7fa6d7dd971284b48efbb",
   "firefoxMinimum": "142.0",
   "geckodriverVersion": "0.37.1",
   "geckodriverLinux64Sha256": "e815130ea95983e162ae91843b48d3a3ce991735635fce83a647afde21e09f7e"

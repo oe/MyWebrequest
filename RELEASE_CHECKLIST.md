@@ -130,6 +130,11 @@ partial historical checks remain pre-certification evidence.
 - 2026-09-02: store metadata preflight aligned `My Webrequest`, all six localized manifest descriptions,
   declared permissions, the store description, and the local-only privacy policy. This is a source/package
   quality gate; it is not Chrome Web Store or Edge Add-ons acceptance.
+- 2026-09-02: Microsoft still serves Edge Stable `121.0.2277.128-1` from its official Linux package
+  repository. CI now verifies the repository SHA-256, extracts that browser without installing it, and runs
+  the exact Edge release archive through the shared Chromium matrix with Chrome-only migration tests skipped
+  by design. The target-aware runner passed nine applicable scenarios on installed Edge 152.0.4191.53; the
+  Edge 121 rows stay unchecked until native x86 CI produces the corresponding evidence.
 
 ## 2. Installed-browser matrix
 

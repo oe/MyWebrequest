@@ -5,22 +5,26 @@ import https from 'node:https';
 import { execFile } from 'node:child_process';
 import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import type { Duplex } from 'node:stream';
 import { promisify } from 'node:util';
 
-import type { BrowserContext, Page } from '@playwright/test';
+import type { BrowserContext, Page, Worker } from '@playwright/test';
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import type { RuleImportRecovery } from '@/infrastructure/rule-import-recovery';
 import { createTranslator, supportedLocales, type AppLocale } from '@/ui/i18n/core';
 
-import { expect, launchChromiumExtensionContext, test } from './extension.fixture';
+import { expect, findExtensionWorker, launchChromiumExtensionContext, test } from './extension.fixture';
 import legacyFixture from '../fixtures/legacy-installation.json' with { type: 'json' };
 
 const now = '2026-09-01T00:00:00.000Z';
 const execFileAsync = promisify(execFile);
+const browserTarget = process.env.MWR_BROWSER_TARGET === 'edge' ? 'edge' : 'chrome';
+const productionExtensionPath = resolve(
+  process.env.MWR_EXTENSION_PATH ?? join(process.cwd(), `dist/${browserTarget}-mv3`),
+);
 
 const languageChoices: Record<AppLocale, string> = {
   en: 'English',
@@ -198,7 +202,7 @@ async function extensionWithFixtureHostAccess(): Promise<{
 }> {
   const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-e2e-extension-'));
   const extensionPath = join(directory, 'extension');
-  await cp(join(process.cwd(), 'dist/chrome-mv3'), extensionPath, { recursive: true });
+  await cp(productionExtensionPath, extensionPath, { recursive: true });
 
   const manifestPath = join(extensionPath, 'manifest.json');
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
@@ -244,11 +248,10 @@ async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPat
 }
 
 async function overlayProductionExtension(extensionPath: string): Promise<void> {
-  const productionPath = join(process.cwd(), 'dist/chrome-mv3');
-  const entries = await readdir(productionPath, { withFileTypes: true });
+  const entries = await readdir(productionExtensionPath, { withFileTypes: true });
   await Promise.all(
     entries.map((entry) =>
-      cp(join(productionPath, entry.name), join(extensionPath, entry.name), {
+      cp(join(productionExtensionPath, entry.name), join(extensionPath, entry.name), {
         recursive: entry.isDirectory(),
         force: true,
       }),
@@ -376,7 +379,9 @@ test('clean install exposes the product UI without required host access', async 
   await expect(primaryNavigation.getByText('Legacy migration')).toHaveCount(0);
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
-  await expect(options.getByRole('menuitem', { name: 'Legacy migration' })).toBeVisible();
+  const migrationMenuItem = options.getByRole('menuitem', { name: 'Legacy migration' });
+  if (browserTarget === 'chrome') await expect(migrationMenuItem).toBeVisible();
+  else await expect(migrationMenuItem).toHaveCount(0);
   expect(consoleIssues).toEqual([]);
 });
 
@@ -594,8 +599,7 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
     const launched = await launchChromiumExtensionContext(fixtureExtension.extensionPath);
     context = launched.context;
     closeContext = launched.close;
-    let [worker] = context.serviceWorkers();
-    worker ??= await context.waitForEvent('serviceworker');
+    const worker = await findExtensionWorker(context);
 
     const rules = crossOriginRules(port);
     await worker.evaluate(
@@ -687,6 +691,7 @@ test('isolated profile enforces the regex and total dynamic-rule safety boundari
 });
 
 test('same-extension upgrade preserves legacy page storage and stages migration', async () => {
+  test.skip(browserTarget !== 'chrome', 'Legacy migration is intentionally Chrome-only.');
   const fixture = await legacyUpgradeFixture();
   const userDataDir = join(fixture.directory, 'profile');
   let launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
@@ -736,6 +741,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
   extensionId,
   extensionWorker,
 }) => {
+  test.skip(browserTarget !== 'chrome', 'Legacy migration is intentionally Chrome-only.');
   const options = await context.newPage();
   let nativeDialogCount = 0;
   options.on('dialog', (dialog) => {
@@ -1025,28 +1031,33 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
 
     await stopExtensionServiceWorker(context, options, extensionId);
     await pauseSwitch.click();
+    let restartedWorker: Worker | undefined;
     await expect
       .poll(async () => {
-        const [candidate] = context.serviceWorkers();
-        if (!candidate) return false;
-        try {
-          return (await candidate.evaluate(() => chrome.runtime.id)) === extensionId;
-        } catch {
-          return false;
+        for (const candidate of context.serviceWorkers()) {
+          try {
+            if ((await candidate.evaluate(() => chrome.runtime.id)) === extensionId) {
+              restartedWorker = candidate;
+              return true;
+            }
+          } catch {
+            // A stopped worker can disappear while the browser reports the new worker.
+          }
         }
+        return false;
       })
       .toBe(true);
-    const [restartedWorker] = context.serviceWorkers();
     expect(restartedWorker).toBeDefined();
     if (!restartedWorker) throw new Error('Extension service worker did not restart.');
-    expect(new URL(restartedWorker.url()).host).toBe(extensionId);
+    const verifiedRestartedWorker = restartedWorker;
+    expect(new URL(verifiedRestartedWorker.url()).host).toBe(extensionId);
     await expect
-      .poll(() => restartedWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
+      .poll(() => verifiedRestartedWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
       .toEqual([]);
     await pauseSwitch.click();
     await expect
       .poll(() =>
-        restartedWorker.evaluate(
+        verifiedRestartedWorker.evaluate(
           async (dnrId) =>
             (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
           rule.dnrId,

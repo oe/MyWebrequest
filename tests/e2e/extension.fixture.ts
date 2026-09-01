@@ -11,6 +11,26 @@ type ExtensionFixtures = {
   extensionWorker: Worker;
 };
 
+async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
+  return worker.evaluate(() => chrome.runtime?.getManifest().name === 'My Webrequest').catch(() => false);
+}
+
+export async function findExtensionWorker(context: BrowserContext): Promise<Worker> {
+  const deadline = Date.now() + 10_000;
+  while (Date.now() < deadline) {
+    for (const worker of context.serviceWorkers()) {
+      if (await isMyWebrequestWorker(worker)) return worker;
+    }
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) break;
+    const worker = await context
+      .waitForEvent('serviceworker', { timeout: Math.min(remaining, 1_000) })
+      .catch(() => undefined);
+    if (worker && (await isMyWebrequestWorker(worker))) return worker;
+  }
+  throw new Error('My Webrequest service worker did not start.');
+}
+
 async function launchExternalChromium(
   executablePath: string,
   extensionPath: string,
@@ -27,9 +47,11 @@ async function launchExternalChromium(
       `--user-data-dir=${userDataDir}`,
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
+      '--disable-background-mode',
       '--no-first-run',
       '--no-default-browser-check',
       '--no-sandbox',
+      '--window-size=1280,900',
       ...(ignoreHTTPSErrors ? ['--ignore-certificate-errors'] : []),
       'about:blank',
     ],
@@ -66,7 +88,16 @@ async function launchExternalChromium(
     close: async () => {
       await browser.close();
       if (child.exitCode === null) child.kill('SIGTERM');
-      if (ownsUserDataDir) await rm(userDataDir, { recursive: true, force: true });
+      if (child.exitCode === null) {
+        await Promise.race([
+          new Promise((resolveExit) => child.once('exit', resolveExit)),
+          new Promise((resolveWait) => setTimeout(resolveWait, 2_000)),
+        ]);
+      }
+      if (child.exitCode === null) child.kill('SIGKILL');
+      if (ownsUserDataDir) {
+        await rm(userDataDir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+      }
     },
   };
 }
@@ -92,14 +123,19 @@ export async function launchChromiumExtensionContext(
 export const test = base.extend<ExtensionFixtures>({
   context: async ({ browserName, ignoreHTTPSErrors }, run) => {
     if (browserName !== 'chromium') throw new Error('Extension E2E requires Playwright Chromium.');
-    const extensionPath = path.resolve(process.cwd(), 'dist/chrome-mv3');
+    const target = process.env.MWR_BROWSER_TARGET === 'edge' ? 'edge' : 'chrome';
+    const extensionPath = path.resolve(
+      process.env.MWR_EXTENSION_PATH ?? path.join(process.cwd(), `dist/${target}-mv3`),
+    );
     const launched = await launchChromiumExtensionContext(extensionPath, ignoreHTTPSErrors);
-    await run(launched.context);
-    await launched.close();
+    try {
+      await run(launched.context);
+    } finally {
+      await launched.close();
+    }
   },
   extensionWorker: async ({ context }, run) => {
-    let [worker] = context.serviceWorkers();
-    worker ??= await context.waitForEvent('serviceworker');
+    const worker = await findExtensionWorker(context);
     await run(worker);
   },
   extensionId: async ({ extensionWorker }, run) => {

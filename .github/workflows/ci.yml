@@ -39,9 +39,33 @@ jobs:
             -o "$floor_dir/chrome.zip" \
             "https://storage.googleapis.com/chrome-for-testing-public/$floor_version/linux64/chrome-linux64.zip"
           unzip -q "$floor_dir/chrome.zip" -d "$floor_dir"
+          extension_archive=$(find dist -maxdepth 1 -name '*-chrome.zip' -print -quit)
+          mkdir -p "$floor_dir/extension"
+          unzip -q "$extension_archive" -d "$floor_dir/extension"
           xvfb-run -a env \
             MWR_CHROMIUM_HEADED=1 \
             MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/chrome-linux64/chrome" \
+            MWR_BROWSER_TARGET=chrome \
+            MWR_EXTENSION_PATH="$floor_dir/extension" \
+            pnpm e2e:chromium:run
+      - name: Verify Edge installation and runtime floor
+        run: |
+          floor_version=$(jq -r .edgeFloorPackageVersion browser-support.json)
+          floor_checksum=$(jq -r .edgeLinux64Sha256 browser-support.json)
+          floor_dir="$RUNNER_TEMP/edge-floor"
+          mkdir -p "$floor_dir/browser" "$floor_dir/extension"
+          curl -fL --retry 3 \
+            -o "$floor_dir/edge.deb" \
+            "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${floor_version}_amd64.deb"
+          echo "$floor_checksum  $floor_dir/edge.deb" | sha256sum --check --strict
+          dpkg-deb --extract "$floor_dir/edge.deb" "$floor_dir/browser"
+          extension_archive=$(find dist -maxdepth 1 -name '*-edge.zip' -print -quit)
+          unzip -q "$extension_archive" -d "$floor_dir/extension"
+          xvfb-run -a env \
+            MWR_CHROMIUM_HEADED=1 \
+            MWR_CHROMIUM_EXECUTABLE_PATH="$floor_dir/browser/opt/microsoft/msedge/msedge" \
+            MWR_BROWSER_TARGET=edge \
+            MWR_EXTENSION_PATH="$floor_dir/extension" \
             pnpm e2e:chromium:run
       - name: Verify Firefox installation and runtime floor
         run: |
