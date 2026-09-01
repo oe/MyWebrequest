@@ -58,11 +58,20 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - The same enabled `http://example.com/*` HTTPS-upgrade rule then converted a fresh HTTP navigation to a
   secure HTTPS page in all three installed browsers without requesting host access. The temporary rule was
   disabled after each proof, leaving the pre-existing browser test rules unchanged.
+- Microsoft Edge 152.0.4191.53 and Firefox 154.0.1 each showed only `http://example.com/*` in the product
+  explanation and native permission prompt for a document redirect rule. Denial kept the enabled intent but
+  reported `Permission` and installed no effective redirect; allowing access changed the rule to `Active`
+  and redirected a fresh `http://example.com/` navigation to IANA's HTTPS example-domain page.
+- Revoking `http://example.com` from each browser's extension settings immediately changed the affected
+  redirect rule to `Permission`; a fresh HTTP navigation then stayed on Example Domain. Re-granting from the
+  originating rule switch restored `Active`. Firefox's targeted revocation left its separately granted
+  `127.0.0.1` header rule active. Edge's global site-access revocation also downgraded that header rule until
+  its separate origin was re-granted, while its hostless block rule remained active throughout. The temporary
+  redirect rules were left saved but disabled after verification.
 
 ## Remaining compatibility work
 
 - Repeat the installed-extension matrix on the supported older browser releases.
-- Complete permission refusal/revocation and redirect coverage on Edge and Firefox.
 - Verify regex substitution, cross-origin subresource redirect, and cross-origin request-header
   modification independently on each browser.
 - Certify the implemented initiator-origin permission model for cross-origin subresource redirects and

@@ -67,6 +67,13 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   test-only manifest with only the two local fixture origins granted. It proves a real cross-origin wildcard
   capture redirect, exact `$1` substitution, initiator scoping, and request-header modification. The complete
   nine-test suite passed; the test-only grant deliberately does not satisfy the native permission-prompt rows.
+- 2026-09-02: Edge 152.0.4191.53 and Firefox 154.0.1 completed the installed navigation-redirect permission
+  lifecycle. Each product explanation and native prompt named only `http://example.com/*`; denial produced a
+  `Permission` rule with no redirect, allowing access produced an `Active` rule and a real Example Domain to
+  IANA redirect, external revocation immediately removed the redirect, and re-grant restored it. Firefox's
+  targeted revocation preserved its independent `127.0.0.1` header rule. Edge's global site-access revocation
+  also downgraded that header rule until its origin was re-granted, while its hostless block rule stayed
+  active. Both temporary redirect rules were left disabled after the proof.
 
 ## 2. Installed-browser matrix
 
@@ -78,10 +85,10 @@ Run each scenario on the current stable browser and one supported older release.
 | Popup and options open with no console errors    | ✓      | ✓    | ✓       |
 | Block rule works without host access             | ✓      | ✓    | ✓       |
 | HTTPS-upgrade rule works without host access     | ✓      | ✓    | ✓       |
-| Navigation redirect grant, refusal, and re-grant | ✓      | ☐    | ☐       |
+| Navigation redirect grant, refusal, and re-grant | ✓      | ✓    | ✓       |
 | Subresource redirect requests initiator access   | ☐      | ☐    | ☐       |
 | Request-header rule requests initiator access    | ☐      | ☐    | ☐       |
-| Permission revocation removes affected DNR rules | ✓      | ☐    | ☐       |
+| Permission revocation removes affected DNR rules | ✓      | ✓    | ✓       |
 | Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
 | Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
 | Legacy migration review/export/apply/rollback    | ☐      | ☐    | ☐       |
