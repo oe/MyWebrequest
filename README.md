@@ -17,7 +17,8 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 - Checksummed rule backup, previewed merge/replace import, and automatic recovery snapshot
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish UI and manifests
 - Keyboard, reduced-motion, contrast, responsive-layout, unit, artifact, and production build checks
-- Isolated Playwright Chromium extension E2E for DNR, popup/options synchronization, and worker restart
+- Isolated Playwright Chromium extension E2E for DNR, popup/options synchronization, worker restart, and
+  legacy migration/export/rollback
 - Chrome, Edge, and Firefox Manifest V3 build targets
 
 Installed-extension permission/action/service-worker certification remains required before a production

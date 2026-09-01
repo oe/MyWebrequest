@@ -1,11 +1,14 @@
 /// <reference types="chrome" />
 
 import http from 'node:http';
+import { readFile } from 'node:fs/promises';
 
 import type { BrowserContext, Page } from '@playwright/test';
+import type { StoredMigration } from '@/application/migration-apply';
 import type { Rule, StoredState } from '@/domain/rules/model';
 
 import { expect, test } from './extension.fixture';
+import legacyFixture from '../fixtures/legacy-installation.json' with { type: 'json' };
 
 const now = '2026-09-01T00:00:00.000Z';
 
@@ -107,6 +110,104 @@ test('clean install exposes the product UI without required host access', async 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByRole('menuitem', { name: 'Legacy migration' })).toBeVisible();
   expect(errors).toEqual([]);
+});
+
+test('legacy localStorage is reviewed, exported, applied disabled, and rolled back', async ({
+  context,
+  extensionId,
+  extensionWorker,
+}) => {
+  const options = await context.newPage();
+  let nativeDialogCount = 0;
+  options.on('dialog', (dialog) => {
+    nativeDialogCount += 1;
+    void dialog.dismiss();
+  });
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+  await options.evaluate((source) => {
+    for (const [key, value] of Object.entries(source)) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  }, legacyFixture);
+  await options.reload();
+
+  const primaryNavigation = options.getByRole('navigation', { name: 'Primary navigation' });
+  const migrationButton = primaryNavigation.getByRole('button', { name: 'Legacy migration' });
+  await expect(migrationButton).toBeVisible();
+  await migrationButton.click();
+  await expect(options.getByRole('heading', { name: 'Legacy migration' })).toBeVisible();
+  await expect(options.getByText('Pending', { exact: true }).first()).toBeVisible();
+
+  const pendingMigration = (await extensionWorker.evaluate(async () => {
+    const stored = await chrome.storage.local.get('requestRulesMigration');
+    return stored.requestRulesMigration;
+  })) as StoredMigration;
+  expect(pendingMigration.bundle.report.items).toHaveLength(20);
+  expect(new Set(pendingMigration.bundle.report.items.map((item) => item.id)).size).toBe(20);
+  expect(pendingMigration.selectedItemIds).toHaveLength(2);
+  expect(pendingMigration.bundle.rawSnapshot['future-key']).toContain('onerror=alert(1)');
+
+  const downloadPromise = options.waitForEvent('download');
+  await options.getByRole('button', { name: 'Export report' }).click();
+  const download = await downloadPromise;
+  const downloadPath = await download.path();
+  if (!downloadPath) throw new Error('Migration report download did not produce a local file.');
+  const exported = JSON.parse(await readFile(downloadPath, 'utf8')) as {
+    exportVersion: number;
+    kind: string;
+    report: StoredMigration['bundle']['report'];
+    rawSnapshot: Record<string, string>;
+  };
+  expect(exported).toMatchObject({
+    exportVersion: 1,
+    kind: 'my-webrequest-legacy-migration',
+    report: { items: expect.any(Array) },
+  });
+  expect(exported.report.items).toHaveLength(20);
+  expect(exported.rawSnapshot['future-key']).toContain('onerror=alert(1)');
+  expect(nativeDialogCount).toBe(0);
+
+  await options.getByRole('button', { name: 'Apply 2 selected' }).click();
+  await expect
+    .poll(async () => {
+      const stored = await extensionWorker.evaluate(async () =>
+        chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
+      );
+      return {
+        status: (stored.requestRulesMigration as StoredMigration).status,
+        rules: Object.values((stored.requestRulesState as StoredState).rules),
+      };
+    })
+    .toMatchObject({
+      status: 'applied',
+      rules: [
+        expect.objectContaining({ enabled: false, migrationState: 'none' }),
+        expect.objectContaining({ enabled: false, migrationState: 'none' }),
+      ],
+    });
+  await expect(options.getByText('Applied', { exact: true }).first()).toBeVisible();
+  await expect
+    .poll(() => extensionWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
+    .toEqual([]);
+
+  await options.getByRole('button', { name: 'Restore pre-migration snapshot' }).click();
+  const restoreDialog = options.getByRole('dialog');
+  await expect(
+    restoreDialog.getByRole('heading', { name: 'Restore the complete pre-migration snapshot?' }),
+  ).toBeVisible();
+  await restoreDialog.getByRole('button', { name: 'Restore snapshot', exact: true }).click();
+  await expect
+    .poll(async () => {
+      const stored = await extensionWorker.evaluate(async () =>
+        chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
+      );
+      return {
+        status: (stored.requestRulesMigration as StoredMigration).status,
+        ruleCount: Object.keys((stored.requestRulesState as StoredState).rules).length,
+      };
+    })
+    .toEqual({ status: 'rolled-back', ruleCount: 0 });
+  await expect(options.getByText('Rolled back', { exact: true }).first()).toBeVisible();
 });
 
 test('block rules reconcile across popup pause and service-worker restart', async ({
