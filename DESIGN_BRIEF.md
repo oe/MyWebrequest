@@ -165,3 +165,14 @@ press feedback, and solid fallbacks for reduced transparency or increased contra
 the header, sidebar, popup, overlays, and persistent editor toolbar; form content remains calm and legible.
 System forced-color mode removes blur and decorative shadows entirely and returns structural surfaces to
 system canvas and text colors.
+
+## 12. Brand icon and store artwork
+
+The V1 icon replaces the generic legacy globe with an original branching-route mark inside a dark blue
+glass lens. The route is the semantic core and must remain recognizable at 16px; the lens, edge highlight,
+and depth are progressive detail for larger sizes. There is no text, blur dependency, or platform logo in
+the runtime icon.
+
+Store artwork may use the same restrained ice-blue material and one short product line, but must remain
+full-bleed and quiet. It must not turn screenshots into device mockups or introduce features that do not
+exist. The canonical SVG and generated assets are documented and checksummed under `store-assets/`.

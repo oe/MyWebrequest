@@ -24,6 +24,7 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
   worker restart, bounded permission previews, forced-color/reduced-motion behavior, six-locale keyboard
   switching, legacy migration, and backup recovery
 - Chrome, Edge, and Firefox Manifest V3 build targets
+- Original branching-route icon, browser-size icon matrix, and audited Chrome/Edge promotional artwork
 
 The current stable-browser matrix and Firefox 142 floor are certified. Chrome 121, Edge 121, signed legacy
 upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md),

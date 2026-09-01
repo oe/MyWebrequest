@@ -6,6 +6,8 @@ import { join } from 'node:path';
 const root = process.cwd();
 const assetRoot = join(root, 'store-assets', 'screenshots');
 const manifest = JSON.parse(await readFile(join(assetRoot, 'manifest.json'), 'utf8'));
+const promotionalRoot = join(root, 'store-assets', 'promotional');
+const promotionalManifest = JSON.parse(await readFile(join(promotionalRoot, 'manifest.json'), 'utf8'));
 const checksumLines = (await readFile(join(root, 'dist', 'SHA256SUMS'), 'utf8')).trim().split('\n');
 const releaseChecksums = new Map(
   checksumLines.map((line) => {
@@ -42,6 +44,42 @@ for (const target of ['chrome', 'edge', 'firefox']) {
   }
 }
 
+assert.equal(promotionalManifest.schemaVersion, 1, 'Unsupported promotional asset manifest schema.');
+const brandSource = await readFile(join(root, promotionalManifest.source.path));
+assert.equal(
+  createHash('sha256').update(brandSource).digest('hex'),
+  promotionalManifest.source.sha256,
+  'The canonical brand icon source changed without regenerating assets.',
+);
+const expectedPromotionalAssets = new Map([
+  ['src/public/icon/16.png', [16, 16]],
+  ['src/public/icon/32.png', [32, 32]],
+  ['src/public/icon/48.png', [48, 48]],
+  ['src/public/icon/96.png', [96, 96]],
+  ['src/public/icon/128.png', [128, 128]],
+  ['store-assets/promotional/edge/logo-300.png', [300, 300]],
+  ['store-assets/promotional/chrome/small-promo-440x280.png', [440, 280]],
+  ['store-assets/promotional/edge/small-promo-440x280.png', [440, 280]],
+]);
+assert.deepEqual(
+  promotionalManifest.assets.map((asset) => asset.path).sort(),
+  [...expectedPromotionalAssets.keys()].sort(),
+  'The promotional asset set is incomplete or contains an unexpected file.',
+);
+for (const asset of promotionalManifest.assets) {
+  const expectedSize = expectedPromotionalAssets.get(asset.path);
+  assert.ok(expectedSize, `Unexpected promotional asset: ${asset.path}`);
+  const buffer = await readFile(join(root, asset.path));
+  assert.equal(buffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `${asset.path} is not PNG.`);
+  assert.equal(buffer.readUInt32BE(16), expectedSize[0], `${asset.path} has the wrong width.`);
+  assert.equal(buffer.readUInt32BE(20), expectedSize[1], `${asset.path} has the wrong height.`);
+  assert.equal(
+    createHash('sha256').update(buffer).digest('hex'),
+    asset.sha256,
+    `${asset.path} hash drifted.`,
+  );
+}
+
 console.log(
-  'Chrome, Edge, and Firefox store screenshots passed dimension, checksum, and artifact provenance audit.',
+  'Chrome, Edge, and Firefox screenshots, runtime icons, and promotional assets passed dimension, checksum, and provenance audit.',
 );

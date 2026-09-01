@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
-      "sourceSha256": "146ce0b4b18cda5eecca409fb8a65d3449703759f856c1d5db42498d231fdc32",
+      "sourceSha256": "5397fea22df86fc17429ad31a77e7d169170d07a7f6230e85488346efadac1b9",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-01T19:23:42.080Z",
+      "capturedAt": "2026-09-01T19:32:32.925Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -37,10 +37,10 @@
     },
     "edge": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
-      "sourceSha256": "611c096bd019e97ef7e8bd648a842b581ce578fe720bd3da9bb5c193e0d85757",
+      "sourceSha256": "47e5036a68441956de0ee341e31e3ec1f0d721568e3efb192973ba2cd1787f21",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-01T19:23:43.821Z",
+      "capturedAt": "2026-09-01T19:32:34.477Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -67,10 +67,10 @@
     },
     "firefox": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
-      "sourceSha256": "e335c1c8de689e06e1bccb4038130d190c7fcadf2f0d790fb9267c20ee40f4eb",
+      "sourceSha256": "9d5b21a15cef9126e098093c9e907d0bdf84ed8a0b694d20c8ffb235cb39e03c",
       "browserName": "Firefox",
       "browserVersion": "142.0",
-      "capturedAt": "2026-09-01T19:24:00.526Z",
+      "capturedAt": "2026-09-01T19:33:15.578Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
@@ -89,7 +89,7 @@
         {
           "path": "firefox/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "947ac9b057f619ab97aeed0cefb980da6545d3f2b3621a17dec7f7b8df414d98",
+          "sha256": "8b4884a27cd6bb888e12d25f7c2b9392d2e5168e5afab03596baa2f67f4befea",
           "width": 1280,
           "height": 800
         }

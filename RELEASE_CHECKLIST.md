@@ -141,6 +141,10 @@ partial historical checks remain pre-certification evidence.
   A committed provenance manifest records archive/browser/image hashes, and `pnpm release:package` now rejects
   missing, resized, modified, or stale screenshots. Visual review found no clipping, unexpected migration
   entry, or target-specific rendering defect.
+- 2026-09-02: the legacy globe icon was replaced with an original branching-route mark that remains legible
+  at 16px and adds restrained blue-glass depth at larger sizes. The generated 16/32/48/96/128 runtime matrix,
+  Edge 300x300 listing logo, and Chrome/Edge 440x280 promotional tiles passed visual review and deterministic
+  dimension/hash audit. The browser packages expose the complete icon matrix in their generated manifests.
 
 ## 2. Installed-browser matrix
 
@@ -198,6 +202,8 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Permission disclosure matches the generated manifest           | ✓                | ✓            | ✓   |
 | Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
 | Screenshots come from the exact checksummed release artifact   | ✓                | ✓            | ✓   |
+| Original store icon and generated runtime icon matrix          | ✓                | ✓            | ✓   |
+| Audited 440x280 promotional tile                               | ✓                | ✓            | N/A |
 | Signed upgrade from the previous public version preserves data | ☐                | N/A          | N/A |
 
 ## 4. Sign-off record

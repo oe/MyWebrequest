@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
+  <title id="title">My Webrequest</title>
+  <desc id="description">A branching request route inside a blue glass lens.</desc>
+  <defs>
+    <linearGradient id="background" x1="156" y1="96" x2="868" y2="936" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#253546"/>
+      <stop offset="0.48" stop-color="#121A24"/>
+      <stop offset="1" stop-color="#080C12"/>
+    </linearGradient>
+    <radialGradient id="lens" cx="0" cy="0" r="1" gradientTransform="translate(426 354) rotate(47) scale(520)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E9F8FF" stop-opacity="0.96"/>
+      <stop offset="0.36" stop-color="#91D6FF" stop-opacity="0.74"/>
+      <stop offset="0.78" stop-color="#2599F0" stop-opacity="0.34"/>
+      <stop offset="1" stop-color="#1369B5" stop-opacity="0.18"/>
+    </radialGradient>
+    <linearGradient id="route" x1="292" y1="710" x2="762" y2="282" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8EDCFF"/>
+      <stop offset="0.48" stop-color="#F7FCFF"/>
+      <stop offset="1" stop-color="#64C5FF"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="212" y1="172" x2="806" y2="848" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" stop-opacity="0.68"/>
+      <stop offset="0.4" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#78CAFF" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect x="48" y="48" width="928" height="928" rx="224" fill="url(#background)"/>
+  <rect x="49" y="49" width="926" height="926" rx="223" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="2"/>
+  <circle cx="512" cy="512" r="330" fill="url(#lens)" stroke="url(#edge)" stroke-width="18"/>
+  <path d="M288 694L510 514L742 304M510 514L748 708" fill="none" stroke="#07111C" stroke-opacity="0.34" stroke-width="78" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M288 682L510 502L742 292M510 502L748 696" fill="none" stroke="url(#route)" stroke-width="62" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="288" cy="682" r="70" fill="#0B1723" stroke="#DDF5FF" stroke-width="34"/>
+  <circle cx="510" cy="502" r="82" fill="#F8FDFF" stroke="#4CB8F8" stroke-width="26"/>
+  <circle cx="742" cy="292" r="70" fill="#0B1723" stroke="#DDF5FF" stroke-width="34"/>
+  <circle cx="748" cy="696" r="70" fill="#0B1723" stroke="#DDF5FF" stroke-width="34"/>
+  <path d="M258 256C324 194 416 166 510 166" fill="none" stroke="#FFFFFF" stroke-opacity="0.58" stroke-width="24" stroke-linecap="round"/>
+</svg>

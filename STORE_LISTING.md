@@ -39,3 +39,6 @@ show the actual rule manager, permission explanation, and backup entry point fro
 checksummed release artifact. A migration review image is Chrome-only and should be added only when it helps
 existing Chrome users. Do not claim Chrome, Edge, or Firefox support until that browser's installed-extension
 certification row in [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md) is complete.
+
+Use the original branching-route icon and the audited 440x280 promotional tile from `store-assets/`. Do not
+substitute the legacy globe icon or upload a resized screenshot as promotional artwork.

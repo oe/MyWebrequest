@@ -6,6 +6,13 @@ const targets = ['chrome-mv3', 'edge-mv3', 'firefox-mv3'];
 const expectedPermissions = ['activeTab', 'declarativeNetRequest', 'storage'];
 const expectedOptionalHosts = ['http://*/*', 'https://*/*'];
 const expectedLocales = ['en', 'es', 'fr', 'ja', 'ko', 'zh_CN'];
+const expectedIcons = {
+  16: 'icon/16.png',
+  32: 'icon/32.png',
+  48: 'icon/48.png',
+  96: 'icon/96.png',
+  128: 'icon/128.png',
+};
 const browserSupport = JSON.parse(readFileSync(join(process.cwd(), 'browser-support.json'), 'utf8'));
 
 function walk(directory) {
@@ -28,6 +35,7 @@ for (const target of targets) {
   assert.equal(manifest.host_permissions, undefined, `${target} must not request install-time hosts.`);
   assert.equal(manifest.content_scripts, undefined, `${target} must not inject content scripts.`);
   assert.equal(manifest.externally_connectable, undefined, `${target} must not expose external messaging.`);
+  assert.deepEqual(manifest.icons, expectedIcons, `${target} does not expose the complete icon matrix.`);
   if (target === 'firefox-mv3') {
     assert.equal(
       manifest.browser_specific_settings?.gecko?.strict_min_version,
@@ -77,4 +85,6 @@ for (const file of sourceFiles) {
   assert.doesNotMatch(source, /(?:eval|new\s+Function)\s*\(/, `${file} contains dynamic code execution.`);
 }
 
-console.log('Browser artifacts passed permission, locale, source-map, endpoint, and remote-code audits.');
+console.log(
+  'Browser artifacts passed permission, locale, icon, source-map, endpoint, and remote-code audits.',
+);

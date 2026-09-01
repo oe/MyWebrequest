@@ -4,19 +4,31 @@ The committed screenshots under `screenshots/<browser>/` are 1280x800, full-blee
 extension UI. Each browser set tells the same three-part product story: rule management, the bounded
 website-access explanation, and verified backup import preview.
 
+The canonical original icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
+16/32/48/96/128px PNG matrix, Edge's 300px listing logo, and Chrome/Edge 440x280 promotional tiles. The
+branching route remains recognizable at toolbar size; the larger lens and restrained translucent material
+connect the icon to the product UI without relying on blur for legibility.
+
 - Chrome Web Store accepts 1280x800 or 640x400 screenshots and recommends the larger size.
 - Microsoft Edge Add-ons accepts 1280x800 or 640x480 screenshots.
 - Firefox Add-ons recommends 1280x800 and a 1.6:1 ratio for other sizes.
 
 The browser-specific source archive, archive checksum, browser version, image dimensions, and image checksum
-are recorded in `screenshots/manifest.json`. `pnpm audit:store-assets` rejects images that do not match that
-manifest or the current `dist/SHA256SUMS`. The audit runs inside `pnpm release:package`, so code changes that
-alter a release archive require a fresh screenshot pass before packaging can succeed.
+are recorded in `screenshots/manifest.json`. Brand and promotional provenance lives in
+`promotional/manifest.json`. `pnpm audit:store-assets` rejects files that do not match these manifests, the
+canonical SVG, or the current `dist/SHA256SUMS`. The audit runs inside `pnpm release:package`, so code changes
+that alter a release archive require a fresh screenshot pass before packaging can succeed.
 
 After creating release archives, refresh Chrome and Edge screenshots with:
 
 ```bash
 pnpm capture:store-screenshots -- chrome edge
+```
+
+Regenerate the icon and promotional assets with:
+
+```bash
+pnpm generate:brand-assets
 ```
 
 Firefox capture uses a temporary isolated GeckoDriver profile and exact Firefox release archive:

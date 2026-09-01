@@ -149,6 +149,10 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   safe import preview. The provenance manifest records the archive/browser/image hashes, and the release gate
   now rejects screenshots that no longer match `dist/SHA256SUMS`. Chrome used isolated Chromium 151, Edge used
   Edge 152.0.4191.53, and Firefox used the declared-floor Firefox 142.0.
+- The generic legacy globe was replaced by an original branching-route icon generated at every declared
+  runtime size. Chrome and Edge also have audited 440x280 promotional tiles, and Edge has a native 300x300
+  listing logo. Artifact audit now requires the exact icon matrix in every generated manifest; store-asset
+  audit verifies the canonical SVG, each PNG's dimensions, and every asset checksum.
 
 ## Remaining compatibility work
 

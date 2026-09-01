@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "source": {
+    "path": "store-assets/brand/app-icon.svg",
+    "sha256": "efbb57b1bccea87569b427797ec1f2779575fad1c60b0ef703066b13bac2704a"
+  },
+  "generatedWith": {
+    "browserName": "Chromium",
+    "browserVersion": "151.0.7922.34"
+  },
+  "generatedAt": "2026-09-01T19:30:55.493Z",
+  "assets": [
+    {
+      "path": "src/public/icon/16.png",
+      "purpose": "Runtime toolbar icon",
+      "sha256": "90c18c52cbf1959229185543439cc439bbd680e719e49d61713066932499c5a9",
+      "width": 16,
+      "height": 16
+    },
+    {
+      "path": "src/public/icon/32.png",
+      "purpose": "Runtime toolbar icon",
+      "sha256": "a1e9b8eb76466ac7562496f54e5ddbed834fbb44c696b98ce60478b045fdf789",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "path": "src/public/icon/48.png",
+      "purpose": "Runtime extension icon",
+      "sha256": "14b6d8fc91231594a9174147a448ef9a7011480b0172db1ff1c312c0abd218e3",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "path": "src/public/icon/96.png",
+      "purpose": "Runtime extension icon",
+      "sha256": "4bf73d61c8e2fdd8717065ad3b9667fec1dd7c12fd8555ad94982098711d9940",
+      "width": 96,
+      "height": 96
+    },
+    {
+      "path": "src/public/icon/128.png",
+      "purpose": "Chrome and Firefox store icon",
+      "sha256": "e2d0623147629ec566c1406d142dd185964a9815bd6f03069e70d82ee1445b3c",
+      "width": 128,
+      "height": 128
+    },
+    {
+      "path": "store-assets/promotional/edge/logo-300.png",
+      "purpose": "Edge listing logo",
+      "sha256": "382851d2bd836c4ef32c841f0f4ecd620bf7d32e34ba231e8aba1376ba746b1e",
+      "width": 300,
+      "height": 300
+    },
+    {
+      "path": "store-assets/promotional/chrome/small-promo-440x280.png",
+      "purpose": "Chrome small promotional tile",
+      "sha256": "6a7ab7a80cb6fddd06dfd02a905c5743ebda50ac3382457eda9a3344aa902c33",
+      "width": 440,
+      "height": 280
+    },
+    {
+      "path": "store-assets/promotional/edge/small-promo-440x280.png",
+      "purpose": "Edge small promotional tile",
+      "sha256": "6a7ab7a80cb6fddd06dfd02a905c5743ebda50ac3382457eda9a3344aa902c33",
+      "width": 440,
+      "height": 280
+    }
+  ]
+}
