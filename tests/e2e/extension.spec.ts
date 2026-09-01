@@ -3,7 +3,7 @@
 import http from 'node:http';
 import https from 'node:https';
 import { execFile } from 'node:child_process';
-import { cp, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import type { Duplex } from 'node:stream';
@@ -210,6 +210,52 @@ async function extensionWithFixtureHostAccess(): Promise<{
   return { directory, extensionPath };
 }
 
+async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPath: string }> {
+  const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-upgrade-e2e-'));
+  const extensionPath = join(directory, 'extension');
+  await mkdir(extensionPath);
+  await Promise.all([
+    writeFile(
+      join(extensionPath, 'manifest.json'),
+      `${JSON.stringify(
+        {
+          manifest_version: 3,
+          name: 'My Webrequest legacy upgrade fixture',
+          version: '0.8.0',
+          permissions: ['activeTab', 'storage', 'declarativeNetRequest'],
+          optional_host_permissions: ['http://*/*', 'https://*/*'],
+          background: { service_worker: 'legacy-background.js' },
+          options_page: 'legacy-options.html',
+        },
+        null,
+        2,
+      )}\n`,
+    ),
+    writeFile(
+      join(extensionPath, 'legacy-background.js'),
+      'chrome.runtime.onInstalled.addListener(() => {});\n',
+    ),
+    writeFile(
+      join(extensionPath, 'legacy-options.html'),
+      '<!doctype html><html><body><h1>Legacy fixture</h1></body></html>\n',
+    ),
+  ]);
+  return { directory, extensionPath };
+}
+
+async function overlayProductionExtension(extensionPath: string): Promise<void> {
+  const productionPath = join(process.cwd(), 'dist/chrome-mv3');
+  const entries = await readdir(productionPath, { withFileTypes: true });
+  await Promise.all(
+    entries.map((entry) =>
+      cp(join(productionPath, entry.name), join(extensionPath, entry.name), {
+        recursive: entry.isDirectory(),
+        force: true,
+      }),
+    ),
+  );
+}
+
 function crossOriginRules(port: number): Rule[] {
   return [
     {
@@ -252,6 +298,29 @@ function crossOriginRules(port: number): Rule[] {
       updatedAt: now,
     },
   ];
+}
+
+function quotaRules(count: number, kind: 'regex' | 'url-filter'): Rule[] {
+  return Array.from({ length: count }, (_, index): Rule => ({
+    schemaVersion: 1,
+    id: `e2e-${kind}-quota-${index}`,
+    dnrId: (kind === 'regex' ? 1_910_000 : 1_920_000) + index,
+    name: `${kind} quota ${index}`,
+    enabled: true,
+    priority: 10,
+    condition: {
+      url:
+        kind === 'regex'
+          ? { kind: 'regex', value: `^https://regex-${index}\\.example/.*$` }
+          : { kind: 'url-filter', value: `||filter-${index}.example^` },
+      resourceTypes: ['main_frame'],
+    },
+    action: { kind: 'block' },
+    permissionOrigins: [],
+    migrationState: 'none',
+    createdAt: now,
+    updatedAt: now,
+  }));
 }
 
 async function stopExtensionServiceWorker(
@@ -571,6 +640,94 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
     await closeContext?.();
     await close(server);
     await rm(fixtureExtension.directory, { force: true, recursive: true });
+  }
+});
+
+test('isolated profile enforces the regex and total dynamic-rule safety boundaries', async ({
+  extensionWorker,
+}) => {
+  test.setTimeout(90_000);
+
+  const regexRules = quotaRules(902, 'regex');
+  await extensionWorker.evaluate(
+    async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+    stateWith(regexRules),
+  );
+  await expect
+    .poll(
+      () =>
+        extensionWorker.evaluate(async () =>
+          (await chrome.declarativeNetRequest.getDynamicRules())
+            .map((rule) => rule.id)
+            .sort((left, right) => left - right),
+        ),
+      { timeout: 30_000 },
+    )
+    .toEqual(regexRules.slice(0, 900).map((rule) => rule.dnrId));
+
+  const dynamicRules = quotaRules(4_502, 'url-filter');
+  await extensionWorker.evaluate(
+    async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+    stateWith(dynamicRules),
+  );
+  await expect
+    .poll(
+      () =>
+        extensionWorker.evaluate(async () => {
+          const rules = await chrome.declarativeNetRequest.getDynamicRules();
+          return {
+            count: rules.length,
+            first: rules.reduce((minimum, rule) => Math.min(minimum, rule.id), Number.MAX_SAFE_INTEGER),
+            last: rules.reduce((maximum, rule) => Math.max(maximum, rule.id), 0),
+          };
+        }),
+      { timeout: 30_000 },
+    )
+    .toEqual({ count: 4_500, first: dynamicRules[0]?.dnrId, last: dynamicRules[4_499]?.dnrId });
+});
+
+test('same-extension upgrade preserves legacy page storage and stages migration', async () => {
+  const fixture = await legacyUpgradeFixture();
+  const userDataDir = join(fixture.directory, 'profile');
+  let launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
+
+  try {
+    let [legacyWorker] = launched.context.serviceWorkers();
+    legacyWorker ??= await launched.context.waitForEvent('serviceworker');
+    const extensionId = new URL(legacyWorker.url()).host;
+    const legacyOptions = await launched.context.newPage();
+    await legacyOptions.goto(`chrome-extension://${extensionId}/legacy-options.html`);
+    await legacyOptions.evaluate((source) => {
+      for (const [key, value] of Object.entries(source)) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+    }, legacyFixture);
+    expect(await legacyOptions.evaluate(() => localStorage.length)).toBe(Object.keys(legacyFixture).length);
+    await launched.close();
+
+    await overlayProductionExtension(fixture.extensionPath);
+    launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
+    let [productionWorker] = launched.context.serviceWorkers();
+    productionWorker ??= await launched.context.waitForEvent('serviceworker');
+    expect(productionWorker.url()).toBe(`chrome-extension://${extensionId}/background.js`);
+
+    const options = await launched.context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
+    expect(
+      await options.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? 'null'), 'future-key'),
+    ).toEqual(legacyFixture['future-key']);
+
+    const staged = (await productionWorker.evaluate(async () => {
+      const stored = await chrome.storage.local.get('requestRulesMigration');
+      return stored.requestRulesMigration;
+    })) as StoredMigration;
+    expect(staged.status).toBe('pending');
+    expect(staged.bundle.report.items).toHaveLength(20);
+    expect(staged.bundle.rawSnapshot['future-key']).toContain('onerror=alert(1)');
+  } finally {
+    await launched.close();
+    await rm(fixture.directory, { force: true, recursive: true });
   }
 });
 

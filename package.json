@@ -35,8 +35,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "security:audit": "node scripts/verify-image-size-patch.mjs && pnpm audit --audit-level high",
+    "audit:store-metadata": "node scripts/audit-store-metadata.mjs",
     "audit:artifacts": "node scripts/audit-artifacts.mjs",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm security:audit && pnpm build:browsers && pnpm e2e:chromium:run && pnpm audit:artifacts && pnpm lint:firefox",
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm security:audit && pnpm audit:store-metadata && pnpm build:browsers && pnpm e2e:chromium:run && pnpm audit:artifacts && pnpm lint:firefox",
     "e2e:chromium:run": "playwright test",
     "postinstall": "wxt prepare"
   },

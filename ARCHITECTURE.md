@@ -27,7 +27,7 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 | Unit tests      | Vitest                                               | Fast pure-domain and component tests                                                    |
 | E2E             | Playwright Chromium                                  | Real extension installation, downloads, storage, DNR, and service-worker testing        |
 | Validation      | Versioned JSON Schema with a typed runtime validator | Treat imports and legacy data as untrusted                                              |
-| CI              | GitHub Actions on Node 24                            | Typecheck, lint, unit, per-browser E2E, build, artifact and store-validator audit       |
+| CI              | GitHub Actions on Node 24                            | Typecheck, lint, unit, browser E2E, build, artifact audit, AMO lint, store preflight    |
 
 Exact dependency versions are pinned in the committed lockfile and upgraded only through the complete
 quality gate. `latest` ranges are not permitted.

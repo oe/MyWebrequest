@@ -109,10 +109,19 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   prompt. After allowing access, all three produced `/target/captured-value` through the real cross-origin XHR
   redirect and `header:cross-origin-pass` through the independent request-header fixture.
 - 2026-09-02: Firefox 142.0 accepted the final `dist/firefox-mv3` package as a temporary MV3 add-on in a clean
-  profile. The repository gate also passed with 24 test files, 114 unit tests, 9 isolated Chromium extension
-  tests, all browser artifact audits, AMO lint, and byte-for-byte reproducible archives. Firefox 142 runtime
+  profile. The repository gate now passes with 24 test files, 114 unit tests, 11 isolated Chromium extension
+  tests, store metadata preflight, all browser artifact audits, AMO lint, and byte-for-byte reproducible
+  archives. Firefox 142 runtime
   scenarios beyond installation remain unchecked. Chromium 121 is now a native x86 CI gate; local emulation
   on this Apple Silicon host is not counted because the old Chrome binary crashes in its emulated GPU process.
+- 2026-09-02: an isolated production Chromium profile proved deterministic enforcement at both safety
+  boundaries: 900 of 902 regex-backed rules and 4,500 of 4,502 total dynamic rules were installed in stored
+  order. A separate same-path, same-extension-ID browser restart upgraded a V0.8-shaped fixture to the current
+  artifact, preserved its page `localStorage`, and staged the exact 20-item legacy report with its unknown raw
+  key. This is repeatable unpacked-upgrade evidence, not the still-required signed-store upgrade.
+- 2026-09-02: store metadata preflight aligned `My Webrequest`, all six localized manifest descriptions,
+  declared permissions, the store description, and the local-only privacy policy. This is a source/package
+  quality gate; it is not Chrome Web Store or Edge Add-ons acceptance.
 
 ## 2. Installed-browser matrix
 

@@ -118,15 +118,26 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
   This proves the declared installation floor and manifest schema are compatible; the full Firefox 142 DNR
   runtime matrix remains pending.
 - The Chromium 121 floor runner is wired into CI with the official Chrome for Testing binary and the same
-  nine-test extension suite. Local execution on this Apple Silicon host is not usable as certification: the
+  extension suite. Local execution on this Apple Silicon host is not usable as certification: the
   old arm64 macOS binary is incompatible with the current macOS release, while x86 Linux emulation crashes in
   Chrome's GPU process. A native x86 CI pass is still required before the Chromium floor is certified.
+- An isolated Chromium profile installed exactly the first 900 of 902 valid regex-backed rules and exactly the
+  first 4,500 of 4,502 valid dynamic rules. This exercises the production browser adapter and confirms both
+  deterministic internal ceilings without touching any normal browser profile.
+- A same-extension-ID upgrade harness wrote all representative V0.8 `localStorage` keys with a legacy fixture,
+  restarted the browser against the production artifact at the same unpacked path, and retained the same
+  extension origin. The new options page detected all source data and staged the expected 20-item migration
+  report, including the unknown raw key. This proves the unpacked upgrade path, but does not replace a signed
+  store-artifact upgrade test.
+- Store metadata preflight now fails the repository gate if the product identity, six localized manifest
+  messages, description bounds, permission disclosures, or local-only privacy statements drift apart. AMO's
+  package validator remains automated; Chrome Web Store and Edge Add-ons acceptance still require submission.
 
 ## Remaining compatibility work
 
 - Repeat the installed-extension matrix at the declared minimums (Chromium 121 and Firefox 142).
-- Verify regex substitution independently on each browser.
-- Add explicit installed-browser quota-boundary smoke tests without filling the user's normal profile.
+- Repeat the isolated quota-boundary smoke on Edge and Firefox at their declared floors.
+- Run a signed upgrade from the previous public Chrome artifact with the production store ID.
 - Run Chrome Web Store, Edge Add-ons, and AMO packaging validators in CI before enabling a release job.
 - Decide whether Safari's conversion, Xcode signing, DNR behavior, and store maintenance cost justify a
   fourth target after the three-browser evidence is stable.
@@ -139,7 +150,8 @@ honors reduced motion, restores keyboard focus, and proves bounded permission pr
 granting origins or changing runtime state. It also covers representative legacy `localStorage`
 detection/report export/disabled application/complete rollback and verifies checksummed backup export, safe
 disabled merge, replace-time snapshot creation, and one-click recovery. Chromium automation is a regression
-gate. A test-only manifest with only the local request and initiator fixture origins additionally proves real
+gate. It also exercises both production quota ceilings and a same-path, same-ID upgrade from a legacy-storage
+fixture. A test-only manifest with only the local request and initiator fixture origins additionally proves real
 cross-origin wildcard capture redirects and request-header modification. Because that harness bypasses the
 native optional-permission prompt, it is not evidence that a branded Chrome, Edge, or Firefox row has passed
 its installed-browser or store certification. For manual installed-browser rechecks, run

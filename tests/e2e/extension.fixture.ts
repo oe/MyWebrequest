@@ -15,8 +15,10 @@ async function launchExternalChromium(
   executablePath: string,
   extensionPath: string,
   ignoreHTTPSErrors: boolean,
+  requestedUserDataDir?: string,
 ): Promise<{ context: BrowserContext; close: () => Promise<void> }> {
-  const userDataDir = await mkdtemp(path.join(tmpdir(), 'mwr-chromium-floor-'));
+  const ownsUserDataDir = requestedUserDataDir === undefined;
+  const userDataDir = requestedUserDataDir ?? (await mkdtemp(path.join(tmpdir(), 'mwr-chromium-floor-')));
   const child = spawn(
     executablePath,
     [
@@ -52,7 +54,7 @@ async function launchExternalChromium(
   }
   if (!port) {
     child.kill('SIGTERM');
-    await rm(userDataDir, { recursive: true, force: true });
+    if (ownsUserDataDir) await rm(userDataDir, { recursive: true, force: true });
     throw new Error(`External Chromium did not expose a debugging port. ${stderr}`.trim());
   }
 
@@ -64,7 +66,7 @@ async function launchExternalChromium(
     close: async () => {
       await browser.close();
       if (child.exitCode === null) child.kill('SIGTERM');
-      await rm(userDataDir, { recursive: true, force: true });
+      if (ownsUserDataDir) await rm(userDataDir, { recursive: true, force: true });
     },
   };
 }
@@ -72,12 +74,13 @@ async function launchExternalChromium(
 export async function launchChromiumExtensionContext(
   extensionPath: string,
   ignoreHTTPSErrors = false,
+  userDataDir?: string,
 ): Promise<{ context: BrowserContext; close: () => Promise<void> }> {
   const executablePath = process.env.MWR_CHROMIUM_EXECUTABLE_PATH;
   if (executablePath) {
-    return launchExternalChromium(executablePath, extensionPath, ignoreHTTPSErrors);
+    return launchExternalChromium(executablePath, extensionPath, ignoreHTTPSErrors, userDataDir);
   }
-  const context = await chromium.launchPersistentContext('', {
+  const context = await chromium.launchPersistentContext(userDataDir ?? '', {
     channel: 'chromium',
     headless: true,
     ignoreHTTPSErrors,
