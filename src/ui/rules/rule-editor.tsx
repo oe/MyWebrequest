@@ -213,6 +213,11 @@ export function RuleEditor({
   const initiatorError = validation.errors.find((issue) => issue.field === 'initiators');
   const requiredOrigins = useMemo(() => requiredPermissionOrigins(draft), [draft]);
   const originalRequiredOrigins = useMemo(() => requiredPermissionOrigins(rule), [rule]);
+  const permissionScopeChanged = useMemo(
+    () => JSON.stringify(requiredOrigins) !== JSON.stringify(originalRequiredOrigins),
+    [originalRequiredOrigins, requiredOrigins],
+  );
+  const draftHasPermission = hasPermission && !permissionScopeChanged;
   const headerOperationCount =
     draft.action.kind === 'modify-request-headers' ? draft.action.operations.length : 0;
 
@@ -269,8 +274,6 @@ export function RuleEditor({
   };
 
   const handleSave = () => {
-    const permissionScopeChanged =
-      JSON.stringify(requiredOrigins) !== JSON.stringify(originalRequiredOrigins);
     if (draft.enabled && (!hasPermission || permissionScopeChanged) && requiredOrigins.length > 0) {
       setPermissionOpen(true);
       return;
@@ -682,10 +685,10 @@ export function RuleEditor({
 
           <Alert
             variant={
-              !initiatorError && (requiredOrigins.length === 0 || hasPermission) ? 'success' : 'warning'
+              !initiatorError && (requiredOrigins.length === 0 || draftHasPermission) ? 'success' : 'warning'
             }
           >
-            {!initiatorError && (requiredOrigins.length === 0 || hasPermission) ? (
+            {!initiatorError && (requiredOrigins.length === 0 || draftHasPermission) ? (
               <CheckCircle2Icon />
             ) : (
               <KeyRoundIcon />
@@ -696,7 +699,7 @@ export function RuleEditor({
                   ? 'hostAccessRequired'
                   : requiredOrigins.length === 0
                     ? 'hostAccessNotNeeded'
-                    : hasPermission
+                    : draftHasPermission
                       ? 'hostAccessGranted'
                       : 'hostAccessRequired',
               )}

@@ -14,6 +14,33 @@ export type RegexSupportResult = {
   reason?: string;
 };
 
+type MatchPattern = {
+  scheme: string;
+  wildcard: boolean;
+  host: string;
+};
+
+function parseMatchPattern(pattern: string): MatchPattern | null {
+  const match = /^(\*|https?):\/\/(\*\.)?([^/]+)\/\*$/.exec(pattern);
+  const scheme = match?.[1];
+  const host = match?.[3];
+  if (!scheme || !host) return null;
+  return { scheme, wildcard: Boolean(match[2]), host: host.toLowerCase() };
+}
+
+function matchPatternCovers(grantedPattern: string, requiredPattern: string): boolean {
+  const granted = parseMatchPattern(grantedPattern);
+  const required = parseMatchPattern(requiredPattern);
+  if (!granted || !required) return grantedPattern === requiredPattern;
+
+  if (granted.scheme !== '*' && granted.scheme !== required.scheme) return false;
+  if (granted.host === '*') return true;
+  if (required.host === '*') return false;
+
+  if (!granted.wildcard) return !required.wildcard && granted.host === required.host;
+  return required.host === granted.host || required.host.endsWith(`.${granted.host}`);
+}
+
 export async function checkRuleRegexSupport(rule: Rule): Promise<RegexSupportResult> {
   if (rule.condition.url.kind === 'url-filter') return { isSupported: true };
   if (!hasExtensionRuntime() || !browser.declarativeNetRequest.isRegexSupported) {
@@ -34,7 +61,8 @@ export async function hasRulePermission(rule: Rule): Promise<boolean> {
   if (!hasExtensionRuntime()) return true;
   const origins = requiredPermissionOrigins(rule);
   if (origins.length === 0) return true;
-  return browser.permissions.contains({ origins });
+  const granted = (await browser.permissions.getAll()).origins ?? [];
+  return origins.every((origin) => granted.some((pattern) => matchPatternCovers(pattern, origin)));
 }
 
 export async function requestRulePermission(rule: Rule): Promise<boolean> {
@@ -63,7 +91,7 @@ export async function getInstalledDynamicRuleIds(): Promise<Set<number> | null> 
   return new Set(installedRules.map((rule) => rule.id));
 }
 
-export async function reconcileDynamicRules(state: StoredState): Promise<void> {
+async function replaceDynamicRules(state: StoredState): Promise<void> {
   if (!hasExtensionRuntime()) return;
 
   const installedRules = await browser.declarativeNetRequest.getDynamicRules();
@@ -90,5 +118,16 @@ export async function reconcileDynamicRules(state: StoredState): Promise<void> {
   await browser.declarativeNetRequest.updateDynamicRules({
     removeRuleIds,
     addRules,
+  });
+}
+
+export async function reconcileDynamicRules(state: StoredState): Promise<void> {
+  if (typeof navigator === 'undefined' || !navigator.locks) {
+    await replaceDynamicRules(state);
+    return;
+  }
+
+  await navigator.locks.request('mywebrequest-dnr-reconcile', async () => {
+    await replaceDynamicRules(state);
   });
 }

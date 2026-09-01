@@ -1,6 +1,6 @@
 # Release Checklist
 
-Status: Local package gate implemented; installed-browser and store certification pending  
+Status: Current-browser runtime pass recorded; older-release, full matrix, and store certification pending
 Last updated: 2026-09-01
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
@@ -31,8 +31,11 @@ These checks reduce risk but do not satisfy any installed-browser matrix row:
   language after reload, supported arrow-key rule navigation, and produced no console warning or error in
   the local browser-rendered smoke test.
 - 2026-09-01: Firefox 154.0.1 accepted `dist/firefox-mv3` as the temporary add-on
-  `mywebrequest@evecalm.com` in a clean headless profile. This proves loadability only; DNR actions,
-  permissions, surfaces, and background lifecycle still require the matrix below.
+  `mywebrequest@evecalm.com` in a clean headless profile.
+- 2026-09-01: the unpacked artifacts were exercised in Chrome 151.0.7922.174, Edge 152.0.0.0, and
+  Firefox 154.0.1. The checks covered top-level blocking, live request-header modification, pause/resume,
+  popup/options state, and extension/background reload recovery. Chrome additionally covered redirect and
+  permission refusal/revocation/re-grant. This is current-version runtime evidence, not store certification.
 
 ## 2. Installed-browser matrix
 
@@ -40,16 +43,16 @@ Run each scenario on the current stable browser and one supported older release.
 
 | Scenario                                         | Chrome | Edge | Firefox |
 | ------------------------------------------------ | ------ | ---- | ------- |
-| Clean install has no required host access        | ☐      | ☐    | ☐       |
-| Popup and options open with no console errors    | ☐      | ☐    | ☐       |
-| Block rule works without host access             | ☐      | ☐    | ☐       |
+| Clean install has no required host access        | ✓      | ✓    | ✓       |
+| Popup and options open with no console errors    | ✓      | ✓    | ✓       |
+| Block rule works without host access             | ✓      | ✓    | ✓       |
 | HTTPS-upgrade rule works without host access     | ☐      | ☐    | ☐       |
-| Navigation redirect grant, refusal, and re-grant | ☐      | ☐    | ☐       |
+| Navigation redirect grant, refusal, and re-grant | ✓      | ☐    | ☐       |
 | Subresource redirect requests initiator access   | ☐      | ☐    | ☐       |
 | Request-header rule requests initiator access    | ☐      | ☐    | ☐       |
-| Permission revocation removes affected DNR rules | ☐      | ☐    | ☐       |
-| Service-worker/background restart reconciles DNR | ☐      | ☐    | ☐       |
-| Popup/options/storage state stays synchronized   | ☐      | ☐    | ☐       |
+| Permission revocation removes affected DNR rules | ✓      | ☐    | ☐       |
+| Service-worker/background restart reconciles DNR | ✓      | ✓    | ✓       |
+| Popup/options/storage state stays synchronized   | ✓      | ✓    | ✓       |
 | Legacy migration review/export/apply/rollback    | ☐      | ☐    | ☐       |
 | Backup merge/replace and recovery snapshot       | ☐      | ☐    | ☐       |
 | Six locales pass keyboard and 200% zoom smoke    | ☐      | ☐    | ☐       |

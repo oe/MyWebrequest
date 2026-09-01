@@ -144,18 +144,21 @@ export function useRuleManager() {
           cycleFree: false,
         };
       }
-      const regexSupport = await checkRuleRegexSupport(rule);
+      // Firefox requires permissions.request() to be invoked in the same user
+      // activation turn. Start it before the first await; the editor's explicit
+      // confirmation button is the user gesture that reaches this callback.
+      const permissionPromise = rule.enabled ? requestRulePermission(rule) : Promise.resolve(true);
+      const regexSupportPromise = checkRuleRegexSupport(rule);
+      const [permissionGranted, regexSupport] = await Promise.all([permissionPromise, regexSupportPromise]);
       if (rule.enabled && !regexSupport.isSupported) {
         return {
-          permissionGranted: permissions[rule.id] === true,
+          permissionGranted,
           regexSupported: false,
           regexReason: regexSupport.reason,
           quotaAvailable: true,
           cycleFree: true,
         };
       }
-      const permissionGranted =
-        !rule.enabled || (await hasRulePermission(rule)) || (await requestRulePermission(rule));
       await persist(nextState);
       return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
     },
@@ -200,18 +203,20 @@ export function useRuleManager() {
           cycleFree: false,
         };
       }
-      const regexSupport = await checkRuleRegexSupport(nextRule);
+      // Keep the permission request inside the originating click gesture for
+      // Firefox. Already-granted origins resolve without another prompt.
+      const permissionPromise = enabled ? requestRulePermission(nextRule) : Promise.resolve(true);
+      const regexSupportPromise = checkRuleRegexSupport(nextRule);
+      const [permissionGranted, regexSupport] = await Promise.all([permissionPromise, regexSupportPromise]);
       if (enabled && !regexSupport.isSupported) {
         return {
-          permissionGranted: permissions[id] === true,
+          permissionGranted,
           regexSupported: false,
           regexReason: regexSupport.reason,
           quotaAvailable: true,
           cycleFree: true,
         };
       }
-      const permissionGranted =
-        !enabled || permissions[id] === true || (await requestRulePermission(nextRule));
       await persist(nextState);
       return { permissionGranted, regexSupported: true, quotaAvailable: true, cycleFree: true };
     },

@@ -18,6 +18,23 @@ describe('compileDnrRule', () => {
         condition: {
           regexFilter: '^https://api\\.example\\.com/v1/(.*)$',
           initiatorDomains: ['app.example.com'],
+          resourceTypes: [
+            'main_frame',
+            'sub_frame',
+            'stylesheet',
+            'script',
+            'image',
+            'font',
+            'object',
+            'xmlhttprequest',
+            'ping',
+            'csp_report',
+            'media',
+            'websocket',
+            'webtransport',
+            'webbundle',
+            'other',
+          ],
         },
         action: {
           type: 'redirect',
@@ -26,6 +43,26 @@ describe('compileDnrRule', () => {
       },
       warnings: [],
     });
+  });
+
+  it('expands an unfiltered Firefox rule to every Firefox resource type', () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+
+    const compiled = compileDnrRule(rule, 'firefox');
+    expect(compiled).toMatchObject({
+      ok: true,
+      rule: {
+        condition: {
+          resourceTypes: expect.arrayContaining(['beacon', 'main_frame', 'web_manifest', 'xslt']),
+        },
+      },
+    });
+    if (!compiled.ok) return;
+    expect(compiled.rule.condition.resourceTypes).not.toEqual(
+      expect.arrayContaining(['webbundle', 'webtransport']),
+    );
   });
 
   it('rejects redirect protocols outside HTTP and HTTPS', () => {

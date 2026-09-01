@@ -1,19 +1,20 @@
 # Browser Support Plan
 
-Status: Multi-target build baseline implemented; per-browser runtime certification pending  
+Status: Current-browser runtime certification complete; older-release and store certification pending
 Last updated: 2026-09-01
 
 ## Current matrix
 
-| Target         | Manifest | Build output       | Current evidence                                        | Release status |
-| -------------- | -------- | ------------------ | ------------------------------------------------------- | -------------- |
-| Chrome         | MV3      | `dist/chrome-mv3`  | Build, shared unit tests, browser-rendered UI QA        | Not certified  |
-| Microsoft Edge | MV3      | `dist/edge-mv3`    | Build parity with the Chromium target                   | Not certified  |
-| Firefox        | MV3      | `dist/firefox-mv3` | Build, strict lint, Firefox 154 temporary-install smoke | Not certified  |
-| Safari         | TBD      | None               | WXT feasibility only; no Xcode conversion or API spike  | Deferred       |
+| Target         | Manifest | Build output       | Current evidence                                                  | Release status            |
+| -------------- | -------- | ------------------ | ----------------------------------------------------------------- | ------------------------- |
+| Chrome         | MV3      | `dist/chrome-mv3`  | Chrome 151 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
+| Microsoft Edge | MV3      | `dist/edge-mv3`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
+| Firefox        | MV3      | `dist/firefox-mv3` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
+| Safari         | TBD      | None               | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
 
-`Not certified` means the artifact exists but has not yet passed installed-extension E2E on that browser.
-It must not be presented as store-ready.
+`Current runtime certified` means the unpacked artifact passed the recorded local installed-extension
+checks on the listed browser version. It does not mean store-ready: the older-release matrix, remaining
+DNR scenarios, signed-artifact upgrade test, and store validation are still required.
 
 ## Decisions
 
@@ -32,12 +33,27 @@ It must not be presented as store-ready.
 - Treat backdrop blur as enhancement only. The UI has solid fallbacks and does not depend on WebKit-only
   visual behavior.
 
-## Known compatibility work
+## 2026-09-01 installed-extension evidence
 
-- Add installed-extension E2E for permission grant, refusal, revocation, and service-worker/background
-  restart on Chrome, Edge, and Firefox.
-- Verify DNR block, upgrade, redirect, regex substitution, and request-header modification independently
-  on each browser.
+- Chrome 151.0.7922.174: no-host-access install; block, redirect, and request-header rules; permission
+  refusal, grant, revocation, and re-grant; pause/resume; popup/options synchronization; service-worker
+  reload recovery. Header fixture received `X-E2E-Test: chrome-pass`.
+- Microsoft Edge 152.0.0.0: no-host-access install; all-resource block including top-level navigation;
+  request-header permission and live modification; pause/resume; popup/options synchronization; extension
+  reload recovery. Header fixture received `X-E2E-Test: edge-pass`.
+- Firefox 154.0.1: temporary install from `dist/firefox-mv3`; all-resource block including top-level
+  navigation; request-header permission requested from the originating click; pause/resume; popup/options
+  synchronization; background reload recovery. Header fixture received `X-E2E-Test: firefox-pass`.
+- The current Firefox 154 schema was checked locally after a runtime rejection showed that `webbundle`
+  was not accepted. Firefox's all-resource expansion is therefore limited to the values accepted by that
+  installed schema and excludes `webbundle` and `webtransport`.
+
+## Remaining compatibility work
+
+- Repeat the installed-extension matrix on the supported older browser releases.
+- Complete permission refusal/revocation and redirect coverage on Edge and Firefox.
+- Verify HTTPS upgrade, regex substitution, cross-origin subresource redirect, and cross-origin
+  request-header modification independently on each browser.
 - Certify the implemented initiator-origin permission model for cross-origin subresource redirects and
   header changes; navigation-only rules request only the request URL origin.
 - Add capability checks around regex support, match testing, rule quotas, and any API whose browser support

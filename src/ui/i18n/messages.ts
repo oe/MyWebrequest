@@ -69,7 +69,7 @@ export const en = {
   removedSection: 'Removed',
   noMatchingRules: 'No matching rules',
   noMatchingRulesDescription: 'Try a different name, action, or URL.',
-  quotaUsage: 'Enabled DNR rules',
+  quotaUsage: 'Enabled rules',
   quotaExceeded: 'The internal safety limit for enabled rules has been reached.',
   invalidRuleCannotEnable: 'Fix this rule before enabling it.',
   enableRule: 'Enable {name}',

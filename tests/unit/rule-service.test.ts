@@ -17,6 +17,13 @@ describe('rule service', () => {
     expect(permissionOriginsFromMatch('https://api.example.com/v1/*')).toEqual(['https://api.example.com/*']);
   });
 
+  it('strips ports because extension match patterns are host-scoped', () => {
+    expect(permissionOriginsFromMatch('http://localhost:4174/probe*')).toEqual(['http://localhost/*']);
+    expect(permissionOriginsFromMatch('https://*.example.com:8443/path/*')).toEqual([
+      'https://*.example.com/*',
+    ]);
+  });
+
   it('preserves legacy match-pattern schemes and wildcard subdomains', () => {
     expect(permissionOriginsFromMatch('*://*.example.com/*')).toEqual(['*://*.example.com/*']);
     expect(permissionOriginsFromMatch('http://example.com/*')).toEqual(['http://example.com/*']);

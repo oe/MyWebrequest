@@ -2,6 +2,48 @@ import type { HeaderOperation, Rule } from './model';
 import { wildcardToRegExpSource } from './test-match';
 import { validateRule } from './validate';
 
+const chromiumResourceTypes = [
+  'main_frame',
+  'sub_frame',
+  'stylesheet',
+  'script',
+  'image',
+  'font',
+  'object',
+  'xmlhttprequest',
+  'ping',
+  'csp_report',
+  'media',
+  'websocket',
+  'webtransport',
+  'webbundle',
+  'other',
+];
+
+const firefoxResourceTypes = [
+  'beacon',
+  'csp_report',
+  'font',
+  'image',
+  'imageset',
+  'json',
+  'main_frame',
+  'media',
+  'object',
+  'object_subrequest',
+  'ping',
+  'script',
+  'speculative',
+  'stylesheet',
+  'sub_frame',
+  'web_manifest',
+  'websocket',
+  'xml_dtd',
+  'xmlhttprequest',
+  'xslt',
+  'other',
+];
+
 export type DnrRule = {
   id: number;
   priority: number;
@@ -28,7 +70,7 @@ function toDnrRegexSubstitution(target: string): string {
   return target.replace(/\$(\d)/g, '\\$1');
 }
 
-export function compileDnrRule(rule: Rule): CompileResult {
+export function compileDnrRule(rule: Rule, targetBrowser = import.meta.env.BROWSER): CompileResult {
   const validation = validateRule(rule);
   if (!validation.valid) {
     return { ok: false, errors: validation.errors.map((issue) => issue.message) };
@@ -39,7 +81,11 @@ export function compileDnrRule(rule: Rule): CompileResult {
   if (rule.condition.url.kind === 'wildcard')
     condition.regexFilter = wildcardToRegExpSource(rule.condition.url.value);
   if (rule.condition.url.kind === 'regex') condition.regexFilter = rule.condition.url.value;
-  if (rule.condition.resourceTypes?.length) condition.resourceTypes = rule.condition.resourceTypes;
+  condition.resourceTypes = rule.condition.resourceTypes?.length
+    ? rule.condition.resourceTypes
+    : targetBrowser === 'firefox'
+      ? firefoxResourceTypes
+      : chromiumResourceTypes;
   if (rule.condition.requestMethods?.length) condition.requestMethods = rule.condition.requestMethods;
   if (rule.condition.initiatorDomains?.length) condition.initiatorDomains = rule.condition.initiatorDomains;
 

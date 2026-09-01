@@ -25,6 +25,17 @@ describe('rule origin scope', () => {
     expect(ruleMatchesOrigin(rule, 'Unavailable on this page')).toBe(false);
   });
 
+  it('matches legacy permission origins that include an explicit port', () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+
+    const portRule = { ...rule, permissionOrigins: ['http://localhost:4174/*'] };
+    expect(ruleMatchesOrigin(portRule, 'http://localhost:4174')).toBe(true);
+    expect(ruleMatchesOrigin(portRule, 'http://localhost:9000')).toBe(true);
+    expect(ruleMatchesOrigin(portRule, 'https://localhost:4174')).toBe(false);
+  });
+
   it('matches a global host pattern without weakening explicit schemes', () => {
     const rule = sampleRules[0];
     expect(rule).toBeDefined();

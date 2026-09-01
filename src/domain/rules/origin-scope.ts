@@ -6,7 +6,10 @@ function patternMatchesOrigin(pattern: string, origin: string): boolean {
 
   try {
     const url = new URL(origin);
-    const [, scheme, wildcard, host] = match;
+    const [, scheme, wildcard] = match;
+    const rawHost = match[3];
+    if (!rawHost) return false;
+    const host = rawHost.startsWith('[') ? rawHost.replace(/\]:\d+$/, ']') : rawHost.replace(/:\d+$/, '');
     const schemeMatches = scheme === '*' || `${scheme}:` === url.protocol;
     const hostMatches =
       host === '*'

@@ -2,6 +2,19 @@ import type { Rule } from './model';
 
 const navigationResourceTypes = new Set(['main_frame', 'sub_frame']);
 
+function normalizeMatchPatternHost(scheme: string, host: string): string | null {
+  if (host === '*') return host;
+
+  const wildcard = host.startsWith('*.');
+  const candidate = wildcard ? host.slice(2) : host;
+  try {
+    const parsed = new URL(`${scheme === '*' ? 'https' : scheme}://${candidate}/`);
+    return `${wildcard ? '*.' : ''}${parsed.hostname}`;
+  } catch {
+    return null;
+  }
+}
+
 export function permissionOriginsFromMatch(value: string): string[] {
   if (value.startsWith('||')) {
     const host = value.slice(2).replace(/\^.*$/, '').replace(/^\*\./, '');
@@ -11,7 +24,7 @@ export function permissionOriginsFromMatch(value: string): string[] {
   const matchPattern = /^(\*|https?):\/\/([^/]+)(?:\/|$)/.exec(value);
   if (matchPattern) {
     const scheme = matchPattern[1];
-    const host = matchPattern[2];
+    const host = scheme && matchPattern[2] ? normalizeMatchPatternHost(scheme, matchPattern[2]) : null;
     if (
       scheme &&
       host &&

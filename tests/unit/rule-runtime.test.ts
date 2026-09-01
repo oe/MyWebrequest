@@ -49,6 +49,9 @@ function installBrowserMock(options: {
     },
     permissions: {
       contains: vi.fn(async () => options.permitted),
+      getAll: vi.fn(async () => ({
+        origins: options.permitted ? ['*://*.app.example.com/*', 'https://api.example.com/*'] : [],
+      })),
       request: vi.fn(async () => options.permitted),
       onAdded,
       onRemoved,
@@ -59,7 +62,7 @@ function installBrowserMock(options: {
     onAdded,
     onRemoved,
     updateDynamicRules,
-    contains: browser.permissions.contains,
+    getAll: browser.permissions.getAll,
     request: browser.permissions.request,
   };
 }
@@ -91,6 +94,19 @@ describe('rule runtime reconciliation', () => {
         },
       ],
     });
+  });
+
+  it('uses an origin-wide lock so extension contexts cannot reconcile concurrently', async () => {
+    const rule = sampleRules[1];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    installBrowserMock({ installedIds: [], permitted: true });
+    const request = vi.fn(async (_name: string, callback: () => Promise<void>) => callback());
+    vi.stubGlobal('navigator', { locks: { request } });
+
+    await reconcileDynamicRules(stateWith(rule));
+
+    expect(request).toHaveBeenCalledWith('mywebrequest-dnr-reconcile', expect.any(Function));
   });
 
   it.each([
@@ -161,7 +177,7 @@ describe('rule runtime reconciliation', () => {
     const expected = {
       origins: ['*://*.app.example.com/*', 'https://api.example.com/*'],
     };
-    expect(runtime.contains).toHaveBeenCalledWith(expected);
+    expect(runtime.getAll).toHaveBeenCalledOnce();
     expect(runtime.request).toHaveBeenCalledWith(expected);
   });
 
@@ -173,8 +189,20 @@ describe('rule runtime reconciliation', () => {
 
     await expect(hasRulePermission(rule)).resolves.toBe(true);
     await expect(requestRulePermission(rule)).resolves.toBe(true);
-    expect(runtime.contains).not.toHaveBeenCalled();
+    expect(runtime.getAll).not.toHaveBeenCalled();
     expect(runtime.request).not.toHaveBeenCalled();
+  });
+
+  it('does not mistake activeTab access for a persistent host grant', async () => {
+    const rule = sampleRules[0];
+    expect(rule).toBeDefined();
+    if (!rule) return;
+    const runtime = installBrowserMock({ installedIds: [], permitted: false });
+    browser.permissions.contains = vi.fn(async () => true);
+
+    await expect(hasRulePermission(rule)).resolves.toBe(false);
+    expect(browser.permissions.contains).not.toHaveBeenCalled();
+    expect(runtime.getAll).toHaveBeenCalledOnce();
   });
 
   it('uses the browser DNR engine to reject an unsupported wildcard expression', async () => {
