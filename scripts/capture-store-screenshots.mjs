@@ -7,6 +7,7 @@ import { basename, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
 import { chromium } from '@playwright/test';
+import { hashArchiveContents } from './hash-archive-contents.mjs';
 
 const execFileAsync = promisify(execFile);
 const root = process.cwd();
@@ -55,7 +56,11 @@ async function loadArtifacts() {
     const actual = sha256(buffer);
     const expected = checksums.get(filename);
     if (actual !== expected) throw new Error(`${filename} does not match dist/SHA256SUMS.`);
-    artifacts[target] = { filename, path, sha256: actual };
+    artifacts[target] = {
+      filename,
+      path,
+      contentSha256: await hashArchiveContents(path),
+    };
   }
   return artifacts;
 }
@@ -496,7 +501,7 @@ async function inspectPng(path) {
 }
 
 const artifacts = await loadArtifacts();
-let existing = { schemaVersion: 1, viewport, targets: {} };
+let existing = { schemaVersion: 2, viewport, targets: {} };
 try {
   existing = JSON.parse(await readFile(join(outputRoot, 'manifest.json'), 'utf8'));
 } catch {
@@ -518,7 +523,7 @@ for (const target of targets) {
   }
   existing.targets[target] = {
     sourceArtifact: artifact.filename,
-    sourceSha256: artifact.sha256,
+    sourceContentSha256: artifact.contentSha256,
     browserName: result.browserName,
     browserVersion: result.browserVersion,
     capturedAt: new Date().toISOString(),
@@ -527,7 +532,7 @@ for (const target of targets) {
   console.log(`Captured ${files.length} ${target} store screenshots from ${basename(artifact.path)}.`);
 }
 
-existing.schemaVersion = 1;
+existing.schemaVersion = 2;
 existing.viewport = viewport;
 await mkdir(outputRoot, { recursive: true });
 await writeFile(join(outputRoot, 'manifest.json'), `${JSON.stringify(existing, null, 2)}\n`);

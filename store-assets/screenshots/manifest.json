@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "viewport": {
     "width": 1280,
     "height": 800
@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
-      "sourceSha256": "fdfbf14668a5c079212eb5c1a49bbb3df5f10ff16402c988712a418e2f06b91f",
+      "sourceContentSha256": "4d3c720d4af21dfd7bc9d4c9ccf72aa4184176e142b9dfb342c77b1d5b75f482",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-02T01:00:50.890Z",
+      "capturedAt": "2026-09-02T01:06:43.623Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -37,10 +37,10 @@
     },
     "edge": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
-      "sourceSha256": "ab8fa962ef217ae4e68bf55597bf5cd5008dc33a5b4608f56dec0a4ab1debc1f",
+      "sourceContentSha256": "eedba6fd787100f94f4372814a5bd0afca8fce1e22d66476e0ba8783b9a13c93",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-02T01:00:52.365Z",
+      "capturedAt": "2026-09-02T01:06:45.138Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -67,10 +67,10 @@
     },
     "firefox": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
-      "sourceSha256": "c923b29ee8ebc727dfcd304e52f404dd742df025f5b300f4d6aa2bf1a48e64db",
+      "sourceContentSha256": "f2808a818587c6ba8f84fe02f3bf83e17e58bceb688277761ce99bf662a02e91",
       "browserName": "Firefox",
       "browserVersion": "155.0",
-      "capturedAt": "2026-09-02T01:00:39.002Z",
+      "capturedAt": "2026-09-02T01:06:47.915Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",

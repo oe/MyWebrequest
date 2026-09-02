@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { hashArchiveContents } from './hash-archive-contents.mjs';
 
 const root = process.cwd();
 const assetRoot = join(root, 'store-assets', 'screenshots');
@@ -16,17 +17,25 @@ const releaseChecksums = new Map(
   }),
 );
 
-assert.equal(manifest.schemaVersion, 1, 'Unsupported store screenshot manifest schema.');
+assert.equal(manifest.schemaVersion, 2, 'Unsupported store screenshot manifest schema.');
 assert.deepEqual(manifest.viewport, { width: 1280, height: 800 }, 'Store screenshots must be 1280x800.');
 assert.deepEqual(Object.keys(manifest.targets).sort(), ['chrome', 'edge', 'firefox']);
 
 for (const target of ['chrome', 'edge', 'firefox']) {
   const entry = manifest.targets[target];
   assert.match(entry.sourceArtifact, new RegExp(`-${target}\\.zip$`));
+  assert.match(entry.sourceContentSha256, /^[a-f0-9]{64}$/);
+  const currentArchive = join(root, 'dist', entry.sourceArtifact);
+  const currentArchiveBytes = await readFile(currentArchive);
   assert.equal(
+    createHash('sha256').update(currentArchiveBytes).digest('hex'),
     releaseChecksums.get(entry.sourceArtifact),
-    entry.sourceSha256,
-    `${target} screenshots do not come from the current checksummed release artifact.`,
+    `${target} release archive does not match dist/SHA256SUMS.`,
+  );
+  assert.equal(
+    await hashArchiveContents(currentArchive),
+    entry.sourceContentSha256,
+    `${target} screenshots do not come from the current release contents.`,
   );
   assert.equal(typeof entry.browserVersion, 'string');
   assert.ok(entry.browserVersion.length > 0);
