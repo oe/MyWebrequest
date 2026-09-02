@@ -777,8 +777,8 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
-    const productionWorker = await findExtensionWorker(launched.context, extensionId);
-    expect(productionWorker.url()).toBe(`chrome-extension://${extensionId}/background.js`);
+    await expect(options).toHaveTitle('My Webrequest');
+    expect(await options.evaluate(() => chrome.runtime.getManifest().version)).toBe('1.0.0');
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(
       await options.evaluate(() => JSON.parse(localStorage.getItem('future-local-key') ?? 'null')),
@@ -786,7 +786,7 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
       preserved: 'from-page-storage',
     });
 
-    const staged = (await productionWorker.evaluate(async () => {
+    const staged = (await options.evaluate(async () => {
       const stored = await chrome.storage.local.get('requestRulesMigration');
       return stored.requestRulesMigration;
     })) as StoredMigration;
@@ -805,7 +805,6 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
 test('legacy localStorage is reviewed, exported, applied disabled, and rolled back', async ({
   context,
   extensionId,
-  extensionWorker,
 }) => {
   test.skip(browserTarget !== 'chrome', 'Legacy migration is intentionally Chrome-only.');
   const options = await context.newPage();
@@ -829,7 +828,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
   await expect(options.getByRole('heading', { name: 'Legacy migration' })).toBeVisible();
   await expect(options.getByText('Pending', { exact: true }).first()).toBeVisible();
 
-  const pendingMigration = (await extensionWorker.evaluate(async () => {
+  const pendingMigration = (await options.evaluate(async () => {
     const stored = await chrome.storage.local.get('requestRulesMigration');
     return stored.requestRulesMigration;
   })) as StoredMigration;
@@ -861,7 +860,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
   await options.getByRole('button', { name: 'Apply 2 selected' }).click();
   await expect
     .poll(async () => {
-      const stored = await extensionWorker.evaluate(async () =>
+      const stored = await options.evaluate(async () =>
         chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
       );
       if (!stored.requestRulesMigration || !stored.requestRulesState) {
@@ -885,9 +884,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
       .getByRole('navigation', { name: 'Primary navigation' })
       .getByRole('button', { name: 'Legacy migration' }),
   ).toHaveCount(0);
-  await expect
-    .poll(() => extensionWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
-    .toEqual([]);
+  await expect.poll(() => options.evaluate(() => chrome.declarativeNetRequest.getDynamicRules())).toEqual([]);
 
   await options.getByRole('button', { name: 'Restore pre-migration snapshot' }).click();
   const restoreDialog = options.getByRole('dialog');
@@ -897,7 +894,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
   await restoreDialog.getByRole('button', { name: 'Restore snapshot', exact: true }).click();
   await expect
     .poll(async () => {
-      const stored = await extensionWorker.evaluate(async () =>
+      const stored = await options.evaluate(async () =>
         chrome.storage.local.get(['requestRulesMigration', 'requestRulesState']),
       );
       if (!stored.requestRulesMigration || !stored.requestRulesState) {
