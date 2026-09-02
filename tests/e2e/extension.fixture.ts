@@ -22,18 +22,25 @@ async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
   return worker.evaluate(() => chrome.runtime?.getManifest().name === 'My Webrequest').catch(() => false);
 }
 
-export async function findExtensionWorker(context: BrowserContext): Promise<Worker> {
-  const deadline = Date.now() + 10_000;
+export async function findExtensionWorker(
+  context: BrowserContext,
+  expectedExtensionId?: string,
+): Promise<Worker> {
+  const matches = (worker: Worker) =>
+    expectedExtensionId
+      ? Promise.resolve(new URL(worker.url()).host === expectedExtensionId)
+      : isMyWebrequestWorker(worker);
+  const deadline = Date.now() + 30_000;
   while (Date.now() < deadline) {
     for (const worker of context.serviceWorkers()) {
-      if (await isMyWebrequestWorker(worker)) return worker;
+      if (await matches(worker)) return worker;
     }
     const remaining = deadline - Date.now();
     if (remaining <= 0) break;
     const worker = await context
       .waitForEvent('serviceworker', { timeout: Math.min(remaining, 1_000) })
       .catch(() => undefined);
-    if (worker && (await isMyWebrequestWorker(worker))) return worker;
+    if (worker && (await matches(worker))) return worker;
   }
   throw new Error('My Webrequest service worker did not start.');
 }

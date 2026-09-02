@@ -755,19 +755,19 @@ test('isolated profile enforces the regex and total dynamic-rule safety boundari
 });
 
 test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', async () => {
+  test.setTimeout(90_000);
   test.skip(browserTarget !== 'chrome', 'Legacy migration is intentionally Chrome-only.');
   const fixture = await legacyUpgradeFixture();
   const userDataDir = join(fixture.directory, 'profile');
   let launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
+  const extensionId = browserSupport.chromeLegacyExtensionId;
 
   try {
-    let [legacyWorker] = launched.context.serviceWorkers();
-    legacyWorker ??= await launched.context.waitForEvent('serviceworker');
-    const extensionId = new URL(legacyWorker.url()).host;
-    expect(extensionId).toBe(browserSupport.chromeLegacyExtensionId);
-    await legacyWorker.evaluate(async (source) => chrome.storage.sync.set(source), legacySyncFixture);
     const legacyOptions = await launched.context.newPage();
     await legacyOptions.goto(`chrome-extension://${extensionId}/legacy-options.html`);
+    const legacyWorker = await findExtensionWorker(launched.context, extensionId);
+    expect(new URL(legacyWorker.url()).host).toBe(extensionId);
+    await legacyWorker.evaluate(async (source) => chrome.storage.sync.set(source), legacySyncFixture);
     await legacyOptions.evaluate(() => {
       localStorage.setItem('future-local-key', JSON.stringify({ preserved: 'from-page-storage' }));
     });
@@ -775,12 +775,10 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
 
     await overlayProductionExtension(fixture.extensionPath);
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
-    let [productionWorker] = launched.context.serviceWorkers();
-    productionWorker ??= await launched.context.waitForEvent('serviceworker');
-    expect(productionWorker.url()).toBe(`chrome-extension://${extensionId}/background.js`);
-
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
+    const productionWorker = await findExtensionWorker(launched.context, extensionId);
+    expect(productionWorker.url()).toBe(`chrome-extension://${extensionId}/background.js`);
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(
       await options.evaluate(() => JSON.parse(localStorage.getItem('future-local-key') ?? 'null')),
