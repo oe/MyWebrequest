@@ -252,11 +252,7 @@ async function sendElementKey(using, value, key, index) {
   });
 }
 
-const permissionProbeOrigins = [
-  'http://127.0.0.1/*',
-  'http://*.localhost/*',
-  'https://*.localhost/*',
-];
+const permissionProbeOrigins = ['http://127.0.0.1/*', 'http://*.localhost/*', 'https://*.localhost/*'];
 
 async function decideFixturePermission(allow) {
   await executeAsync(
@@ -308,7 +304,9 @@ async function decideFixturePermission(allow) {
     prompt.notifications[0]?.id !== 'addon-webext-permissions-notification' ||
     prompt.notifications[0]?.name !== 'My Webrequest'
   ) {
-    throw new Error(`Firefox permission prompt did not describe the bounded fixture origins: ${JSON.stringify(prompt)}`);
+    throw new Error(
+      `Firefox permission prompt did not describe the bounded fixture origins: ${JSON.stringify(prompt)}`,
+    );
   }
 
   const actionLabel = allow ? 'Allow' : 'Deny';
@@ -431,15 +429,8 @@ try {
      })`,
     { backup: true, legacy: false },
   );
-  await sendElementKey(
-    'xpath',
-    `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`,
-    '\uE00C',
-  );
-  await pollExtension(
-    `document.activeElement?.getAttribute('aria-label') ?? null`,
-    'Settings',
-  );
+  await sendElementKey('xpath', `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`, '\uE00C');
+  await pollExtension(`document.activeElement?.getAttribute('aria-label') ?? null`, 'Settings');
 
   const localeLabels = {
     en: 'Settings',
@@ -485,10 +476,11 @@ try {
   await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
   await pollExtension(
     `({
-       clientWidth: document.documentElement.clientWidth,
+       viewportWidth: window.innerWidth,
+       contentWithinViewport: document.documentElement.clientWidth <= window.innerWidth,
        noHorizontalOverflow: document.documentElement.scrollWidth === document.documentElement.clientWidth,
      })`,
-    { clientWidth: 640, noHorizontalOverflow: true },
+    { viewportWidth: 640, contentWithinViewport: true, noHorizontalOverflow: true },
   );
   await command('POST', `/session/${sessionId}/moz/context`, { context: 'chrome' });
   await executeAsync(
@@ -835,15 +827,21 @@ try {
     redirectUrl: `http://localhost:${fixture.port}/target/captured-value`,
     header: 'header:cross-origin-pass',
   };
-  if (JSON.stringify(stableJson(crossOriginResult)) !== JSON.stringify(stableJson(expectedCrossOriginResult))) {
-    throw new Error(`Firefox cross-origin rules produced an unexpected result: ${JSON.stringify(crossOriginResult)}`);
+  if (
+    JSON.stringify(stableJson(crossOriginResult)) !== JSON.stringify(stableJson(expectedCrossOriginResult))
+  ) {
+    throw new Error(
+      `Firefox cross-origin rules produced an unexpected result: ${JSON.stringify(crossOriginResult)}`,
+    );
   }
   if (
     fixture.hits.redirectMisses !== 0 ||
     fixture.hits.redirectedPath !== '/target/captured-value' ||
     fixture.hits.receivedHeader !== 'cross-origin-pass'
   ) {
-    throw new Error(`Firefox cross-origin fixtures were not modified as expected: ${JSON.stringify(fixture.hits)}`);
+    throw new Error(
+      `Firefox cross-origin fixtures were not modified as expected: ${JSON.stringify(fixture.hits)}`,
+    );
   }
 
   await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
