@@ -12,6 +12,8 @@ import {
   type Worker,
 } from '@playwright/test';
 
+import browserSupport from '../../browser-support.json' with { type: 'json' };
+
 type ExtensionFixtures = {
   context: BrowserContext;
   extensionId: string;
@@ -115,8 +117,14 @@ async function launchExternalChromium(
     context,
     close: async () => {
       await browser.close();
-      if (child.exitCode === null) child.kill('SIGTERM');
       if (child.exitCode === null) {
+        await Promise.race([
+          new Promise((resolveExit) => child.once('exit', resolveExit)),
+          new Promise((resolveWait) => setTimeout(resolveWait, 3_000)),
+        ]);
+      }
+      if (child.exitCode === null) {
+        child.kill('SIGTERM');
         await Promise.race([
           new Promise((resolveExit) => child.once('exit', resolveExit)),
           new Promise((resolveWait) => setTimeout(resolveWait, 2_000)),
@@ -163,7 +171,14 @@ export const test = base.extend<ExtensionFixtures>({
     }
   },
   extensionWorker: async ({ context }, run) => {
-    const worker = await findExtensionWorker(context);
+    const expectedExtensionId =
+      process.env.MWR_BROWSER_TARGET === 'edge' ? undefined : browserSupport.chromeLegacyExtensionId;
+    const wakePage = expectedExtensionId ? await context.newPage() : undefined;
+    if (wakePage) {
+      await wakePage.goto(`chrome-extension://${expectedExtensionId}/options.html`);
+    }
+    const worker = await findExtensionWorker(context, expectedExtensionId);
+    await wakePage?.close();
     await run(worker);
   },
   extensionId: async ({ extensionWorker }, run) => {
