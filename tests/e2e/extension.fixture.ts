@@ -86,7 +86,10 @@ async function launchExternalChromium(
 
   let browser: Browser | undefined;
   let connectionError: unknown;
-  for (let attempt = 0; attempt < 100; attempt += 1) {
+  // A freshly unpacked installation-floor browser can spend noticeably longer
+  // creating its first profile on a cold CI runner. Match the worker startup
+  // budget below instead of treating that one-time initialization as a failure.
+  for (let attempt = 0; attempt < 300; attempt += 1) {
     if (child.exitCode !== null) break;
     try {
       const [port] = (await readFile(activePortPath, 'utf8')).split('\n');
