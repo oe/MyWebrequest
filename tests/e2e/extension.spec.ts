@@ -357,11 +357,9 @@ async function stopExtensionServiceWorker(
 test('clean install exposes the product UI without required host access', async ({
   context,
   extensionId,
-  extensionWorker,
+  extensionPage,
 }) => {
-  const origins = await extensionWorker.evaluate(
-    async () => (await chrome.permissions.getAll()).origins ?? [],
-  );
+  const origins = await extensionPage.evaluate(async () => (await chrome.permissions.getAll()).origins ?? []);
   expect(origins).toEqual([]);
 
   const options = await context.newPage();
@@ -427,10 +425,10 @@ test('all six locales switch by keyboard, persist, and fit the compact layout', 
 test('rule filters compose and quota statistics stay fixed below the scrolling list', async ({
   context,
   extensionId,
-  extensionWorker,
+  extensionPage,
 }) => {
   const rules = [...quotaRules(24, 'url-filter'), ...permissionRules()];
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
     stateWith(rules),
   );
@@ -522,7 +520,7 @@ test.describe('hostless HTTPS upgrade', () => {
   test('upgrades a real local navigation without requesting host access', async ({
     context,
     extensionId,
-    extensionWorker,
+    extensionPage,
   }) => {
     const tls = await localTlsCredentials();
     let upgradeHits = 0;
@@ -540,13 +538,13 @@ test.describe('hostless HTTPS upgrade', () => {
     const rule = upgradeRule(port);
 
     try {
-      await extensionWorker.evaluate(
+      await extensionPage.evaluate(
         async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
         stateWith([rule]),
       );
       await expect
         .poll(() =>
-          extensionWorker.evaluate(
+          extensionPage.evaluate(
             async (dnrId) =>
               (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
             rule.dnrId,
@@ -554,7 +552,7 @@ test.describe('hostless HTTPS upgrade', () => {
         )
         .toBe(true);
       expect(
-        await extensionWorker.evaluate(async () => (await chrome.permissions.getAll()).origins ?? []),
+        await extensionPage.evaluate(async () => (await chrome.permissions.getAll()).origins ?? []),
       ).toEqual([]);
 
       const options = await context.newPage();
@@ -580,11 +578,11 @@ test.describe('hostless HTTPS upgrade', () => {
 test('permission previews stay bounded and cancel without changing runtime state', async ({
   context,
   extensionId,
-  extensionWorker,
+  extensionPage,
 }) => {
   const [navigationRule, subresourceRule] = permissionRules();
   if (!navigationRule || !subresourceRule) throw new Error('Permission fixtures are incomplete.');
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
     stateWith([navigationRule, subresourceRule]),
   );
@@ -617,7 +615,7 @@ test('permission previews stay bounded and cancel without changing runtime state
   await expect(requestedOrigins.getByText('https://api.example/*', { exact: true })).toBeVisible();
   await permissionDialog.getByRole('button', { name: 'Cancel', exact: true }).click();
 
-  const runtime = await extensionWorker.evaluate(async () => {
+  const runtime = await extensionPage.evaluate(async () => {
     const stored = await chrome.storage.local.get('requestRulesState');
     return {
       enabled: Object.values((stored.requestRulesState as StoredState).rules).map((rule) => rule.enabled),
@@ -712,19 +710,19 @@ test('fixture-granted origins prove cross-origin redirect substitution and reque
 });
 
 test('isolated profile enforces the regex and total dynamic-rule safety boundaries', async ({
-  extensionWorker,
+  extensionPage,
 }) => {
   test.setTimeout(90_000);
 
   const regexRules = quotaRules(902, 'regex');
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
     stateWith(regexRules),
   );
   await expect
     .poll(
       () =>
-        extensionWorker.evaluate(async () =>
+        extensionPage.evaluate(async () =>
           (await chrome.declarativeNetRequest.getDynamicRules())
             .map((rule) => rule.id)
             .sort((left, right) => left - right),
@@ -734,14 +732,14 @@ test('isolated profile enforces the regex and total dynamic-rule safety boundari
     .toEqual(regexRules.slice(0, 900).map((rule) => rule.dnrId));
 
   const dynamicRules = quotaRules(4_502, 'url-filter');
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
     stateWith(dynamicRules),
   );
   await expect
     .poll(
       () =>
-        extensionWorker.evaluate(async () => {
+        extensionPage.evaluate(async () => {
           const rules = await chrome.declarativeNetRequest.getDynamicRules();
           return {
             count: rules.length,
@@ -765,12 +763,12 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
   try {
     const legacyOptions = await launched.context.newPage();
     await legacyOptions.goto(`chrome-extension://${extensionId}/legacy-options.html`);
-    const legacyWorker = await findExtensionWorker(launched.context, extensionId);
-    expect(new URL(legacyWorker.url()).host).toBe(extensionId);
-    await legacyWorker.evaluate(async (source) => chrome.storage.sync.set(source), legacySyncFixture);
+    expect(await legacyOptions.evaluate(() => chrome.runtime.id)).toBe(extensionId);
+    await legacyOptions.evaluate(async (source) => chrome.storage.sync.set(source), legacySyncFixture);
     await legacyOptions.evaluate(() => {
       localStorage.setItem('future-local-key', JSON.stringify({ preserved: 'from-page-storage' }));
     });
+    await legacyOptions.close();
     await launched.close();
 
     await overlayProductionExtension(fixture.extensionPath);
@@ -912,12 +910,12 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
 test('backup export supports safe merge, replacement, and recovery', async ({
   context,
   extensionId,
-  extensionWorker,
+  extensionPage,
 }) => {
   const sourceRule = backupRule('source-a', 1_910_001, 'https://source.example/*', true);
   const currentRule = backupRule('current-b', 1_910_002, 'https://current.example/*', false);
 
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (sourceState) => chrome.storage.local.set({ requestRulesState: sourceState }),
     stateWith([sourceRule]),
   );
@@ -941,7 +939,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
     enabled: true,
   });
 
-  await extensionWorker.evaluate(
+  await extensionPage.evaluate(
     async (currentState) => chrome.storage.local.set({ requestRulesState: currentState }),
     stateWith([currentRule]),
   );
@@ -962,7 +960,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
 
   await expect
     .poll(async () => {
-      const stored = await extensionWorker.evaluate(async () =>
+      const stored = await extensionPage.evaluate(async () =>
         chrome.storage.local.get(['requestRulesState', 'ruleImportRecovery']),
       );
       const state = stored.requestRulesState as StoredState;
@@ -985,7 +983,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
 
   await expect
     .poll(async () => {
-      const stored = await extensionWorker.evaluate(async () =>
+      const stored = await extensionPage.evaluate(async () =>
         chrome.storage.local.get(['requestRulesState', 'ruleImportRecovery']),
       );
       const state = stored.requestRulesState as StoredState;
@@ -1012,7 +1010,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
 
   await expect
     .poll(async () => {
-      const stored = await extensionWorker.evaluate(async () =>
+      const stored = await extensionPage.evaluate(async () =>
         chrome.storage.local.get(['requestRulesState', 'ruleImportRecovery']),
       );
       const state = stored.requestRulesState as StoredState;
@@ -1030,7 +1028,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
 test('block rules reconcile across popup pause and service-worker restart', async ({
   context,
   extensionId,
-  extensionWorker,
+  extensionPage,
 }) => {
   let blockedPathHits = 0;
   const server = http.createServer((request, response) => {
@@ -1042,7 +1040,7 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
   const rule = blockRule(port);
 
   try {
-    await extensionWorker.evaluate(
+    await extensionPage.evaluate(
       async (nextState) => {
         await chrome.storage.local.set({ requestRulesState: nextState });
       },
@@ -1050,7 +1048,7 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
     );
     await expect
       .poll(() =>
-        extensionWorker.evaluate(
+        extensionPage.evaluate(
           async (dnrId) =>
             (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
           rule.dnrId,
@@ -1073,7 +1071,7 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
     const pauseSwitch = popup.getByRole('switch', { name: 'Pause all rules' });
     await pauseSwitch.click();
     await expect
-      .poll(() => extensionWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
+      .poll(() => extensionPage.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
       .toEqual([]);
     await expect(options.getByText('Paused', { exact: true }).first()).toBeVisible();
 
@@ -1084,7 +1082,7 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
     await pauseSwitch.click();
     await expect
       .poll(() =>
-        extensionWorker.evaluate(
+        extensionPage.evaluate(
           async (dnrId) =>
             (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
           rule.dnrId,
@@ -1115,12 +1113,12 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
     const verifiedRestartedWorker = restartedWorker;
     expect(new URL(verifiedRestartedWorker.url()).host).toBe(extensionId);
     await expect
-      .poll(() => verifiedRestartedWorker.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
+      .poll(() => extensionPage.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
       .toEqual([]);
     await pauseSwitch.click();
     await expect
       .poll(() =>
-        verifiedRestartedWorker.evaluate(
+        extensionPage.evaluate(
           async (dnrId) =>
             (await chrome.declarativeNetRequest.getDynamicRules()).some((item) => item.id === dnrId),
           rule.dnrId,

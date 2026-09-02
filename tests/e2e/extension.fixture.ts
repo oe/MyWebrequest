@@ -9,6 +9,7 @@ import {
   test as base,
   type Browser,
   type BrowserContext,
+  type Page,
   type Worker,
 } from '@playwright/test';
 
@@ -17,7 +18,7 @@ import browserSupport from '../../browser-support.json' with { type: 'json' };
 type ExtensionFixtures = {
   context: BrowserContext;
   extensionId: string;
-  extensionWorker: Worker;
+  extensionPage: Page;
 };
 
 async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
@@ -116,6 +117,7 @@ async function launchExternalChromium(
   return {
     context,
     close: async () => {
+      await Promise.all(context.pages().map((page) => page.close().catch(() => undefined)));
       await browser.close();
       if (child.exitCode === null) {
         await Promise.race([
@@ -170,20 +172,19 @@ export const test = base.extend<ExtensionFixtures>({
       await launched.close();
     }
   },
-  extensionWorker: async ({ context }, run) => {
-    const expectedExtensionId =
-      process.env.MWR_BROWSER_TARGET === 'edge' ? undefined : browserSupport.chromeLegacyExtensionId;
-    const wakePage = expectedExtensionId ? await context.newPage() : undefined;
-    if (wakePage) {
-      await wakePage.goto(`chrome-extension://${expectedExtensionId}/options.html`);
+  extensionId: async ({ context }, run) => {
+    if (process.env.MWR_BROWSER_TARGET !== 'edge') {
+      await run(browserSupport.chromeLegacyExtensionId);
+      return;
     }
-    const worker = await findExtensionWorker(context, expectedExtensionId);
-    await wakePage?.close();
-    await run(worker);
+    const worker = await findExtensionWorker(context);
+    await run(new URL(worker.url()).host);
   },
-  extensionId: async ({ extensionWorker }, run) => {
-    const extensionId = new URL(extensionWorker.url()).host;
-    await run(extensionId);
+  extensionPage: async ({ context, extensionId }, run) => {
+    const extensionPage = await context.newPage();
+    await extensionPage.goto(`chrome-extension://${extensionId}/options.html`);
+    await run(extensionPage);
+    await extensionPage.close();
   },
 });
 
