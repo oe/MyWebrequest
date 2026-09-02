@@ -1,0 +1,47 @@
+---
+import {
+  ArrowUpRight,
+  BookOpen,
+  FingerprintPattern,
+  GitCompareArrows,
+  ShieldCheck,
+  Wrench,
+  Zap,
+} from '@lucide/astro';
+import { guideCopy, guideSlugs, type Locale } from '../content';
+import { localizedPath } from '../lib/routes';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const icons = {
+  'quick-start': Zap,
+  matching: GitCompareArrows,
+  actions: Wrench,
+  permissions: ShieldCheck,
+  migration: FingerprintPattern,
+  troubleshooting: BookOpen,
+};
+---
+
+<div class="guide-grid">
+  {
+    guideSlugs.map((slug) => {
+      const guide = guideCopy(locale, slug);
+      const Icon = icons[slug];
+      return (
+        <a class="guide-link" href={localizedPath(locale, `guides/${slug}`)}>
+          <Icon aria-hidden="true" size={20} stroke-width={1.7} />
+          <span>
+            <>
+              <strong>{guide.title}</strong>
+              <small>{guide.description}</small>
+            </>
+          </span>
+          <ArrowUpRight class="guide-arrow" aria-hidden="true" size={16} />
+        </a>
+      );
+    })
+  }
+</div>

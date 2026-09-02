@@ -1,0 +1,13 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { localizedPath } from '../lib/routes';
+---
+
+<BaseLayout locale="en" title="Page not found">
+  <section class="not-found shell">
+    <p class="eyebrow">404</p><h1>Page not found</h1><p>The page may have moved into the guide library.</p><a
+      class="button primary"
+      href={localizedPath('en')}>Return home</a
+    >
+  </section>
+</BaseLayout>

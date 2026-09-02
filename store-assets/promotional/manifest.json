@@ -2,67 +2,67 @@
   "schemaVersion": 1,
   "source": {
     "path": "store-assets/brand/app-icon.svg",
-    "sha256": "efbb57b1bccea87569b427797ec1f2779575fad1c60b0ef703066b13bac2704a"
+    "sha256": "1f82bc79eb6bdd6f03802bda2287cddd3d58265bae52d4c267562efb2398fb59"
   },
   "generatedWith": {
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-01T19:30:55.493Z",
+  "generatedAt": "2026-09-02T17:14:28.684Z",
   "assets": [
     {
       "path": "src/public/icon/16.png",
       "purpose": "Runtime toolbar icon",
-      "sha256": "90c18c52cbf1959229185543439cc439bbd680e719e49d61713066932499c5a9",
+      "sha256": "96da9aebf33057d9e3693b43d4763a71e3102089bf8353c3c70b8fe8d6245ecb",
       "width": 16,
       "height": 16
     },
     {
       "path": "src/public/icon/32.png",
       "purpose": "Runtime toolbar icon",
-      "sha256": "a1e9b8eb76466ac7562496f54e5ddbed834fbb44c696b98ce60478b045fdf789",
+      "sha256": "00463f5e662e8a5e64cb8d8883b3f24cd41d51965ef600f172ea541007f199a2",
       "width": 32,
       "height": 32
     },
     {
       "path": "src/public/icon/48.png",
       "purpose": "Runtime extension icon",
-      "sha256": "14b6d8fc91231594a9174147a448ef9a7011480b0172db1ff1c312c0abd218e3",
+      "sha256": "9ab223b7ee6523242a220a7120396bd2eb7b87bc846f7ad36dd0c2e4be5f84ee",
       "width": 48,
       "height": 48
     },
     {
       "path": "src/public/icon/96.png",
       "purpose": "Runtime extension icon",
-      "sha256": "4bf73d61c8e2fdd8717065ad3b9667fec1dd7c12fd8555ad94982098711d9940",
+      "sha256": "082df32195de06de2d1147df83cd326f99a9e888c3f05cb1665757be82b79948",
       "width": 96,
       "height": 96
     },
     {
       "path": "src/public/icon/128.png",
       "purpose": "Chrome and Firefox store icon",
-      "sha256": "e2d0623147629ec566c1406d142dd185964a9815bd6f03069e70d82ee1445b3c",
+      "sha256": "977cec924a2fef795fc6b1e75e675fd4f06b1884e16fdae9618c1f81c37bfa65",
       "width": 128,
       "height": 128
     },
     {
       "path": "store-assets/promotional/edge/logo-300.png",
       "purpose": "Edge listing logo",
-      "sha256": "382851d2bd836c4ef32c841f0f4ecd620bf7d32e34ba231e8aba1376ba746b1e",
+      "sha256": "c8b308e0e9de0d7668132fadd8a6a5b70c22947c5fd17020698e428d0411a99f",
       "width": 300,
       "height": 300
     },
     {
       "path": "store-assets/promotional/chrome/small-promo-440x280.png",
       "purpose": "Chrome small promotional tile",
-      "sha256": "6a7ab7a80cb6fddd06dfd02a905c5743ebda50ac3382457eda9a3344aa902c33",
+      "sha256": "84cacba72c334e88443452035646ab8a1f000f178a183d723be65124d282f1ad",
       "width": 440,
       "height": 280
     },
     {
       "path": "store-assets/promotional/edge/small-promo-440x280.png",
       "purpose": "Edge small promotional tile",
-      "sha256": "6a7ab7a80cb6fddd06dfd02a905c5743ebda50ac3382457eda9a3344aa902c33",
+      "sha256": "84cacba72c334e88443452035646ab8a1f000f178a183d723be65124d282f1ad",
       "width": 440,
       "height": 280
     }

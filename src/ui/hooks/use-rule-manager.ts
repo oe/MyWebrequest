@@ -2,12 +2,14 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   createRule,
+  createStarterRule,
   duplicateRule,
   removeRule,
   restoreRule,
   updatePausedState,
   upsertRule,
 } from '@/application/rule-service';
+import type { StarterRuleKind } from '@/application/rule-service';
 import { commitRuleState } from '@/application/rule-transaction';
 import {
   readRuleRuntimeSnapshot,
@@ -296,6 +298,17 @@ export function useRuleManager() {
     [persist],
   );
 
+  const addStarterRule = useCallback(
+    async (kind: StarterRuleKind, name: string) => {
+      const current = stateRef.current;
+      if (!current) return;
+      const rule = createStarterRule(kind, name);
+      await persist(upsertRule(current, rule));
+      setSelectedId(rule.id);
+    },
+    [persist],
+  );
+
   const deleteRule = useCallback(
     async (id: string) => {
       const current = stateRef.current;
@@ -391,6 +404,7 @@ export function useRuleManager() {
   return {
     adoptState,
     addRule,
+    addStarterRule,
     copyRule,
     deleteRule,
     diagnostics,

@@ -91,6 +91,9 @@ unless explicitly approved.
 - Chrome action popup for current-site status and quick entry.
 - Full-page options UI as the primary rule manager.
 - First-run or upgrade migration flow inside the options UI.
+- Unified first-run empty state with three disabled, editable starter rules and a blank-rule path.
+- Static six-language product/help site covering quick start, matching, actions, permissions, migration,
+  and troubleshooting.
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish from the first release.
 - Shared Chrome, Edge, and Firefox Manifest V3 builds, with a separate release gate for each browser.
 
@@ -163,6 +166,8 @@ unless explicitly approved.
 - Show action, scope, enabled state, and permission state in each row.
 - Make unsupported or blocked states actionable rather than decorative.
 - Support undo after deleting one rule; require a preview for bulk deletion.
+- When no rules exist, show one coherent onboarding state. Starter examples must be regular editable rules,
+  created disabled and validated through the same path as user-authored rules.
 
 ### Rule editor
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArchiveRestoreIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
+import type { StarterRuleKind } from '@/application/rule-service';
 import type { Rule } from '@/domain/rules/model';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { supportsLegacyMigration } from '@/infrastructure/browser-capabilities';
@@ -143,6 +144,23 @@ export function OptionsApp() {
     setCreating(true);
     try {
       await manager.addRule(undefined, t('untitledRule'));
+    } catch (error) {
+      toast.error(errorMessage(error, t('createRuleError')));
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const handleStarterCreate = async (kind: StarterRuleKind) => {
+    if (creating) return;
+    setCreating(true);
+    const names: Record<StarterRuleKind, string> = {
+      'block-analytics': t('starterBlockName'),
+      'redirect-local': t('starterRedirectName'),
+      'remove-referrer': t('starterHeaderName'),
+    };
+    try {
+      await manager.addStarterRule(kind, names[kind]);
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {
@@ -364,7 +382,10 @@ export function OptionsApp() {
               )}
             </>
           ) : (
-            <EmptyRules onCreate={() => void handleCreate()} />
+            <EmptyRules
+              onCreate={() => void handleCreate()}
+              onCreateStarter={(kind) => void handleStarterCreate(kind)}
+            />
           )}
         </div>
       </main>

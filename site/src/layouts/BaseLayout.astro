@@ -1,0 +1,105 @@
+---
+import { Image } from 'astro:assets';
+import icon from '../assets/app-icon.svg';
+import { homeCopy, localeNames, locales, type Locale } from '../content';
+import { localizedPath, withBase } from '../lib/routes';
+import '../styles/global.css';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  path?: string;
+}
+
+const { locale, title, description, path = '' } = Astro.props;
+const copy = homeCopy[locale];
+const pageTitle = title ? `${title} · My Webrequest` : 'My Webrequest — Clear, local request rules';
+const pageDescription = description ?? copy.description;
+const canonical = new URL(localizedPath(locale, path), Astro.site);
+const socialImage = new URL(withBase('app-icon.svg'), Astro.site);
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'My Webrequest',
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Microsoft Edge, Firefox',
+  description: pageDescription,
+  codeRepository: 'https://github.com/oe/MyWebrequest',
+  license: 'https://github.com/oe/MyWebrequest/blob/master/LICENSE',
+};
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={pageDescription} />
+    <meta name="theme-color" content="#f7f9fc" />
+    <link rel="icon" type="image/svg+xml" href={withBase('app-icon.svg')} />
+    <link rel="canonical" href={canonical} />
+    {
+      locales.map((alternate) => (
+        <link
+          rel="alternate"
+          hreflang={alternate}
+          href={new URL(localizedPath(alternate, path), Astro.site)}
+        />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={new URL(localizedPath('en', path), Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="My Webrequest" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={pageDescription} />
+    <title>{pageTitle}</title>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(schema)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href={localizedPath(locale)} aria-label="My Webrequest home">
+          <Image src={icon} alt="" width={34} height={34} />
+          <span>My Webrequest</span>
+        </a>
+        <nav aria-label="Primary navigation">
+          <a href={localizedPath(locale, 'guides/quick-start')}>{copy.navGuides}</a>
+          <a href={localizedPath(locale, 'guides/permissions')}>{copy.navPrivacy}</a>
+          <a href="https://github.com/oe/MyWebrequest">{copy.openGithub}</a>
+          <details class="locale-menu">
+            <summary>{localeNames[locale]}</summary>
+            <div class="locale-options">
+              {
+                locales.map((item) => (
+                  <a aria-current={item === locale ? 'page' : undefined} href={localizedPath(item, path)}>
+                    {localeNames[item]}
+                  </a>
+                ))
+              }
+            </div>
+          </details>
+        </nav>
+      </div>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <div class="brand footer-brand">
+          <Image src={icon} alt="" width={28} height={28} /><span>My Webrequest</span>
+        </div>
+        <p>{copy.footer}</p>
+        <a href="https://github.com/oe/MyWebrequest">GitHub</a>
+      </div>
+    </footer>
+  </body>
+</html>

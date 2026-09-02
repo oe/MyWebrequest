@@ -1,0 +1,101 @@
+---
+import { Image } from 'astro:assets';
+import { ArrowRight, Check, CodeXml, LockKeyhole, Sparkles } from '@lucide/astro';
+import rulesOverview from '../assets/rules-overview.png';
+import { homeCopy, type Locale } from '../content';
+import { githubUrl, localizedPath } from '../lib/routes';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import GuideLinks from './GuideLinks.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const copy = homeCopy[locale];
+---
+
+<BaseLayout locale={locale}>
+  <section class="hero shell">
+    <div class="hero-copy">
+      <p class="eyebrow"><Sparkles size={15} aria-hidden="true" />{copy.eyebrow}</p>
+      <h1>{copy.title}</h1>
+      <p class="lede">{copy.description}</p>
+      <div class="hero-actions">
+        <a class="button primary" href={localizedPath(locale, 'guides/quick-start')}
+          >{copy.quickStart}<ArrowRight size={16} /></a
+        >
+        <a class="button secondary" href={githubUrl()}><CodeXml size={16} />{copy.github}</a>
+      </div>
+      <p class="compatibility"><Check size={15} aria-hidden="true" />{copy.compatibility}</p>
+    </div>
+    <div class="product-frame" aria-label="My Webrequest rule manager preview">
+      <div class="window-bar"><span></span><span></span><span></span><small>My Webrequest</small></div>
+      <Image
+        src={rulesOverview}
+        alt="My Webrequest rule manager showing a redirect rule"
+        widths={[640, 960, 1280]}
+        sizes="(max-width: 800px) 94vw, 52vw"
+        loading="eager"
+      />
+    </div>
+  </section>
+
+  <section class="section workflow-section">
+    <div class="shell">
+      <div class="section-heading narrow">
+        <p class="eyebrow">{copy.workflowEyebrow}</p>
+        <h2>{copy.workflowTitle}</h2>
+        <p>{copy.workflowDescription}</p>
+      </div>
+      <ol class="workflow">
+        {
+          copy.steps.map((step, index) => (
+            <li>
+              <>
+                <span>{index + 1}</span>
+                <div>
+                  <>
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                  </>
+                </div>
+              </>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section shell">
+    <div class="section-heading"><h2>{copy.capabilitiesTitle}</h2></div>
+    <div class="capability-grid">
+      {
+        copy.capabilities.map((capability, index) => (
+          <article>
+            <>
+              <small>0{index + 1}</small>
+              <h3>{capability.title}</h3>
+              <p>{capability.description}</p>
+            </>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section guide-section">
+    <div class="shell">
+      <div class="section-heading narrow"><h2>{copy.guidesTitle}</h2><p>{copy.guidesDescription}</p></div>
+      <GuideLinks locale={locale} />
+    </div>
+  </section>
+
+  <section class="section shell trust-section">
+    <LockKeyhole size={28} aria-hidden="true" />
+    <div><h2>{copy.trustTitle}</h2><p>{copy.trustDescription}</p></div>
+    <a class="text-link" href={localizedPath(locale, 'guides/permissions')}
+      >{copy.navPrivacy}<ArrowRight size={15} /></a
+    >
+  </section>
+</BaseLayout>

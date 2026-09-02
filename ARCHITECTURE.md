@@ -24,6 +24,7 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 | Language        | TypeScript strict                                    | Typed domain models and safer Chrome API integration                                    |
 | UI              | React for popup/options only                         | Existing team familiarity and component/state needs without putting React in the worker |
 | Styling         | Tailwind CSS v4 plus shadcn `radix-nova` tokens      | Local CSS variables and utilities, no runtime CSS-in-JS                                 |
+| Website         | Astro 7 static output                                | Minimal client JavaScript, optimized assets, localized SEO, GitHub Pages deployment     |
 | Unit tests      | Vitest                                               | Fast pure-domain and component tests                                                    |
 | E2E             | Playwright Chromium                                  | Real extension installation, downloads, storage, DNR, and service-worker testing        |
 | Validation      | Versioned JSON Schema with a typed runtime validator | Treat imports and legacy data as untrusted                                              |
@@ -84,12 +85,23 @@ tests/
   unit/
   integration/
   e2e/
+site/
+  src/
+    assets/
+    components/
+    layouts/
+    pages/
+    styles/
 ```
 
 WXT uses `src/` as its source root. Entrypoints contain only browser/page bootstrap adapters; UI composition,
 application behavior, domain logic, infrastructure adapters, and copied extension assets all live beneath `src/`.
 WXT-generated directories and `dist/` build output are ignored. Source code contains no generated manifest or
 compiled JavaScript.
+
+The website is an independent workspace package under `site/`. All authored website code and image inputs
+live in `site/src/`; `site/public/` contains only static public entry assets, and `site/dist/` is generated.
+The extension links to stable locale-aware routes through `src/ui/help-links.ts`.
 
 ## 4. Layer responsibilities
 

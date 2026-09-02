@@ -4,6 +4,8 @@ import { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
 export { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
+export type StarterRuleKind = 'block-analytics' | 'redirect-local' | 'remove-referrer';
+
 export function createRule(origin?: string, name = 'Untitled rule'): Rule {
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
@@ -22,6 +24,51 @@ export function createRule(origin?: string, name = 'Untitled rule'): Rule {
     createdAt: now,
     updatedAt: now,
   };
+}
+
+export function createStarterRule(kind: StarterRuleKind, name: string): Rule {
+  const rule = createRule(undefined, name);
+  switch (kind) {
+    case 'block-analytics':
+      return {
+        ...rule,
+        condition: {
+          url: { kind: 'url-filter', value: '||analytics.example.com^' },
+          resourceTypes: ['xmlhttprequest', 'ping'],
+        },
+        action: { kind: 'block' },
+        permissionOrigins: [],
+      };
+    case 'redirect-local': {
+      const match = 'https://api.example.com/v1/*';
+      return {
+        ...rule,
+        condition: {
+          url: { kind: 'wildcard', value: match },
+          resourceTypes: ['xmlhttprequest'],
+          initiatorDomains: ['app.example.com'],
+        },
+        action: { kind: 'redirect', target: 'http://localhost:3000/v1/$1' },
+        permissionOrigins: permissionOriginsFromMatch(match),
+      };
+    }
+    case 'remove-referrer': {
+      const match = 'https://images.example.com/*';
+      return {
+        ...rule,
+        condition: {
+          url: { kind: 'wildcard', value: match },
+          resourceTypes: ['image'],
+          initiatorDomains: ['app.example.com'],
+        },
+        action: {
+          kind: 'modify-request-headers',
+          operations: [{ header: 'Referer', operation: 'remove' }],
+        },
+        permissionOrigins: permissionOriginsFromMatch(match),
+      };
+    }
+  }
 }
 
 export function upsertRule(state: StoredState, rule: Rule): StoredState {

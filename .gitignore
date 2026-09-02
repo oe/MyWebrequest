@@ -3,6 +3,7 @@
 node_modules/
 app.zip
 .wxt/
+site/.astro/
 coverage/
 dist/
 playwright-report/

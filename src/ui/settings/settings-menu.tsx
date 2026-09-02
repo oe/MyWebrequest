@@ -1,4 +1,10 @@
-import { ArchiveRestoreIcon, DatabaseBackupIcon, SettingsIcon } from 'lucide-react';
+import {
+  ArchiveRestoreIcon,
+  BookOpenIcon,
+  DatabaseBackupIcon,
+  ExternalLinkIcon,
+  SettingsIcon,
+} from 'lucide-react';
 
 import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
@@ -11,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '@/ui/components/dropdown-menu';
 import { useI18n } from '@/ui/i18n';
+import { helpUrl } from '@/ui/help-links';
 import { cn } from '@/ui/lib/utils';
 
 type SettingsMenuProps = {
@@ -28,7 +35,7 @@ export function SettingsMenu({
   onOpenData,
   onOpenMigration,
 }: SettingsMenuProps) {
-  const { t } = useI18n();
+  const { locale, t } = useI18n();
 
   return (
     <DropdownMenu>
@@ -52,6 +59,13 @@ export function SettingsMenu({
           <DropdownMenuItem onSelect={onOpenData}>
             <DatabaseBackupIcon />
             {t('dataManagement')}
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a href={helpUrl(locale)} target="_blank" rel="noreferrer">
+              <BookOpenIcon />
+              {t('helpCenter')}
+              <ExternalLinkIcon className="ml-auto size-3 text-muted-foreground" />
+            </a>
           </DropdownMenuItem>
           {showMigration ? (
             <DropdownMenuItem onSelect={onOpenMigration}>

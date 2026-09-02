@@ -9,10 +9,10 @@ Japanese, French, and Spanish. The shared descriptions intentionally contain no 
 claim. Only `chromeLegacyMigrationNote` may be appended to the Chrome listing; it must never be copied to
 Edge Add-ons or AMO.
 
-The canonical original icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
+The canonical icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
 16/32/48/96/128px PNG matrix, Edge's 300px listing logo, and Chrome/Edge 440x280 promotional tiles. The
-branching route remains recognizable at toolbar size; the larger lens and restrained translucent material
-connect the icon to the product UI without relying on blur for legibility.
+standalone blue globe and white Americas preserve the legacy identity at toolbar size; cleaner edges and a
+restrained highlight connect it to the current product UI without depending on blur for legibility.
 
 - Chrome Web Store accepts 1280x800 or 640x400 screenshots and recommends the larger size.
 - Microsoft Edge Add-ons accepts 1280x800 or 640x480 screenshots.

@@ -168,10 +168,10 @@ system canvas and text colors.
 
 ## 12. Brand icon and store artwork
 
-The V1 icon replaces the generic legacy globe with an original branching-route mark inside a dark blue
-glass lens. The route is the semantic core and must remain recognizable at 16px; the lens, edge highlight,
-and depth are progressive detail for larger sizes. There is no text, blur dependency, or platform logo in
-the runtime icon.
+The V1 icon is a conservative remaster of the established glossy blue globe. It preserves the standalone
+circular silhouette, white Americas landmass, cyan-to-deep-blue ocean, and small-size recognition of the
+legacy mark while cleaning edges and reducing incidental detail. There is no outer tile, route/network
+symbol, text, blur dependency, or platform logo in the runtime icon.
 
 Store artwork may use the same restrained ice-blue material and one short product line, but must remain
 full-bleed and quiet. It must not turn screenshots into device mockups or introduce features that do not

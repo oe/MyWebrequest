@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   createRule,
+  createStarterRule,
   duplicateRule,
   permissionOriginsFromMatch,
   removeRule,
@@ -78,6 +79,21 @@ describe('rule service', () => {
     expect(rule.enabled).toBe(false);
     expect(rule.condition.url.value).toBe('https://docs.example.com/*');
     expect(rule.permissionOrigins).toEqual(['https://docs.example.com/*']);
+  });
+
+  it.each([
+    ['block-analytics', 'block', '||analytics.example.com^', ['xmlhttprequest', 'ping']],
+    ['redirect-local', 'redirect', 'https://api.example.com/v1/*', ['xmlhttprequest']],
+    ['remove-referrer', 'modify-request-headers', 'https://images.example.com/*', ['image']],
+  ] as const)('creates a disabled and valid %s starter', (kind, action, match, resourceTypes) => {
+    const rule = createStarterRule(kind, `Starter ${kind}`);
+    expect(rule).toMatchObject({
+      name: `Starter ${kind}`,
+      enabled: false,
+      action: { kind: action },
+      condition: { url: { value: match }, resourceTypes },
+    });
+    expect(validateRule(rule)).toMatchObject({ valid: true, errors: [] });
   });
 
   it('adds and removes a rule without leaving a dangling order entry', () => {

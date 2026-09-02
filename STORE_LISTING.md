@@ -47,5 +47,5 @@ checksummed release artifact. A migration review image is Chrome-only and should
 existing Chrome users. Do not claim Chrome, Edge, or Firefox support until that browser's installed-extension
 certification row in [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md) is complete.
 
-Use the original branching-route icon and the audited 440x280 promotional tile from `store-assets/`. Do not
-substitute the legacy globe icon or upload a resized screenshot as promotional artwork.
+Use the conservatively remastered blue-globe icon and the audited 440x280 promotional tile from
+`store-assets/`. Do not substitute an unrelated symbol or upload a resized screenshot as promotional artwork.

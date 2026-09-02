@@ -25,8 +25,10 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
   worker restart, bounded permission previews, forced-color/reduced-motion behavior, six-locale keyboard
   switching, legacy migration, and backup recovery
 - Chrome, Edge, and Firefox Manifest V3 build targets
-- Original branching-route icon, browser-size icon matrix, and audited Chrome/Edge promotional artwork
+- Conservatively remastered original blue-globe icon, browser-size icon matrix, and audited Chrome/Edge
+  promotional artwork
 - Six-language store descriptions, permission/privacy summaries, search terms, and screenshot captions
+- Disabled starter-rule onboarding plus a six-language Astro 7 product and help site
 
 The current stable-browser matrix and Firefox 142 floor are certified. Chrome 121, Edge 121, signed legacy
 upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md),
@@ -62,6 +64,17 @@ pnpm build:browsers
 ```
 
 Artifacts are written to `dist/chrome-mv3`, `dist/edge-mv3`, and `dist/firefox-mv3`.
+
+Run or build the website with:
+
+```bash
+pnpm site:dev
+pnpm site:check
+pnpm site:build
+```
+
+The static site is generated in `site/dist/` and published by `.github/workflows/pages.yml` to the GitHub
+Pages project URL. Its source, components, localized copy, and optimized image inputs live under `site/src/`.
 
 Create checksummed release candidates after the local gate passes:
 

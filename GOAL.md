@@ -1,7 +1,7 @@
 # My Webrequest V1 Goal
 
 Status: Active delivery goal  
-Last updated: 2026-09-01  
+Last updated: 2026-09-03
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
 [MIGRATION.md](MIGRATION.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md),
 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
@@ -30,6 +30,8 @@ but correctness, explainability, accessibility, and upgrade safety are release g
 6. **Local only:** no accounts, telemetry, remote code, remote fonts, or product-owned network endpoint.
 7. **Evidence before support claims:** a browser is supported only after installed-extension E2E and its
    store validator pass.
+8. **Learnable without guesswork:** first-run examples and a fast, localized help site explain matching,
+   actions, permissions, migration, and recovery without hiding unsafe defaults.
 
 ## Language contract
 
@@ -116,7 +118,19 @@ Exit gate: all V1 workflows in `PRODUCT_SPEC.md` are usable without dead control
 
 Exit gate: all six languages pass the same functional and accessibility smoke suite without clipping.
 
-### M5 — Browser certification and release
+### M5 — Onboarding and help
+
+- Offer three editable starter rules plus a blank-rule path from one unified empty state.
+- Create every starter disabled and require the same validation and permission flow as an ordinary rule.
+- Link Settings and the empty state to a six-language help center.
+- Build the static product and documentation site with Astro 7, canonical URLs, language alternates,
+  structured data, sitemap, responsive layouts, and no unsupported installation claim.
+- Publish the site through the official GitHub Pages Actions workflow.
+
+Exit gate: all 36 localized guide routes build, the empty-state journey passes installed-extension E2E,
+and the production site is reachable at its canonical project URL.
+
+### M6 — Browser certification and release
 
 - Run installed-extension E2E on Chrome, Edge, and Firefox for every action and permission lifecycle.
 - Prove worker termination/restart, migration, import rollback, and cross-surface synchronization.
@@ -140,4 +154,5 @@ path. They never return as active runtime code.
 
 V1 is complete only when all milestone exit gates pass, the repository quality gate is green on Node 24,
 the worktree contains no obsolete implementation, generated artifacts are reproducible under `dist/`, and
-the support matrix contains no claim that exceeds installed-extension evidence.
+the support matrix contains no claim that exceeds installed-extension evidence. Store submission remains a
+separate user-authorized operation and is not implied by completing the website or release candidates.

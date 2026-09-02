@@ -360,7 +360,9 @@ test('clean install exposes the product UI without required host access', async 
   extensionPage,
 }) => {
   const origins = await extensionPage.evaluate(async () => (await chrome.permissions.getAll()).origins ?? []);
-  expect(origins).toEqual([]);
+  expect(await extensionPage.evaluate(async () => (await chrome.permissions.getAll()).origins ?? [])).toEqual(
+    [],
+  );
 
   const options = await context.newPage();
   const consoleIssues: string[] = [];
@@ -379,9 +381,33 @@ test('clean install exposes the product UI without required host access', async 
   await expect(primaryNavigation.getByText('Legacy migration')).toHaveCount(0);
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
+  await expect(options.getByRole('menuitem', { name: 'Help & guides' })).toHaveAttribute(
+    'href',
+    'https://app.evecalm.com/MyWebrequest/guides/quick-start/',
+  );
   const migrationMenuItem = options.getByRole('menuitem', { name: 'Legacy migration' });
   if (browserTarget === 'chrome') await expect(migrationMenuItem).toBeVisible();
   else await expect(migrationMenuItem).toHaveCount(0);
+  await options.keyboard.press('Escape');
+
+  await expect(options.getByRole('heading', { name: 'No rules yet' })).toBeVisible();
+  await expect(options.getByText('Examples are created disabled')).toBeVisible();
+  await options.getByRole('button', { name: /Block analytics/ }).click();
+  await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
+  const starter = await extensionPage.evaluate(async () => {
+    const stored = await chrome.storage.local.get('requestRulesState');
+    const state = stored.requestRulesState as StoredState;
+    return state.rules[state.order[0] ?? ''];
+  });
+  expect(starter).toMatchObject({
+    enabled: false,
+    condition: {
+      url: { kind: 'url-filter', value: '||analytics.example.com^' },
+      resourceTypes: ['xmlhttprequest', 'ping'],
+    },
+    action: { kind: 'block' },
+  });
+  expect(origins).toEqual([]);
   expect(consoleIssues).toEqual([]);
 });
 
