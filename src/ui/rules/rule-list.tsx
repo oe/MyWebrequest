@@ -1,25 +1,45 @@
-import type { KeyboardEvent } from 'react';
+import { useMemo, type KeyboardEvent } from 'react';
 import { ChevronRightIcon, SearchIcon } from 'lucide-react';
 
-import type { Rule, RuleStatus } from '@/domain/rules/model';
 import type { RuleQuotaUsage } from '@/domain/rules/diagnostics';
+import { RESOURCE_TYPES, type Rule, type RuleStatus } from '@/domain/rules/model';
 import { Badge } from '@/ui/components/badge';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/ui/components/input-group';
 import { ScrollArea } from '@/ui/components/scroll-area';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/ui/components/select';
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
 import { useI18n } from '@/ui/i18n';
 import { cn } from '@/ui/lib/utils';
-import { localizedActionLabel, ruleMatchesQuery } from './filter-rules';
+import {
+  localizedActionKindLabel,
+  localizedActionLabel,
+  localizedResourceTypeLabel,
+  RULE_ACTION_FILTERS,
+  ruleMatchesRuleList,
+  type RuleActionFilter,
+  type RuleResourceTypeFilter,
+} from './filter-rules';
 import { StatusBadge } from './status-badge';
 
 type RuleListProps = {
   query: string;
+  actionFilter: RuleActionFilter;
+  resourceTypeFilter: RuleResourceTypeFilter;
   rules: Rule[];
   selectedId: string | null;
   statuses: Record<string, RuleStatus>;
   quota: RuleQuotaUsage | null;
   onQueryChange: (query: string) => void;
+  onActionFilterChange: (action: RuleActionFilter) => void;
+  onResourceTypeFilterChange: (resourceType: RuleResourceTypeFilter) => void;
   onSelect: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
   pendingIds?: ReadonlySet<string>;
@@ -27,11 +47,15 @@ type RuleListProps = {
 
 export function RuleList({
   query,
+  actionFilter,
+  resourceTypeFilter,
   rules,
   selectedId,
   statuses,
   quota,
   onQueryChange,
+  onActionFilterChange,
+  onResourceTypeFilterChange,
   onSelect,
   onToggle,
   pendingIds,
@@ -55,7 +79,13 @@ export function RuleList({
     { label: t('needsReviewSection'), statuses: ['review-required', 'unsupported'] },
     { label: t('removedSection'), statuses: ['removed'] },
   ];
-  const filtered = rules.filter((rule) => ruleMatchesQuery(rule, query, t));
+  const filtered = useMemo(
+    () =>
+      rules.filter((rule) =>
+        ruleMatchesRuleList(rule, { query, action: actionFilter, resourceType: resourceTypeFilter }, t),
+      ),
+    [actionFilter, query, resourceTypeFilter, rules, t],
+  );
 
   const handleRuleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
@@ -81,23 +111,68 @@ export function RuleList({
   return (
     <section
       aria-label={t('rules')}
+      data-rule-list
       data-material="glass-content"
-      className="flex min-h-0 flex-col border-r max-[799px]:border-r-0"
+      className="flex h-full min-h-0 flex-col border-r max-[799px]:border-r-0"
     >
-      <div className="border-b p-3 min-[800px]:hidden">
-        <InputGroup>
-          <InputGroupAddon>
-            <SearchIcon />
-          </InputGroupAddon>
-          <InputGroupInput
-            aria-label={t('searchRules')}
-            placeholder={t('searchRules')}
-            value={query}
-            onChange={(event) => onQueryChange(event.target.value)}
-          />
-        </InputGroup>
+      <div className="shrink-0 border-b">
+        <div className="p-3 min-[800px]:hidden">
+          <InputGroup>
+            <InputGroupAddon>
+              <SearchIcon />
+            </InputGroupAddon>
+            <InputGroupInput
+              aria-label={t('searchRules')}
+              placeholder={t('searchRules')}
+              value={query}
+              onChange={(event) => onQueryChange(event.target.value)}
+            />
+          </InputGroup>
+        </div>
+        <div
+          role="group"
+          aria-label={t('filterRules')}
+          className="grid grid-cols-2 gap-2 px-3 pb-3 min-[800px]:pt-3"
+        >
+          <Select
+            value={actionFilter}
+            onValueChange={(value) => onActionFilterChange(value as RuleActionFilter)}
+          >
+            <SelectTrigger className="w-full min-w-0" size="sm" aria-label={t('filterByAction')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">{t('allActions')}</SelectItem>
+                {RULE_ACTION_FILTERS.map((action) => (
+                  <SelectItem key={action} value={action}>
+                    {localizedActionKindLabel(action, t)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Select
+            value={resourceTypeFilter}
+            onValueChange={(value) => onResourceTypeFilterChange(value as RuleResourceTypeFilter)}
+          >
+            <SelectTrigger className="w-full min-w-0" size="sm" aria-label={t('filterByResourceType')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="all">{t('allResourceTypes')}</SelectItem>
+                {RESOURCE_TYPES.map((resourceType) => (
+                  <SelectItem key={resourceType} value={resourceType}>
+                    {localizedResourceTypeLabel(resourceType, t)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-      <ScrollArea className="min-h-0 flex-1">
+      <ScrollArea data-rule-list-scroll className="min-h-0 flex-1">
         {sections.map((section) => {
           const sectionRules = filtered.filter((rule) =>
             section.statuses.includes(statuses[rule.id] ?? 'disabled'),
@@ -169,7 +244,10 @@ export function RuleList({
         ) : null}
       </ScrollArea>
       {quota ? (
-        <div className="grid gap-1 border-t px-4 py-2 text-xs text-muted-foreground">
+        <div
+          data-rule-quota
+          className="grid shrink-0 gap-1 border-t bg-background/70 px-4 py-2 text-xs text-muted-foreground supports-backdrop-filter:bg-background/60"
+        >
           <div className="flex items-center justify-between gap-3">
             <span>{t('quotaUsage')}</span>
             <span className="font-mono tabular-nums">

@@ -17,7 +17,6 @@ import { permissionOriginsFromMatch } from '@/application/rule-service';
 import {
   RESOURCE_TYPES,
   type HeaderOperation,
-  type ResourceType,
   type Rule,
   type RuleAction,
   type RuleStatus,
@@ -61,6 +60,7 @@ import { Switch } from '@/ui/components/switch';
 import { Textarea } from '@/ui/components/textarea';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
+import { localizedResourceTypeLabel } from './filter-rules';
 import { PermissionScope } from './permission-scope';
 import { StatusBadge } from './status-badge';
 
@@ -86,24 +86,6 @@ type RuleEditorProps = {
 };
 
 const REQUEST_METHODS = ['connect', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put'] as const;
-
-function resourceTypeLabel(type: ResourceType, t: Translate): string {
-  const keys = {
-    main_frame: 'resourceMainFrame',
-    sub_frame: 'resourceSubFrame',
-    stylesheet: 'resourceStylesheet',
-    script: 'resourceScript',
-    image: 'resourceImage',
-    font: 'resourceFont',
-    object: 'resourceObject',
-    xmlhttprequest: 'resourceXmlHttpRequest',
-    ping: 'resourcePing',
-    media: 'resourceMedia',
-    websocket: 'resourceWebSocket',
-    other: 'resourceOther',
-  } as const;
-  return t(keys[type]);
-}
 
 function toggleValue<T>(values: T[] | undefined, value: T): T[] {
   const current = values ?? [];
@@ -489,7 +471,7 @@ export function RuleEditor({
                         }))
                       }
                     >
-                      {resourceTypeLabel(type, t)}
+                      {localizedResourceTypeLabel(type, t)}
                     </Button>
                   );
                 })}

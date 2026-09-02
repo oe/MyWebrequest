@@ -27,7 +27,12 @@ import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { shouldShowMigrationNavigation } from '@/ui/migration/migration-navigation';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
-import { ruleMatchesQuery } from '@/ui/rules/filter-rules';
+import {
+  ruleMatchesRuleList,
+  type RuleActionFilter,
+  type RuleListCriteria,
+  type RuleResourceTypeFilter,
+} from '@/ui/rules/filter-rules';
 import { PermissionScope } from '@/ui/rules/permission-scope';
 import { RuleEditor } from '@/ui/rules/rule-editor';
 import { RuleList } from '@/ui/rules/rule-list';
@@ -42,6 +47,8 @@ export function OptionsApp() {
   const migrationManager = useMigrationManager(migrationAvailable);
   const [view, setView] = useState<OptionsView>('rules');
   const [query, setQuery] = useState('');
+  const [actionFilter, setActionFilter] = useState<RuleActionFilter>('all');
+  const [resourceTypeFilter, setResourceTypeFilter] = useState<RuleResourceTypeFilter>('all');
   const [creating, setCreating] = useState(false);
   const [editorDirty, setEditorDirty] = useState(false);
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -105,16 +112,31 @@ export function OptionsApp() {
     action?.();
   };
 
-  const handleQueryChange = (nextQuery: string) => {
-    if (selectedRule && !ruleMatchesQuery(selectedRule, nextQuery, t)) {
-      requestNavigation(() => {
-        setQuery(nextQuery);
+  const applyListCriteria = (criteria: RuleListCriteria) => {
+    const updateCriteria = () => {
+      setQuery(criteria.query);
+      setActionFilter(criteria.action);
+      setResourceTypeFilter(criteria.resourceType);
+      if (selectedRule && !ruleMatchesRuleList(selectedRule, criteria, t)) {
         manager.setSelectedId(null);
-      });
+      }
+    };
+
+    if (selectedRule && !ruleMatchesRuleList(selectedRule, criteria, t)) {
+      requestNavigation(updateCriteria);
       return;
     }
-    setQuery(nextQuery);
+    updateCriteria();
   };
+
+  const handleQueryChange = (nextQuery: string) =>
+    applyListCriteria({ query: nextQuery, action: actionFilter, resourceType: resourceTypeFilter });
+
+  const handleActionFilterChange = (nextAction: RuleActionFilter) =>
+    applyListCriteria({ query, action: nextAction, resourceType: resourceTypeFilter });
+
+  const handleResourceTypeFilterChange = (nextResourceType: RuleResourceTypeFilter) =>
+    applyListCriteria({ query, action: actionFilter, resourceType: nextResourceType });
 
   const handleCreate = async () => {
     if (creating) return;
@@ -300,15 +322,19 @@ export function OptionsApp() {
             />
           ) : hasRules ? (
             <>
-              <div className={cn(selectedRule && 'max-[799px]:hidden')}>
+              <div className={cn('h-full min-h-0', selectedRule && 'max-[799px]:hidden')}>
                 <RuleList
                   query={query}
+                  actionFilter={actionFilter}
+                  resourceTypeFilter={resourceTypeFilter}
                   rules={manager.rules}
                   selectedId={manager.selectedId}
                   statuses={manager.statuses}
                   pendingIds={pendingRuleIds}
                   quota={manager.quota}
                   onQueryChange={handleQueryChange}
+                  onActionFilterChange={handleActionFilterChange}
+                  onResourceTypeFilterChange={handleResourceTypeFilterChange}
                   onSelect={(id) => requestNavigation(() => manager.setSelectedId(id))}
                   onToggle={handleToggle}
                 />

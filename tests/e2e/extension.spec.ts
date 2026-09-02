@@ -424,6 +424,68 @@ test('all six locales switch by keyboard, persist, and fit the compact layout', 
   ).toEqual({ clientWidth: 640, scrollWidth: 640 });
 });
 
+test('rule filters compose and quota statistics stay fixed below the scrolling list', async ({
+  context,
+  extensionId,
+  extensionWorker,
+}) => {
+  const rules = [...quotaRules(24, 'url-filter'), ...permissionRules()];
+  await extensionWorker.evaluate(
+    async (nextState) => chrome.storage.local.set({ requestRulesState: nextState }),
+    stateWith(rules),
+  );
+
+  const options = await context.newPage();
+  await options.setViewportSize({ width: 1_100, height: 720 });
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+  const actionFilter = options.getByRole('combobox', { name: 'Filter by action' });
+  const resourceTypeFilter = options.getByRole('combobox', { name: 'Filter by resource type' });
+  await expect(actionFilter).toHaveText('All actions');
+  await expect(resourceTypeFilter).toHaveText('All resource types');
+
+  await actionFilter.click();
+  await options.getByRole('option', { name: 'Header' }).click();
+  await expect(options.getByText('Subresource header permission', { exact: true })).toBeVisible();
+  await expect(options.getByText('url-filter quota 0', { exact: true })).toHaveCount(0);
+
+  await resourceTypeFilter.click();
+  await options.getByRole('option', { name: 'Fetch / XHR' }).click();
+  await expect(options.getByText('Subresource header permission', { exact: true })).toBeVisible();
+
+  await resourceTypeFilter.click();
+  await options.getByRole('option', { name: 'Document' }).click();
+  await expect(options.getByText('No matching rules', { exact: true })).toBeVisible();
+
+  await actionFilter.click();
+  await options.getByRole('option', { name: 'All actions' }).click();
+  await expect(options.getByText('url-filter quota 0', { exact: true })).toBeVisible();
+
+  const layoutBeforeScroll = await options.evaluate(() => {
+    const list = document.querySelector<HTMLElement>('[data-rule-list]');
+    const quota = document.querySelector<HTMLElement>('[data-rule-quota]');
+    const viewport = document.querySelector<HTMLElement>(
+      '[data-rule-list-scroll] [data-slot="scroll-area-viewport"]',
+    );
+    if (!list || !quota || !viewport) throw new Error('Rule list layout fixtures are missing.');
+    const listBox = list.getBoundingClientRect();
+    const quotaBox = quota.getBoundingClientRect();
+    viewport.scrollTop = viewport.scrollHeight;
+    return {
+      bottomGap: Math.abs(listBox.bottom - quotaBox.bottom),
+      quotaTop: quotaBox.top,
+      scrollTop: viewport.scrollTop,
+    };
+  });
+  expect(layoutBeforeScroll.bottomGap).toBeLessThanOrEqual(1);
+  expect(layoutBeforeScroll.scrollTop).toBeGreaterThan(0);
+
+  const quotaTopAfterScroll = await options
+    .locator('[data-rule-quota]')
+    .evaluate((element) => element.getBoundingClientRect().top);
+  expect(Math.abs(quotaTopAfterScroll - layoutBeforeScroll.quotaTop)).toBeLessThanOrEqual(1);
+});
+
 test('forced colors, reduced motion, and keyboard focus remain usable', async ({ context, extensionId }) => {
   const options = await context.newPage();
   await options.emulateMedia({ forcedColors: 'active', reducedMotion: 'reduce' });

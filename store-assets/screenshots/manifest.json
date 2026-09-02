@@ -7,22 +7,22 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
-      "sourceSha256": "95690b44fb9e0148677ca251038d313d726a40a884fa1ddedaa5d5fe7f34ce76",
+      "sourceSha256": "fdfbf14668a5c079212eb5c1a49bbb3df5f10ff16402c988712a418e2f06b91f",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-01T20:00:26.265Z",
+      "capturedAt": "2026-09-02T01:00:50.890Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "297cfff044d7ce8bb3f906e93fe29cd0df611f796c03e5c347e2e9a65d9fa7d7",
+          "sha256": "399f7902e8ff423d6a3ee0081f02500c45696882f8ee9d87ca64de82d55f40aa",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "b96c9f85f3054f397f02f777422da4f082372e4522b225081019c236f4adf7d2",
+          "sha256": "f204b46845d29ea3fe55362f0ffb330fe3b70451ce44b7d187c466ac4a577fb6",
           "width": 1280,
           "height": 800
         },
@@ -37,22 +37,22 @@
     },
     "edge": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
-      "sourceSha256": "26454a5cb51526d079189bca344ff43bc083600013415bb07d5d3c9807c43b68",
+      "sourceSha256": "ab8fa962ef217ae4e68bf55597bf5cd5008dc33a5b4608f56dec0a4ab1debc1f",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-01T20:00:27.813Z",
+      "capturedAt": "2026-09-02T01:00:52.365Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "297cfff044d7ce8bb3f906e93fe29cd0df611f796c03e5c347e2e9a65d9fa7d7",
+          "sha256": "399f7902e8ff423d6a3ee0081f02500c45696882f8ee9d87ca64de82d55f40aa",
           "width": 1280,
           "height": 800
         },
         {
           "path": "edge/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "b96c9f85f3054f397f02f777422da4f082372e4522b225081019c236f4adf7d2",
+          "sha256": "f204b46845d29ea3fe55362f0ffb330fe3b70451ce44b7d187c466ac4a577fb6",
           "width": 1280,
           "height": 800
         },
@@ -67,29 +67,29 @@
     },
     "firefox": {
       "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
-      "sourceSha256": "4efa5368255a644108d793afe007f9d06ebc71947b2f70aca588aa14b3a1a32d",
+      "sourceSha256": "c923b29ee8ebc727dfcd304e52f404dd742df025f5b300f4d6aa2bf1a48e64db",
       "browserName": "Firefox",
-      "browserVersion": "142.0",
-      "capturedAt": "2026-09-01T20:00:37.822Z",
+      "browserVersion": "155.0",
+      "capturedAt": "2026-09-02T01:00:39.002Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "9686f9486e03f3b68373bc2a76da8c2c5e54bced46f62c69d630d461b215507a",
+          "sha256": "5c071b0faffcb5b2f57d242bf4626005de7282b987ec671f7559cef65ece351f",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "bd4a99e81be2569c5bb371991d47a14f17aa9ab5366a0ba162a1f3340344a11f",
+          "sha256": "5710d042348dd918d145afa21f6698e4f265ec95d0ff3a0c8033dea785671fcf",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "8b4884a27cd6bb888e12d25f7c2b9392d2e5168e5afab03596baa2f67f4befea",
+          "sha256": "2a7a1e5f3ae2173117ca84044276c071739aceb22ff96e4e3055213ab54d7447",
           "width": 1280,
           "height": 800
         }
