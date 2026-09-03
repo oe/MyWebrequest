@@ -516,6 +516,44 @@ test('all six locales switch by keyboard, persist, and fit the compact layout', 
   ).toEqual({ clientWidth: 640, scrollWidth: 640 });
 });
 
+test('appearance follows the system and stays synchronized across extension surfaces', async ({
+  context,
+  extensionId,
+}) => {
+  const options = await context.newPage();
+  await options.emulateMedia({ colorScheme: 'dark' });
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+
+  await expect(options.locator('html')).toHaveAttribute('data-theme-preference', 'system');
+  await expect(options.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(options.locator('html')).toHaveClass(/dark/);
+
+  await options.getByRole('button', { name: 'Settings', exact: true }).click();
+  await options.getByRole('menuitem', { name: 'Appearance', exact: true }).hover();
+  await options.getByRole('menuitemradio', { name: 'Light', exact: true }).click();
+  await expect(options.locator('html')).toHaveAttribute('data-theme-preference', 'light');
+  await expect(options.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(options.locator('html')).not.toHaveClass(/dark/);
+
+  const popup = await context.newPage();
+  await popup.emulateMedia({ colorScheme: 'dark' });
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await expect(popup.locator('html')).toHaveAttribute('data-theme', 'light');
+  await popup.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await popup.getByRole('menuitemradio', { name: 'Dark', exact: true }).click();
+
+  await expect(popup.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(options.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await popup.getByRole('button', { name: 'Appearance', exact: true }).click();
+  await popup.getByRole('menuitemradio', { name: 'Follow system', exact: true }).click();
+  await expect(popup.locator('html')).toHaveAttribute('data-theme-preference', 'system');
+  await expect(popup.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(options.locator('html')).toHaveAttribute('data-theme-preference', 'system');
+
+  await options.reload();
+  await expect(options.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
 test('rule filters compose and quota statistics stay fixed below the scrolling list', async ({
   context,
   extensionId,

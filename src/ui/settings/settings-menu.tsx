@@ -19,6 +19,7 @@ import {
 import { useI18n } from '@/ui/i18n';
 import { helpUrl } from '@/ui/help-links';
 import { cn } from '@/ui/lib/utils';
+import { ThemeMenu } from '@/ui/theme';
 
 type SettingsMenuProps = {
   compact?: boolean;
@@ -67,6 +68,7 @@ export function SettingsMenu({
               <ExternalLinkIcon className="ml-auto size-3 text-muted-foreground" />
             </a>
           </DropdownMenuItem>
+          <ThemeMenu variant="sub" />
           {showMigration ? (
             <DropdownMenuItem onSelect={onOpenMigration}>
               <ArchiveRestoreIcon />

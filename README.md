@@ -19,6 +19,8 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
   identity and reads its `storage.sync` schema plus older page `localStorage` without mutating either source
 - Checksummed rule backup, previewed merge/replace import, and automatic recovery snapshot
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish UI and manifests
+- System-aware light and dark appearance controls shared across extension surfaces, plus a matching persisted
+  appearance preference on the product and help site
 - Keyboard, reduced-motion, contrast, responsive-layout, unit, artifact, and production build checks
 - Isolated Playwright Chromium extension E2E for block and HTTPS-upgrade DNR, quota boundaries, upgrade
   preservation, popup/options synchronization,

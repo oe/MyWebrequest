@@ -24,6 +24,7 @@ import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 import { useI18n } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { supportedPageOrigin } from '@/ui/lib/supported-page';
+import { ThemeMenu } from '@/ui/theme';
 
 function canUseExtensionTabs(): boolean {
   return typeof browser !== 'undefined' && Boolean(browser.tabs && browser.runtime?.id);
@@ -119,9 +120,12 @@ export function PopupApp() {
             <ShieldCheckIcon className="size-5" aria-hidden="true" />
             <h1 className="text-base font-semibold">{t('appName')}</h1>
           </div>
-          <Badge variant={paused ? 'warning' : 'success'}>
-            {t(paused ? 'statusPaused' : 'statusActive')}
-          </Badge>
+          <div className="flex items-center gap-1">
+            <ThemeMenu />
+            <Badge variant={paused ? 'warning' : 'success'}>
+              {t(paused ? 'statusPaused' : 'statusActive')}
+            </Badge>
+          </div>
         </header>
         <Separator />
 

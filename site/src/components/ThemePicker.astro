@@ -1,0 +1,132 @@
+---
+import type { Locale } from '../content';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const labels: Record<Locale, { label: string; system: string; light: string; dark: string }> = {
+  en: { label: 'Appearance', system: 'Follow system', light: 'Light', dark: 'Dark' },
+  'zh-CN': { label: '外观', system: '跟随系统', light: '浅色', dark: '深色' },
+  ko: { label: '화면 모드', system: '시스템 설정 따르기', light: '라이트', dark: '다크' },
+  ja: { label: '外観', system: 'システム設定に合わせる', light: 'ライト', dark: 'ダーク' },
+  fr: { label: 'Apparence', system: 'Suivre le système', light: 'Clair', dark: 'Sombre' },
+  es: { label: 'Apariencia', system: 'Seguir el sistema', light: 'Claro', dark: 'Oscuro' },
+};
+const copy = labels[locale];
+---
+
+<details class="theme-menu" data-theme-picker>
+  <summary aria-label={copy.label} title={copy.label}>
+    <span class="theme-icon-set" aria-hidden="true">
+      <svg class="theme-icon theme-icon-system" viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="13" rx="2"></rect>
+        <path d="M8 21h8M12 17v4"></path>
+      </svg>
+      <svg class="theme-icon theme-icon-light" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"
+        ></path>
+      </svg>
+      <svg class="theme-icon theme-icon-dark" viewBox="0 0 24 24">
+        <path d="M20.4 15.5A8 8 0 0 1 8.5 3.6 8.5 8.5 0 1 0 20.4 15.5Z"></path>
+      </svg>
+    </span>
+    <span class="sr-only">{copy.label}</span>
+  </summary>
+  <div class="theme-options" role="radiogroup" aria-label={copy.label}>
+    <button type="button" role="radio" data-theme-value="system">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="13" rx="2"></rect>
+        <path d="M8 21h8M12 17v4"></path>
+      </svg>
+      {copy.system}
+      <span class="theme-check" aria-hidden="true">✓</span>
+    </button>
+    <button type="button" role="radio" data-theme-value="light">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.66 6.34l1.41-1.41"
+        ></path>
+      </svg>
+      {copy.light}
+      <span class="theme-check" aria-hidden="true">✓</span>
+    </button>
+    <button type="button" role="radio" data-theme-value="dark">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20.4 15.5A8 8 0 0 1 8.5 3.6 8.5 8.5 0 1 0 20.4 15.5Z"></path>
+      </svg>
+      {copy.dark}
+      <span class="theme-check" aria-hidden="true">✓</span>
+    </button>
+  </div>
+</details>
+
+<script is:inline>
+  (() => {
+    const storageKey = 'ui.theme';
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const valid = new Set(['system', 'light', 'dark']);
+    const root = document.documentElement;
+
+    const applyTheme = (preference, persist = false) => {
+      const normalized = valid.has(preference) ? preference : 'system';
+      const resolved = normalized === 'system' ? (media.matches ? 'dark' : 'light') : normalized;
+      root.dataset.themePreference = normalized;
+      root.dataset.theme = resolved;
+      root.style.colorScheme = resolved;
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute('content', resolved === 'dark' ? '#111822' : '#f7f9fc');
+      if (persist) {
+        try {
+          localStorage.setItem(storageKey, normalized);
+        } catch {}
+      }
+      document.querySelectorAll('[data-theme-value]').forEach((control) => {
+        control.setAttribute('aria-checked', String(control.getAttribute('data-theme-value') === normalized));
+      });
+    };
+
+    document.querySelectorAll('[data-theme-picker]').forEach((picker) => {
+      const controls = [...picker.querySelectorAll('[data-theme-value]')];
+      controls.forEach((control, index) => {
+        control.addEventListener('click', () => {
+          applyTheme(control.getAttribute('data-theme-value'), true);
+          picker.removeAttribute('open');
+        });
+        control.addEventListener('keydown', (event) => {
+          const direction = ['ArrowRight', 'ArrowDown'].includes(event.key)
+            ? 1
+            : ['ArrowLeft', 'ArrowUp'].includes(event.key)
+              ? -1
+              : 0;
+          const targetIndex =
+            event.key === 'Home'
+              ? 0
+              : event.key === 'End'
+                ? controls.length - 1
+                : direction
+                  ? (index + direction + controls.length) % controls.length
+                  : -1;
+          if (targetIndex < 0) return;
+          event.preventDefault();
+          const target = controls[targetIndex];
+          target?.focus();
+          applyTheme(target?.getAttribute('data-theme-value'), true);
+        });
+      });
+    });
+
+    media.addEventListener('change', () => {
+      if (root.dataset.themePreference === 'system') applyTheme('system');
+    });
+    window.addEventListener('storage', (event) => {
+      if (event.key === storageKey) applyTheme(event.newValue);
+    });
+    applyTheme(root.dataset.themePreference);
+  })();
+</script>

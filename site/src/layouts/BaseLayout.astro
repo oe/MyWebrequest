@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import icon from '../assets/app-icon.svg';
+import ThemePicker from '../components/ThemePicker.astro';
 import { homeCopy, localeNames, locales, type Locale } from '../content';
 import { localeLanguageTag, localizedPath, withBase } from '../lib/routes';
 import '../styles/global.css';
@@ -76,6 +77,28 @@ const schema = title
     <meta name="generator" content={Astro.generator} />
     <meta name="description" content={pageDescription} />
     <meta name="theme-color" content="#f7f9fc" />
+    <script is:inline>
+      (() => {
+        const key = 'ui.theme';
+        let preference = 'system';
+        try {
+          const stored = localStorage.getItem(key);
+          if (stored === 'light' || stored === 'dark') preference = stored;
+        } catch {}
+        const resolved =
+          preference === 'system'
+            ? window.matchMedia('(prefers-color-scheme: dark)').matches
+              ? 'dark'
+              : 'light'
+            : preference;
+        document.documentElement.dataset.themePreference = preference;
+        document.documentElement.dataset.theme = resolved;
+        document.documentElement.style.colorScheme = resolved;
+        document
+          .querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', resolved === 'dark' ? '#111822' : '#f7f9fc');
+      })();
+    </script>
     <link rel="icon" type="image/svg+xml" href={withBase('app-icon.svg')} />
     <link rel="canonical" href={canonical} />
     {
@@ -112,6 +135,7 @@ const schema = title
           <a href={localizedPath(locale, 'guides/quick-start')}>{copy.navGuides}</a>
           <a href={localizedPath(locale, 'guides/permissions')}>{copy.navPrivacy}</a>
           <a href="https://github.com/oe/MyWebrequest">{copy.openGithub}</a>
+          <ThemePicker locale={locale} />
           <details class="locale-menu">
             <summary>{localeNames[locale]}</summary>
             <div class="locale-options">

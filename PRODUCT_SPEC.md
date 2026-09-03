@@ -1,8 +1,8 @@
 # My Webrequest Product Specification
 
-Status: Approved baseline; implementation in progress  
-Last updated: 2026-09-01  
-Owners: Product and engineering  
+Status: Approved baseline; implementation in progress
+Last updated: 2026-09-04
+Owners: Product and engineering
 Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md),
 [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
@@ -94,6 +94,8 @@ unless explicitly approved.
 - Unified first-run empty state with three disabled, editable starter rules and a blank-rule path.
 - Static six-language product/help site covering quick start, matching, actions, advanced redirect recipes,
   permissions, migration, breaking changes with alternatives, and troubleshooting.
+- System-aware light and dark appearance controls on the popup, options UI, and product/help site, with an
+  explicit Follow system default and a persisted manual override.
 - Four task-first help entry points with progressive disclosure for advanced and legacy reference material;
   users should not need to read the documentation before creating a basic rule.
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish from the first release.
@@ -207,6 +209,7 @@ unless explicitly approved.
 - Full keyboard operation with visible focus.
 - Do not use color as the only status indicator.
 - Respect zoom, text scaling, high contrast, and `prefers-reduced-motion`.
+- Follow `prefers-color-scheme` by default and preserve an explicit light, dark, or system appearance choice.
 - Use semantic controls and announcements for validation, save, and permission results.
 - Externalize all user-visible strings and design for Chinese text expansion.
 - Use English as the complete fallback catalog and fail CI when any release locale is missing a key.
