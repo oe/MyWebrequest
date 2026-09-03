@@ -1,46 +1,33 @@
 ---
-import {
-  ArrowUpRight,
-  BookOpen,
-  FingerprintPattern,
-  GitCompareArrows,
-  ListRestart,
-  Route,
-  ShieldCheck,
-  Wrench,
-  Zap,
-} from '@lucide/astro';
-import { guideCopy, guideSlugs, type Locale } from '../content';
+import { ArrowUpRight, ListRestart, Route, ShieldCheck, Zap } from '@lucide/astro';
+import { guideGroupCopy, guideGroups, guideGroupSlugs, type GuideGroup, type Locale } from '../content';
 import { localizedPath } from '../lib/routes';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const icons = {
-  'quick-start': Zap,
-  matching: GitCompareArrows,
-  actions: Wrench,
-  'advanced-examples': Route,
-  permissions: ShieldCheck,
-  migration: FingerprintPattern,
-  'breaking-changes': ListRestart,
-  troubleshooting: BookOpen,
+const icons: Record<GuideGroup, typeof Zap> = {
+  start: Zap,
+  tasks: Route,
+  upgrade: ListRestart,
+  support: ShieldCheck,
 };
 ---
 
 <div class="guide-grid">
   {
-    guideSlugs.map((slug) => {
-      const guide = guideCopy(locale, slug);
-      const Icon = icons[slug];
+    guideGroups.map((group) => {
+      const copy = guideGroupCopy[locale][group];
+      const Icon = icons[group];
+      const destination = guideGroupSlugs[group][0];
       return (
-        <a class="guide-link" href={localizedPath(locale, `guides/${slug}`)}>
+        <a class="guide-link" href={localizedPath(locale, `guides/${destination}`)}>
           <Icon aria-hidden="true" size={20} stroke-width={1.7} />
           <span>
             <>
-              <strong>{guide.title}</strong>
-              <small>{guide.description}</small>
+              <strong>{copy.title}</strong>
+              <small>{copy.description}</small>
             </>
           </span>
           <ArrowUpRight class="guide-arrow" aria-hidden="true" size={16} />

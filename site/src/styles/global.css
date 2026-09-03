@@ -456,21 +456,20 @@ h3 {
 
 .guide-layout {
   display: grid;
-  grid-template-columns: 190px minmax(0, 680px) minmax(230px, 1fr);
-  gap: 62px;
+  grid-template-columns: 200px minmax(0, 760px);
+  justify-content: center;
+  gap: 72px;
   align-items: start;
   padding-block: 72px 120px;
 }
-.guide-sidebar,
-.guide-related {
+.guide-sidebar {
   position: sticky;
   top: 96px;
 }
 .guide-article {
   min-width: 0;
 }
-.guide-sidebar > p,
-.guide-related > p {
+.guide-sidebar > p {
   margin: 34px 0 12px;
   color: #8995a4;
   font-size: 10px;
@@ -478,22 +477,57 @@ h3 {
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
-.guide-sidebar nav {
+.guide-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.guide-nav details {
+  border-bottom: 1px solid var(--soft-line);
+}
+.guide-nav summary {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  list-style: none;
+  color: #4f5d6e;
+  font-size: 13px;
+  font-weight: 650;
+}
+.guide-nav summary::-webkit-details-marker {
+  display: none;
+}
+.guide-nav summary svg {
+  flex: 0 0 auto;
+  color: #8b97a5;
+  transition: transform 150ms ease;
+}
+.guide-nav details[open] summary {
+  color: var(--ink);
+}
+.guide-nav details[open] summary svg {
+  transform: rotate(180deg);
+}
+.guide-nav details > div {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  padding-bottom: 8px;
 }
-.guide-sidebar nav a {
+.guide-nav a {
   padding: 8px 10px;
   border-radius: 7px;
   color: #5f6d7d;
   font-size: 13px;
 }
-.guide-sidebar nav a:hover {
+.guide-nav a:hover {
   color: var(--ink);
   background: #edf3f8;
 }
-.guide-sidebar nav a[aria-current='page'] {
+.guide-nav a[aria-current='page'] {
   color: #0a66b5;
   background: #eaf4fc;
   font-weight: 650;
@@ -503,24 +537,74 @@ h3 {
   border-bottom: 1px solid var(--line);
 }
 .guide-article h1 {
-  font-size: clamp(42px, 5vw, 64px);
-  line-height: 1;
-  letter-spacing: -0.055em;
+  font-size: clamp(40px, 4.5vw, 56px);
+  line-height: 1.04;
+  letter-spacing: -0.05em;
 }
 .guide-article > section {
   padding-block: 44px;
   border-bottom: 1px solid var(--line);
+}
+.guide-article > section.guide-step {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 18px;
+  padding-block: 30px;
+}
+.guide-step-number {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e6f2fc;
+  color: #0a66b5;
+  font-size: 12px;
+  font-weight: 750;
 }
 .guide-article h2 {
   margin-bottom: 18px;
   font-size: 25px;
   letter-spacing: -0.03em;
 }
-.guide-article section p {
+.guide-article section p,
+.guide-disclosure-content p {
   margin-top: 14px;
   color: #526174;
   font-size: 16px;
   line-height: 1.78;
+}
+.guide-disclosure {
+  border-bottom: 1px solid var(--line);
+}
+.guide-disclosure > summary {
+  display: flex;
+  min-height: 78px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--ink);
+}
+.guide-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.guide-disclosure > summary span {
+  font-size: 20px;
+  font-weight: 660;
+  letter-spacing: -0.025em;
+}
+.guide-disclosure > summary svg {
+  flex: 0 0 auto;
+  color: #387cb2;
+  transition: transform 150ms ease;
+}
+.guide-disclosure[open] > summary svg {
+  transform: rotate(180deg);
+}
+.guide-disclosure-content {
+  padding: 0 0 36px;
 }
 .guide-points {
   display: grid;
@@ -574,18 +658,6 @@ h3 {
   font-size: 13px;
   font-weight: 650;
 }
-.guide-related .guide-grid {
-  grid-template-columns: 1fr;
-}
-.guide-related .guide-link {
-  grid-template-columns: 22px minmax(0, 1fr);
-  padding: 14px 4px;
-  border-right: 0;
-}
-.guide-related .guide-link small,
-.guide-related .guide-arrow {
-  display: none;
-}
 .not-found {
   min-height: 65vh;
   display: grid;
@@ -616,9 +688,6 @@ h3 {
   .guide-layout {
     grid-template-columns: 170px minmax(0, 1fr);
     gap: 48px;
-  }
-  .guide-related {
-    display: none;
   }
 }
 
@@ -706,19 +775,23 @@ h3 {
   }
   .guide-layout {
     grid-template-columns: 1fr;
+    gap: 34px;
     padding-top: 38px;
   }
   .guide-sidebar {
     position: static;
   }
-  .guide-sidebar nav {
-    display: none;
-  }
   .guide-sidebar > p {
     display: none;
   }
+  .guide-nav {
+    margin-top: 22px;
+  }
   .guide-article h1 {
-    font-size: 46px;
+    font-size: 42px;
+  }
+  .guide-disclosure > summary {
+    min-height: 70px;
   }
 }
 

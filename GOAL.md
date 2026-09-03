@@ -127,6 +127,8 @@ Exit gate: all six languages pass the same functional and accessibility smoke su
   structured data, sitemap, responsive layouts, and no unsupported installation claim.
 - Document executable advanced Redirect recipes and publish a legacy breaking-change matrix with practical
   alternatives for every intentionally removed capability.
+- Keep the public site task-first: four help entry points, one navigation surface per guide, progressive
+  disclosure for reference-heavy material, and concise semantic homepage copy instead of SEO filler.
 - Publish the site through the official GitHub Pages Actions workflow.
 
 Exit gate: all 48 localized guide routes build, the empty-state journey passes installed-extension E2E,

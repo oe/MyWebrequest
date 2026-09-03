@@ -94,6 +94,8 @@ unless explicitly approved.
 - Unified first-run empty state with three disabled, editable starter rules and a blank-rule path.
 - Static six-language product/help site covering quick start, matching, actions, advanced redirect recipes,
   permissions, migration, breaking changes with alternatives, and troubleshooting.
+- Four task-first help entry points with progressive disclosure for advanced and legacy reference material;
+  users should not need to read the documentation before creating a basic rule.
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish from the first release.
 - Shared Chrome, Edge, and Firefox Manifest V3 builds, with a separate release gate for each browser.
 

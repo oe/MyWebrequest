@@ -22,7 +22,68 @@ export const guideSlugs = [
 ] as const;
 export type GuideSlug = (typeof guideSlugs)[number];
 
+export const guideGroups = ['start', 'tasks', 'upgrade', 'support'] as const;
+export type GuideGroup = (typeof guideGroups)[number];
+
+export const guideGroupSlugs: Record<GuideGroup, readonly GuideSlug[]> = {
+  start: ['quick-start', 'matching', 'actions'],
+  tasks: ['advanced-examples'],
+  upgrade: ['migration', 'breaking-changes'],
+  support: ['troubleshooting', 'permissions'],
+};
+
+type GuideGroupCopy = { title: string; description: string };
+
+export const guideGroupCopy: Record<Locale, Record<GuideGroup, GuideGroupCopy>> = {
+  en: {
+    start: { title: 'Get started', description: 'Create and test your first rule.' },
+    tasks: { title: 'Common tasks', description: 'Use practical Redirect recipes.' },
+    upgrade: { title: 'Migration & upgrades', description: 'Bring old Chrome rules forward safely.' },
+    support: { title: 'Privacy & troubleshooting', description: 'Understand access or fix a rule.' },
+  },
+  'zh-CN': {
+    start: { title: '开始使用', description: '创建并测试第一条规则。' },
+    tasks: { title: '常见任务', description: '按场景使用 Redirect 规则。' },
+    upgrade: { title: '迁移与升级', description: '安全迁移旧版 Chrome 规则。' },
+    support: { title: '隐私与排查', description: '了解权限或解决规则问题。' },
+  },
+  ko: {
+    start: { title: '시작하기', description: '첫 규칙을 만들고 테스트합니다.' },
+    tasks: { title: '자주 쓰는 작업', description: '실용적인 Redirect 예제를 사용합니다.' },
+    upgrade: { title: '이전과 업그레이드', description: '기존 Chrome 규칙을 안전하게 옮깁니다.' },
+    support: { title: '개인정보와 문제 해결', description: '접근 권한을 이해하고 문제를 해결합니다.' },
+  },
+  ja: {
+    start: { title: 'はじめる', description: '最初のルールを作成してテストします。' },
+    tasks: { title: 'よくある作業', description: '実用的な Redirect 例を使います。' },
+    upgrade: { title: '移行とアップグレード', description: '旧 Chrome ルールを安全に引き継ぎます。' },
+    support: { title: 'プライバシーと問題解決', description: '権限を理解し、問題を解決します。' },
+  },
+  fr: {
+    start: { title: 'Bien démarrer', description: 'Créez et testez votre première règle.' },
+    tasks: { title: 'Tâches courantes', description: 'Utilisez des exemples Redirect pratiques.' },
+    upgrade: { title: 'Migration et mise à niveau', description: 'Migrez vos règles Chrome en sécurité.' },
+    support: {
+      title: 'Confidentialité et dépannage',
+      description: 'Comprenez les accès ou corrigez une règle.',
+    },
+  },
+  es: {
+    start: { title: 'Primeros pasos', description: 'Crea y prueba tu primera regla.' },
+    tasks: { title: 'Tareas habituales', description: 'Usa ejemplos prácticos de Redirect.' },
+    upgrade: {
+      title: 'Migración y actualización',
+      description: 'Migra reglas antiguas de Chrome con seguridad.',
+    },
+    support: {
+      title: 'Privacidad y solución de problemas',
+      description: 'Entiende el acceso o corrige una regla.',
+    },
+  },
+};
+
 type HomeCopy = {
+  metaTitle: string;
   navGuides: string;
   navPrivacy: string;
   openGithub: string;
@@ -47,6 +108,7 @@ type HomeCopy = {
 
 export const homeCopy: Record<Locale, HomeCopy> = {
   en: {
+    metaTitle: 'Local request rules for Chrome, Edge, and Firefox',
     navGuides: 'Guides',
     navPrivacy: 'Privacy',
     openGithub: 'GitHub',
@@ -88,14 +150,15 @@ export const homeCopy: Record<Locale, HomeCopy> = {
         description: 'Review supported legacy rules and preserve unsupported source data.',
       },
     ],
-    guidesTitle: 'Help that explains the why',
-    guidesDescription: 'Learn matching, permissions, actions, and migration with concrete examples.',
+    guidesTitle: 'Start with what you want to do',
+    guidesDescription: 'Take the short path first. Open details only when you need them.',
     trustTitle: 'Private by default',
     trustDescription:
       'Rules stay in browser storage. The extension has no analytics and no remote rule service.',
     footer: 'Open source · Manifest V3 · Local-first',
   },
   'zh-CN': {
+    metaTitle: 'Chrome、Edge 与 Firefox 请求规则管理器',
     navGuides: '指南',
     navPrivacy: '隐私',
     openGithub: 'GitHub',
@@ -126,13 +189,14 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       { title: '备份', description: '导出带校验和的 JSON，导入前先预览变更。' },
       { title: '迁移', description: '检查可支持的旧规则，并保留不支持的原始数据。' },
     ],
-    guidesTitle: '不仅告诉你怎么做，也说明为什么',
-    guidesDescription: '通过具体示例学习匹配、权限、操作和迁移。',
+    guidesTitle: '从你要做的事开始',
+    guidesDescription: '先走最短路径，需要时再查看原理和边界。',
     trustTitle: '默认保护隐私',
     trustDescription: '规则保存在浏览器本地。扩展没有分析服务，也没有远端规则服务。',
     footer: '开源 · Manifest V3 · 本地优先',
   },
   ko: {
+    metaTitle: 'Chrome, Edge 및 Firefox용 요청 규칙 관리자',
     navGuides: '가이드',
     navPrivacy: '개인정보',
     openGithub: 'GitHub',
@@ -167,13 +231,14 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       { title: '백업', description: '체크섬 JSON을 내보내고 가져오기 전에 변경 사항을 봅니다.' },
       { title: '이전', description: '지원되는 기존 규칙을 검토하고 지원되지 않는 원본도 보존합니다.' },
     ],
-    guidesTitle: '이유까지 설명하는 도움말',
-    guidesDescription: '구체적인 예제로 일치, 권한, 작업, 이전을 알아보세요.',
+    guidesTitle: '하려는 일부터 시작하세요',
+    guidesDescription: '먼저 짧은 경로를 따르고 필요할 때만 세부 정보를 확인하세요.',
     trustTitle: '기본적으로 비공개',
     trustDescription: '규칙은 브라우저 저장소에 남습니다. 분석 기능이나 원격 규칙 서비스가 없습니다.',
     footer: '오픈 소스 · Manifest V3 · 로컬 우선',
   },
   ja: {
+    metaTitle: 'Chrome・Edge・Firefox 向けリクエストルール管理',
     navGuides: 'ガイド',
     navPrivacy: 'プライバシー',
     openGithub: 'GitHub',
@@ -211,13 +276,14 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       },
       { title: '移行', description: '対応する旧ルールを確認し、未対応の元データも保存します。' },
     ],
-    guidesTitle: '理由までわかるヘルプ',
-    guidesDescription: '具体例から一致条件、権限、操作、移行を学べます。',
+    guidesTitle: 'やりたいことから始める',
+    guidesDescription: 'まず最短の手順を使い、必要なときだけ詳細を確認できます。',
     trustTitle: '初期状態からプライベート',
     trustDescription: 'ルールはブラウザ内に保存されます。分析機能も外部ルールサービスもありません。',
     footer: 'オープンソース · Manifest V3 · ローカル優先',
   },
   fr: {
+    metaTitle: 'Règles de requêtes pour Chrome, Edge et Firefox',
     navGuides: 'Guides',
     navPrivacy: 'Confidentialité',
     openGithub: 'GitHub',
@@ -265,15 +331,15 @@ export const homeCopy: Record<Locale, HomeCopy> = {
         description: 'Vérifiez les anciennes règles et conservez les sources non prises en charge.',
       },
     ],
-    guidesTitle: 'Une aide qui explique pourquoi',
-    guidesDescription:
-      'Découvrez la correspondance, les autorisations, les actions et la migration par des exemples concrets.',
+    guidesTitle: 'Commencez par votre objectif',
+    guidesDescription: 'Suivez d’abord le chemin court, puis ouvrez les détails si nécessaire.',
     trustTitle: 'Confidentiel par défaut',
     trustDescription:
       'Les règles restent dans le stockage du navigateur. Aucun suivi ni service distant de règles.',
     footer: 'Open source · Manifest V3 · Local en priorité',
   },
   es: {
+    metaTitle: 'Reglas de solicitudes para Chrome, Edge y Firefox',
     navGuides: 'Guías',
     navPrivacy: 'Privacidad',
     openGithub: 'GitHub',
@@ -314,18 +380,25 @@ export const homeCopy: Record<Locale, HomeCopy> = {
         description: 'Revisa reglas antiguas compatibles y conserva los datos no compatibles.',
       },
     ],
-    guidesTitle: 'Ayuda que también explica el porqué',
-    guidesDescription: 'Aprende coincidencias, permisos, acciones y migración con ejemplos concretos.',
+    guidesTitle: 'Empieza por lo que quieres hacer',
+    guidesDescription: 'Sigue primero la ruta corta y abre los detalles solo cuando los necesites.',
     trustTitle: 'Privado por defecto',
     trustDescription: 'Las reglas permanecen en el navegador. No hay analítica ni servicio remoto de reglas.',
     footer: 'Código abierto · Manifest V3 · Local primero',
   },
 };
 
-type GuideCopy = {
+export type GuideSectionCopy = {
+  title: string;
+  paragraphs: string[];
+  points?: string[];
+  code?: string;
+};
+
+export type GuideCopy = {
   title: string;
   description: string;
-  sections: Array<{ title: string; paragraphs: string[]; points?: string[]; code?: string }>;
+  sections: GuideSectionCopy[];
 };
 
 const redirectExamples = {
@@ -372,17 +445,17 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
     description: 'Create, test, and safely enable your first request rule.',
     sections: [
       {
-        title: 'Start with an example',
-        paragraphs: [
-          'Open the rule manager and choose one of the three disabled starter rules. A starter is real, editable data—not a hidden preset.',
-          'Replace every example.com value with a domain you control or intend to target. Keep the rule disabled while you review it.',
-        ],
+        title: 'Choose an example',
+        paragraphs: ['Open the rule manager and choose one of the three disabled, editable examples.'],
       },
       {
-        title: 'Test before enabling',
+        title: 'Set the target',
+        paragraphs: ['Replace example.com with the domain you intend to handle. Keep the rule disabled.'],
+      },
+      {
+        title: 'Test and enable',
         paragraphs: [
-          'Use Test rule with a representative URL. The preview evaluates locally and sends no request.',
-          'Save the rule, then enable it. If host access is needed, the browser shows the exact scope before its permission prompt.',
+          'Test a representative URL, save, then enable. The browser shows any required access first.',
         ],
       },
     ],
@@ -692,18 +765,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   'zh-CN': {
     'quick-start': [
       {
-        title: '从示例开始',
-        paragraphs: [
-          '打开规则管理器，选择三条停用示例之一。示例就是可编辑的真实规则，不是隐藏预设。',
-          '把 example.com 替换为你拥有或确实要处理的域名，检查期间保持停用。',
-        ],
+        title: '选择示例',
+        paragraphs: ['打开规则管理器，选择三条停用且可编辑的示例之一。'],
       },
       {
-        title: '启用前先测试',
-        paragraphs: [
-          '用“测试规则”输入代表性 URL。预览仅在本地计算，不会发送请求。',
-          '保存后再启用。需要网站访问时，浏览器提示前会先显示确切范围。',
-        ],
+        title: '设置目标',
+        paragraphs: ['把 example.com 换成要处理的域名，暂时保持停用。'],
+      },
+      {
+        title: '测试并启用',
+        paragraphs: ['测试一个代表性 URL，保存后启用；需要网站访问时会先显示范围。'],
       },
     ],
     matching: [
@@ -890,18 +961,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ko: {
     'quick-start': [
       {
-        title: '예제로 시작',
-        paragraphs: [
-          '규칙 관리자에서 비활성 예제 세 가지 중 하나를 고릅니다. 예제는 숨겨진 프리셋이 아니라 편집 가능한 실제 규칙입니다.',
-          'example.com을 직접 관리하거나 대상으로 삼을 도메인으로 바꾸고 검토 중에는 비활성 상태를 유지하세요.',
-        ],
+        title: '예제 선택',
+        paragraphs: ['규칙 관리자에서 비활성화된 편집 가능한 예제 세 가지 중 하나를 고릅니다.'],
       },
       {
-        title: '활성화 전 테스트',
-        paragraphs: [
-          '규칙 테스트에 대표 URL을 입력하세요. 네트워크 요청 없이 로컬에서만 계산합니다.',
-          '저장 후 활성화하세요. 접근 권한이 필요하면 브라우저 프롬프트 전에 정확한 범위를 보여 줍니다.',
-        ],
+        title: '대상 설정',
+        paragraphs: ['example.com을 처리할 도메인으로 바꾸고 규칙은 비활성 상태로 둡니다.'],
+      },
+      {
+        title: '테스트 후 활성화',
+        paragraphs: ['대표 URL을 테스트하고 저장한 뒤 활성화합니다. 필요한 접근 범위가 먼저 표시됩니다.'],
       },
     ],
     matching: [
@@ -1089,18 +1158,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ja: {
     'quick-start': [
       {
-        title: 'サンプルから開始',
-        paragraphs: [
-          'ルール管理画面で無効なサンプルを一つ選びます。サンプルは編集できる実データです。',
-          'example.com を対象ドメインへ置き換え、確認中は無効のままにします。',
-        ],
+        title: 'サンプルを選ぶ',
+        paragraphs: ['ルール管理画面で、無効になっている編集可能なサンプルを一つ選びます。'],
       },
       {
-        title: '有効化前にテスト',
-        paragraphs: [
-          '代表的な URL を「ルールをテスト」で確認します。通信は発生しません。',
-          '保存後に有効化し、必要なら表示された範囲だけサイトアクセスを許可します。',
-        ],
+        title: '対象を設定',
+        paragraphs: ['example.com を対象ドメインへ置き換え、ルールは無効のままにします。'],
+      },
+      {
+        title: 'テストして有効化',
+        paragraphs: ['代表 URL をテストして保存し、有効化します。必要なアクセス範囲が先に表示されます。'],
       },
     ],
     matching: [
@@ -1288,18 +1355,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   fr: {
     'quick-start': [
       {
-        title: 'Commencer par un exemple',
-        paragraphs: [
-          'Dans le gestionnaire, choisissez l’un des trois exemples désactivés. Il s’agit d’une vraie règle modifiable.',
-          'Remplacez example.com par le domaine visé et laissez la règle désactivée pendant la vérification.',
-        ],
+        title: 'Choisir un exemple',
+        paragraphs: ['Dans le gestionnaire, choisissez l’un des trois exemples désactivés et modifiables.'],
       },
       {
-        title: 'Tester avant d’activer',
-        paragraphs: [
-          'Testez une URL représentative. La prévisualisation reste locale et n’envoie aucune requête.',
-          'Enregistrez puis activez. La portée exacte est affichée avant toute demande du navigateur.',
-        ],
+        title: 'Définir la cible',
+        paragraphs: ['Remplacez example.com par le domaine visé et gardez la règle désactivée.'],
+      },
+      {
+        title: 'Tester et activer',
+        paragraphs: ['Testez une URL, enregistrez puis activez. La portée nécessaire est affichée avant.'],
       },
     ],
     matching: [
@@ -1493,18 +1558,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   es: {
     'quick-start': [
       {
-        title: 'Empezar con un ejemplo',
-        paragraphs: [
-          'En el gestor, elige uno de los tres ejemplos desactivados. Es una regla real y editable.',
-          'Cambia example.com por el dominio objetivo y mantenla desactivada mientras la revisas.',
-        ],
+        title: 'Elegir un ejemplo',
+        paragraphs: ['En el gestor, elige uno de los tres ejemplos desactivados y editables.'],
       },
       {
-        title: 'Probar antes de activar',
-        paragraphs: [
-          'Prueba una URL representativa. La vista previa es local y no envía solicitudes.',
-          'Guarda y activa. Verás el alcance exacto antes de cualquier aviso del navegador.',
-        ],
+        title: 'Definir el destino',
+        paragraphs: ['Cambia example.com por el dominio objetivo y mantén la regla desactivada.'],
+      },
+      {
+        title: 'Probar y activar',
+        paragraphs: ['Prueba una URL, guarda y activa. Verás primero el acceso necesario.'],
       },
     ],
     matching: [

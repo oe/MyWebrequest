@@ -20,7 +20,12 @@ The page follows the concepts' cool-white canvas, editorial spacing, sparse blue
 - Keep shadows below 10% opacity. Glass is limited to navigation and the product frame.
 - Every page has canonical and alternate-language links.
 - JavaScript is not required for reading any page.
-- Technical recipes use readable code blocks and open bullet lists rather than adding a new card system.
+- The home page keeps one clear product story: outcome, three-step workflow, supported actions, four help
+  entry points, and privacy. Search terminology belongs in concise semantic copy and metadata, not filler.
+- Help navigation exposes four task groups and expands only the current group; never repeat the full guide
+  list on both sides of an article.
+- Technical recipes keep readable code blocks behind native disclosure controls so scenario titles stay
+  scannable without hiding content from no-JavaScript readers.
 - Breaking changes always pair the old behavior with a supported alternative or a clear no-equivalent note.
 
 ## Responsive behavior

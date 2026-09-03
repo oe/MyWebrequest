@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 
-import { guideCopy, guideSlugs, homeCopy, locales } from '../../site/src/content';
+import {
+  guideCopy,
+  guideGroupCopy,
+  guideGroups,
+  guideGroupSlugs,
+  guideSlugs,
+  homeCopy,
+  locales,
+} from '../../site/src/content';
 import type { Rule } from '../../src/domain/rules/model';
 import { matchRule } from '../../src/domain/rules/test-match';
 
@@ -30,12 +38,28 @@ describe('website content matrix', () => {
   it('publishes every guide in every supported locale', () => {
     for (const locale of locales) {
       expect(homeCopy[locale].title.length).toBeGreaterThan(10);
+      expect(homeCopy[locale].metaTitle).not.toBe('');
       for (const slug of guideSlugs) {
         const guide = guideCopy(locale, slug);
         expect(guide.title).not.toBe('');
         expect(guide.description).not.toBe('');
         expect(guide.sections.length).toBeGreaterThanOrEqual(2);
         expect(guide.sections.every((section) => section.paragraphs.length > 0)).toBe(true);
+      }
+    }
+  });
+
+  it('groups help into four short task-first entry points without hiding a guide', () => {
+    expect(guideGroups).toHaveLength(4);
+    expect(guideGroups.flatMap((group) => guideGroupSlugs[group])).toEqual(
+      expect.arrayContaining([...guideSlugs]),
+    );
+    expect(new Set(guideGroups.flatMap((group) => guideGroupSlugs[group])).size).toBe(guideSlugs.length);
+
+    for (const locale of locales) {
+      for (const group of guideGroups) {
+        expect(guideGroupCopy[locale][group].title).not.toBe('');
+        expect(guideGroupCopy[locale][group].description).not.toBe('');
       }
     }
   });

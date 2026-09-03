@@ -1,0 +1,66 @@
+---
+import { ChevronDown } from '@lucide/astro';
+import type { GuideSectionCopy } from '../content';
+
+interface Props {
+  section: GuideSectionCopy;
+  disclosure?: boolean;
+  number?: number;
+}
+
+const { section, disclosure = false, number } = Astro.props;
+---
+
+{
+  disclosure ? (
+    <details class="guide-disclosure">
+      <summary>
+        <span>{section.title}</span>
+        <ChevronDown aria-hidden="true" size={18} />
+      </summary>
+      <div class="guide-disclosure-content">
+        {section.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+        {section.points?.length ? (
+          <ul class="guide-points">
+            {section.points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        ) : null}
+        {section.code ? (
+          <pre>
+            <code>{section.code}</code>
+          </pre>
+        ) : null}
+      </div>
+    </details>
+  ) : (
+    <section class:list={{ 'guide-step': number }}>
+      {number ? (
+        <span class="guide-step-number" aria-hidden="true">
+          {number}
+        </span>
+      ) : null}
+      <div>
+        <h2>{section.title}</h2>
+        {section.paragraphs.map((paragraph) => (
+          <p>{paragraph}</p>
+        ))}
+        {section.points?.length ? (
+          <ul class="guide-points">
+            {section.points.map((point) => (
+              <li>{point}</li>
+            ))}
+          </ul>
+        ) : null}
+        {section.code ? (
+          <pre>
+            <code>{section.code}</code>
+          </pre>
+        ) : null}
+      </div>
+    </section>
+  )
+}

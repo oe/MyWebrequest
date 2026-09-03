@@ -1,9 +1,18 @@
 ---
-import { ArrowLeft, ArrowRight, CodeXml } from '@lucide/astro';
-import { guideCopy, guideSlugs, homeCopy, type GuideSlug, type Locale } from '../content';
+import { ArrowLeft, ArrowRight, ChevronDown, CodeXml } from '@lucide/astro';
+import {
+  guideCopy,
+  guideGroupCopy,
+  guideGroups,
+  guideGroupSlugs,
+  guideSlugs,
+  homeCopy,
+  type GuideSlug,
+  type Locale,
+} from '../content';
 import { githubUrl, localizedPath } from '../lib/routes';
 import BaseLayout from '../layouts/BaseLayout.astro';
-import GuideLinks from './GuideLinks.astro';
+import GuideSection from './GuideSection.astro';
 
 interface Props {
   locale: Locale;
@@ -15,6 +24,15 @@ const copy = homeCopy[locale];
 const index = guideSlugs.indexOf(slug);
 const previous = index > 0 ? guideSlugs[index - 1] : undefined;
 const next = index < guideSlugs.length - 1 ? guideSlugs[index + 1] : undefined;
+const currentGroup = guideGroups.find((group) => guideGroupSlugs[group].some((item) => item === slug));
+const summarySection = slug === 'breaking-changes' ? guide.sections[0] : undefined;
+const detailSections =
+  slug === 'advanced-examples'
+    ? [...guide.sections.slice(1, 5), guide.sections[0], ...guide.sections.slice(5)]
+    : summarySection
+      ? guide.sections.slice(1)
+      : guide.sections;
+const progressive = slug === 'advanced-examples' || slug === 'breaking-changes';
 ---
 
 <BaseLayout locale={locale} title={guide.title} description={guide.description} path={`guides/${slug}`}>
@@ -22,15 +40,25 @@ const next = index < guideSlugs.length - 1 ? guideSlugs[index + 1] : undefined;
     <aside class="guide-sidebar">
       <a class="back-link" href={localizedPath(locale)}><ArrowLeft size={15} />My Webrequest</a>
       <p>{copy.navGuides}</p>
-      <nav aria-label={copy.navGuides}>
+      <nav class="guide-nav" aria-label={copy.navGuides}>
         {
-          guideSlugs.map((item) => (
-            <a
-              aria-current={item === slug ? 'page' : undefined}
-              href={localizedPath(locale, `guides/${item}`)}
-            >
-              {guideCopy(locale, item).title}
-            </a>
+          guideGroups.map((group) => (
+            <details open={group === currentGroup}>
+              <summary>
+                <span>{guideGroupCopy[locale][group].title}</span>
+                <ChevronDown aria-hidden="true" size={15} />
+              </summary>
+              <div>
+                {guideGroupSlugs[group].map((item) => (
+                  <a
+                    aria-current={item === slug ? 'page' : undefined}
+                    href={localizedPath(locale, `guides/${item}`)}
+                  >
+                    {guideCopy(locale, item).title}
+                  </a>
+                ))}
+              </div>
+            </details>
           ))
         }
       </nav>
@@ -39,26 +67,14 @@ const next = index < guideSlugs.length - 1 ? guideSlugs[index + 1] : undefined;
       <header>
         <p class="eyebrow">My Webrequest</p><h1>{guide.title}</h1><p class="lede">{guide.description}</p>
       </header>
+      {summarySection ? <GuideSection section={summarySection} /> : null}
       {
-        guide.sections.map((section) => (
-          <section>
-            <h2>{section.title}</h2>
-            {section.paragraphs.map((paragraph) => (
-              <p>{paragraph}</p>
-            ))}
-            {section.points?.length ? (
-              <ul class="guide-points">
-                {section.points.map((point) => (
-                  <li>{point}</li>
-                ))}
-              </ul>
-            ) : null}
-            {section.code ? (
-              <pre>
-                <code>{section.code}</code>
-              </pre>
-            ) : null}
-          </section>
+        detailSections.map((section, sectionIndex) => (
+          <GuideSection
+            section={section}
+            disclosure={progressive}
+            number={slug === 'quick-start' ? sectionIndex + 1 : undefined}
+          />
         ))
       }
       <div class="guide-callout">
@@ -91,6 +107,5 @@ const next = index < guideSlugs.length - 1 ? guideSlugs[index + 1] : undefined;
         }
       </nav>
     </article>
-    <aside class="guide-related"><p>{copy.guidesTitle}</p><GuideLinks locale={locale} /></aside>
   </div>
 </BaseLayout>

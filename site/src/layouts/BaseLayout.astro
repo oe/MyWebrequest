@@ -14,20 +14,48 @@ interface Props {
 
 const { locale, title, description, path = '' } = Astro.props;
 const copy = homeCopy[locale];
-const pageTitle = title ? `${title} · My Webrequest` : 'My Webrequest — Clear, local request rules';
+const pageTitle = title ? `${title} · My Webrequest` : `My Webrequest — ${copy.metaTitle}`;
 const pageDescription = description ?? copy.description;
 const canonical = new URL(localizedPath(locale, path), Astro.site);
 const socialImage = new URL(withBase('app-icon.svg'), Astro.site);
-const schema = {
-  '@context': 'https://schema.org',
+const softwareSchema = {
   '@type': 'SoftwareApplication',
   name: 'My Webrequest',
   applicationCategory: 'BrowserApplication',
   operatingSystem: 'Chrome, Microsoft Edge, Firefox',
+  browserRequirements: 'Manifest V3 compatible browser',
   description: pageDescription,
+  featureList: copy.capabilities.map((capability) => capability.title),
+  inLanguage: locale,
+  isAccessibleForFree: true,
   codeRepository: 'https://github.com/oe/MyWebrequest',
   license: 'https://github.com/oe/MyWebrequest/blob/master/LICENSE',
 };
+const schema = title
+  ? {
+      '@context': 'https://schema.org',
+      '@graph': [
+        softwareSchema,
+        {
+          '@type': 'TechArticle',
+          headline: title,
+          description: pageDescription,
+          inLanguage: locale,
+          mainEntityOfPage: canonical,
+          isPartOf: {
+            '@type': 'WebSite',
+            name: 'My Webrequest',
+            url: new URL(localizedPath(locale), Astro.site),
+          },
+          author: {
+            '@type': 'Organization',
+            name: 'My Webrequest',
+            url: 'https://github.com/oe/MyWebrequest',
+          },
+        },
+      ],
+    }
+  : { '@context': 'https://schema.org', ...softwareSchema };
 ---
 
 <!doctype html>
