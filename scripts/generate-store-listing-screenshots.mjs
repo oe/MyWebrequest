@@ -21,59 +21,69 @@ const sources = Object.fromEntries(
 
 const scenes = [
   {
+    index: '01 / 05',
     filename: '01-request-rules-made-clear.png',
     source: 'rules',
     layout: 'hero',
     eyebrow: 'MY WEBREQUEST',
     headline: 'Request rules,\nmade clear.',
     subhead: 'Create, test, and manage browser request rules without editing raw DNR JSON.',
-    background: 'linear-gradient(138deg, #061a43 0%, #075bcf 58%, #08aee9 100%)',
-    foreground: '#ffffff',
-    muted: 'rgba(255,255,255,.78)',
+    background: '#f2efe8',
+    foreground: '#171a1e',
+    muted: '#5d6268',
+    frame: 'rgba(23,26,30,.16)',
   },
   {
+    index: '02 / 05',
     filename: '02-match-with-precision.png',
     source: 'rules',
     layout: 'offset-right',
     eyebrow: 'CLEAR CONDITIONS',
     headline: 'Match with\nprecision.',
     subhead: 'Use wildcards, regular expressions, resource types, methods, and priorities.',
-    background: 'linear-gradient(145deg, #eef8ff 0%, #d8eeff 52%, #a8ddff 100%)',
-    foreground: '#071a33',
-    muted: '#4a627b',
+    background: '#e8edf0',
+    foreground: '#171a1e',
+    muted: '#59636c',
+    frame: 'rgba(23,26,30,.16)',
   },
   {
+    index: '03 / 05',
     filename: '03-access-only-when-needed.png',
     source: 'permission',
     layout: 'split',
     eyebrow: 'BOUNDED PERMISSIONS',
     headline: 'Access only\nwhen needed.',
     subhead: 'Review the exact website origins before continuing to the browser prompt.',
-    background: 'linear-gradient(132deg, #051735 0%, #093f92 50%, #087dcc 100%)',
-    foreground: '#ffffff',
-    muted: 'rgba(255,255,255,.76)',
+    background: '#1c2025',
+    foreground: '#f7f6f2',
+    muted: '#bec5cc',
+    frame: 'rgba(255,255,255,.18)',
   },
   {
+    index: '04 / 05',
     filename: '04-preview-before-import.png',
     source: 'backup',
     layout: 'offset-left',
     eyebrow: 'SAFE BACKUPS',
     headline: 'Preview before\nyou import.',
     subhead: 'See additions, updates, conflicts, and import mode before any rule changes.',
-    background: 'linear-gradient(142deg, #f5fbff 0%, #e8f4ff 48%, #cce9ff 100%)',
-    foreground: '#071a33',
-    muted: '#50677f',
+    background: '#efe5d8',
+    foreground: '#191b1e',
+    muted: '#625f5a',
+    frame: 'rgba(25,27,30,.16)',
   },
   {
+    index: '05 / 05',
     filename: '05-local-by-design.png',
     source: 'backup',
     layout: 'minimal',
     eyebrow: 'PRIVATE BY DEFAULT',
     headline: 'Local by\ndesign.',
     subhead: 'Rules, backups, and settings stay on this device.',
-    background: 'linear-gradient(135deg, #04132f 0%, #0746a5 52%, #00a9dc 100%)',
-    foreground: '#ffffff',
-    muted: 'rgba(255,255,255,.78)',
+    background: '#f3f1ea',
+    foreground: '#171a1e',
+    muted: '#5d6268',
+    frame: 'rgba(23,26,30,.16)',
   },
 ];
 
@@ -107,26 +117,13 @@ function sceneHtml(scene) {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         background: ${scene.background};
       }
-      body::before {
+      body::after {
         content: "";
         position: absolute;
-        inset: 0;
-        opacity: .3;
-        background-image:
-          linear-gradient(rgba(255,255,255,.12) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,.12) 1px, transparent 1px);
-        background-size: 64px 64px;
-        mask-image: linear-gradient(120deg, transparent 0%, black 55%, black 100%);
-      }
-      .orbital {
-        position: absolute;
-        width: 720px;
-        height: 720px;
-        left: -390px;
-        top: -260px;
-        border: 1px solid rgba(255,255,255,.22);
-        border-radius: 50%;
-        box-shadow: 0 0 0 72px rgba(255,255,255,.06), 0 0 0 144px rgba(46,201,255,.07);
+        z-index: 8;
+        inset: 28px;
+        border: 1px solid ${scene.frame};
+        pointer-events: none;
       }
       .copy {
         position: absolute;
@@ -146,8 +143,7 @@ function sceneHtml(scene) {
         width: 34px;
         height: 4px;
         border-radius: 999px;
-        background: #43c8ff;
-        box-shadow: 0 0 18px rgba(67,200,255,.7);
+        background: #168bd2;
       }
       h1 {
         margin: 0;
@@ -170,16 +166,27 @@ function sceneHtml(scene) {
         display: block;
         width: 68px;
         height: 68px;
-        filter: drop-shadow(0 12px 18px rgba(0,20,68,.24));
+        filter: drop-shadow(0 8px 12px rgba(17,28,39,.16));
+      }
+      .index {
+        position: absolute;
+        z-index: 6;
+        right: 62px;
+        bottom: 48px;
+        color: ${scene.muted};
+        font-size: 15px;
+        font-weight: 680;
+        letter-spacing: .14em;
+        font-variant-numeric: tabular-nums;
       }
       .window {
         position: absolute;
         z-index: 2;
         overflow: hidden;
-        border: 2px solid rgba(255,255,255,.72);
-        border-radius: 28px;
+        border: 1px solid rgba(23,32,42,.18);
+        border-radius: 18px;
         background: #f7f9fc;
-        box-shadow: 0 36px 90px rgba(0,18,64,.32), inset 0 1px 0 rgba(255,255,255,.95);
+        box-shadow: 0 24px 54px rgba(19,33,48,.16), inset 0 1px 0 rgba(255,255,255,.95);
       }
       .chrome {
         position: absolute;
@@ -207,31 +214,30 @@ function sceneHtml(scene) {
       .hero .copy h1 { font-size: 62px; }
       .hero .copy p { max-width: 650px; margin-top: 18px; font-size: 21px; }
       .hero .mark { right: 64px; top: 58px; }
-      .hero .window { left: 72px; top: 292px; width: 1136px; height: 690px; transform: rotate(-1deg); }
+      .hero .window { left: 72px; top: 292px; width: 1136px; height: 690px; transform: rotate(.25deg); }
 
       .offset-right .copy { left: 72px; top: 96px; width: 470px; }
       .offset-right .mark { left: 72px; bottom: 62px; }
-      .offset-right .window { right: -80px; top: 80px; width: 820px; height: 650px; transform: rotate(-2.2deg); }
+      .offset-right .window { right: -80px; top: 80px; width: 820px; height: 650px; transform: rotate(-.7deg); }
       .offset-right .window img { width: 145%; max-width: none; transform: translateX(-31%); object-fit: cover; }
 
       .split .copy { left: 72px; top: 122px; width: 450px; }
       .split .mark { left: 72px; bottom: 62px; }
-      .split .window { right: -54px; top: 76px; width: 750px; height: 650px; transform: rotate(1.6deg); }
+      .split .window { right: -54px; top: 76px; width: 750px; height: 650px; }
 
       .offset-left .copy { right: 70px; top: 92px; width: 455px; }
       .offset-left .mark { right: 70px; bottom: 64px; }
-      .offset-left .window { left: -66px; top: 134px; width: 790px; height: 620px; transform: rotate(2deg); }
+      .offset-left .window { left: -66px; top: 134px; width: 790px; height: 620px; transform: rotate(.65deg); }
       .offset-left .window img { width: 136%; max-width: none; object-position: left center; }
 
       .minimal .copy { left: 108px; top: 170px; width: 430px; }
       .minimal .mark { left: 108px; top: 72px; width: 76px; height: 76px; }
-      .minimal .window { right: -70px; top: 84px; width: 760px; height: 646px; transform: rotate(-2deg); }
+      .minimal .window { right: -70px; top: 84px; width: 760px; height: 646px; transform: rotate(-.5deg); }
       .minimal .window img { width: 132%; max-width: none; object-position: left center; }
-      .minimal .orbital { left: -150px; top: 230px; }
     </style>
     <main class="${scene.layout}">
-      <div class="orbital"></div>
       <img class="mark" alt="" src="data:image/svg+xml;base64,${encodedIcon}">
+      <div class="index">${scene.index}</div>
       <section class="copy">
         <div class="eyebrow">${scene.eyebrow}</div>
         <h1>${headline}</h1>

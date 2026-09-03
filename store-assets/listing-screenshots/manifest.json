@@ -10,7 +10,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-03T16:18:11.045Z",
+  "generatedAt": "2026-09-03T16:27:44.557Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
@@ -36,7 +36,7 @@
       "source": "store-assets/screenshots/chrome/01-rules-overview.png",
       "headline": "Request rules, made clear.",
       "subhead": "Create, test, and manage browser request rules without editing raw DNR JSON.",
-      "sha256": "1ce373af16e53b2f786865e025e0a62a2aa703acb48fe75501ba9e48916e9dc6",
+      "sha256": "635aaffc780a71680306b2b3b10a7ba45c2ec39bac033ef82614703d3c82fc9c",
       "width": 1280,
       "height": 800
     },
@@ -46,7 +46,7 @@
       "source": "store-assets/screenshots/chrome/01-rules-overview.png",
       "headline": "Match with precision.",
       "subhead": "Use wildcards, regular expressions, resource types, methods, and priorities.",
-      "sha256": "d8c6791d5856c4984528859c7d69be6168453650f8698f66816f92dbda091728",
+      "sha256": "e4686bb1092faeb6e37ea9ab304dc2276026159451c11e443776c2a1b60c369f",
       "width": 1280,
       "height": 800
     },
@@ -56,7 +56,7 @@
       "source": "store-assets/screenshots/chrome/02-permission-explanation.png",
       "headline": "Access only when needed.",
       "subhead": "Review the exact website origins before continuing to the browser prompt.",
-      "sha256": "79c67c92e01e146e36bb88edbd97a2fe7c5e7a36be1f6868f53b0774df7a54dd",
+      "sha256": "c369b77889ca222c35d658bf42d5a5122de088fad930acb19433ef4d1bc4f9bc",
       "width": 1280,
       "height": 800
     },
@@ -66,7 +66,7 @@
       "source": "store-assets/screenshots/chrome/03-backup-restore.png",
       "headline": "Preview before you import.",
       "subhead": "See additions, updates, conflicts, and import mode before any rule changes.",
-      "sha256": "87b14b29530962af21f3436d0fe169516de9af0763fe7a7efbc3fbf5a05724c9",
+      "sha256": "ddfa253684561879c2ef174c397a16e491e88c3eeffe8526c53b39f40464d182",
       "width": 1280,
       "height": 800
     },
@@ -76,7 +76,7 @@
       "source": "store-assets/screenshots/chrome/03-backup-restore.png",
       "headline": "Local by design.",
       "subhead": "Rules, backups, and settings stay on this device.",
-      "sha256": "a81977257261c18dbd588f805adc32a428cbaee755cfb7a165c1b00766372072",
+      "sha256": "b1864824213ce412a1a5218794feacebe16b6c6f5683bb7c2f2c9c09bdcadb15",
       "width": 1280,
       "height": 800
     }
