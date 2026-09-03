@@ -1,14 +1,27 @@
 {
-  "schemaVersion": 1,
-  "source": {
-    "path": "store-assets/brand/app-icon.svg",
-    "sha256": "1f82bc79eb6bdd6f03802bda2287cddd3d58265bae52d4c267562efb2398fb59"
-  },
+  "schemaVersion": 2,
+  "sources": [
+    {
+      "path": "store-assets/brand/app-icon.svg",
+      "purpose": "Canonical brand icon",
+      "sha256": "1f82bc79eb6bdd6f03802bda2287cddd3d58265bae52d4c267562efb2398fb59"
+    },
+    {
+      "path": "store-assets/screenshots/chrome/01-rules-overview.png",
+      "purpose": "Real rules editor UI used in promotional artwork",
+      "sha256": "399f7902e8ff423d6a3ee0081f02500c45696882f8ee9d87ca64de82d55f40aa"
+    },
+    {
+      "path": "store-assets/screenshots/chrome/02-permission-explanation.png",
+      "purpose": "Real permission UI used in marquee artwork",
+      "sha256": "f204b46845d29ea3fe55362f0ffb330fe3b70451ce44b7d187c466ac4a577fb6"
+    }
+  ],
   "generatedWith": {
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-02T17:14:28.684Z",
+  "generatedAt": "2026-09-03T16:11:23.714Z",
   "assets": [
     {
       "path": "src/public/icon/16.png",
@@ -55,14 +68,21 @@
     {
       "path": "store-assets/promotional/chrome/small-promo-440x280.png",
       "purpose": "Chrome small promotional tile",
-      "sha256": "84cacba72c334e88443452035646ab8a1f000f178a183d723be65124d282f1ad",
+      "sha256": "bec9e603d4e553daa7cdd3e8bbc8b8384f5372930a210dd648a477cd567383f0",
       "width": 440,
       "height": 280
     },
     {
+      "path": "store-assets/promotional/chrome/marquee-promo-1400x560.png",
+      "purpose": "Chrome marquee promotional tile",
+      "sha256": "1b71b8295b2744c05acffbb237c8596204bef698ae609aae58441cca6ee21a99",
+      "width": 1400,
+      "height": 560
+    },
+    {
       "path": "store-assets/promotional/edge/small-promo-440x280.png",
       "purpose": "Edge small promotional tile",
-      "sha256": "84cacba72c334e88443452035646ab8a1f000f178a183d723be65124d282f1ad",
+      "sha256": "bec9e603d4e553daa7cdd3e8bbc8b8384f5372930a210dd648a477cd567383f0",
       "width": 440,
       "height": 280
     }

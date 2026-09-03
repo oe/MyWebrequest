@@ -53,13 +53,24 @@ for (const target of ['chrome', 'edge', 'firefox']) {
   }
 }
 
-assert.equal(promotionalManifest.schemaVersion, 1, 'Unsupported promotional asset manifest schema.');
-const brandSource = await readFile(join(root, promotionalManifest.source.path));
-assert.equal(
-  createHash('sha256').update(brandSource).digest('hex'),
-  promotionalManifest.source.sha256,
-  'The canonical brand icon source changed without regenerating assets.',
+assert.equal(promotionalManifest.schemaVersion, 2, 'Unsupported promotional asset manifest schema.');
+assert.deepEqual(
+  promotionalManifest.sources.map((source) => source.path).sort(),
+  [
+    'store-assets/brand/app-icon.svg',
+    'store-assets/screenshots/chrome/01-rules-overview.png',
+    'store-assets/screenshots/chrome/02-permission-explanation.png',
+  ],
+  'The promotional artwork source set is incomplete or contains an unexpected file.',
 );
+for (const source of promotionalManifest.sources) {
+  const sourceBytes = await readFile(join(root, source.path));
+  assert.equal(
+    createHash('sha256').update(sourceBytes).digest('hex'),
+    source.sha256,
+    `${source.path} changed without regenerating promotional assets.`,
+  );
+}
 const expectedPromotionalAssets = new Map([
   ['src/public/icon/16.png', [16, 16]],
   ['src/public/icon/32.png', [32, 32]],
@@ -68,6 +79,7 @@ const expectedPromotionalAssets = new Map([
   ['src/public/icon/128.png', [128, 128]],
   ['store-assets/promotional/edge/logo-300.png', [300, 300]],
   ['store-assets/promotional/chrome/small-promo-440x280.png', [440, 280]],
+  ['store-assets/promotional/chrome/marquee-promo-1400x560.png', [1400, 560]],
   ['store-assets/promotional/edge/small-promo-440x280.png', [440, 280]],
 ]);
 assert.deepEqual(

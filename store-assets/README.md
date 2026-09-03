@@ -10,11 +10,14 @@ claim. Only `chromeLegacyMigrationNote` may be appended to the Chrome listing; i
 Edge Add-ons or AMO.
 
 The canonical icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
-16/32/48/96/128px PNG matrix, Edge's 300px listing logo, and Chrome/Edge 440x280 promotional tiles. The
-standalone blue globe and white Americas preserve the legacy identity at toolbar size; cleaner edges and a
-restrained highlight connect it to the current product UI without depending on blur for legibility.
+16/32/48/96/128px PNG matrix, Edge's 300px listing logo, Chrome/Edge 440x280 promotional tiles, and Chrome's
+optional 1400x560 marquee tile. The promotional artwork adapts Goldie's product-first framing to extension
+store proportions: the legacy blue globe stays recognizable while verified, current UI is presented inside a
+browser-window frame. The saturated full-bleed artwork avoids relying on marketing copy that cannot be
+localized in Chrome's global promotional-image fields.
 
 - Chrome Web Store accepts 1280x800 or 640x400 screenshots and recommends the larger size.
+- Chrome Web Store requires a 440x280 small promotional tile and accepts an optional 1400x560 marquee tile.
 - Microsoft Edge Add-ons accepts 1280x800 or 640x480 screenshots.
 - Firefox Add-ons recommends 1280x800 and a 1.6:1 ratio for other sizes.
 
