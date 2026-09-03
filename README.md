@@ -28,7 +28,8 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 - Conservatively remastered original blue-globe icon, browser-size icon matrix, and audited Chrome/Edge
   promotional artwork
 - Six-language store descriptions, permission/privacy summaries, search terms, and screenshot captions
-- Disabled starter-rule onboarding plus a six-language Astro 7 product and help site
+- Disabled starter-rule onboarding plus a six-language Astro 7 product and help site with tested Redirect
+  recipes and a legacy breaking-change/alternative guide
 
 The current stable-browser matrix and Firefox 142 floor are certified. Chrome 121, Edge 121, signed legacy
 upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md),

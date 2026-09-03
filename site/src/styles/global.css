@@ -466,6 +466,9 @@ h3 {
   position: sticky;
   top: 96px;
 }
+.guide-article {
+  min-width: 0;
+}
 .guide-sidebar > p,
 .guide-related > p {
   margin: 34px 0 12px;
@@ -518,6 +521,18 @@ h3 {
   color: #526174;
   font-size: 16px;
   line-height: 1.78;
+}
+.guide-points {
+  display: grid;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding-left: 22px;
+  color: #526174;
+  font-size: 15px;
+  line-height: 1.7;
+}
+.guide-points li::marker {
+  color: #2f84c6;
 }
 .guide-article pre {
   overflow-x: auto;

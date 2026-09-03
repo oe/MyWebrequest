@@ -46,6 +46,13 @@ const next = index < guideSlugs.length - 1 ? guideSlugs[index + 1] : undefined;
             {section.paragraphs.map((paragraph) => (
               <p>{paragraph}</p>
             ))}
+            {section.points?.length ? (
+              <ul class="guide-points">
+                {section.points.map((point) => (
+                  <li>{point}</li>
+                ))}
+              </ul>
+            ) : null}
             {section.code ? (
               <pre>
                 <code>{section.code}</code>

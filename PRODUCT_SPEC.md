@@ -92,8 +92,8 @@ unless explicitly approved.
 - Full-page options UI as the primary rule manager.
 - First-run or upgrade migration flow inside the options UI.
 - Unified first-run empty state with three disabled, editable starter rules and a blank-rule path.
-- Static six-language product/help site covering quick start, matching, actions, permissions, migration,
-  and troubleshooting.
+- Static six-language product/help site covering quick start, matching, actions, advanced redirect recipes,
+  permissions, migration, breaking changes with alternatives, and troubleshooting.
 - English, Simplified Chinese, Korean, Japanese, French, and Spanish from the first release.
 - Shared Chrome, Edge, and Firefox Manifest V3 builds, with a separate release gate for each browser.
 

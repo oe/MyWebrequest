@@ -125,9 +125,11 @@ Exit gate: all six languages pass the same functional and accessibility smoke su
 - Link Settings and the empty state to a six-language help center.
 - Build the static product and documentation site with Astro 7, canonical URLs, language alternates,
   structured data, sitemap, responsive layouts, and no unsupported installation claim.
+- Document executable advanced Redirect recipes and publish a legacy breaking-change matrix with practical
+  alternatives for every intentionally removed capability.
 - Publish the site through the official GitHub Pages Actions workflow.
 
-Exit gate: all 36 localized guide routes build, the empty-state journey passes installed-extension E2E,
+Exit gate: all 48 localized guide routes build, the empty-state journey passes installed-extension E2E,
 and the production site is reachable at its canonical project URL.
 
 ### M6 — Browser certification and release

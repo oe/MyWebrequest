@@ -20,6 +20,8 @@ The page follows the concepts' cool-white canvas, editorial spacing, sparse blue
 - Keep shadows below 10% opacity. Glass is limited to navigation and the product frame.
 - Every page has canonical and alternate-language links.
 - JavaScript is not required for reading any page.
+- Technical recipes use readable code blocks and open bullet lists rather than adding a new card system.
+- Breaking changes always pair the old behavior with a supported alternative or a clear no-equivalent note.
 
 ## Responsive behavior
 
