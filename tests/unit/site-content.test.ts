@@ -97,6 +97,18 @@ describe('website content matrix', () => {
     }
   });
 
+  it('explains URL-filter anchors and redirect captures with copyable examples in every locale', () => {
+    for (const locale of locales) {
+      const matching = guideCopy(locale, 'matching');
+      const text = JSON.stringify(matching);
+      expect(matching.sections).toHaveLength(3);
+      expect(text).toContain('||example.com^');
+      expect(text).toContain('$1');
+      expect(text).toContain('$2');
+      expect(matching.sections.filter((section) => section.code)).toHaveLength(2);
+    }
+  });
+
   it('keeps the documented redirect capture recipes executable', () => {
     const localApi = redirectRule(
       { kind: 'wildcard', value: 'https://api.staging.example.com/v1/*' },

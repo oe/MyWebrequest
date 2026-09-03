@@ -180,6 +180,7 @@
 
   [data-slot='dialog-content'],
   [data-slot='dropdown-menu-content'],
+  [data-slot='popover-content'],
   [data-slot='select-content'] {
     -webkit-backdrop-filter: blur(28px) saturate(165%);
     backdrop-filter: blur(28px) saturate(165%);
@@ -201,6 +202,7 @@
   [data-material^='glass-'],
   [data-slot='dialog-content'],
   [data-slot='dropdown-menu-content'],
+  [data-slot='popover-content'],
   [data-slot='select-content'] {
     background-color: var(--background);
   }

@@ -481,6 +481,25 @@ Action        Redirect
 Destination   http://localhost:5173/checkout.js`,
 } as const;
 
+const matchingExamples = {
+  urlFilter: `||example.com^
+|https://example.com/app.js|
+https://example.com/assets/*`,
+  captures: `https://api.example.com/v1/*
+→ http://localhost:3000/v1/$1
+
+https://api.example.com/v1/users/42
+→ http://localhost:3000/v1/users/42
+$1 = users/42
+
+^https://api\\.example\\.com/v1/(users|projects)/([^?]+)$
+→ https://api.example.com/v2/$1/$2
+
+https://api.example.com/v1/projects/alpha
+→ https://api.example.com/v2/projects/alpha
+$1 = projects, $2 = alpha`,
+} as const;
+
 const enGuides: Record<GuideSlug, GuideCopy> = {
   'quick-start': {
     title: 'Quick start',
@@ -507,18 +526,28 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
     description: 'Choose the narrowest match that describes your intent.',
     sections: [
       {
-        title: 'URL filters',
-        paragraphs: [
-          'URL filters use the browser Declarative Net Request syntax. They are efficient for host or path matching.',
+        title: 'Start with the simplest option',
+        paragraphs: ['You do not need regular expressions for most rules. Pick the first option that fits:'],
+        points: [
+          'URL filter: a domain, fixed URL, or path. Fast and simple, but it cannot create $1 values.',
+          'Wildcard: use * when a redirect must keep part of the original URL.',
+          'Regular expression: use only for several precisely defined captures or alternatives.',
         ],
-        code: '||example.com^',
       },
       {
-        title: 'Wildcards and regular expressions',
+        title: 'What || and ^ mean',
         paragraphs: [
-          'Use a wildcard when you need a captured value such as $1 in a redirect. Use regular expressions only when a filter or wildcard cannot express the match.',
-          'Resource types, methods, and initiator domains narrow the rule further. Leaving types or methods empty means all values.',
+          'In a URL filter, || starts matching at a domain name and includes subdomains. The ^ after the domain requires a separator or the end of the URL, so example.com does not accidentally match example.company. A single | anchors the beginning or end; * matches any number of characters.',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: 'How $1 through $9 work',
+        paragraphs: [
+          'These are placeholders used only in a Redirect destination. With a wildcard, the first * becomes $1 and the second becomes $2. With a regular expression, the first capturing (...) becomes $1, the second becomes $2, and so on. URL filters never create captures.',
+          'Finally, resource types, methods, and initiator domains can narrow the rule. Leaving types or methods empty means all values.',
+        ],
+        code: matchingExamples.captures,
       },
     ],
   },
@@ -838,16 +867,28 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'URL 过滤器',
-        paragraphs: ['URL 过滤器使用浏览器的 Declarative Net Request 语法，最适合按域名或路径匹配。'],
-        code: '||example.com^',
+        title: '先选最简单的匹配方式',
+        paragraphs: ['大多数规则都不需要正则表达式。按下面的顺序选择即可：'],
+        points: [
+          'URL 过滤器：匹配域名、固定 URL 或路径，简单高效，但不能生成 $1。',
+          '通配符：重定向时需要保留原 URL 的一部分，就用 *。',
+          '正则表达式：只有需要多个精确分组或备选项时再使用。',
+        ],
       },
       {
-        title: '通配符与正则表达式',
+        title: '|| 和 ^ 是什么意思',
         paragraphs: [
-          '如果重定向地址需要复用原 URL 的一部分（例如 $1），可以使用通配符。只有普通过滤器和通配符都不够用时，再考虑正则表达式。',
-          '还可以按资源类型、请求方法和来源网页进一步缩小范围。类型或方法留空时，表示不做限制。',
+          '在 URL 过滤器中，|| 表示从域名开始匹配，并包含它的子域名。域名后的 ^ 要求这里是分隔符或 URL 结尾，因此 example.com 不会误匹配 example.company。单个 | 用来限定开头或结尾，* 表示任意数量的字符。',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: '$1 到 $9 怎么用',
+        paragraphs: [
+          '它们只能写在重定向目标中。使用通配符时，第一个 * 是 $1，第二个是 $2；使用正则表达式时，第一个捕获括号 (...) 是 $1，第二个是 $2，依此类推。URL 过滤器不会产生捕获值。',
+          '最后还可以按资源类型、请求方法和来源网页缩小范围。类型或方法留空表示不限制。',
+        ],
+        code: matchingExamples.captures,
       },
     ],
     actions: [
@@ -1040,18 +1081,28 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'URL 필터',
-        paragraphs: [
-          '브라우저의 Declarative Net Request 문법을 사용합니다. 도메인이나 경로를 일치시킬 때 가장 간단하고 빠릅니다.',
+        title: '가장 간단한 방식부터 선택하세요',
+        paragraphs: ['대부분의 규칙에는 정규식이 필요하지 않습니다. 다음 순서로 고르면 됩니다.'],
+        points: [
+          'URL 필터: 도메인, 고정 URL, 경로를 간단히 지정합니다. 단, $1 값은 만들 수 없습니다.',
+          '와일드카드: 리디렉션에서 원래 URL의 일부를 유지해야 할 때 *를 사용합니다.',
+          '정규식: 여러 부분을 정확히 나누거나 선택지를 표현해야 할 때만 사용합니다.',
         ],
-        code: '||example.com^',
       },
       {
-        title: '와일드카드와 정규식',
+        title: '||와 ^의 의미',
         paragraphs: [
-          '리디렉션 주소에서 원래 URL의 일부를 $1로 재사용하려면 와일드카드를 사용하세요. 일반 필터와 와일드카드로 표현할 수 없을 때만 정규식을 권장합니다.',
-          '리소스 유형, 요청 메서드, 요청 출처 도메인으로 범위를 더 좁힐 수 있습니다. 유형이나 메서드를 비워 두면 제한하지 않습니다.',
+          'URL 필터에서 ||는 도메인 이름부터 일치하며 하위 도메인도 포함합니다. 도메인 뒤의 ^는 구분 문자나 URL 끝을 요구하므로 example.com이 example.company와 잘못 일치하지 않습니다. | 하나는 시작이나 끝을 고정하고, *는 임의 개수의 문자와 일치합니다.',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: '$1부터 $9까지 사용하는 방법',
+        paragraphs: [
+          '이 값들은 리디렉션 대상에서만 사용합니다. 와일드카드에서는 첫 번째 *가 $1, 두 번째가 $2입니다. 정규식에서는 첫 번째 캡처 괄호 (...)가 $1, 두 번째가 $2가 됩니다. URL 필터는 캡처 값을 만들지 않습니다.',
+          '마지막으로 리소스 유형, 요청 메서드, 요청 출처 도메인으로 범위를 더 좁힐 수 있습니다. 유형이나 메서드를 비워 두면 제한하지 않습니다.',
+        ],
+        code: matchingExamples.captures,
       },
     ],
     actions: [
@@ -1247,18 +1298,28 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'URL フィルター',
-        paragraphs: [
-          'ブラウザの Declarative Net Request 構文を使います。ドメインやパスを指定するなら、最もシンプルで高速な方法です。',
+        title: 'まず最も簡単な方法を選ぶ',
+        paragraphs: ['ほとんどのルールに正規表現は必要ありません。次の順で選びます。'],
+        points: [
+          'URL フィルター：ドメイン、固定 URL、パスを簡単に指定できます。ただし $1 は作れません。',
+          'ワイルドカード：リダイレクト先に元の URL の一部を残したい場合は * を使います。',
+          '正規表現：複数の部分を正確に分ける場合や、選択肢が必要な場合だけ使います。',
         ],
-        code: '||example.com^',
       },
       {
-        title: 'ワイルドカードと正規表現',
+        title: '|| と ^ の意味',
         paragraphs: [
-          'リダイレクト先で元の URL の一部を $1 として使いたい場合は、ワイルドカードを選びます。通常のフィルターやワイルドカードで表せない場合だけ、正規表現を使うのがおすすめです。',
-          'リソースの種類、リクエストメソッド、リクエスト元のドメインでも範囲を絞れます。種類やメソッドを空欄にすると、制限なしになります。',
+          'URL フィルターの || はドメイン名から一致させ、サブドメインも含めます。ドメイン直後の ^ は区切り文字または URL の末尾を必須にするため、example.com が example.company に誤って一致しません。| 一つは先頭または末尾を固定し、* は任意の数の文字に一致します。',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: '$1〜$9 の使い方',
+        paragraphs: [
+          'これらはリダイレクト先でのみ使います。ワイルドカードでは最初の * が $1、次が $2 です。正規表現では最初のキャプチャ用 (...) が $1、次が $2 になります。URL フィルターはキャプチャ値を作りません。',
+          '最後に、リソースの種類、リクエストメソッド、リクエスト元のドメインで範囲をさらに絞れます。種類やメソッドを空欄にすると制限なしです。',
+        ],
+        code: matchingExamples.captures,
       },
     ],
     actions: [
@@ -1454,18 +1515,30 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'Filtres URL',
+        title: 'Commencez par la méthode la plus simple',
         paragraphs: [
-          'Ils utilisent la syntaxe Declarative Net Request du navigateur. C’est la méthode la plus simple pour cibler un domaine ou un chemin.',
+          'La plupart des règles n’ont pas besoin d’expression régulière. Choisissez dans cet ordre :',
         ],
-        code: '||example.com^',
+        points: [
+          'Filtre d’URL : pour un domaine, une URL fixe ou un chemin. Simple et rapide, mais sans valeur $1.',
+          'Caractère générique : utilisez * si la redirection doit conserver une partie de l’URL d’origine.',
+          'Expression régulière : seulement pour plusieurs captures précises ou des alternatives.',
+        ],
       },
       {
-        title: 'Jokers et expressions régulières',
+        title: 'Signification de || et ^',
         paragraphs: [
-          'Utilisez un joker si la destination doit reprendre une partie de l’URL avec $1. Réservez les expressions régulières aux cas qu’un filtre ou un joker ne peut pas couvrir.',
-          'Vous pouvez encore réduire le périmètre avec le type de ressource, la méthode de requête et le domaine initiateur. Un type ou une méthode vide ne pose aucune restriction.',
+          'Dans un filtre d’URL, || commence au nom de domaine et inclut les sous-domaines. Le ^ placé après le domaine exige un séparateur ou la fin de l’URL : example.com ne correspond donc pas à example.company. Un seul | fixe le début ou la fin, tandis que * correspond à un nombre quelconque de caractères.',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: 'Utiliser $1 à $9',
+        paragraphs: [
+          'Ces valeurs s’emploient uniquement dans la destination d’une redirection. Avec un joker, le premier * devient $1 et le deuxième $2. Avec une expression régulière, la première capture (...) devient $1, la deuxième $2, etc. Un filtre d’URL ne crée aucune capture.',
+          'Enfin, limitez davantage la règle par type de ressource, méthode et domaine initiateur. Laisser les types ou méthodes vides signifie qu’ils sont tous acceptés.',
+        ],
+        code: matchingExamples.captures,
       },
     ],
     actions: [
@@ -1663,18 +1736,28 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'Filtros de URL',
-        paragraphs: [
-          'Usan la sintaxis Declarative Net Request del navegador. Es la forma más sencilla de seleccionar un dominio o una ruta.',
+        title: 'Empieza por la opción más sencilla',
+        paragraphs: ['La mayoría de las reglas no necesitan expresiones regulares. Elige en este orden:'],
+        points: [
+          'Filtro de URL: para un dominio, una URL fija o una ruta. Es sencillo y rápido, pero no genera $1.',
+          'Comodín: usa * si la redirección debe conservar una parte de la URL original.',
+          'Expresión regular: solo cuando necesites varias capturas precisas o alternativas.',
         ],
-        code: '||example.com^',
       },
       {
-        title: 'Comodines y expresiones regulares',
+        title: 'Qué significan || y ^',
         paragraphs: [
-          'Usa un comodín si la dirección de destino debe reutilizar parte de la URL mediante $1. Reserva las expresiones regulares para los casos que no puedas resolver con un filtro o comodín.',
-          'También puedes limitar el alcance por tipo de recurso, método de solicitud y dominio iniciador. Si dejas vacíos los tipos o métodos, no se aplicará ningún límite.',
+          'En un filtro de URL, || empieza en el nombre de dominio e incluye sus subdominios. El ^ después del dominio exige un separador o el final de la URL, así example.com no coincide por error con example.company. Un solo | fija el inicio o el final; * coincide con cualquier cantidad de caracteres.',
         ],
+        code: matchingExamples.urlFilter,
+      },
+      {
+        title: 'Cómo usar $1 a $9',
+        paragraphs: [
+          'Estos valores solo se usan en el destino de una redirección. Con un comodín, el primer * es $1 y el segundo, $2. Con una expresión regular, el primer grupo (...) es $1, el segundo es $2, y así sucesivamente. Un filtro de URL no crea capturas.',
+          'Por último, puedes limitar la regla por tipo de recurso, método y dominio iniciador. Si dejas vacíos los tipos o métodos, se aceptan todos.',
+        ],
+        code: matchingExamples.captures,
       },
     ],
     actions: [

@@ -394,6 +394,19 @@ test('clean install exposes the product UI without required host access', async 
   await expect(options.getByText('Examples are created disabled')).toBeVisible();
   await options.getByRole('button', { name: /Block analytics/ }).click();
   await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
+  await options.getByRole('button', { name: 'Open match syntax help' }).click();
+  const matchHelp = options.locator('[data-slot="popover-content"]');
+  await expect(matchHelp.getByText('How this URL is matched', { exact: true })).toBeVisible();
+  await expect(matchHelp.getByText('URL filters do not create $1 values.', { exact: false })).toBeVisible();
+  await expect(matchHelp.getByRole('link', { name: 'See the matching guide' })).toHaveAttribute(
+    'href',
+    'https://webrequest.forth.ink/guides/matching/',
+  );
+  await options.keyboard.press('Escape');
+  await options.getByRole('combobox', { name: 'Action', exact: true }).click();
+  await options.getByRole('option', { name: 'Redirect' }).click();
+  await expect(options.getByRole('textbox', { name: 'Destination' })).toHaveValue('https://example.com/');
+  await expect(options.getByText('URL filters do not provide $1 values.', { exact: false })).toBeVisible();
   const starter = await extensionPage.evaluate(async () => {
     const stored = await chrome.storage.local.get('requestRulesState');
     const state = stored.requestRulesState as StoredState;

@@ -61,6 +61,7 @@ import { Textarea } from '@/ui/components/textarea';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { localizedResourceTypeLabel } from './filter-rules';
+import { MatchHelpPopover } from './match-help-popover';
 import { PermissionScope } from './permission-scope';
 import { StatusBadge } from './status-badge';
 
@@ -103,13 +104,20 @@ function parseInitiatorDomains(value: string): string[] {
   ];
 }
 
-function actionFromKind(kind: RuleAction['kind'], current: RuleAction): RuleAction {
+function actionFromKind(
+  kind: RuleAction['kind'],
+  current: RuleAction,
+  matchKind: Rule['condition']['url']['kind'],
+): RuleAction {
   if (kind === current.kind) return current;
   switch (kind) {
     case 'block':
       return { kind: 'block' };
     case 'redirect':
-      return { kind: 'redirect', target: 'https://example.com/$1' };
+      return {
+        kind: 'redirect',
+        target: matchKind === 'url-filter' ? 'https://example.com/' : 'https://example.com/$1',
+      };
     case 'upgrade-scheme':
       return { kind: 'upgrade-scheme' };
     case 'modify-request-headers':
@@ -427,7 +435,10 @@ export function RuleEditor({
               </Select>
             </Field>
             <Field data-invalid={Boolean(matchError || regexRuntimeError)}>
-              <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
+              <div className="flex items-center gap-1">
+                <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
+                <MatchHelpPopover kind={draft.condition.url.kind} />
+              </div>
               <Input
                 id="rule-match"
                 className="font-mono"
@@ -486,7 +497,11 @@ export function RuleEditor({
                 onValueChange={(value) =>
                   setDraft((current) => ({
                     ...current,
-                    action: actionFromKind(value as RuleAction['kind'], current.action),
+                    action: actionFromKind(
+                      value as RuleAction['kind'],
+                      current.action,
+                      current.condition.url.kind,
+                    ),
                   }))
                 }
               >
@@ -523,7 +538,9 @@ export function RuleEditor({
                     }))
                   }
                 />
-                <FieldDescription>{t('destinationHelp')}</FieldDescription>
+                <FieldDescription>
+                  {t(draft.condition.url.kind === 'url-filter' ? 'destinationFixedHelp' : 'destinationHelp')}
+                </FieldDescription>
                 {destinationError ? <FieldError>{validationMessage(destinationError, t)}</FieldError> : null}
               </Field>
             ) : null}

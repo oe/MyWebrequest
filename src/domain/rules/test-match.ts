@@ -19,6 +19,37 @@ export function wildcardToRegExpSource(value: string): string {
   return `^${value.split('*').map(escapeRegExp).join('(.*)')}$`;
 }
 
+const urlSeparatorSource = '(?:[^A-Za-z0-9_.%\\-]|$)';
+
+export function urlFilterToRegExpSource(value: string): string {
+  let filter = value;
+  let prefix = '';
+  let suffix = '';
+
+  if (filter.startsWith('||')) {
+    filter = filter.slice(2);
+    prefix = '^[A-Za-z][A-Za-z0-9+.-]*://(?:[^./?#:]+\\.)*';
+  } else if (filter.startsWith('|')) {
+    filter = filter.slice(1);
+    prefix = '^';
+  }
+
+  if (filter.endsWith('|')) {
+    filter = filter.slice(0, -1);
+    suffix = '$';
+  }
+
+  const body = [...filter]
+    .map((character) => {
+      if (character === '*') return '.*';
+      if (character === '^') return urlSeparatorSource;
+      return escapeRegExp(character);
+    })
+    .join('');
+
+  return `${prefix}${body}${suffix}`;
+}
+
 export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
   const validation = validateRule(rule);
   if (!validation.valid) {
@@ -35,13 +66,7 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
   } else if (rule.condition.url.kind === 'regex') {
     expression = new RegExp(rule.condition.url.value);
   } else {
-    const filter = rule.condition.url.value;
-    if (filter.startsWith('||')) {
-      const host = filter.slice(2).replace(/\^$/, '');
-      expression = new RegExp(`^https?://(?:[^/]+\\.)?${escapeRegExp(host)}(?:[/:]|$)`);
-    } else {
-      expression = new RegExp(escapeRegExp(filter).replace(/\\\*/g, '.*'));
-    }
+    expression = new RegExp(urlFilterToRegExpSource(rule.condition.url.value));
   }
 
   const match = candidateUrl.match(expression);
