@@ -37,47 +37,53 @@ type GuideGroupCopy = { title: string; description: string };
 export const guideGroupCopy: Record<Locale, Record<GuideGroup, GuideGroupCopy>> = {
   en: {
     start: { title: 'Get started', description: 'Create and test your first rule.' },
-    tasks: { title: 'Common tasks', description: 'Use practical Redirect recipes.' },
-    upgrade: { title: 'Migration & upgrades', description: 'Bring old Chrome rules forward safely.' },
-    support: { title: 'Privacy & troubleshooting', description: 'Understand access or fix a rule.' },
+    tasks: { title: 'Everyday recipes', description: 'Put redirects to work in real scenarios.' },
+    upgrade: { title: 'Move from the old version', description: 'Bring your Chrome rules across safely.' },
+    support: { title: 'Privacy & troubleshooting', description: 'Review permissions and fix common issues.' },
   },
   'zh-CN': {
-    start: { title: '开始使用', description: '创建并测试第一条规则。' },
-    tasks: { title: '常见任务', description: '按场景使用 Redirect 规则。' },
-    upgrade: { title: '迁移与升级', description: '安全迁移旧版 Chrome 规则。' },
-    support: { title: '隐私与排查', description: '了解权限或解决规则问题。' },
+    start: { title: '快速上手', description: '从创建第一条规则开始。' },
+    tasks: { title: '实用示例', description: '看看重定向能解决哪些实际问题。' },
+    upgrade: { title: '从旧版升级', description: '稳妥地迁移原有 Chrome 规则。' },
+    support: { title: '隐私与故障排查', description: '了解权限，并解决常见问题。' },
   },
   ko: {
-    start: { title: '시작하기', description: '첫 규칙을 만들고 테스트합니다.' },
-    tasks: { title: '자주 쓰는 작업', description: '실용적인 Redirect 예제를 사용합니다.' },
-    upgrade: { title: '이전과 업그레이드', description: '기존 Chrome 규칙을 안전하게 옮깁니다.' },
-    support: { title: '개인정보와 문제 해결', description: '접근 권한을 이해하고 문제를 해결합니다.' },
+    start: { title: '빠르게 시작하기', description: '첫 규칙을 만들고 테스트해 보세요.' },
+    tasks: { title: '활용 예제', description: '리디렉션으로 해결할 수 있는 작업을 살펴보세요.' },
+    upgrade: { title: '이전 버전에서 옮기기', description: '기존 Chrome 규칙을 안전하게 가져오세요.' },
+    support: {
+      title: '개인정보 및 문제 해결',
+      description: '권한을 확인하고 자주 생기는 문제를 해결하세요.',
+    },
   },
   ja: {
-    start: { title: 'はじめる', description: '最初のルールを作成してテストします。' },
-    tasks: { title: 'よくある作業', description: '実用的な Redirect 例を使います。' },
-    upgrade: { title: '移行とアップグレード', description: '旧 Chrome ルールを安全に引き継ぎます。' },
-    support: { title: 'プライバシーと問題解決', description: '権限を理解し、問題を解決します。' },
+    start: { title: 'まず使ってみる', description: '最初のルールを作成してテストします。' },
+    tasks: { title: '活用例', description: 'リダイレクトが役立つ場面を紹介します。' },
+    upgrade: { title: '旧バージョンから移行', description: '以前の Chrome ルールを安全に引き継ぎます。' },
+    support: { title: 'プライバシーとトラブル解決', description: '権限を確認し、よくある問題を解決します。' },
   },
   fr: {
     start: { title: 'Bien démarrer', description: 'Créez et testez votre première règle.' },
-    tasks: { title: 'Tâches courantes', description: 'Utilisez des exemples Redirect pratiques.' },
-    upgrade: { title: 'Migration et mise à niveau', description: 'Migrez vos règles Chrome en sécurité.' },
+    tasks: { title: 'Exemples pratiques', description: 'Découvrez des usages concrets de la redirection.' },
+    upgrade: {
+      title: 'Passer de l’ancienne version',
+      description: 'Importez vos anciennes règles Chrome sans risque.',
+    },
     support: {
       title: 'Confidentialité et dépannage',
-      description: 'Comprenez les accès ou corrigez une règle.',
+      description: 'Vérifiez les autorisations et résolvez les problèmes courants.',
     },
   },
   es: {
     start: { title: 'Primeros pasos', description: 'Crea y prueba tu primera regla.' },
-    tasks: { title: 'Tareas habituales', description: 'Usa ejemplos prácticos de Redirect.' },
+    tasks: { title: 'Ejemplos prácticos', description: 'Descubre usos reales de las redirecciones.' },
     upgrade: {
-      title: 'Migración y actualización',
-      description: 'Migra reglas antiguas de Chrome con seguridad.',
+      title: 'Pasar desde la versión anterior',
+      description: 'Importa tus reglas antiguas de Chrome de forma segura.',
     },
     support: {
-      title: 'Privacidad y solución de problemas',
-      description: 'Entiende el acceso o corrige una regla.',
+      title: 'Privacidad y ayuda',
+      description: 'Revisa los permisos y resuelve los problemas más comunes.',
     },
   },
 };
@@ -112,279 +118,315 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     navGuides: 'Guides',
     navPrivacy: 'Privacy',
     openGithub: 'GitHub',
-    eyebrow: 'Local-first request rules',
-    title: 'See every rule. Change only what you mean to.',
+    eyebrow: 'Request rules that stay on your device',
+    title: 'Know exactly which requests you are changing.',
     description:
-      'A clear Manifest V3 rule manager for blocking, redirecting, upgrading, and adjusting request headers—without sending your rules away.',
-    quickStart: 'Read the quick start',
-    github: 'View source',
+      'Block, redirect, upgrade to HTTPS, or adjust request headers with a clear Manifest V3 rule manager. Your rules never leave the browser.',
+    quickStart: 'Get started',
+    github: 'View on GitHub',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: 'A safer workflow',
-    workflowTitle: 'From intent to an active browser rule',
+    workflowEyebrow: 'A safer way to work',
+    workflowTitle: 'Build a rule, check it, then turn it on',
     workflowDescription:
-      'Build a rule in small, inspectable steps. Examples and migrated rules stay disabled until you decide they are ready.',
+      'Every step stays visible. Examples and imported rules remain off until you have reviewed them.',
     steps: [
       {
-        title: 'Match precisely',
+        title: 'Choose what to match',
         description:
-          'Choose a URL filter, wildcard, or regular expression, then narrow by resource type or initiator.',
+          'Start with a URL filter, wildcard, or regular expression. Narrow it further by resource type or initiator.',
       },
       {
-        title: 'Preview locally',
-        description: 'Test a URL and inspect the expected result without making a network request.',
+        title: 'Test before enabling',
+        description: 'Try a URL and see the expected result without sending a network request.',
       },
       {
-        title: 'Grant only what is needed',
-        description: 'Host access is requested only when the selected action actually requires it.',
+        title: 'Approve only what is needed',
+        description: 'The browser asks for site access only when the rule really needs it.',
       },
     ],
-    capabilitiesTitle: 'Focused tools for request rules',
+    capabilitiesTitle: 'Everything you need for focused request rules',
     capabilities: [
       { title: 'Block', description: 'Stop matching requests with no host permission.' },
-      { title: 'Redirect', description: 'Send a request to a controlled HTTP or HTTPS destination.' },
+      { title: 'Redirect', description: 'Send matching requests to another HTTP or HTTPS address.' },
       { title: 'Upgrade', description: 'Move matching HTTP traffic to HTTPS.' },
-      { title: 'Headers', description: 'Remove or set allowed request headers in a bounded scope.' },
-      { title: 'Backup', description: 'Export checksummed JSON and preview changes before importing.' },
+      { title: 'Headers', description: 'Remove or set supported request headers within a defined scope.' },
+      { title: 'Backup', description: 'Export verified JSON and preview every change before importing.' },
       {
         title: 'Migration',
-        description: 'Review supported legacy rules and preserve unsupported source data.',
+        description: 'Review rules from the old version while keeping the original data available.',
       },
     ],
-    guidesTitle: 'Start with what you want to do',
-    guidesDescription: 'Take the short path first. Open details only when you need them.',
+    guidesTitle: 'What would you like to do?',
+    guidesDescription: 'Start with a short guide, then dig into the details when you need them.',
     trustTitle: 'Private by default',
     trustDescription:
-      'Rules stay in browser storage. The extension has no analytics and no remote rule service.',
-    footer: 'Open source · Manifest V3 · Local-first',
+      'Rules stay in your browser. There is no analytics code and no remote service handling your rules.',
+    footer: 'Open source · Manifest V3 · Stored locally',
   },
   'zh-CN': {
     metaTitle: 'Chrome、Edge 与 Firefox 请求规则管理器',
     navGuides: '指南',
     navPrivacy: '隐私',
     openGithub: 'GitHub',
-    eyebrow: '本地优先的请求规则',
-    title: '看清每条规则，只改变你真正想改的请求。',
+    eyebrow: '规则只保存在浏览器中',
+    title: '规则看得清，请求改得准。',
     description:
-      '清晰的 Manifest V3 规则管理器，可阻止、重定向、升级请求及调整请求头；规则不会被发送到远端。',
-    quickStart: '阅读快速开始',
-    github: '查看源码',
+      '用清晰易懂的 Manifest V3 规则阻止或重定向请求、升级到 HTTPS，以及调整请求头。所有规则都留在你的浏览器里。',
+    quickStart: '快速上手',
+    github: '在 GitHub 查看源码',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: '更安全的工作流',
-    workflowTitle: '从意图到浏览器中生效的规则',
-    workflowDescription: '把规则拆成可检查的小步骤。示例和迁移规则在你确认之前始终保持停用。',
+    workflowEyebrow: '更稳妥的使用方式',
+    workflowTitle: '先创建、再测试，确认无误后启用',
+    workflowDescription: '每一步都清楚可见。示例规则和迁移来的规则会保持关闭，直到你亲自确认。',
     steps: [
       {
-        title: '精确匹配',
-        description: '选择 URL 过滤器、通配符或正则表达式，再用资源类型和发起方缩小范围。',
+        title: '确定匹配范围',
+        description: '选择 URL 过滤器、通配符或正则表达式，再按资源类型和来源网页缩小范围。',
       },
-      { title: '本地预览', description: '无需发出网络请求，就能测试 URL 并查看预期结果。' },
-      { title: '只授予必要权限', description: '只有所选操作确实需要时，扩展才会申请对应网站访问权限。' },
+      { title: '启用前先测试', description: '输入一个 URL 就能看到预期结果，不会真的发出网络请求。' },
+      { title: '只开放必要权限', description: '只有规则确实需要时，浏览器才会请求相应的网站访问权限。' },
     ],
-    capabilitiesTitle: '专注于请求规则的工具',
+    capabilitiesTitle: '处理请求规则所需的核心功能',
     capabilities: [
-      { title: '阻止', description: '无需网站权限即可停止匹配的请求。' },
-      { title: '重定向', description: '将请求发送到受控的 HTTP 或 HTTPS 地址。' },
-      { title: '升级', description: '把匹配的 HTTP 流量升级到 HTTPS。' },
-      { title: '请求头', description: '在限定范围内移除或设置浏览器允许的请求头。' },
-      { title: '备份', description: '导出带校验和的 JSON，导入前先预览变更。' },
-      { title: '迁移', description: '检查可支持的旧规则，并保留不支持的原始数据。' },
+      { title: '阻止', description: '直接拦截符合条件的请求，无需网站访问权限。' },
+      { title: '重定向', description: '把符合条件的请求转到另一个 HTTP 或 HTTPS 地址。' },
+      { title: '升级到 HTTPS', description: '自动把符合条件的 HTTP 请求改为 HTTPS。' },
+      { title: '请求头', description: '在明确的范围内移除或设置浏览器允许的请求头。' },
+      { title: '备份', description: '导出经过校验的 JSON；导入前可以先查看所有变更。' },
+      { title: '旧版迁移', description: '逐条检查旧版规则，同时保留无法迁移的原始数据。' },
     ],
-    guidesTitle: '从你要做的事开始',
-    guidesDescription: '先走最短路径，需要时再查看原理和边界。',
-    trustTitle: '默认保护隐私',
-    trustDescription: '规则保存在浏览器本地。扩展没有分析服务，也没有远端规则服务。',
-    footer: '开源 · Manifest V3 · 本地优先',
+    guidesTitle: '你想用它做什么？',
+    guidesDescription: '先看简短步骤，遇到需要时再了解细节。',
+    trustTitle: '隐私无需额外设置',
+    trustDescription: '规则只保存在浏览器中。扩展不含数据分析，也不会把规则交给远端服务处理。',
+    footer: '开源 · Manifest V3 · 本地存储',
   },
   ko: {
     metaTitle: 'Chrome, Edge 및 Firefox용 요청 규칙 관리자',
     navGuides: '가이드',
     navPrivacy: '개인정보',
     openGithub: 'GitHub',
-    eyebrow: '로컬 우선 요청 규칙',
-    title: '모든 규칙을 확인하고, 의도한 요청만 바꾸세요.',
+    eyebrow: '브라우저 안에만 저장되는 규칙',
+    title: '어떤 요청이 바뀌는지 한눈에 확인하세요.',
     description:
-      '규칙을 외부로 보내지 않고 차단, 리디렉션, HTTPS 업그레이드, 요청 헤더 수정을 관리하는 명확한 Manifest V3 도구입니다.',
-    quickStart: '빠른 시작 읽기',
-    github: '소스 보기',
+      '요청 차단, 리디렉션, HTTPS 전환, 요청 헤더 수정을 명확한 Manifest V3 규칙으로 관리하세요. 규칙은 브라우저 밖으로 전송되지 않습니다.',
+    quickStart: '빠르게 시작하기',
+    github: 'GitHub에서 소스 보기',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: '더 안전한 흐름',
-    workflowTitle: '의도에서 실제 브라우저 규칙까지',
+    workflowEyebrow: '더 안전한 사용 흐름',
+    workflowTitle: '만들고, 확인한 다음, 활성화하세요',
     workflowDescription:
-      '작고 확인 가능한 단계로 규칙을 만드세요. 예제와 이전 규칙은 직접 준비할 때까지 비활성 상태입니다.',
+      '설정 과정을 단계별로 확인할 수 있습니다. 예제와 가져온 규칙은 직접 검토하기 전까지 꺼진 상태로 유지됩니다.',
     steps: [
       {
-        title: '정확히 일치시키기',
-        description: 'URL 필터, 와일드카드, 정규식을 고르고 리소스 유형과 시작 도메인으로 범위를 좁힙니다.',
+        title: '대상 범위 정하기',
+        description:
+          'URL 필터, 와일드카드, 정규식 중 하나를 고르고 리소스 유형과 요청 출처로 범위를 좁히세요.',
       },
-      { title: '로컬 미리보기', description: '네트워크 요청 없이 URL과 예상 결과를 테스트합니다.' },
       {
-        title: '필요한 권한만 허용',
-        description: '선택한 작업에 실제로 필요할 때만 사이트 접근 권한을 요청합니다.',
+        title: '활성화 전에 테스트',
+        description: '실제 네트워크 요청을 보내지 않고 URL과 예상 결과를 확인하세요.',
+      },
+      {
+        title: '필요한 권한만 승인',
+        description: '규칙에 꼭 필요한 경우에만 브라우저가 사이트 접근 권한을 요청합니다.',
       },
     ],
-    capabilitiesTitle: '요청 규칙에 집중한 도구',
+    capabilitiesTitle: '요청 규칙에 필요한 핵심 기능',
     capabilities: [
-      { title: '차단', description: '사이트 권한 없이 일치하는 요청을 중지합니다.' },
-      { title: '리디렉션', description: '요청을 제어된 HTTP 또는 HTTPS 대상으로 보냅니다.' },
-      { title: '업그레이드', description: '일치하는 HTTP 트래픽을 HTTPS로 바꿉니다.' },
-      { title: '헤더', description: '제한된 범위에서 허용된 요청 헤더를 제거하거나 설정합니다.' },
-      { title: '백업', description: '체크섬 JSON을 내보내고 가져오기 전에 변경 사항을 봅니다.' },
-      { title: '이전', description: '지원되는 기존 규칙을 검토하고 지원되지 않는 원본도 보존합니다.' },
+      { title: '차단', description: '사이트 접근 권한 없이 조건에 맞는 요청을 차단합니다.' },
+      { title: '리디렉션', description: '조건에 맞는 요청을 다른 HTTP 또는 HTTPS 주소로 보냅니다.' },
+      { title: 'HTTPS로 전환', description: '조건에 맞는 HTTP 요청을 HTTPS로 바꿉니다.' },
+      { title: '요청 헤더', description: '정해진 범위 안에서 지원되는 요청 헤더를 제거하거나 설정합니다.' },
+      { title: '백업', description: '검증된 JSON으로 내보내고, 가져오기 전에 변경 내용을 확인합니다.' },
+      {
+        title: '이전 버전 가져오기',
+        description: '기존 규칙을 검토하면서 변환할 수 없는 원본도 보관합니다.',
+      },
     ],
-    guidesTitle: '하려는 일부터 시작하세요',
-    guidesDescription: '먼저 짧은 경로를 따르고 필요할 때만 세부 정보를 확인하세요.',
-    trustTitle: '기본적으로 비공개',
-    trustDescription: '규칙은 브라우저 저장소에 남습니다. 분석 기능이나 원격 규칙 서비스가 없습니다.',
-    footer: '오픈 소스 · Manifest V3 · 로컬 우선',
+    guidesTitle: '무엇을 하고 싶으신가요?',
+    guidesDescription: '짧은 안내부터 시작하고, 필요할 때 세부 내용을 확인하세요.',
+    trustTitle: '처음부터 개인정보를 보호합니다',
+    trustDescription: '규칙은 브라우저에만 저장됩니다. 분석 도구도, 규칙을 처리하는 원격 서비스도 없습니다.',
+    footer: '오픈 소스 · Manifest V3 · 브라우저에 저장',
   },
   ja: {
     metaTitle: 'Chrome・Edge・Firefox 向けリクエストルール管理',
     navGuides: 'ガイド',
     navPrivacy: 'プライバシー',
     openGithub: 'GitHub',
-    eyebrow: 'ローカル優先のリクエストルール',
-    title: 'すべてのルールを見通し、意図した通信だけを変える。',
+    eyebrow: 'ルールはブラウザ内に保存',
+    title: 'どの通信を変えるのか、ひと目でわかる。',
     description:
-      'ルールを外部へ送らずに、遮断、転送、HTTPS 化、リクエストヘッダーの変更を管理できる Manifest V3 ツールです。',
-    quickStart: 'クイックスタート',
-    github: 'ソースを見る',
+      'わかりやすい Manifest V3 ルールで、リクエストのブロック、リダイレクト、HTTPS 化、ヘッダー変更を管理できます。ルールがブラウザの外へ送られることはありません。',
+    quickStart: 'まず使ってみる',
+    github: 'GitHub でソースを見る',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: 'より安全な流れ',
-    workflowTitle: '意図から実際のブラウザルールまで',
+    workflowEyebrow: '安心して使える手順',
+    workflowTitle: '作成して、確かめてから、有効にする',
     workflowDescription:
-      '小さく確認可能な手順でルールを作成します。サンプルと移行ルールは、確認するまで無効のままです。',
+      '設定内容を一つずつ確認できます。サンプルや移行したルールは、自分で確認するまで無効のままです。',
     steps: [
       {
-        title: '正確に一致',
-        description: 'URL フィルター、ワイルドカード、正規表現を選び、リソース種別や開始元で絞り込みます。',
+        title: '対象を絞り込む',
+        description:
+          'URL フィルター、ワイルドカード、正規表現を選び、リソースの種類やリクエスト元でさらに絞ります。',
       },
-      { title: 'ローカルで確認', description: '通信を発生させずに URL と期待される結果をテストします。' },
+      { title: '有効にする前にテスト', description: '実際に通信せず、URL と期待される結果を確認できます。' },
       {
-        title: '必要な権限だけ',
-        description: '選択した操作に本当に必要な場合だけ、サイトアクセスを要求します。',
+        title: '必要な権限だけ許可',
+        description: 'ルールに必要な場合だけ、ブラウザがサイトへのアクセス許可を求めます。',
       },
     ],
-    capabilitiesTitle: 'リクエストルールに集中した機能',
+    capabilitiesTitle: 'リクエストルールに必要な機能をひと通り',
     capabilities: [
-      { title: '遮断', description: 'サイト権限なしで一致するリクエストを止めます。' },
-      { title: '転送', description: '制御された HTTP / HTTPS の宛先へ送ります。' },
-      { title: 'HTTPS 化', description: '一致する HTTP 通信を HTTPS に変更します。' },
-      { title: 'ヘッダー', description: '限定した範囲で許可されたリクエストヘッダーを操作します。' },
+      { title: 'ブロック', description: 'サイトへのアクセス許可なしで、条件に合うリクエストを止めます。' },
+      { title: 'リダイレクト', description: '条件に合うリクエストを別の HTTP / HTTPS URL へ送ります。' },
+      { title: 'HTTPS 化', description: '条件に合う HTTP リクエストを HTTPS に切り替えます。' },
+      {
+        title: 'リクエストヘッダー',
+        description: '指定した範囲で、対応するヘッダーを削除または設定します。',
+      },
       {
         title: 'バックアップ',
-        description: 'チェックサム付き JSON を出力し、読み込み前に変更を確認します。',
+        description: '検証可能な JSON を書き出し、読み込む前に変更点を確認できます。',
       },
-      { title: '移行', description: '対応する旧ルールを確認し、未対応の元データも保存します。' },
+      {
+        title: '旧版からの移行',
+        description: '以前のルールを確認しながら、変換できない元データも残します。',
+      },
     ],
-    guidesTitle: 'やりたいことから始める',
-    guidesDescription: 'まず最短の手順を使い、必要なときだけ詳細を確認できます。',
-    trustTitle: '初期状態からプライベート',
-    trustDescription: 'ルールはブラウザ内に保存されます。分析機能も外部ルールサービスもありません。',
-    footer: 'オープンソース · Manifest V3 · ローカル優先',
+    guidesTitle: '何をしたいですか？',
+    guidesDescription: 'まずは短い手順から。詳しい仕組みは必要になったときに確認できます。',
+    trustTitle: '特別な設定なしでプライバシーを保護',
+    trustDescription:
+      'ルールはブラウザ内だけに保存されます。アクセス解析も、ルールを処理する外部サービスもありません。',
+    footer: 'オープンソース · Manifest V3 · ブラウザ内に保存',
   },
   fr: {
     metaTitle: 'Règles de requêtes pour Chrome, Edge et Firefox',
     navGuides: 'Guides',
     navPrivacy: 'Confidentialité',
     openGithub: 'GitHub',
-    eyebrow: 'Règles de requête locales',
-    title: 'Voyez chaque règle. Ne modifiez que ce que vous avez choisi.',
+    eyebrow: 'Vos règles restent dans le navigateur',
+    title: 'Sachez exactement quelles requêtes vous modifiez.',
     description:
-      'Un gestionnaire Manifest V3 clair pour bloquer, rediriger, sécuriser et ajuster les en-têtes, sans envoyer vos règles ailleurs.',
-    quickStart: 'Lire le démarrage rapide',
-    github: 'Voir le code',
+      'Bloquez ou redirigez des requêtes, forcez le HTTPS et ajustez les en-têtes avec des règles Manifest V3 faciles à comprendre. Rien n’est envoyé hors du navigateur.',
+    quickStart: 'Bien démarrer',
+    github: 'Voir le code sur GitHub',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: 'Un parcours plus sûr',
-    workflowTitle: 'De l’intention à une règle active',
+    workflowEyebrow: 'Une méthode plus sûre',
+    workflowTitle: 'Créez la règle, testez-la, puis activez-la',
     workflowDescription:
-      'Créez une règle par étapes vérifiables. Les exemples et les règles migrées restent désactivés jusqu’à votre validation.',
+      'Chaque étape reste visible. Les exemples et les règles importées restent désactivés tant que vous ne les avez pas vérifiés.',
     steps: [
       {
-        title: 'Cibler précisément',
+        title: 'Définir ce qui doit correspondre',
         description:
-          'Choisissez un filtre URL, un joker ou une expression régulière, puis limitez le type et l’origine.',
+          'Choisissez un filtre d’URL, un joker ou une expression régulière, puis affinez par type de ressource ou domaine initiateur.',
       },
       {
-        title: 'Prévisualiser localement',
-        description: 'Testez une URL et son résultat attendu sans envoyer de requête réseau.',
+        title: 'Tester avant d’activer',
+        description: 'Essayez une URL et vérifiez le résultat attendu sans envoyer de requête réseau.',
       },
       {
-        title: 'Accorder le strict nécessaire',
-        description: 'L’accès à un site est demandé uniquement si l’action choisie l’exige.',
+        title: 'N’autoriser que le nécessaire',
+        description: 'Le navigateur demande l’accès au site uniquement si la règle en a réellement besoin.',
       },
     ],
-    capabilitiesTitle: 'Des outils ciblés pour vos règles',
+    capabilitiesTitle: 'L’essentiel pour gérer vos règles de requête',
     capabilities: [
-      { title: 'Bloquer', description: 'Arrêtez les requêtes correspondantes sans autorisation de site.' },
+      {
+        title: 'Bloquer',
+        description: 'Bloquez les requêtes correspondantes sans autorisation d’accès au site.',
+      },
       {
         title: 'Rediriger',
-        description: 'Envoyez une requête vers une destination HTTP ou HTTPS contrôlée.',
+        description: 'Envoyez les requêtes correspondantes vers une autre adresse HTTP ou HTTPS.',
       },
-      { title: 'Sécuriser', description: 'Faites passer le trafic HTTP correspondant en HTTPS.' },
+      {
+        title: 'Passer en HTTPS',
+        description: 'Remplacez les requêtes HTTP correspondantes par leur version HTTPS.',
+      },
       {
         title: 'En-têtes',
-        description: 'Retirez ou définissez des en-têtes autorisés dans une portée limitée.',
+        description: 'Supprimez ou définissez les en-têtes pris en charge dans un périmètre précis.',
       },
-      { title: 'Sauvegarder', description: 'Exportez un JSON vérifié et prévisualisez une importation.' },
+      {
+        title: 'Sauvegarder',
+        description: 'Exportez un JSON vérifié et contrôlez les changements avant de l’importer.',
+      },
       {
         title: 'Migrer',
-        description: 'Vérifiez les anciennes règles et conservez les sources non prises en charge.',
+        description:
+          'Vérifiez les anciennes règles tout en conservant les données qui ne peuvent pas être converties.',
       },
     ],
-    guidesTitle: 'Commencez par votre objectif',
-    guidesDescription: 'Suivez d’abord le chemin court, puis ouvrez les détails si nécessaire.',
-    trustTitle: 'Confidentiel par défaut',
+    guidesTitle: 'Que souhaitez-vous faire ?',
+    guidesDescription: 'Commencez par un guide court, puis consultez les détails si nécessaire.',
+    trustTitle: 'La confidentialité, sans réglage supplémentaire',
     trustDescription:
-      'Les règles restent dans le stockage du navigateur. Aucun suivi ni service distant de règles.',
-    footer: 'Open source · Manifest V3 · Local en priorité',
+      'Les règles restent dans votre navigateur. Aucun outil d’analyse ni service distant ne les traite.',
+    footer: 'Open source · Manifest V3 · Stockage local',
   },
   es: {
     metaTitle: 'Reglas de solicitudes para Chrome, Edge y Firefox',
     navGuides: 'Guías',
     navPrivacy: 'Privacidad',
     openGithub: 'GitHub',
-    eyebrow: 'Reglas de solicitud locales',
-    title: 'Ve cada regla. Cambia solo lo que quieres cambiar.',
+    eyebrow: 'Tus reglas se quedan en el navegador',
+    title: 'Ten claro qué solicitudes estás modificando.',
     description:
-      'Un gestor Manifest V3 claro para bloquear, redirigir, actualizar a HTTPS y ajustar cabeceras sin enviar tus reglas fuera.',
-    quickStart: 'Leer inicio rápido',
-    github: 'Ver código',
+      'Bloquea o redirige solicitudes, fuerza HTTPS y ajusta encabezados con reglas Manifest V3 fáciles de entender. Tus reglas nunca salen del navegador.',
+    quickStart: 'Primeros pasos',
+    github: 'Ver el código en GitHub',
     compatibility: 'Chrome · Edge · Firefox',
-    workflowEyebrow: 'Un flujo más seguro',
-    workflowTitle: 'De la intención a una regla activa',
+    workflowEyebrow: 'Una forma más segura de trabajar',
+    workflowTitle: 'Crea la regla, compruébala y luego actívala',
     workflowDescription:
-      'Crea reglas en pasos pequeños y verificables. Los ejemplos y reglas migradas permanecen desactivados hasta que los revises.',
+      'Cada paso queda a la vista. Los ejemplos y las reglas importadas siguen desactivados hasta que los revises.',
     steps: [
       {
-        title: 'Coincidir con precisión',
-        description: 'Elige filtro de URL, comodín o expresión regular y limita por recurso o iniciador.',
+        title: 'Define qué debe coincidir',
+        description:
+          'Elige un filtro de URL, un comodín o una expresión regular y limita el alcance por recurso o dominio iniciador.',
       },
       {
-        title: 'Previsualizar localmente',
-        description: 'Prueba una URL y el resultado esperado sin enviar una solicitud de red.',
+        title: 'Prueba antes de activar',
+        description: 'Comprueba una URL y el resultado esperado sin enviar ninguna solicitud de red.',
       },
       {
-        title: 'Conceder solo lo necesario',
-        description: 'El acceso al sitio se solicita únicamente cuando la acción lo necesita.',
+        title: 'Concede solo lo necesario',
+        description: 'El navegador solo pide acceso a un sitio cuando la regla realmente lo necesita.',
       },
     ],
-    capabilitiesTitle: 'Herramientas centradas en reglas',
+    capabilitiesTitle: 'Lo esencial para gestionar reglas de solicitud',
     capabilities: [
-      { title: 'Bloquear', description: 'Detén solicitudes coincidentes sin permiso del sitio.' },
-      { title: 'Redirigir', description: 'Envía una solicitud a un destino HTTP o HTTPS controlado.' },
-      { title: 'Actualizar', description: 'Cambia el tráfico HTTP coincidente a HTTPS.' },
-      { title: 'Cabeceras', description: 'Quita o define cabeceras permitidas con un alcance limitado.' },
-      { title: 'Copia', description: 'Exporta JSON con suma de control y previsualiza la importación.' },
+      { title: 'Bloquear', description: 'Bloquea las solicitudes coincidentes sin acceso al sitio.' },
       {
-        title: 'Migración',
-        description: 'Revisa reglas antiguas compatibles y conserva los datos no compatibles.',
+        title: 'Redirigir',
+        description: 'Envía las solicitudes coincidentes a otra dirección HTTP o HTTPS.',
+      },
+      { title: 'Usar HTTPS', description: 'Cambia las solicitudes HTTP coincidentes a HTTPS.' },
+      {
+        title: 'Encabezados',
+        description: 'Elimina o define encabezados compatibles dentro de un alcance concreto.',
+      },
+      {
+        title: 'Copia de seguridad',
+        description: 'Exporta un JSON verificado y revisa los cambios antes de importarlo.',
+      },
+      {
+        title: 'Importar la versión anterior',
+        description: 'Revisa las reglas antiguas y conserva los datos que no se pueden convertir.',
       },
     ],
-    guidesTitle: 'Empieza por lo que quieres hacer',
-    guidesDescription: 'Sigue primero la ruta corta y abre los detalles solo cuando los necesites.',
-    trustTitle: 'Privado por defecto',
-    trustDescription: 'Las reglas permanecen en el navegador. No hay analítica ni servicio remoto de reglas.',
-    footer: 'Código abierto · Manifest V3 · Local primero',
+    guidesTitle: '¿Qué quieres hacer?',
+    guidesDescription: 'Empieza con una guía breve y consulta los detalles cuando los necesites.',
+    trustTitle: 'Privacidad sin configuración adicional',
+    trustDescription:
+      'Las reglas permanecen en tu navegador. No hay analítica ni servicios remotos que las procesen.',
+    footer: 'Código abierto · Manifest V3 · Guardado local',
   },
 };
 
@@ -680,83 +722,98 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
 
 const localizedGuideMeta: Record<Exclude<Locale, 'en'>, Record<GuideSlug, [string, string]>> = {
   'zh-CN': {
-    'quick-start': ['快速开始', '创建、测试并安全启用你的第一条请求规则。'],
-    matching: ['匹配请求', '用尽可能精确的条件表达你的意图。'],
-    actions: ['规则操作', '理解阻止、重定向、HTTPS 升级和请求头修改。'],
-    'advanced-examples': ['高级规则示例', '用于开发、迁移和可控调试的实用重定向方案。'],
-    permissions: ['权限与隐私', '了解规则为何申请网站访问，以及哪些数据始终留在本地。'],
-    migration: ['旧版迁移', '在不静默启用旧行为的前提下保留有用规则。'],
-    'breaking-changes': ['从 0.12.11 升级', '了解 Manifest V3 重构中的重大变更与替代方案。'],
-    troubleshooting: ['问题排查', '处理常见的匹配、权限和运行时问题。'],
+    'quick-start': ['快速上手', '三步创建、测试并启用第一条规则。'],
+    matching: ['如何匹配请求', '选择合适的匹配方式，并尽量缩小影响范围。'],
+    actions: ['规则能做什么', '了解阻止、重定向、升级到 HTTPS 和修改请求头。'],
+    'advanced-examples': ['实用重定向示例', '用几个实际场景掌握开发调试、API 切换和 CDN 迁移。'],
+    permissions: ['权限与隐私', '了解何时需要网站权限，以及哪些数据始终留在浏览器中。'],
+    migration: ['迁移旧版规则', '把仍然有用的规则带到新版，同时避免意外启用。'],
+    'breaking-changes': ['从 0.12.11 升级', '旧版有哪些变化、哪些功能被移除，以及可以用什么替代。'],
+    troubleshooting: ['故障排查', '解决规则不生效、权限不足和导入失败等常见问题。'],
   },
   ko: {
-    'quick-start': ['빠른 시작', '첫 요청 규칙을 만들고 테스트한 뒤 안전하게 활성화합니다.'],
-    matching: ['요청 일치', '의도를 표현하는 가장 좁은 조건을 선택합니다.'],
-    actions: ['규칙 작업', '차단, 리디렉션, HTTPS 업그레이드와 요청 헤더를 이해합니다.'],
-    'advanced-examples': ['고급 규칙 예제', '개발, 마이그레이션, 제한된 디버깅을 위한 리디렉션 예제입니다.'],
-    permissions: ['권한과 개인정보', '사이트 접근이 필요한 이유와 로컬에 남는 데이터를 알아봅니다.'],
-    migration: ['기존 규칙 이전', '오래된 동작을 자동 활성화하지 않고 유용한 규칙을 옮깁니다.'],
-    'breaking-changes': ['0.12.11에서 업그레이드', 'Manifest V3 재구축의 주요 변경점과 대안을 설명합니다.'],
-    troubleshooting: ['문제 해결', '일치, 권한, 런타임의 일반적인 문제를 해결합니다.'],
+    'quick-start': ['빠르게 시작하기', '세 단계로 첫 규칙을 만들고 테스트한 뒤 활성화하세요.'],
+    matching: ['요청을 일치시키는 방법', '알맞은 일치 방식을 고르고 영향 범위를 최대한 좁히세요.'],
+    actions: ['규칙으로 할 수 있는 일', '차단, 리디렉션, HTTPS 전환, 요청 헤더 변경을 알아보세요.'],
+    'advanced-examples': ['실전 리디렉션 예제', '개발, API 전환, CDN 이전에 활용할 수 있는 예제입니다.'],
+    permissions: ['권한 및 개인정보', '사이트 권한이 필요한 경우와 브라우저에 남는 데이터를 확인하세요.'],
+    migration: ['이전 버전 규칙 가져오기', '기존 규칙을 실수로 켜지 않고 새 버전으로 옮기세요.'],
+    'breaking-changes': ['0.12.11에서 업그레이드', '달라진 점, 제거된 기능, 대신 사용할 방법을 확인하세요.'],
+    troubleshooting: ['문제 해결', '규칙, 권한, 가져오기에서 자주 생기는 문제를 해결하세요.'],
   },
   ja: {
-    'quick-start': ['クイックスタート', '最初のリクエストルールを作成、テストし、安全に有効化します。'],
-    matching: ['リクエストの一致', '目的を表す最も狭い条件を選びます。'],
-    actions: ['ルール操作', '遮断、転送、HTTPS 化、リクエストヘッダーを理解します。'],
-    'advanced-examples': ['高度なルール例', '開発、移行、限定的なデバッグに使える転送レシピです。'],
-    permissions: ['権限とプライバシー', 'サイトアクセスが必要な理由と、ローカルに残るデータを説明します。'],
-    migration: ['旧版からの移行', '古い動作を勝手に有効化せず、有用なルールを引き継ぎます。'],
+    'quick-start': ['まず使ってみる', '3 ステップで最初のルールを作成、テスト、有効化します。'],
+    matching: ['リクエストの指定方法', '用途に合う指定方法を選び、影響する範囲をできるだけ絞ります。'],
+    actions: ['ルールでできること', 'ブロック、リダイレクト、HTTPS 化、リクエストヘッダー変更を紹介します。'],
+    'advanced-examples': ['実践的なリダイレクト例', '開発、API の切り替え、CDN 移行に役立つ設定例です。'],
+    permissions: [
+      '権限とプライバシー',
+      'サイトへのアクセス許可が必要な場面と、ブラウザ内に残るデータを説明します。',
+    ],
+    migration: ['旧バージョンから移行', '以前のルールを誤って有効にせず、新しいバージョンへ引き継ぎます。'],
     'breaking-changes': [
       '0.12.11 からのアップグレード',
-      'Manifest V3 再構築の破壊的変更と代替手段を説明します。',
+      '変更点、削除された機能、代わりに使える方法をまとめています。',
     ],
-    troubleshooting: ['トラブルシューティング', '一致、権限、実行時の一般的な問題を解決します。'],
+    troubleshooting: ['トラブルシューティング', 'ルール、権限、読み込みでよく起きる問題を解決します。'],
   },
   fr: {
-    'quick-start': ['Démarrage rapide', 'Créez, testez et activez votre première règle en toute sécurité.'],
-    matching: ['Correspondance', 'Choisissez le critère le plus précis pour votre intention.'],
-    actions: ['Actions de règle', 'Comprenez le blocage, la redirection, HTTPS et les en-têtes.'],
+    'quick-start': ['Bien démarrer', 'Créez, testez puis activez votre première règle en trois étapes.'],
+    matching: ['Cibler les requêtes', 'Choisissez la méthode adaptée et limitez au maximum le périmètre.'],
+    actions: [
+      'Ce que les règles peuvent faire',
+      'Découvrez le blocage, la redirection, le passage en HTTPS et les en-têtes.',
+    ],
     'advanced-examples': [
-      'Exemples de règles avancées',
-      'Des redirections pratiques pour le développement, les migrations et le débogage contrôlé.',
+      'Exemples pratiques de redirection',
+      'Des cas concrets pour le développement, les changements d’API et les migrations de CDN.',
     ],
     permissions: [
       'Autorisations et confidentialité',
-      'Comprenez pourquoi un accès est demandé et ce qui reste local.',
+      'Découvrez quand un accès au site est nécessaire et quelles données restent dans le navigateur.',
     ],
     migration: [
-      'Migration héritée',
-      'Conservez les règles utiles sans activer silencieusement les anciens comportements.',
+      'Importer les règles de l’ancienne version',
+      'Importez les règles encore utiles sans les activer par erreur.',
     ],
     'breaking-changes': [
       'Mise à niveau depuis 0.12.11',
-      'Les changements incompatibles de la refonte Manifest V3 et leurs alternatives.',
+      'Ce qui change, ce qui disparaît et les solutions à utiliser à la place.',
     ],
     troubleshooting: [
       'Dépannage',
-      'Résolvez les problèmes courants de correspondance, d’autorisation et d’exécution.',
+      'Résolvez les problèmes courants de règles, d’autorisations et d’importation.',
     ],
   },
   es: {
-    'quick-start': ['Inicio rápido', 'Crea, prueba y activa con seguridad tu primera regla.'],
-    matching: ['Coincidencia de solicitudes', 'Elige la condición más específica que exprese tu intención.'],
-    actions: ['Acciones de regla', 'Entiende bloqueo, redirección, HTTPS y cabeceras.'],
-    'advanced-examples': [
-      'Ejemplos de reglas avanzadas',
-      'Redirecciones prácticas para desarrollo, migraciones y depuración controlada.',
+    'quick-start': ['Primeros pasos', 'Crea, prueba y activa tu primera regla en tres pasos.'],
+    matching: [
+      'Cómo seleccionar solicitudes',
+      'Elige el método adecuado y limita el alcance todo lo posible.',
     ],
-    permissions: ['Permisos y privacidad', 'Por qué se solicita acceso y qué permanece local.'],
+    actions: [
+      'Qué pueden hacer las reglas',
+      'Descubre el bloqueo, la redirección, el uso de HTTPS y los encabezados.',
+    ],
+    'advanced-examples': [
+      'Ejemplos prácticos de redirección',
+      'Casos reales para desarrollo, cambios de API y migraciones de CDN.',
+    ],
+    permissions: [
+      'Permisos y privacidad',
+      'Cuándo hace falta acceso a un sitio y qué datos se quedan en el navegador.',
+    ],
     migration: [
-      'Migración anterior',
-      'Conserva reglas útiles sin activar silenciosamente comportamientos antiguos.',
+      'Importar reglas de la versión anterior',
+      'Importa las reglas que aún sirven sin activarlas por error.',
     ],
     'breaking-changes': [
       'Actualizar desde 0.12.11',
-      'Cambios incompatibles de la reconstrucción Manifest V3 y sus alternativas.',
+      'Qué cambia, qué se elimina y qué puedes usar en su lugar.',
     ],
     troubleshooting: [
       'Solución de problemas',
-      'Resuelve problemas comunes de coincidencia, permisos y ejecución.',
+      'Resuelve problemas habituales con reglas, permisos e importaciones.',
     ],
   },
 };
@@ -765,195 +822,199 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   'zh-CN': {
     'quick-start': [
       {
-        title: '选择示例',
-        paragraphs: ['打开规则管理器，选择三条停用且可编辑的示例之一。'],
+        title: '选一个示例',
+        paragraphs: ['打开规则管理器，从三个示例中选一个。示例默认关闭，可以放心修改。'],
       },
       {
-        title: '设置目标',
-        paragraphs: ['把 example.com 换成要处理的域名，暂时保持停用。'],
+        title: '换成你的网址',
+        paragraphs: ['把 example.com 换成你要处理的域名，先不要启用规则。'],
       },
       {
-        title: '测试并启用',
-        paragraphs: ['测试一个代表性 URL，保存后启用；需要网站访问时会先显示范围。'],
+        title: '测试后再启用',
+        paragraphs: [
+          '用一个真实 URL 测试效果，确认无误后保存并启用。需要网站权限时，浏览器会先告诉你具体范围。',
+        ],
       },
     ],
     matching: [
       {
         title: 'URL 过滤器',
-        paragraphs: ['URL 过滤器使用浏览器 Declarative Net Request 语法，适合高效匹配主机或路径。'],
+        paragraphs: ['URL 过滤器使用浏览器的 Declarative Net Request 语法，最适合按域名或路径匹配。'],
         code: '||example.com^',
       },
       {
         title: '通配符与正则表达式',
         paragraphs: [
-          '需要在重定向中通过 $1 复用捕获内容时使用通配符；只有前两者无法表达时才使用正则。',
-          '资源类型、请求方法和发起方域名会进一步缩小范围；留空表示匹配全部。',
+          '如果重定向地址需要复用原 URL 的一部分（例如 $1），可以使用通配符。只有普通过滤器和通配符都不够用时，再考虑正则表达式。',
+          '还可以按资源类型、请求方法和来源网页进一步缩小范围。类型或方法留空时，表示不做限制。',
         ],
       },
     ],
     actions: [
       {
-        title: '安全操作',
+        title: '哪些操作不需要网站权限',
         paragraphs: [
-          '阻止和升级 HTTPS 无需网站访问权限。重定向和请求头会改变页面收到的内容，因此需要限定权限。',
+          '阻止请求和升级到 HTTPS 不需要网站访问权限。重定向和修改请求头会改变网页收到的内容，因此浏览器会要求你授权相应的网站。',
         ],
       },
       {
         title: '重定向与请求头',
         paragraphs: [
-          '目标必须使用 HTTP 或 HTTPS，通配符或正则捕获可通过 $1 到 $9 插入。',
-          '请求头规则可移除或设置浏览器允许的请求头，禁止的名称会在启用前被拒绝。',
+          '重定向目标必须是 HTTP 或 HTTPS 地址。通配符和正则表达式捕获的内容，可以用 $1 到 $9 放进目标地址。',
+          '请求头规则只能移除或设置浏览器允许修改的字段。遇到禁止修改的名称时，扩展会在启用前给出提示。',
         ],
       },
     ],
     'advanced-examples': [
       {
-        title: '复制示例前先看这里',
+        title: '使用示例前，请先注意',
         paragraphs: [
-          '所有示例都使用保留的 example.com 域名。请替换为你控制的来源，先以停用状态创建规则，再用代表性 URL 执行“测试规则”。',
-          '重定向和请求头会改变页面收到的内容。应同时限制资源类型和发起方域名，避免无关页面触发规则。',
+          '下面的示例都使用专门用于文档的 example.com。请换成你自己管理的域名，先保持规则关闭，再用几个真实 URL 进行测试。',
+          '重定向和请求头会改变网页实际收到的内容。请尽量限制资源类型和来源网页，避免规则影响无关网站。',
         ],
       },
       {
-        title: '把测试环境 API 转到本地服务',
+        title: '把测试环境的 API 转到本地',
         paragraphs: [
-          '该规则把 /v1/ 后的全部路径保存在捕获组 $1 中，适合让真实前端连接本地 API 或反向代理，而无需修改应用构建。',
-          '只选择本地服务确实处理的方法；发起方会把规则限制在 app.example.com 启动的请求。',
+          '这条规则会把 /v1/ 后面的完整路径放进 $1。这样无需修改前端构建，就能让现有网页连接本地 API 或反向代理。',
+          '只勾选本地服务支持的请求方法，并把来源网页限制为 app.example.com。',
         ],
         code: redirectExamples.localApi,
       },
       {
-        title: '把自有站点从旧 CDN 迁到新 CDN',
+        title: '临时把旧 CDN 切到新 CDN',
         paragraphs: [
-          '该规则保留完整资源路径，把脚本、样式、图片和字体迁到新主机，可作为更新站点代码期间的临时兼容桥。',
-          '它是无条件重定向，不是故障转移；新 CDN 失败时浏览器不会自动回退旧 CDN。',
+          '这条规则会保留脚本、样式、图片和字体的完整路径，只替换资源域名。适合在网站代码尚未全部更新时临时过渡。',
+          '请注意：这是固定重定向，不是故障切换。新 CDN 无法访问时，浏览器不会自动退回旧 CDN。',
         ],
         code: redirectExamples.cdnMigration,
       },
       {
-        title: '用正则捕获桥接只读 API 版本',
+        title: '用正则把只读 API 从 v1 切到 v2',
         paragraphs: [
-          '两个捕获组会保留资源类型和标识符，同时把 /v1/ 改为 /v2/。仅允许 GET，可避免意外改变写入语义。',
-          '保存时会由当前浏览器检查正则支持；如果一个通配符就够用，请优先使用通配符。',
+          '两个捕获组分别保留资源类型和 ID，只把 /v1/ 改成 /v2/。规则仅匹配 GET，避免误改写入请求。',
+          '保存时，浏览器会检查是否支持这条正则表达式。如果一个通配符就能解决问题，优先使用通配符会更简单。',
         ],
         code: redirectExamples.apiBridge,
       },
       {
-        title: '回归测试时只替换一个线上脚本',
+        title: '调试时只替换一个线上脚本',
         paragraphs: [
-          '精确 URL 过滤器可以把单个脚本替换为本地调试版本，不会把站点的全部资源都重定向。',
-          '仅用于你控制的应用；如果页面使用 HTTPS，本地 HTTPS 服务可以避免混合内容限制。',
+          '精确匹配一个脚本地址，就能把它换成本地调试版本，而不会影响网站的其他资源。',
+          '请只在自己管理的应用上使用。如果网页本身采用 HTTPS，本地服务也最好使用 HTTPS，以免被浏览器的混合内容策略拦截。',
         ],
         code: redirectExamples.localScript,
       },
       {
-        title: 'Redirect 做不到什么',
+        title: '重定向不适合做什么',
         paragraphs: [
-          '所有匹配条件通过后就会执行重定向。它不能等待 404、检查响应正文、在网络失败后选择目标，也不能运行 JavaScript 动态计算 URL。',
+          '只要所有条件匹配，浏览器就会立刻重定向。它无法等到 404 后再处理，也不能读取响应内容、在网络失败后切换地址，或运行 JavaScript 动态生成 URL。',
         ],
         points: [
-          '目标只能使用 HTTP 或 HTTPS。',
-          '通配符和正则捕获通过 $1 到 $9 引用。',
-          '查询参数顺序、解码方式和重复键不会被自动归一化。',
-          '避免重定向环；明显的自重定向和检测到的循环会被阻止。',
+          '目标地址只能使用 HTTP 或 HTTPS。',
+          '通配符和正则表达式的捕获内容用 $1 到 $9 引用。',
+          '查询参数的顺序、编码方式和重复参数不会被自动整理。',
+          '请避免循环重定向；扩展会阻止明显的自重定向和已检测到的循环。',
         ],
       },
     ],
     permissions: [
       {
-        title: '按需申请网站访问',
+        title: '只在需要时请求网站权限',
         paragraphs: [
-          'HTTP/HTTPS 访问被声明为可选权限，仅在启用确实需要具体来源的重定向或请求头规则时申请。',
-          '规则、备份和测试输入都保存在浏览器中；没有分析或远端规则服务。',
+          '网站访问属于可选权限。只有在启用重定向或请求头规则，并且规则需要访问具体网站时，浏览器才会向你确认。',
+          '规则、备份和测试过的 URL 都保存在浏览器中。扩展不含数据分析，也没有远端规则服务。',
         ],
       },
       {
-        title: '保持范围明确',
-        paragraphs: ['优先使用具体协议和主机。对子资源操作补充发起方域名，以限制哪些页面可以触发规则。'],
+        title: '尽量缩小权限范围',
+        paragraphs: [
+          '尽量填写明确的协议和域名。修改脚本、图片等子资源时，再指定来源网页，避免其他网站触发同一条规则。',
+        ],
       },
     ],
     migration: [
       {
-        title: '仅针对 Chrome',
+        title: '自动迁移仅支持 Chrome',
         paragraphs: [
-          '旧扩展只存在于 Chrome，因此自动检测只在 Chrome 提供，Edge 和 Firefox 会隐藏入口。',
-          '旧安装若使用不同扩展 ID，可从设置导入 JSON 备份。',
+          '旧版扩展只在 Chrome 发布过，因此只有 Chrome 会显示自动检测入口。Edge 和 Firefox 不会显示这项功能。',
+          '如果旧版使用了不同的扩展 ID，也可以在设置中手动导入 JSON 备份。',
         ],
       },
       {
-        title: '先检查再应用',
+        title: '迁移后先检查，不会自动启用',
         paragraphs: [
-          '支持的规则会转为停用候选；有歧义的规则需要检查，不支持或已移除功能仍保留在可导出快照中。',
-          '应用前可导出报告留档，之后也可以恢复迁移前快照。',
+          '能够转换的规则会以关闭状态加入候选列表；含义不明确的规则会标记为“需要检查”。无法支持或已经移除的功能，仍会保留在可导出的原始快照里。',
+          '应用前可以先导出迁移报告留档，之后也能恢复迁移前的快照。',
         ],
       },
     ],
     'breaking-changes': [
       {
-        title: '兼容性承诺',
+        title: '新版会保留什么',
         paragraphs: [
-          '当前版本保留了有价值的请求规则核心，但不是旧 Manifest V2 扩展的原样运行时副本。Chrome 可以检测或导入旧数据；Edge 和 Firefox 从未发布旧版，因此没有自动迁移。',
-          '旧数据不会被静默启用。每一项都会标为自动、需要检查、不支持、已移除或无效，原始内容保留在迁移快照中。',
+          '新版保留了最实用的请求规则能力，但不会原样复制旧版 Manifest V2 的所有行为。Chrome 可以检测或导入旧数据；Edge 和 Firefox 从未发布过旧版，因此不需要自动迁移。',
+          '任何旧规则都不会悄悄启用。迁移结果会清楚标为“可自动转换”“需要检查”“不支持”“已移除”或“无效”，原始数据也会留在迁移快照中。',
         ],
       },
       {
-        title: '有正式替代方案的旧规则',
-        paragraphs: ['以下能力有直接或范围更明确的现代替代方案；启用前仍应逐条检查。'],
+        title: '这些旧规则可以迁移',
+        paragraphs: ['下面的功能都有直接替代方案，或可以用范围更明确的新规则实现。启用前仍请逐条检查。'],
         points: [
-          '有效的 block 列表会转换为现代“阻止”规则。',
-          '独立 HSTS 规则会转换为“升级到 HTTPS”；浏览器自身的 HSTS 机制仍独立工作。',
-          'Custom URL 仅在匹配和替换语义可安全表达时转换；编码或范围变化必须人工检查。',
-          '防盗链可改为范围明确的请求头规则，并显式填写资源主机与发起方域名。',
-          '旧分类开关只保留为每条规则的启用意图，候选规则仍保持停用，等待检查和授权。',
+          '格式有效的 Block 列表会转换为新版“阻止”规则。',
+          '独立的 HSTS 规则会转换为“升级到 HTTPS”；浏览器自带的 HSTS 仍然独立工作。',
+          'Custom URL 只有在匹配和替换方式能够安全表达时才会转换；如果编码或作用范围发生变化，会要求人工检查。',
+          '防盗链可以改写为范围明确的请求头规则，并指定资源域名和来源网页。',
+          '旧版分类开关会转换成每条规则的启用状态，但迁移后的候选规则仍然默认关闭，等待你检查并授权。',
         ],
       },
       {
-        title: '已移除功能与实际替代方案',
-        paragraphs: ['重构不会恢复范围过宽、已经过时或与请求规则无关的浏览器行为。'],
+        title: '已移除的功能，以及可以怎么替代',
+        paragraphs: ['新版不再保留范围过大、已经过时，或与请求规则关系不大的功能。'],
         points: [
-          '请求日志：使用浏览器 Network 面板，或在一次明确的调试会话中导出 HAR；本扩展不会保存浏览历史。',
-          '全局 CORS 覆盖：配置服务端、使用开发反向代理或独立测试环境；这里不提供不安全的全局等价功能。',
-          'User-Agent 覆盖与预设：临时测试可使用浏览器开发者工具，长期差异应使用服务端特性开关。',
-          '可编程右键菜单：固定目标使用浏览器书签；脚本化行为应交给单独评估过的自动化工具。',
-          'Google 搜索重定向：优先修改浏览器搜索引擎；只有固定 URL 结构足够时才创建范围明确的 Redirect 规则。',
-          'Google 到 useso 的 CDN 改写：删除旧规则，改用仍在维护的 CDN 或自托管资源；历史端点已过时。',
-          '二维码：在可用时使用浏览器或操作系统的分享、二维码工具。',
-          '图标样式、捐赠界面、遥测和远端服务在 My Webrequest 内没有替代项。',
+          '请求日志：使用浏览器开发者工具的 Network 面板，或在调试时导出 HAR。My Webrequest 不会记录你的浏览历史。',
+          '全局修改 CORS：请配置服务端、使用开发反向代理，或搭建独立测试环境。新版不提供风险较高的全局开关。',
+          '修改 User-Agent：临时测试可以使用浏览器开发者工具；长期差异更适合用服务端功能开关处理。',
+          '可编程右键菜单：固定网址可以用书签；需要运行脚本时，请使用经过单独评估的自动化工具。',
+          'Google 搜索重定向：优先修改浏览器默认搜索引擎；只有 URL 结构固定时，才适合用一条范围明确的重定向规则处理。',
+          'Google 到 useso 的 CDN 改写：旧端点已经过时，请删除这类规则，改用仍在维护的 CDN 或自行托管资源。',
+          '生成二维码：使用浏览器或操作系统自带的分享、二维码功能。',
+          '图标样式、捐赠界面、遥测和远端服务不再属于 My Webrequest 的功能范围。',
         ],
       },
       {
-        title: 'Custom URL 可能无法等价迁移',
+        title: 'Custom URL 规则不一定能原样迁移',
         paragraphs: [
-          '旧引擎可以用 JavaScript 时代的占位逻辑处理主机、路径和查询参数；Manifest V3 只提供更窄的正则替换模型。',
-          '任意顺序查询参数提取、动态占位符、不支持的正则语法、超过九个捕获组及非 HTTP(S) 目标会保持停用并可导出。只有简化 URL 约定后才应手工重建。',
+          '旧版可以用类似 JavaScript 的占位符处理域名、路径和查询参数，而 Manifest V3 只支持更有限的正则替换。',
+          '不固定顺序的查询参数、动态占位符、浏览器不支持的正则语法、超过九个捕获组，以及非 HTTP(S) 目标都不会自动转换。它们会保持关闭并可导出，建议简化 URL 规则后再手动重建。',
         ],
       },
       {
-        title: '推荐升级检查清单',
-        paragraphs: ['把迁移当成一次审查，而不是一键激活。'],
+        title: '建议按这个顺序升级',
+        paragraphs: ['把迁移当作一次检查，而不是一键开启所有旧规则。'],
         points: [
-          '应用任何内容前，先导出迁移报告和原始快照。',
-          '先处理自动转换的阻止与 HTTPS 升级候选。',
-          '用代表性路径、查询参数、资源类型和发起方测试每条 Redirect。',
-          '把范围过宽的防盗链或请求头行为改为明确的发起方域名。',
-          '仅在仍需要审计记录时保留已移除和不支持项目。',
-          '最终规则稳定后，再导出一份当前格式的备份。',
+          '应用任何迁移结果前，先导出迁移报告和原始快照。',
+          '先检查能够自动转换的阻止规则和 HTTPS 升级规则。',
+          '用有代表性的路径、查询参数、资源类型和来源网页测试每条重定向规则。',
+          '为范围过大的防盗链或请求头规则补充明确的来源网页。',
+          '只有在需要留档时，才继续保留已移除和不支持的项目。',
+          '全部规则稳定后，再导出一份新版格式的备份。',
         ],
       },
     ],
     troubleshooting: [
       {
-        title: '规则未运行',
+        title: '规则没有生效',
         paragraphs: [
-          '检查全局暂停是否关闭、规则是否启用、字段是否有效，以及浏览器是否授予列出的网站权限。',
-          '用精确 URL 测试，并核对资源类型与发起方；仅 URL 匹配并不代表所有条件都满足。',
+          '先确认扩展没有全局暂停、规则已经启用、各项输入有效，并且浏览器已经授予所需的网站权限。',
+          '使用实际 URL 运行测试，再核对资源类型和来源网页。URL 匹配，并不代表其他条件也一定匹配。',
         ],
       },
       {
-        title: '导入或运行时错误',
+        title: '导入失败或浏览器规则不同步',
         paragraphs: [
-          '应用前先预览导入。校验和失败表示备份已改变或不完整。',
-          '重新打开管理器会校准浏览器规则与保存状态；大改前请先导出备份。',
+          '导入前先查看变更预览。如果校验失败，通常表示备份文件被修改过，或内容不完整。',
+          '重新打开规则管理器会尝试同步保存状态和浏览器中的实际规则。准备大幅修改前，请先导出备份。',
         ],
       },
     ],
@@ -961,60 +1022,66 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ko: {
     'quick-start': [
       {
-        title: '예제 선택',
-        paragraphs: ['규칙 관리자에서 비활성화된 편집 가능한 예제 세 가지 중 하나를 고릅니다.'],
+        title: '예제 하나 고르기',
+        paragraphs: [
+          '규칙 관리자에서 세 가지 예제 중 하나를 고르세요. 예제는 기본적으로 꺼져 있어 부담 없이 수정할 수 있습니다.',
+        ],
       },
       {
-        title: '대상 설정',
-        paragraphs: ['example.com을 처리할 도메인으로 바꾸고 규칙은 비활성 상태로 둡니다.'],
+        title: '내 주소로 바꾸기',
+        paragraphs: ['example.com을 적용할 도메인으로 바꾸고, 아직 규칙은 켜지 마세요.'],
       },
       {
-        title: '테스트 후 활성화',
-        paragraphs: ['대표 URL을 테스트하고 저장한 뒤 활성화합니다. 필요한 접근 범위가 먼저 표시됩니다.'],
+        title: '테스트한 뒤 켜기',
+        paragraphs: [
+          '실제 URL로 결과를 확인한 뒤 저장하고 활성화하세요. 사이트 권한이 필요하면 브라우저가 먼저 범위를 알려 줍니다.',
+        ],
       },
     ],
     matching: [
       {
         title: 'URL 필터',
-        paragraphs: ['브라우저의 Declarative Net Request 문법을 사용하며 호스트나 경로 일치에 효율적입니다.'],
+        paragraphs: [
+          '브라우저의 Declarative Net Request 문법을 사용합니다. 도메인이나 경로를 일치시킬 때 가장 간단하고 빠릅니다.',
+        ],
         code: '||example.com^',
       },
       {
         title: '와일드카드와 정규식',
         paragraphs: [
-          '$1 캡처가 필요하면 와일드카드를, 다른 방식으로 표현할 수 없을 때만 정규식을 사용하세요.',
-          '리소스 유형, 메서드, 시작 도메인으로 범위를 더 좁힐 수 있습니다. 비워 두면 모두 일치합니다.',
+          '리디렉션 주소에서 원래 URL의 일부를 $1로 재사용하려면 와일드카드를 사용하세요. 일반 필터와 와일드카드로 표현할 수 없을 때만 정규식을 권장합니다.',
+          '리소스 유형, 요청 메서드, 요청 출처 도메인으로 범위를 더 좁힐 수 있습니다. 유형이나 메서드를 비워 두면 제한하지 않습니다.',
         ],
       },
     ],
     actions: [
       {
-        title: '안전한 작업',
+        title: '사이트 권한 없이 쓸 수 있는 기능',
         paragraphs: [
-          '차단과 HTTPS 업그레이드는 사이트 접근 없이 동작합니다. 리디렉션과 헤더 변경은 제한된 권한이 필요합니다.',
+          '차단과 HTTPS 전환은 사이트 접근 권한 없이 동작합니다. 리디렉션과 요청 헤더 변경은 페이지가 받는 내용을 바꾸므로 해당 사이트에 대한 권한이 필요합니다.',
         ],
       },
       {
         title: '리디렉션과 헤더',
         paragraphs: [
-          '대상은 HTTP 또는 HTTPS여야 하며 캡처는 $1부터 $9까지 사용할 수 있습니다.',
-          '허용된 요청 헤더만 제거하거나 설정할 수 있고 금지된 이름은 활성화 전에 거부됩니다.',
+          '리디렉션 대상은 HTTP 또는 HTTPS 주소여야 합니다. 와일드카드나 정규식에서 캡처한 값은 $1부터 $9까지 사용할 수 있습니다.',
+          '브라우저가 허용하는 요청 헤더만 제거하거나 설정할 수 있습니다. 바꿀 수 없는 헤더는 규칙을 켜기 전에 알려 줍니다.',
         ],
       },
     ],
     'advanced-examples': [
       {
-        title: '예제를 복사하기 전에',
+        title: '예제를 사용하기 전에',
         paragraphs: [
-          '모든 예제는 예약된 example.com 도메인을 사용합니다. 직접 관리하는 출처로 바꾸고 비활성 상태로 만든 뒤 대표 URL로 규칙 테스트를 실행하세요.',
-          '리디렉션과 요청 헤더는 페이지가 받는 내용을 바꿉니다. 리소스 유형과 시작 도메인을 좁혀 관련 없는 페이지가 규칙을 실행하지 못하게 하세요.',
+          '모든 예제는 문서용 example.com 도메인을 사용합니다. 직접 관리하는 주소로 바꾸고, 규칙을 끈 상태에서 실제 URL 몇 개를 테스트하세요.',
+          '리디렉션과 요청 헤더는 페이지가 실제로 받는 내용을 바꿉니다. 리소스 유형과 요청 출처를 좁혀 다른 사이트에 영향을 주지 않도록 하세요.',
         ],
       },
       {
         title: '스테이징 API를 로컬 서버로 보내기',
         paragraphs: [
           '/v1/ 뒤의 경로를 캡처 $1로 유지합니다. 애플리케이션 빌드를 바꾸지 않고 실제 프런트엔드를 로컬 API나 역방향 프록시에 연결할 때 유용합니다.',
-          '로컬 서버가 처리하는 메서드만 선택하고 시작 도메인을 app.example.com으로 제한하세요.',
+          '로컬 서버가 처리하는 메서드만 선택하고 요청 출처를 app.example.com으로 제한하세요.',
         ],
         code: redirectExamples.localApi,
       },
@@ -1057,15 +1124,17 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     permissions: [
       {
-        title: '필요할 때만 접근',
+        title: '필요할 때만 사이트 권한 요청',
         paragraphs: [
-          '구체적인 출처가 필요한 규칙을 활성화할 때만 선택적 사이트 접근을 요청합니다.',
-          '규칙, 백업, 테스트 입력은 브라우저에 남고 분석이나 원격 규칙 서비스가 없습니다.',
+          '사이트 접근은 선택 권한입니다. 특정 사이트가 필요한 리디렉션이나 헤더 규칙을 켤 때만 브라우저가 권한을 요청합니다.',
+          '규칙, 백업, 테스트한 URL은 브라우저에만 남습니다. 분석 도구나 원격 규칙 서비스는 없습니다.',
         ],
       },
       {
-        title: '범위를 좁게 유지',
-        paragraphs: ['구체적인 스킴과 호스트를 사용하고, 하위 리소스 작업에는 시작 도메인을 추가하세요.'],
+        title: '권한 범위 좁히기',
+        paragraphs: [
+          '가능하면 프로토콜과 도메인을 정확히 지정하세요. 스크립트나 이미지 같은 하위 리소스를 바꿀 때는 요청 출처 도메인도 추가하세요.',
+        ],
       },
     ],
     migration: [
@@ -1100,7 +1169,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           '유효한 block 목록은 현대식 차단 규칙이 됩니다.',
           '독립 HSTS 규칙은 HTTPS 업그레이드 규칙이 되며 브라우저 자체 HSTS는 별도로 동작합니다.',
           'Custom URL은 일치와 치환을 안전하게 표현할 수 있을 때만 변환됩니다.',
-          '핫링크 보호는 명시적인 자산 호스트와 시작 도메인을 가진 제한된 요청 헤더 규칙으로 다시 만들 수 있습니다.',
+          '핫링크 방지는 자산 도메인과 요청 출처 도메인을 명확히 지정한 요청 헤더 규칙으로 다시 만들 수 있습니다.',
           '이전 범주 스위치는 규칙별 활성화 의도로만 보존되며 후보는 검토와 권한 승인 전까지 비활성입니다.',
         ],
       },
@@ -1131,8 +1200,8 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         points: [
           '적용 전 이전 보고서와 원본 스냅샷을 내보냅니다.',
           '자동 차단 및 HTTPS 업그레이드 후보부터 처리합니다.',
-          '각 Redirect를 대표 경로, 쿼리, 리소스 유형, 시작 도메인으로 테스트합니다.',
-          '광범위한 핫링크와 헤더 동작을 명시적 시작 도메인으로 제한합니다.',
+          '각 리디렉션을 대표 경로, 쿼리, 리소스 유형, 요청 출처 도메인으로 테스트합니다.',
+          '범위가 넓은 핫링크 방지와 헤더 동작은 요청 출처 도메인을 지정해 제한합니다.',
           '감사 기록이 필요할 때만 제거되거나 미지원인 항목을 보관합니다.',
           '최종 규칙이 안정되면 현재 형식 백업을 내보냅니다.',
         ],
@@ -1143,7 +1212,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '규칙이 실행되지 않음',
         paragraphs: [
           '전체 일시 정지, 활성 상태, 유효성, 사이트 권한을 확인하세요.',
-          '정확한 URL로 테스트한 뒤 리소스 유형과 시작 도메인을 확인하세요.',
+          '실제 URL로 테스트한 뒤 리소스 유형과 요청 출처 도메인을 확인하세요.',
         ],
       },
       {
@@ -1158,60 +1227,68 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ja: {
     'quick-start': [
       {
-        title: 'サンプルを選ぶ',
-        paragraphs: ['ルール管理画面で、無効になっている編集可能なサンプルを一つ選びます。'],
+        title: 'サンプルを一つ選ぶ',
+        paragraphs: [
+          'ルール管理画面で、3 つのサンプルから一つ選びます。サンプルは最初から無効なので、安心して編集できます。',
+        ],
       },
       {
-        title: '対象を設定',
-        paragraphs: ['example.com を対象ドメインへ置き換え、ルールは無効のままにします。'],
+        title: '自分の URL に置き換える',
+        paragraphs: [
+          'example.com を対象のドメインに置き換えます。この時点では、まだルールを有効にしません。',
+        ],
       },
       {
-        title: 'テストして有効化',
-        paragraphs: ['代表 URL をテストして保存し、有効化します。必要なアクセス範囲が先に表示されます。'],
+        title: 'テストしてから有効にする',
+        paragraphs: [
+          '実際の URL で結果を確認し、問題がなければ保存して有効にします。サイトへのアクセス許可が必要な場合は、先に対象範囲が表示されます。',
+        ],
       },
     ],
     matching: [
       {
         title: 'URL フィルター',
-        paragraphs: ['ブラウザの Declarative Net Request 構文を使い、ホストやパスを効率的に一致させます。'],
+        paragraphs: [
+          'ブラウザの Declarative Net Request 構文を使います。ドメインやパスを指定するなら、最もシンプルで高速な方法です。',
+        ],
         code: '||example.com^',
       },
       {
         title: 'ワイルドカードと正規表現',
         paragraphs: [
-          '$1 の捕捉が必要ならワイルドカード、他で表せない場合だけ正規表現を使います。',
-          'リソース種別、メソッド、開始元ドメインでさらに絞れます。空欄はすべてを意味します。',
+          'リダイレクト先で元の URL の一部を $1 として使いたい場合は、ワイルドカードを選びます。通常のフィルターやワイルドカードで表せない場合だけ、正規表現を使うのがおすすめです。',
+          'リソースの種類、リクエストメソッド、リクエスト元のドメインでも範囲を絞れます。種類やメソッドを空欄にすると、制限なしになります。',
         ],
       },
     ],
     actions: [
       {
-        title: '安全な操作',
+        title: 'サイトへのアクセス許可が不要な操作',
         paragraphs: [
-          '遮断と HTTPS 化はサイトアクセスなしで動作します。転送とヘッダー変更には限定した権限が必要です。',
+          'ブロックと HTTPS 化は、サイトへのアクセス許可なしで動作します。リダイレクトとヘッダー変更はページが受け取る内容を変えるため、対象サイトへの許可が必要です。',
         ],
       },
       {
-        title: '転送とヘッダー',
+        title: 'リダイレクトとヘッダー',
         paragraphs: [
-          '宛先は HTTP または HTTPS にし、捕捉は $1〜$9 で挿入できます。',
-          'ブラウザが許可するリクエストヘッダーだけを操作できます。',
+          'リダイレクト先には HTTP または HTTPS の URL を指定します。ワイルドカードや正規表現でキャプチャした値は、$1〜$9 として使えます。',
+          '変更できるのは、ブラウザが許可しているリクエストヘッダーだけです。対応していない名前は、有効にする前に表示されます。',
         ],
       },
     ],
     'advanced-examples': [
       {
-        title: '例をコピーする前に',
+        title: '設定例を使う前に',
         paragraphs: [
-          'すべての例は予約済みの example.com ドメインを使います。管理している接続元へ置き換え、無効のまま作成し、代表的な URL で「ルールをテスト」を実行してください。',
-          '転送とリクエストヘッダーはページが受け取る内容を変えます。リソース種別と開始元ドメインを絞り、無関係なページから発動しないようにします。',
+          'すべての例では、文書用の example.com ドメインを使っています。自分で管理している URL に置き換え、無効のまま作成してから、実際の URL をいくつかテストしてください。',
+          'リダイレクトとリクエストヘッダーは、ページが実際に受け取る内容を変えます。リソースの種類とリクエスト元を絞り、関係のないサイトに影響しないようにします。',
         ],
       },
       {
         title: 'ステージング API をローカルサーバーへ送る',
         paragraphs: [
-          '/v1/ 以降のパスを捕捉 $1 として保持します。アプリのビルドを変えずに実際のフロントエンドをローカル API やリバースプロキシへ接続できます。',
-          'ローカルサーバーが扱うメソッドだけを選び、開始元を app.example.com に限定します。',
+          '/v1/ より後のパスを $1 として残します。アプリのビルドを変えずに、実際のフロントエンドをローカル API やリバースプロキシへ接続できます。',
+          'ローカルサーバーが扱うメソッドだけを選び、リクエスト元を app.example.com に限定します。',
         ],
         code: redirectExamples.localApi,
       },
@@ -1219,15 +1296,15 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '管理しているサイトを新しい CDN へ移す',
         paragraphs: [
           'スクリプト、スタイル、画像、フォントの完全なパスを保ったまま新しいホストへ移します。サイト本体の更新中に一時的な互換ブリッジとして使えます。',
-          'これは常時転送でありフェイルオーバーではありません。新しい CDN が失敗しても旧 CDN へ戻りません。',
+          'これは常に実行されるリダイレクトで、フェイルオーバーではありません。新しい CDN に接続できなくても、以前の CDN へ自動では戻りません。',
         ],
         code: redirectExamples.cdnMigration,
       },
       {
-        title: '正規表現の捕捉で読み取り専用 API を橋渡しする',
+        title: '正規表現で読み取り専用 API を v1 から v2 へ切り替える',
         paragraphs: [
-          '二つの捕捉グループでリソース種別と ID を保持しつつ /v1/ を /v2/ に変えます。GET のみにして書き込みの意味が変わるのを防ぎます。',
-          '保存時に現在のブラウザが正規表現の対応可否を確認します。一つの捕捉で足りるならワイルドカードを優先してください。',
+          '二つのキャプチャグループでリソースの種類と ID を残し、/v1/ だけを /v2/ に変えます。GET だけに限定することで、書き込みリクエストを誤って変更するのを防ぎます。',
+          '保存時に、現在のブラウザが正規表現に対応しているか確認します。キャプチャが一つで足りる場合は、より簡単なワイルドカードを優先してください。',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -1240,29 +1317,31 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         code: redirectExamples.localScript,
       },
       {
-        title: 'Redirect ではできないこと',
+        title: 'リダイレクトではできないこと',
         paragraphs: [
-          'すべての条件が一致すると直ちに転送します。404 を待つ、レスポンス本文を調べる、通信失敗後に宛先を選ぶ、JavaScript で URL を計算するといった処理はできません。',
+          'すべての条件に一致すると、ブラウザはすぐにリダイレクトします。404 を待つ、レスポンス本文を読む、通信に失敗してから別の宛先を選ぶ、JavaScript で URL を生成するといった処理はできません。',
         ],
         points: [
           '宛先は HTTP または HTTPS に限られます。',
-          'ワイルドカードと正規表現の捕捉は $1〜$9 で参照します。',
+          'ワイルドカードと正規表現のキャプチャは $1〜$9 で参照します。',
           'クエリ順序、デコード、重複キーは自動で正規化されません。',
-          '自己転送や検出された循環は遮断されます。',
+          '同じ URL へのリダイレクトや、検出されたループはブロックされます。',
         ],
       },
     ],
     permissions: [
       {
-        title: '必要時だけ要求',
+        title: '必要なときだけサイトへのアクセスを許可',
         paragraphs: [
-          '具体的な接続元が必要なルールを有効化する時だけ、任意のサイトアクセスを要求します。',
-          'ルール、バックアップ、テスト入力はブラウザ内に残ります。',
+          'サイトへのアクセスは任意の権限です。特定のサイトが必要なリダイレクトやヘッダールールを有効にするときだけ、ブラウザが許可を求めます。',
+          'ルール、バックアップ、テストした URL はブラウザ内に保存されます。アクセス解析も外部のルールサービスもありません。',
         ],
       },
       {
-        title: '範囲を限定',
-        paragraphs: ['具体的なスキームとホストを使い、サブリソース操作には開始元ドメインを追加します。'],
+        title: 'アクセス範囲を絞る',
+        paragraphs: [
+          'できるだけ具体的なプロトコルとドメインを指定してください。スクリプトや画像などを変更する場合は、リクエスト元のドメインも追加します。',
+        ],
       },
     ],
     migration: [
@@ -1294,10 +1373,10 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           '次の機能には直接的、または範囲を限定した現代的な代替があります。有効化前に一件ずつ確認してください。',
         ],
         points: [
-          '有効な block リストは新しい遮断ルールになります。',
+          '有効な Block リストは新しいブロックルールになります。',
           '独立した HSTS ルールは HTTPS 化ルールになり、ブラウザ本来の HSTS は別に動作します。',
           'Custom URL は一致と置換を安全に表現できる場合だけ変換されます。',
-          '直リンク防止は、資産ホストと開始元ドメインを明示した限定的なリクエストヘッダールールで再作成できます。',
+          '直リンク防止は、対象のホストとリクエスト元ドメインを明示したリクエストヘッダールールとして作り直せます。',
           '旧カテゴリスイッチはルールごとの有効化意図としてのみ保持され、確認と権限承認までは無効です。',
         ],
       },
@@ -1309,7 +1388,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           '全体 CORS 上書き：サーバーを設定するか、開発用リバースプロキシまたは専用テスト環境を使います。',
           'User-Agent 変更：一時テストは開発者ツール、長期的な分岐はサーバー側の機能フラグを使います。',
           'プログラム可能なコンテキストメニュー：固定先はブックマーク、スクリプト処理は別途検証した自動化ツールを使います。',
-          'Google 検索転送：ブラウザの検索エンジンを設定するか、固定 URL 形状で十分な場合だけ限定的な Redirect を作ります。',
+          'Google 検索のリダイレクト：ブラウザの検索エンジンを設定するか、URL の形が固定されている場合だけ範囲を絞ったリダイレクトルールを作ります。',
           'Google-to-useso CDN 書き換え：旧ルールを削除し、保守中の CDN または自己ホスト資産へ移行します。',
           'QR 生成：利用可能なブラウザまたは OS の共有機能を使います。',
           'アイコンスタイル、寄付 UI、テレメトリ、リモートサービスは My Webrequest 内で代替しません。',
@@ -1319,7 +1398,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Custom URL は同等に移行できない場合がある',
         paragraphs: [
           '旧エンジンはホスト、パス、クエリに JavaScript 時代のプレースホルダー処理を使えましたが、Manifest V3 はより限定的な正規表現置換だけを提供します。',
-          '順序に依存しないクエリ抽出、計算型プレースホルダー、未対応正規表現、九個を超える捕捉、HTTP(S) 以外の宛先は無効のまま保存されます。',
+          '順序に依存しないクエリ抽出、計算型プレースホルダー、未対応の正規表現、9 個を超えるキャプチャ、HTTP(S) 以外の宛先は、無効のまま保存されます。',
         ],
       },
       {
@@ -1327,9 +1406,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         paragraphs: ['移行を一括有効化ではなく、確認作業として扱ってください。'],
         points: [
           '適用前に移行レポートと原本スナップショットを書き出します。',
-          '自動変換された遮断と HTTPS 化の候補から始めます。',
-          '各 Redirect を代表的なパス、クエリ、リソース種別、開始元でテストします。',
-          '広すぎる直リンク防止やヘッダー処理を明示的な開始元へ限定します。',
+          '自動変換されたブロックと HTTPS 化の候補から始めます。',
+          '各リダイレクトを、代表的なパス、クエリ、リソースの種類、リクエスト元でテストします。',
+          '範囲が広すぎる直リンク防止やヘッダー処理は、リクエスト元を明示して絞り込みます。',
           '監査に必要な間だけ削除済み・未対応項目を保持します。',
           '最終ルールが安定したら現行形式のバックアップを書き出します。',
         ],
@@ -1340,7 +1419,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'ルールが動かない',
         paragraphs: [
           '全体停止、有効状態、入力の妥当性、サイト権限を確認します。',
-          '正確な URL でテストし、リソース種別と開始元も確認します。',
+          '実際の URL でテストし、リソースの種類とリクエスト元も確認します。',
         ],
       },
       {
@@ -1355,55 +1434,61 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   fr: {
     'quick-start': [
       {
-        title: 'Choisir un exemple',
-        paragraphs: ['Dans le gestionnaire, choisissez l’un des trois exemples désactivés et modifiables.'],
+        title: 'Choisissez un exemple',
+        paragraphs: [
+          'Dans le gestionnaire, choisissez l’un des trois exemples. Ils sont désactivés par défaut et peuvent être modifiés sans risque.',
+        ],
       },
       {
-        title: 'Définir la cible',
-        paragraphs: ['Remplacez example.com par le domaine visé et gardez la règle désactivée.'],
+        title: 'Remplacez l’adresse',
+        paragraphs: [
+          'Remplacez example.com par le domaine à traiter. Laissez la règle désactivée pour le moment.',
+        ],
       },
       {
-        title: 'Tester et activer',
-        paragraphs: ['Testez une URL, enregistrez puis activez. La portée nécessaire est affichée avant.'],
+        title: 'Testez avant d’activer',
+        paragraphs: [
+          'Vérifiez le résultat avec une URL réelle, puis enregistrez et activez la règle. Si un accès au site est nécessaire, le navigateur vous indique d’abord son périmètre.',
+        ],
       },
     ],
     matching: [
       {
         title: 'Filtres URL',
         paragraphs: [
-          'Ils utilisent la syntaxe Declarative Net Request du navigateur et conviennent aux hôtes ou chemins.',
+          'Ils utilisent la syntaxe Declarative Net Request du navigateur. C’est la méthode la plus simple pour cibler un domaine ou un chemin.',
         ],
         code: '||example.com^',
       },
       {
         title: 'Jokers et expressions régulières',
         paragraphs: [
-          'Utilisez un joker pour réemployer une capture $1 et une expression régulière seulement en dernier recours.',
-          'Les types, méthodes et domaines initiateurs réduisent encore la portée.',
+          'Utilisez un joker si la destination doit reprendre une partie de l’URL avec $1. Réservez les expressions régulières aux cas qu’un filtre ou un joker ne peut pas couvrir.',
+          'Vous pouvez encore réduire le périmètre avec le type de ressource, la méthode de requête et le domaine initiateur. Un type ou une méthode vide ne pose aucune restriction.',
         ],
       },
     ],
     actions: [
       {
-        title: 'Actions sûres',
+        title: 'Actions sans autorisation de site',
         paragraphs: [
-          'Le blocage et HTTPS fonctionnent sans accès au site. Les redirections et en-têtes exigent une portée limitée.',
+          'Le blocage et le passage en HTTPS fonctionnent sans autorisation d’accès au site. Les redirections et les modifications d’en-têtes changent ce que reçoit la page : elles nécessitent donc une autorisation ciblée.',
         ],
       },
       {
         title: 'Redirections et en-têtes',
         paragraphs: [
-          'La destination doit être HTTP ou HTTPS, avec des captures $1 à $9.',
-          'Seuls les en-têtes autorisés par le navigateur peuvent être retirés ou définis.',
+          'La destination doit être une URL HTTP ou HTTPS. Les valeurs capturées par un joker ou une expression régulière peuvent être reprises avec $1 à $9.',
+          'Seuls les en-têtes acceptés par le navigateur peuvent être supprimés ou définis. Les noms interdits sont signalés avant l’activation.',
         ],
       },
     ],
     'advanced-examples': [
       {
-        title: 'Avant de copier un exemple',
+        title: 'Avant d’utiliser un exemple',
         paragraphs: [
-          'Tous les exemples utilisent les domaines réservés example.com. Remplacez-les par des origines que vous contrôlez, créez la règle désactivée, puis utilisez Tester la règle avec des URL représentatives.',
-          'Les redirections et en-têtes changent ce que reçoit une page. Limitez les types de ressources et les domaines initiateurs.',
+          'Tous les exemples utilisent le domaine documentaire example.com. Remplacez-le par une adresse que vous gérez, créez la règle désactivée, puis testez-la avec plusieurs URL réelles.',
+          'Les redirections et les en-têtes changent ce que reçoit réellement une page. Limitez les types de ressources et les domaines initiateurs pour ne pas affecter d’autres sites.',
         ],
       },
       {
@@ -1453,16 +1538,16 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     permissions: [
       {
-        title: 'Accès à la demande',
+        title: 'Un accès demandé uniquement si nécessaire',
         paragraphs: [
-          'L’accès facultatif n’est demandé qu’à l’activation d’une règle qui en a besoin.',
-          'Règles, sauvegardes et tests restent dans le navigateur. Aucun suivi ni service distant.',
+          'L’accès aux sites est une autorisation facultative. Le navigateur ne la demande qu’à l’activation d’une redirection ou d’une règle d’en-tête qui en a réellement besoin.',
+          'Les règles, les sauvegardes et les URL testées restent dans le navigateur. Aucun outil d’analyse ni service distant ne les traite.',
         ],
       },
       {
-        title: 'Limiter la portée',
+        title: 'Réduire le périmètre d’accès',
         paragraphs: [
-          'Préférez un protocole et un hôte précis, puis ajoutez les domaines initiateurs pour les sous-ressources.',
+          'Précisez autant que possible le protocole et le domaine. Pour les scripts, images et autres sous-ressources, ajoutez aussi les domaines initiateurs.',
         ],
       },
     ],
@@ -1477,7 +1562,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Vérifier d’abord',
         paragraphs: [
-          'Les règles prises en charge deviennent des candidates désactivées. Les données non prises en charge restent exportables.',
+          'Les règles compatibles sont importées mais restent désactivées. Les données qui ne peuvent pas être converties restent disponibles à l’export.',
         ],
       },
     ],
@@ -1485,7 +1570,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Promesse de compatibilité',
         paragraphs: [
-          'La version actuelle conserve le cœur utile des règles réseau, mais ne reproduit pas à l’identique l’ancien runtime Manifest V2. Chrome peut détecter ou importer les anciennes données ; Edge et Firefox n’ont pas de migration automatique car aucune ancienne version n’y a été publiée.',
+          'La version actuelle conserve l’essentiel des règles réseau, sans reproduire à l’identique le fonctionnement de l’ancienne extension Manifest V2. Chrome peut détecter ou importer les anciennes données. Edge et Firefox n’ont pas de migration automatique, puisqu’aucune ancienne version n’y a été publiée.',
           'Aucun élément n’est activé silencieusement. Chaque entrée est classée automatique, à vérifier, non prise en charge, supprimée ou invalide, et la source reste dans l’instantané.',
         ],
       },
@@ -1499,7 +1584,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Les règles HSTS autonomes deviennent des règles de passage à HTTPS ; le HSTS natif du navigateur reste indépendant.',
           'Custom URL n’est converti que si la correspondance et la substitution peuvent être représentées sans risque.',
           'La protection anti-hotlink peut être recréée avec une règle d’en-tête limitée à des hôtes et initiateurs explicites.',
-          'Les anciens interrupteurs deviennent une intention par règle, mais les candidates restent désactivées avant examen et autorisation.',
+          'Les anciens interrupteurs sont convertis en état individuel pour chaque règle. Les règles importées restent toutefois désactivées jusqu’à leur vérification et à l’autorisation nécessaire.',
         ],
       },
       {
@@ -1530,7 +1615,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         paragraphs: ['Traitez la migration comme une revue, pas comme une activation en un clic.'],
         points: [
           'Exportez le rapport et l’instantané brut avant toute application.',
-          'Commencez par les candidates automatiques de blocage et HTTPS.',
+          'Commencez par les règles de blocage et de passage en HTTPS converties automatiquement.',
           'Testez chaque Redirect avec des chemins, requêtes, types et initiateurs représentatifs.',
           'Remplacez les règles d’en-tête trop larges par des initiateurs explicites.',
           'Ne gardez les éléments supprimés ou non pris en charge que pour les besoins d’audit.',
@@ -1558,55 +1643,61 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   es: {
     'quick-start': [
       {
-        title: 'Elegir un ejemplo',
-        paragraphs: ['En el gestor, elige uno de los tres ejemplos desactivados y editables.'],
+        title: 'Elige un ejemplo',
+        paragraphs: [
+          'En el gestor encontrarás tres ejemplos. Están desactivados de forma predeterminada, así que puedes editarlos sin riesgo.',
+        ],
       },
       {
-        title: 'Definir el destino',
-        paragraphs: ['Cambia example.com por el dominio objetivo y mantén la regla desactivada.'],
+        title: 'Cambia la dirección',
+        paragraphs: [
+          'Sustituye example.com por el dominio que quieres tratar. De momento, deja la regla desactivada.',
+        ],
       },
       {
-        title: 'Probar y activar',
-        paragraphs: ['Prueba una URL, guarda y activa. Verás primero el acceso necesario.'],
+        title: 'Prueba antes de activar',
+        paragraphs: [
+          'Comprueba el resultado con una URL real y, si todo está bien, guarda y activa la regla. Si necesita acceso al sitio, el navegador te mostrará primero el alcance.',
+        ],
       },
     ],
     matching: [
       {
         title: 'Filtros de URL',
         paragraphs: [
-          'Usan la sintaxis Declarative Net Request del navegador y son eficientes para hosts o rutas.',
+          'Usan la sintaxis Declarative Net Request del navegador. Es la forma más sencilla de seleccionar un dominio o una ruta.',
         ],
         code: '||example.com^',
       },
       {
         title: 'Comodines y expresiones regulares',
         paragraphs: [
-          'Usa un comodín para reutilizar una captura $1 y una expresión regular solo si lo anterior no basta.',
-          'Tipos, métodos y dominios iniciadores reducen aún más el alcance.',
+          'Usa un comodín si la dirección de destino debe reutilizar parte de la URL mediante $1. Reserva las expresiones regulares para los casos que no puedas resolver con un filtro o comodín.',
+          'También puedes limitar el alcance por tipo de recurso, método de solicitud y dominio iniciador. Si dejas vacíos los tipos o métodos, no se aplicará ningún límite.',
         ],
       },
     ],
     actions: [
       {
-        title: 'Acciones seguras',
+        title: 'Acciones que no necesitan acceso al sitio',
         paragraphs: [
-          'Bloquear y actualizar a HTTPS funcionan sin acceso al sitio. Redirecciones y cabeceras necesitan un alcance limitado.',
+          'Bloquear y cambiar a HTTPS funcionan sin acceso al sitio. Las redirecciones y los cambios de encabezados modifican lo que recibe la página, por lo que necesitan un permiso limitado.',
         ],
       },
       {
-        title: 'Redirecciones y cabeceras',
+        title: 'Redirecciones y encabezados',
         paragraphs: [
-          'El destino debe usar HTTP o HTTPS y las capturas van de $1 a $9.',
-          'Solo se pueden quitar o definir cabeceras permitidas por el navegador.',
+          'El destino debe ser una URL HTTP o HTTPS. Puedes reutilizar las capturas de un comodín o una expresión regular mediante $1 a $9.',
+          'Solo se pueden eliminar o definir los encabezados que admite el navegador. Los nombres no permitidos se indican antes de activar la regla.',
         ],
       },
     ],
     'advanced-examples': [
       {
-        title: 'Antes de copiar un ejemplo',
+        title: 'Antes de usar un ejemplo',
         paragraphs: [
-          'Todos los ejemplos usan dominios reservados de example.com. Sustitúyelos por orígenes bajo tu control, crea la regla desactivada y prueba URL representativas antes de activarla.',
-          'Las redirecciones y cabeceras cambian lo que recibe una página. Limita los tipos de recurso y los dominios iniciadores.',
+          'Todos los ejemplos usan el dominio documental example.com. Sustitúyelo por una dirección que controles, crea la regla desactivada y pruébala con varias URL reales.',
+          'Las redirecciones y los encabezados cambian lo que recibe realmente una página. Limita los tipos de recurso y los dominios iniciadores para no afectar a otros sitios.',
         ],
       },
       {
@@ -1656,15 +1747,17 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     permissions: [
       {
-        title: 'Acceso bajo demanda',
+        title: 'Acceso solo cuando hace falta',
         paragraphs: [
-          'El acceso opcional solo se solicita al activar una regla que realmente lo necesita.',
-          'Reglas, copias y pruebas permanecen en el navegador. No hay analítica ni servicio remoto.',
+          'El acceso a sitios es un permiso opcional. El navegador solo lo solicita al activar una redirección o una regla de encabezados que realmente lo necesita.',
+          'Las reglas, las copias de seguridad y las URL de prueba permanecen en el navegador. No hay analítica ni servicios remotos que las procesen.',
         ],
       },
       {
-        title: 'Limitar el alcance',
-        paragraphs: ['Prefiere un esquema y host concretos y añade dominios iniciadores para subrecursos.'],
+        title: 'Reduce el alcance del permiso',
+        paragraphs: [
+          'Especifica el protocolo y el dominio siempre que puedas. Para scripts, imágenes y otros subrecursos, añade también los dominios iniciadores.',
+        ],
       },
     ],
     migration: [
@@ -1686,7 +1779,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Promesa de compatibilidad',
         paragraphs: [
-          'La versión actual conserva el núcleo útil de reglas de red, pero no copia el runtime Manifest V2 anterior. Chrome puede detectar o importar datos antiguos; Edge y Firefox no tienen migración automática porque allí nunca hubo una versión anterior.',
+          'La versión actual conserva lo esencial de las reglas de red, pero no reproduce exactamente el funcionamiento de la antigua extensión Manifest V2. Chrome puede detectar o importar datos anteriores. Edge y Firefox no necesitan migración automática porque nunca tuvieron una versión antigua.',
           'Nada se activa silenciosamente. Cada elemento se clasifica como automático, para revisar, no compatible, eliminado o inválido, y el original permanece en la instantánea.',
         ],
       },
@@ -1699,8 +1792,8 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Las listas block válidas se convierten en reglas de bloqueo modernas.',
           'Las reglas HSTS independientes pasan a Actualizar a HTTPS; el HSTS nativo del navegador sigue separado.',
           'Custom URL solo se convierte si la coincidencia y sustitución pueden representarse de forma segura.',
-          'La protección contra hotlink puede recrearse como una regla de cabecera limitada a hosts e iniciadores explícitos.',
-          'Los interruptores de categoría pasan a ser intención por regla, pero las candidatas siguen desactivadas hasta su revisión y permiso.',
+          'La protección contra hotlink puede recrearse con una regla de encabezado limitada a dominios de recursos e iniciadores concretos.',
+          'Los antiguos interruptores de categoría se convierten en el estado de cada regla, pero las reglas importadas siguen desactivadas hasta que las revises y concedas los permisos necesarios.',
         ],
       },
       {
@@ -1731,7 +1824,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Exporta el informe y la instantánea original antes de aplicar nada.',
           'Empieza por las candidatas automáticas de bloqueo y HTTPS.',
           'Prueba cada Redirect con rutas, consultas, tipos e iniciadores representativos.',
-          'Sustituye reglas de cabecera amplias por iniciadores explícitos.',
+          'Limita las reglas de encabezados demasiado amplias con iniciadores concretos.',
           'Conserva elementos eliminados o incompatibles solo mientras necesites la auditoría.',
           'Exporta una copia en el formato actual cuando el conjunto final sea estable.',
         ],

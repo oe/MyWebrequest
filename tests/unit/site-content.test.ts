@@ -70,6 +70,21 @@ describe('website content matrix', () => {
     }
   });
 
+  it('avoids literal translation leftovers in localized product copy', () => {
+    const localizedText = (locale: Exclude<(typeof locales)[number], 'en'>) =>
+      JSON.stringify({
+        home: homeCopy[locale],
+        groups: guideGroupCopy[locale],
+        guides: guideSlugs.map((slug) => guideCopy(locale, slug)),
+      });
+
+    expect(localizedText('zh-CN')).not.toMatch(/静默|工作流|受控的|发起方/);
+    expect(localizedText('ko')).not.toMatch(/시작 도메인|로컬 우선/);
+    expect(localizedText('ja')).not.toMatch(/遮断|転送|開始元|捕捉/);
+    expect(localizedText('fr')).not.toMatch(/runtime Manifest|Local en priorité/);
+    expect(localizedText('es')).not.toMatch(/runtime Manifest|cabeceras?/i);
+  });
+
   it('publishes substantial advanced and legacy-upgrade help in every locale', () => {
     for (const locale of locales) {
       const advanced = guideCopy(locale, 'advanced-examples');
