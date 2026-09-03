@@ -8,6 +8,7 @@ import {
   KeyRoundIcon,
   PlusIcon,
   PlayIcon,
+  SparklesIcon,
   Trash2Icon,
   XIcon,
 } from 'lucide-react';
@@ -23,12 +24,7 @@ import {
 } from '@/domain/rules/model';
 import type { RuleDiagnostic } from '@/domain/rules/diagnostics';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
-import {
-  matchRule,
-  urlFilterToRegExpSource,
-  wildcardToRegExpSource,
-  type MatchResult,
-} from '@/domain/rules/test-match';
+import { matchRule, type MatchResult } from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Button } from '@/ui/components/button';
@@ -66,6 +62,12 @@ import { Textarea } from '@/ui/components/textarea';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { localizedResourceTypeLabel } from './filter-rules';
+import {
+  convertedMatchValue,
+  regexWithWildcardCaptures,
+  suggestedMatchKind,
+  type MatchKind,
+} from './match-kind';
 import { MatchHelpPopover } from './match-help-popover';
 import { PermissionScope } from './permission-scope';
 import { StatusBadge } from './status-badge';
@@ -198,6 +200,7 @@ export function RuleEditor({
   const [copying, setCopying] = useState(false);
   const [regexRuntimeError, setRegexRuntimeError] = useState<string | null>(null);
   const [permissionOpen, setPermissionOpen] = useState(false);
+  const [dismissedMatchSuggestion, setDismissedMatchSuggestion] = useState<string | null>(null);
 
   const validation = useMemo(() => validateRule(draft), [draft]);
   const draftFingerprint = useMemo(() => JSON.stringify(draft), [draft]);
@@ -217,6 +220,18 @@ export function RuleEditor({
   const draftHasPermission = hasPermission && !permissionScopeChanged;
   const headerOperationCount =
     draft.action.kind === 'modify-request-headers' ? draft.action.operations.length : 0;
+  const suggestedKind = useMemo(
+    () => suggestedMatchKind(draft.condition.url.value, draft.condition.url.kind),
+    [draft.condition.url.kind, draft.condition.url.value],
+  );
+  const matchSuggestionKey = suggestedKind
+    ? `${draft.condition.url.kind}:${suggestedKind}:${draft.condition.url.value}`
+    : null;
+  const showMatchSuggestion = Boolean(matchSuggestionKey && matchSuggestionKey !== dismissedMatchSuggestion);
+  const captureQuickFixAvailable =
+    draft.condition.url.kind === 'url-filter' &&
+    /^https?:\/\//.test(draft.condition.url.value) &&
+    draft.condition.url.value.includes('*');
 
   useEffect(() => {
     onDirtyChange(dirty);
@@ -238,6 +253,37 @@ export function RuleEditor({
       ...current,
       condition: { ...current.condition, url: { ...current.condition.url, value } },
       permissionOrigins: permissionOriginsFromMatch(value),
+    }));
+  };
+
+  const changeMatchKind = (nextKind: MatchKind, reinterpret = false) => {
+    setRegexRuntimeError(null);
+    setDismissedMatchSuggestion(null);
+    setDraft((current) => {
+      const value = reinterpret
+        ? current.condition.url.value
+        : convertedMatchValue(current.condition.url.value, current.condition.url.kind, nextKind);
+      const inferredOrigins = permissionOriginsFromMatch(value);
+      return {
+        ...current,
+        condition: { ...current.condition, url: { kind: nextKind, value } },
+        permissionOrigins: inferredOrigins.length > 0 ? inferredOrigins : current.permissionOrigins,
+      };
+    });
+  };
+
+  const convertUrlFilterToCapturingRegex = () => {
+    setRegexRuntimeError(null);
+    setDismissedMatchSuggestion(null);
+    setDraft((current) => ({
+      ...current,
+      condition: {
+        ...current.condition,
+        url: {
+          kind: 'regex',
+          value: regexWithWildcardCaptures(current.condition.url.value),
+        },
+      },
     }));
   };
 
@@ -408,59 +454,57 @@ export function RuleEditor({
                 onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
               />
             </Field>
-            <Field>
-              <FieldLabel htmlFor="rule-match-kind">{t('matchType')}</FieldLabel>
-              <Select
-                value={draft.condition.url.kind}
-                disabled={readOnly}
-                onValueChange={(kind) => {
-                  setRegexRuntimeError(null);
-                  setDraft((current) => {
-                    const value =
-                      kind === 'url-filter'
-                        ? '||example.com^'
-                        : kind === 'wildcard'
-                          ? 'https://example.com/*'
-                          : current.condition.url.kind === 'url-filter'
-                            ? urlFilterToRegExpSource(current.condition.url.value)
-                            : wildcardToRegExpSource(current.condition.url.value);
-                    return {
-                      ...current,
-                      condition: {
-                        ...current.condition,
-                        url: { kind: kind as Rule['condition']['url']['kind'], value },
-                      },
-                      permissionOrigins:
-                        kind === 'regex' ? current.permissionOrigins : permissionOriginsFromMatch(value),
-                    };
-                  });
-                }}
-              >
-                <SelectTrigger id="rule-match-kind" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="url-filter">{t('urlFilter')}</SelectItem>
-                    <SelectItem value="wildcard">{t('wildcard')}</SelectItem>
-                    <SelectItem value="regex">{t('regularExpression')}</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </Field>
             <Field data-invalid={Boolean(matchError || regexRuntimeError)}>
-              <div className="flex items-center gap-1">
-                <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
-                <MatchHelpPopover kind={draft.condition.url.kind} />
-              </div>
-              <Input
-                id="rule-match"
-                className="font-mono"
-                value={draft.condition.url.value}
-                disabled={readOnly}
-                aria-invalid={Boolean(matchError || regexRuntimeError)}
-                onChange={(event) => updateMatch(event.target.value)}
-              />
+              <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
+              <InputGroup>
+                <InputGroupInput
+                  id="rule-match"
+                  className="font-mono"
+                  value={draft.condition.url.value}
+                  disabled={readOnly}
+                  aria-invalid={Boolean(matchError || regexRuntimeError)}
+                  onChange={(event) => updateMatch(event.target.value)}
+                />
+                <InputGroupAddon align="inline-end">
+                  <Select
+                    value={draft.condition.url.kind}
+                    disabled={readOnly}
+                    onValueChange={(kind) => changeMatchKind(kind as MatchKind)}
+                  >
+                    <SelectTrigger
+                      size="sm"
+                      className="max-w-40"
+                      aria-label={t('matchSyntaxSelectorLabel', {
+                        syntax: t(
+                          draft.condition.url.kind === 'url-filter'
+                            ? 'urlFilterShort'
+                            : draft.condition.url.kind === 'wildcard'
+                              ? 'wildcardShort'
+                              : 'regexShort',
+                        ),
+                      })}
+                    >
+                      <SelectValue>
+                        {t(
+                          draft.condition.url.kind === 'url-filter'
+                            ? 'urlFilterShort'
+                            : draft.condition.url.kind === 'wildcard'
+                              ? 'wildcardShort'
+                              : 'regexShort',
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent align="end">
+                      <SelectGroup>
+                        <SelectItem value="url-filter">{t('urlFilter')}</SelectItem>
+                        <SelectItem value="wildcard">{t('wildcard')}</SelectItem>
+                        <SelectItem value="regex">{t('regularExpression')}</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <MatchHelpPopover kind={draft.condition.url.kind} />
+                </InputGroupAddon>
+              </InputGroup>
               <FieldDescription>
                 {t(
                   draft.condition.url.kind === 'url-filter'
@@ -472,6 +516,27 @@ export function RuleEditor({
               </FieldDescription>
               {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
               {regexRuntimeError ? <FieldError>{regexRuntimeError}</FieldError> : null}
+              {showMatchSuggestion && suggestedKind === 'regex' ? (
+                <Alert>
+                  <SparklesIcon />
+                  <AlertTitle>{t('regexSuggestionTitle')}</AlertTitle>
+                  <AlertDescription className="flex flex-col gap-2">
+                    <span>{t('regexSuggestionDescription')}</span>
+                    <span className="flex flex-wrap gap-2">
+                      <Button size="xs" onClick={() => changeMatchKind('regex', true)}>
+                        {t('useRegularExpression')}
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        onClick={() => setDismissedMatchSuggestion(matchSuggestionKey)}
+                      >
+                        {t('keepCurrentSyntax')}
+                      </Button>
+                    </span>
+                  </AlertDescription>
+                </Alert>
+              ) : null}
             </Field>
             <Field>
               <FieldLabel>{t('resourceTypes')}</FieldLabel>
@@ -555,7 +620,31 @@ export function RuleEditor({
                 <FieldDescription>
                   {t(draft.condition.url.kind === 'url-filter' ? 'destinationFixedHelp' : 'destinationHelp')}
                 </FieldDescription>
-                {destinationError ? <FieldError>{validationMessage(destinationError, t)}</FieldError> : null}
+                {destinationError?.code === 'capture-match-required' ? (
+                  <Alert variant="warning">
+                    <CircleAlertIcon />
+                    <AlertTitle>{t('captureModeNeededTitle')}</AlertTitle>
+                    <AlertDescription className="flex flex-col gap-2">
+                      <span>{t('captureModeNeededDescription')}</span>
+                      {captureQuickFixAvailable ? (
+                        <span className="flex flex-wrap gap-2">
+                          <Button
+                            size="xs"
+                            variant="outline"
+                            onClick={() => changeMatchKind('wildcard', true)}
+                          >
+                            {t('useSimpleWildcard')}
+                          </Button>
+                          <Button size="xs" variant="outline" onClick={convertUrlFilterToCapturingRegex}>
+                            {t('convertToRegularExpression')}
+                          </Button>
+                        </span>
+                      ) : null}
+                    </AlertDescription>
+                  </Alert>
+                ) : destinationError ? (
+                  <FieldError>{validationMessage(destinationError, t)}</FieldError>
+                ) : null}
               </Field>
             ) : null}
             {draft.action.kind === 'modify-request-headers' ? (

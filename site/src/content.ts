@@ -527,6 +527,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'Choose one of three match modes',
         paragraphs: [
           'The editor has two browser rule formats and one simpler My Webrequest format. Most rules need only the first option:',
+          'New rules start with URL filter. If an entry clearly looks like a regular expression, the editor suggests switching but never changes the mode by itself.',
         ],
         points: [
           'URL filter (recommended): browser-native pattern syntax for a domain, fixed URL, or path. It cannot create $1 values.',
@@ -872,6 +873,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '三种匹配方式，怎么选',
         paragraphs: [
           '编辑器提供两种浏览器规则格式，以及一种更容易上手的 My Webrequest 格式。大多数情况选第一种就够了：',
+          '新规则默认使用 URL 过滤器。输入内容明显像正则时，编辑器会建议切换，但不会擅自改变匹配方式。',
         ],
         points: [
           'URL 过滤器（推荐）：浏览器原生的简洁语法，适合域名、固定 URL 和路径，但不能生成 $1。',
@@ -1090,6 +1092,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '세 가지 일치 방식 중 선택하기',
         paragraphs: [
           '브라우저 규칙 형식 두 가지와 더 쉬운 My Webrequest 형식 한 가지가 있습니다. 대부분은 첫 번째 방식이면 충분합니다.',
+          '새 규칙은 URL 필터로 시작합니다. 입력이 정규식으로 명확하게 보이면 전환을 제안하지만, 모드를 자동으로 바꾸지는 않습니다.',
         ],
         points: [
           'URL 필터(권장): 도메인, 고정 URL, 경로에 알맞은 브라우저 기본 문법입니다. $1 값은 만들 수 없습니다.',
@@ -1311,6 +1314,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '3 つの一致方式から選ぶ',
         paragraphs: [
           'ブラウザーのルール形式が 2 つ、より簡単な My Webrequest 形式が 1 つあります。ほとんどの場合は最初の方式で十分です。',
+          '新しいルールは URL フィルターで始まります。入力が明らかに正規表現なら切り替えを提案しますが、自動では変更しません。',
         ],
         points: [
           'URL フィルター（推奨）：ドメイン、固定 URL、パスに適したブラウザー標準の構文です。$1 は作れません。',
@@ -1532,6 +1536,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Choisir entre trois modes',
         paragraphs: [
           'L’éditeur propose deux formats du navigateur et un format My Webrequest plus simple. Le premier suffit le plus souvent :',
+          'Une nouvelle règle commence en mode Filtre d’URL. Si la saisie ressemble clairement à une expression régulière, l’éditeur propose de changer de mode sans jamais le faire automatiquement.',
         ],
         points: [
           'Filtre d’URL (recommandé) : syntaxe native du navigateur pour un domaine, une URL fixe ou un chemin. Elle ne produit pas de valeur $1.',
@@ -1755,6 +1760,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Elige entre tres modos',
         paragraphs: [
           'El editor ofrece dos formatos del navegador y uno más sencillo de My Webrequest. La primera opción basta casi siempre:',
+          'Las reglas nuevas empiezan con Filtro de URL. Si el contenido parece claramente una expresión regular, el editor propone cambiar de modo, pero nunca lo hace automáticamente.',
         ],
         points: [
           'Filtro de URL (recomendado): sintaxis nativa del navegador para un dominio, una URL fija o una ruta. No genera $1.',

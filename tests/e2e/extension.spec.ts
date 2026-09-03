@@ -404,28 +404,59 @@ test('clean install exposes the product UI without required host access', async 
   );
   await options.keyboard.press('Escape');
 
-  const matchType = options.getByRole('combobox', { name: 'Match type' });
-  await matchType.click();
+  await expect(options.getByText('Match type', { exact: true })).toHaveCount(0);
+  const matchSyntax = options.getByRole('combobox', { name: /Matching syntax:/ });
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: URL filter');
+  await matchSyntax.click();
   await expect(options.getByRole('option')).toHaveCount(3);
   await options.getByRole('option', { name: 'Simple wildcard' }).click();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Wildcard');
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   await expect(matchHelp.getByText('Simple wildcard syntax', { exact: true })).toBeVisible();
   await expect(matchHelp.getByText('My Webrequest convenience mode', { exact: false })).toBeVisible();
   await options.keyboard.press('Escape');
 
-  await matchType.click();
+  await matchSyntax.click();
   await options.getByRole('option', { name: 'Regular expression' }).click();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Regex');
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   await expect(matchHelp.getByText('Regular expression syntax', { exact: true })).toBeVisible();
   await expect(matchHelp.getByText('A literal dot.', { exact: false })).toBeVisible();
   await options.keyboard.press('Escape');
 
-  await matchType.click();
+  await matchSyntax.click();
   await options.getByRole('option', { name: 'URL filter (recommended)' }).click();
+  const matchUrl = options.getByRole('textbox', { name: 'Match URL' });
+  const anchoredRegex = '^https://api\\.example\\.com/(.*)$';
+  await matchUrl.fill(anchoredRegex);
+  await expect(options.getByText('This looks like a regular expression', { exact: true })).toBeVisible();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: URL filter');
+  await options.getByRole('button', { name: 'Use regular expression' }).click();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Regex');
+  await expect(matchUrl).toHaveValue(anchoredRegex);
+
+  await matchSyntax.click();
+  await options.getByRole('option', { name: 'URL filter (recommended)' }).click();
+  await matchUrl.fill('https://example.com/*');
   await options.getByRole('combobox', { name: 'Action', exact: true }).click();
   await options.getByRole('option', { name: 'Redirect' }).click();
-  await expect(options.getByRole('textbox', { name: 'Destination' })).toHaveValue('https://example.com/');
-  await expect(options.getByText('URL filters do not provide $1 values.', { exact: false })).toBeVisible();
+  const destination = options.getByRole('textbox', { name: 'Destination' });
+  await expect(destination).toHaveValue('https://example.com/');
+  await destination.fill('https://new.example.com/$1');
+  await expect(options.getByText('This destination needs captured values', { exact: true })).toBeVisible();
+  await options.getByRole('button', { name: 'Use simple wildcard' }).click();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Wildcard');
+  await expect(matchUrl).toHaveValue('https://example.com/*');
+  await expect(options.getByText('This destination needs captured values', { exact: true })).toHaveCount(0);
+
+  await matchSyntax.click();
+  await options.getByRole('option', { name: 'URL filter (recommended)' }).click();
+  await matchUrl.fill('https://example.com/*');
+  await expect(options.getByText('This destination needs captured values', { exact: true })).toBeVisible();
+  await options.getByRole('button', { name: 'Convert to regular expression' }).click();
+  await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Regex');
+  await expect(matchUrl).toHaveValue('^https://example\\.com/(.*)$');
+  await expect(options.getByText('This destination needs captured values', { exact: true })).toHaveCount(0);
   const starter = await extensionPage.evaluate(async () => {
     const stored = await chrome.storage.local.get('requestRulesState');
     const state = stored.requestRulesState as StoredState;
