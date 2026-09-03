@@ -77,21 +77,21 @@ describe('rule service', () => {
   it('creates a disabled site-scoped rule', () => {
     const rule = createRule('https://docs.example.com');
     expect(rule.enabled).toBe(false);
-    expect(rule.condition.url.value).toBe('https://docs.example.com/*');
+    expect(rule.condition.url).toEqual({ kind: 'url-filter', value: 'https://docs.example.com/*' });
     expect(rule.permissionOrigins).toEqual(['https://docs.example.com/*']);
   });
 
   it.each([
-    ['block-analytics', 'block', '||analytics.example.com^', ['xmlhttprequest', 'ping']],
-    ['redirect-local', 'redirect', 'https://api.example.com/v1/*', ['xmlhttprequest']],
-    ['remove-referrer', 'modify-request-headers', 'https://images.example.com/*', ['image']],
-  ] as const)('creates a disabled and valid %s starter', (kind, action, match, resourceTypes) => {
+    ['block-analytics', 'block', 'url-filter', '||analytics.example.com^', ['xmlhttprequest', 'ping']],
+    ['redirect-local', 'redirect', 'wildcard', 'https://api.example.com/v1/*', ['xmlhttprequest']],
+    ['remove-referrer', 'modify-request-headers', 'url-filter', 'https://images.example.com/*', ['image']],
+  ] as const)('creates a disabled and valid %s starter', (kind, action, matchKind, match, resourceTypes) => {
     const rule = createStarterRule(kind, `Starter ${kind}`);
     expect(rule).toMatchObject({
       name: `Starter ${kind}`,
       enabled: false,
       action: { kind: action },
-      condition: { url: { value: match }, resourceTypes },
+      condition: { url: { kind: matchKind, value: match }, resourceTypes },
     });
     expect(validateRule(rule)).toMatchObject({ valid: true, errors: [] });
   });

@@ -396,13 +396,32 @@ test('clean install exposes the product UI without required host access', async 
   await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   const matchHelp = options.locator('[data-slot="popover-content"]');
-  await expect(matchHelp.getByText('How this URL is matched', { exact: true })).toBeVisible();
-  await expect(matchHelp.getByText('URL filters do not create $1 values.', { exact: false })).toBeVisible();
+  await expect(matchHelp.getByText('URL filter syntax', { exact: true })).toBeVisible();
+  await expect(matchHelp.getByText('browser-native pattern syntax', { exact: false })).toBeVisible();
   await expect(matchHelp.getByRole('link', { name: 'See the matching guide' })).toHaveAttribute(
     'href',
     'https://webrequest.forth.ink/guides/matching/',
   );
   await options.keyboard.press('Escape');
+
+  const matchType = options.getByRole('combobox', { name: 'Match type' });
+  await matchType.click();
+  await expect(options.getByRole('option')).toHaveCount(3);
+  await options.getByRole('option', { name: 'Simple wildcard' }).click();
+  await options.getByRole('button', { name: 'Open match syntax help' }).click();
+  await expect(matchHelp.getByText('Simple wildcard syntax', { exact: true })).toBeVisible();
+  await expect(matchHelp.getByText('My Webrequest convenience mode', { exact: false })).toBeVisible();
+  await options.keyboard.press('Escape');
+
+  await matchType.click();
+  await options.getByRole('option', { name: 'Regular expression' }).click();
+  await options.getByRole('button', { name: 'Open match syntax help' }).click();
+  await expect(matchHelp.getByText('Regular expression syntax', { exact: true })).toBeVisible();
+  await expect(matchHelp.getByText('A literal dot.', { exact: false })).toBeVisible();
+  await options.keyboard.press('Escape');
+
+  await matchType.click();
+  await options.getByRole('option', { name: 'URL filter (recommended)' }).click();
   await options.getByRole('combobox', { name: 'Action', exact: true }).click();
   await options.getByRole('option', { name: 'Redirect' }).click();
   await expect(options.getByRole('textbox', { name: 'Destination' })).toHaveValue('https://example.com/');

@@ -9,7 +9,7 @@ export type StarterRuleKind = 'block-analytics' | 'redirect-local' | 'remove-ref
 export function createRule(origin?: string, name = 'Untitled rule'): Rule {
   const now = new Date().toISOString();
   const id = crypto.randomUUID();
-  const match = origin ? `${origin.replace(/\/$/, '')}/*` : 'https://example.com/*';
+  const match = origin ? `${origin.replace(/\/$/, '')}/*` : '||example.com^';
   return {
     schemaVersion: 1,
     id,
@@ -17,7 +17,7 @@ export function createRule(origin?: string, name = 'Untitled rule'): Rule {
     name,
     enabled: false,
     priority: 1,
-    condition: { url: { kind: 'wildcard', value: match } },
+    condition: { url: { kind: 'url-filter', value: match } },
     action: { kind: 'block' },
     permissionOrigins: permissionOriginsFromMatch(match),
     migrationState: 'none',
@@ -49,7 +49,7 @@ export function createStarterRule(kind: StarterRuleKind, name: string): Rule {
           initiatorDomains: ['app.example.com'],
         },
         action: { kind: 'redirect', target: 'http://localhost:3000/v1/$1' },
-        permissionOrigins: permissionOriginsFromMatch(match),
+        permissionOrigins: ['https://api.example.com/*'],
       };
     }
     case 'remove-referrer': {
@@ -57,7 +57,7 @@ export function createStarterRule(kind: StarterRuleKind, name: string): Rule {
       return {
         ...rule,
         condition: {
-          url: { kind: 'wildcard', value: match },
+          url: { kind: 'url-filter', value: match },
           resourceTypes: ['image'],
           initiatorDomains: ['app.example.com'],
         },

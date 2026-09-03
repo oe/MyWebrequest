@@ -105,6 +105,8 @@ describe('website content matrix', () => {
       expect(text).toContain('||example.com^');
       expect(text).toContain('$1');
       expect(text).toContain('$2');
+      expect(text).toContain('declarativeNetRequest');
+      expect(matching.sections[0]?.points).toHaveLength(3);
       expect(matching.sections.filter((section) => section.code)).toHaveLength(2);
     }
   });

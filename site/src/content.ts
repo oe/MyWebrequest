@@ -133,7 +133,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       {
         title: 'Choose what to match',
         description:
-          'Start with a URL filter, wildcard, or regular expression. Narrow it further by resource type or initiator.',
+          'Use a URL filter for everyday rules, a simple wildcard for easy captures, or a regular expression for advanced logic.',
       },
       {
         title: 'Test before enabling',
@@ -181,7 +181,8 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     steps: [
       {
         title: '确定匹配范围',
-        description: '选择 URL 过滤器、通配符或正则表达式，再按资源类型和来源网页缩小范围。',
+        description:
+          '一般规则用 URL 过滤器，简单捕获用通配符，复杂逻辑再用正则；还可按资源类型和来源网页缩小范围。',
       },
       { title: '启用前先测试', description: '输入一个 URL 就能看到预期结果，不会真的发出网络请求。' },
       { title: '只开放必要权限', description: '只有规则确实需要时，浏览器才会请求相应的网站访问权限。' },
@@ -220,8 +221,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     steps: [
       {
         title: '대상 범위 정하기',
-        description:
-          'URL 필터, 와일드카드, 정규식 중 하나를 고르고 리소스 유형과 요청 출처로 범위를 좁히세요.',
+        description: '일반 규칙은 URL 필터, 간단한 캡처는 와일드카드, 고급 조건은 정규식을 사용하세요.',
       },
       {
         title: '활성화 전에 테스트',
@@ -270,7 +270,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       {
         title: '対象を絞り込む',
         description:
-          'URL フィルター、ワイルドカード、正規表現を選び、リソースの種類やリクエスト元でさらに絞ります。',
+          '通常は URL フィルター、簡単なキャプチャはワイルドカード、高度な条件は正規表現を使います。',
       },
       { title: '有効にする前にテスト', description: '実際に通信せず、URL と期待される結果を確認できます。' },
       {
@@ -323,7 +323,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       {
         title: 'Définir ce qui doit correspondre',
         description:
-          'Choisissez un filtre d’URL, un joker ou une expression régulière, puis affinez par type de ressource ou domaine initiateur.',
+          'Filtre d’URL au quotidien, joker simplifié pour les captures, expression régulière pour la logique avancée.',
       },
       {
         title: 'Tester avant d’activer',
@@ -389,7 +389,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
       {
         title: 'Define qué debe coincidir',
         description:
-          'Elige un filtro de URL, un comodín o una expresión regular y limita el alcance por recurso o dominio iniciador.',
+          'Filtro de URL para reglas habituales, comodín simple para capturas y expresión regular para lógica avanzada.',
       },
       {
         title: 'Prueba antes de activar',
@@ -444,7 +444,7 @@ export type GuideCopy = {
 };
 
 const redirectExamples = {
-  localApi: `Match type    Wildcard
+  localApi: `Match type    Simple wildcard
 Match         https://api.staging.example.com/v1/*
 Resources     XMLHttpRequest
 Methods       GET, POST, PUT, PATCH, DELETE
@@ -454,7 +454,7 @@ Destination   http://localhost:3000/v1/$1
 
 https://api.staging.example.com/v1/users/42
 → http://localhost:3000/v1/users/42`,
-  cdnMigration: `Match type    Wildcard
+  cdnMigration: `Match type    Simple wildcard
 Match         https://static.legacy.example.com/*
 Resources     Script, Stylesheet, Image, Font
 Initiator     www.example.com
@@ -485,19 +485,17 @@ const matchingExamples = {
   urlFilter: `||example.com^
 |https://example.com/app.js|
 https://example.com/assets/*`,
-  captures: `https://api.example.com/v1/*
-→ http://localhost:3000/v1/$1
-
-https://api.example.com/v1/users/42
-→ http://localhost:3000/v1/users/42
+  captures: `Simple wildcard
+Match         https://api.example.com/v1/*
+Request       https://api.example.com/v1/users/42
 $1 = users/42
+Destination   http://localhost:3000/v1/$1
 
-^https://api\\.example\\.com/v1/(users|projects)/([^?]+)$
-→ https://api.example.com/v2/$1/$2
-
-https://api.example.com/v1/projects/alpha
-→ https://api.example.com/v2/projects/alpha
-$1 = projects, $2 = alpha`,
+Regular expression
+Match         ^https://api\\.example\\.com/v1/(users|projects)/([^?]+)$
+Request       https://api.example.com/v1/projects/alpha
+$1 = projects, $2 = alpha
+Destination   https://api.example.com/v2/$1/$2`,
 } as const;
 
 const enGuides: Record<GuideSlug, GuideCopy> = {
@@ -526,25 +524,29 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
     description: 'Choose the narrowest match that describes your intent.',
     sections: [
       {
-        title: 'Start with the simplest option',
-        paragraphs: ['You do not need regular expressions for most rules. Pick the first option that fits:'],
+        title: 'Choose one of three match modes',
+        paragraphs: [
+          'The editor has two browser rule formats and one simpler My Webrequest format. Most rules need only the first option:',
+        ],
         points: [
-          'URL filter: a domain, fixed URL, or path. Fast and simple, but it cannot create $1 values.',
-          'Wildcard: use * when a redirect must keep part of the original URL.',
-          'Regular expression: use only for several precisely defined captures or alternatives.',
+          'URL filter (recommended): browser-native pattern syntax for a domain, fixed URL, or path. It cannot create $1 values.',
+          'Simple wildcard: My Webrequest turns each * into a captured part. Use it for straightforward redirects that keep part of the original URL.',
+          'Regular expression: browser-checked syntax for precise captures, alternatives, and advanced logic. Support can vary by browser.',
         ],
       },
       {
         title: 'What || and ^ mean',
         paragraphs: [
           'In a URL filter, || starts matching at a domain name and includes subdomains. The ^ after the domain requires a separator or the end of the URL, so example.com does not accidentally match example.company. A single | anchors the beginning or end; * matches any number of characters.',
+          'This is declarativeNetRequest URL-filter syntax, not a WebExtension host-permission match pattern. My Webrequest derives the required permission pattern for you.',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: 'How $1 through $9 work',
+        title: 'Captures and $1 through $9',
         paragraphs: [
-          'These are placeholders used only in a Redirect destination. With a wildcard, the first * becomes $1 and the second becomes $2. With a regular expression, the first capturing (...) becomes $1, the second becomes $2, and so on. URL filters never create captures.',
+          'In Simple wildcard mode, the first * becomes $1, the second becomes $2, and so on. In Regular expression mode, use ^ and $ to anchor the URL, \\. for a literal dot, .* for any text, and (...) for each capture group.',
+          '$1 through $9 work only in a Redirect destination. The * in URL filter mode matches text but never captures it.',
           'Finally, resource types, methods, and initiator domains can narrow the rule. Leaving types or methods empty means all values.',
         ],
         code: matchingExamples.captures,
@@ -564,7 +566,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
       {
         title: 'Redirects and headers',
         paragraphs: [
-          'Redirect destinations must use HTTP or HTTPS. Captures from wildcard or regular-expression matches can be inserted as $1 through $9.',
+          'Redirect destinations must use HTTP or HTTPS. Values captured by Simple wildcard or Regular expression can be inserted as $1 through $9.',
           'Header rules can remove or set browser-approved request headers. My Webrequest rejects forbidden names before activation.',
         ],
       },
@@ -601,7 +603,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'Bridge a read-only API version with regex captures',
         paragraphs: [
           'Two capture groups preserve the resource family and identifier while changing /v1/ to /v2/. Restricting the method to GET avoids silently changing write semantics.',
-          'Regular-expression support is checked by the active browser when you save. Prefer a wildcard when one capture is enough.',
+          'Regular-expression support is checked by the active browser when you save. Prefer Simple wildcard when each * can safely stand for one captured part.',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -620,7 +622,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         ],
         points: [
           'Targets must use HTTP or HTTPS.',
-          'Wildcard and regular-expression captures are referenced as $1 through $9.',
+          'Simple-wildcard and regular-expression captures are referenced as $1 through $9.',
           'Query-string order, decoding, and repeated keys are not automatically normalized.',
           'Avoid redirect cycles; My Webrequest blocks obvious self-redirects and detected cycles.',
         ],
@@ -867,25 +869,29 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: '先选最简单的匹配方式',
-        paragraphs: ['大多数规则都不需要正则表达式。按下面的顺序选择即可：'],
+        title: '三种匹配方式，怎么选',
+        paragraphs: [
+          '编辑器提供两种浏览器规则格式，以及一种更容易上手的 My Webrequest 格式。大多数情况选第一种就够了：',
+        ],
         points: [
-          'URL 过滤器：匹配域名、固定 URL 或路径，简单高效，但不能生成 $1。',
-          '通配符：重定向时需要保留原 URL 的一部分，就用 *。',
-          '正则表达式：只有需要多个精确分组或备选项时再使用。',
+          'URL 过滤器（推荐）：浏览器原生的简洁语法，适合域名、固定 URL 和路径，但不能生成 $1。',
+          '简易通配符：My Webrequest 会把每个 * 变成捕获值，适合重定向时简单保留原 URL 的一部分。',
+          '正则表达式：适合精确捕获、备选项和复杂条件；支持情况由当前浏览器检查。',
         ],
       },
       {
         title: '|| 和 ^ 是什么意思',
         paragraphs: [
           '在 URL 过滤器中，|| 表示从域名开始匹配，并包含它的子域名。域名后的 ^ 要求这里是分隔符或 URL 结尾，因此 example.com 不会误匹配 example.company。单个 | 用来限定开头或结尾，* 表示任意数量的字符。',
+          '这里使用的是 declarativeNetRequest 的 URL 过滤器语法，不是 WebExtension 的网站权限匹配格式；所需的权限格式会由 My Webrequest 自动生成。',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: '$1 到 $9 怎么用',
+        title: '捕获与 $1 到 $9',
         paragraphs: [
-          '它们只能写在重定向目标中。使用通配符时，第一个 * 是 $1，第二个是 $2；使用正则表达式时，第一个捕获括号 (...) 是 $1，第二个是 $2，依此类推。URL 过滤器不会产生捕获值。',
+          '在简易通配符模式中，第一个 * 是 $1，第二个是 $2，依此类推。在正则模式中，^ 和 $ 限定 URL 的开头与结尾，\\. 匹配普通句点，.* 匹配任意内容，(...) 是捕获组。',
+          '$1 到 $9 只能写在重定向目标中。URL 过滤器里的 * 虽然能匹配任意内容，但不会捕获。',
           '最后还可以按资源类型、请求方法和来源网页缩小范围。类型或方法留空表示不限制。',
         ],
         code: matchingExamples.captures,
@@ -901,7 +907,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '重定向与请求头',
         paragraphs: [
-          '重定向目标必须是 HTTP 或 HTTPS 地址。通配符和正则表达式捕获的内容，可以用 $1 到 $9 放进目标地址。',
+          '重定向目标必须是 HTTP 或 HTTPS 地址。简易通配符或正则表达式捕获的内容，可以用 $1 到 $9 放进目标地址。',
           '请求头规则只能移除或设置浏览器允许修改的字段。遇到禁止修改的名称时，扩展会在启用前给出提示。',
         ],
       },
@@ -934,7 +940,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '用正则把只读 API 从 v1 切到 v2',
         paragraphs: [
           '两个捕获组分别保留资源类型和 ID，只把 /v1/ 改成 /v2/。规则仅匹配 GET，避免误改写入请求。',
-          '保存时，浏览器会检查是否支持这条正则表达式。如果一个通配符就能解决问题，优先使用通配符会更简单。',
+          '保存时，当前浏览器会检查是否支持这条正则表达式。如果每个 * 都能明确对应一段要保留的内容，使用简易通配符会更直观。',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -953,7 +959,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
         points: [
           '目标地址只能使用 HTTP 或 HTTPS。',
-          '通配符和正则表达式的捕获内容用 $1 到 $9 引用。',
+          '简易通配符和正则表达式的捕获内容都用 $1 到 $9 引用。',
           '查询参数的顺序、编码方式和重复参数不会被自动整理。',
           '请避免循环重定向；扩展会阻止明显的自重定向和已检测到的循环。',
         ],
@@ -1081,25 +1087,29 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: '가장 간단한 방식부터 선택하세요',
-        paragraphs: ['대부분의 규칙에는 정규식이 필요하지 않습니다. 다음 순서로 고르면 됩니다.'],
+        title: '세 가지 일치 방식 중 선택하기',
+        paragraphs: [
+          '브라우저 규칙 형식 두 가지와 더 쉬운 My Webrequest 형식 한 가지가 있습니다. 대부분은 첫 번째 방식이면 충분합니다.',
+        ],
         points: [
-          'URL 필터: 도메인, 고정 URL, 경로를 간단히 지정합니다. 단, $1 값은 만들 수 없습니다.',
-          '와일드카드: 리디렉션에서 원래 URL의 일부를 유지해야 할 때 *를 사용합니다.',
-          '정규식: 여러 부분을 정확히 나누거나 선택지를 표현해야 할 때만 사용합니다.',
+          'URL 필터(권장): 도메인, 고정 URL, 경로에 알맞은 브라우저 기본 문법입니다. $1 값은 만들 수 없습니다.',
+          '간단한 와일드카드: My Webrequest가 각 *를 캡처 값으로 바꿉니다. 원래 URL의 일부를 간단히 보존하는 리디렉션에 알맞습니다.',
+          '정규식: 정확한 캡처, 선택지, 고급 조건에 사용하며 현재 브라우저가 지원 여부를 검사합니다.',
         ],
       },
       {
         title: '||와 ^의 의미',
         paragraphs: [
           'URL 필터에서 ||는 도메인 이름부터 일치하며 하위 도메인도 포함합니다. 도메인 뒤의 ^는 구분 문자나 URL 끝을 요구하므로 example.com이 example.company와 잘못 일치하지 않습니다. | 하나는 시작이나 끝을 고정하고, *는 임의 개수의 문자와 일치합니다.',
+          '이는 WebExtension 사이트 권한의 일치 패턴이 아니라 declarativeNetRequest URL 필터 문법입니다. 필요한 권한 패턴은 My Webrequest가 자동으로 만듭니다.',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: '$1부터 $9까지 사용하는 방법',
+        title: '캡처와 $1부터 $9',
         paragraphs: [
-          '이 값들은 리디렉션 대상에서만 사용합니다. 와일드카드에서는 첫 번째 *가 $1, 두 번째가 $2입니다. 정규식에서는 첫 번째 캡처 괄호 (...)가 $1, 두 번째가 $2가 됩니다. URL 필터는 캡처 값을 만들지 않습니다.',
+          '간단한 와일드카드에서는 첫 번째 *가 $1, 두 번째가 $2가 됩니다. 정규식에서는 ^와 $가 URL의 시작과 끝, \\.이 마침표 자체, .*가 임의의 문자열, (...)가 캡처 그룹을 뜻합니다.',
+          '$1부터 $9는 리디렉션 대상에서만 씁니다. URL 필터의 *는 문자열과 일치하지만 캡처하지 않습니다.',
           '마지막으로 리소스 유형, 요청 메서드, 요청 출처 도메인으로 범위를 더 좁힐 수 있습니다. 유형이나 메서드를 비워 두면 제한하지 않습니다.',
         ],
         code: matchingExamples.captures,
@@ -1115,7 +1125,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '리디렉션과 헤더',
         paragraphs: [
-          '리디렉션 대상은 HTTP 또는 HTTPS 주소여야 합니다. 와일드카드나 정규식에서 캡처한 값은 $1부터 $9까지 사용할 수 있습니다.',
+          '리디렉션 대상은 HTTP 또는 HTTPS 주소여야 합니다. 간단한 와일드카드나 정규식에서 캡처한 값은 $1부터 $9까지 사용할 수 있습니다.',
           '브라우저가 허용하는 요청 헤더만 제거하거나 설정할 수 있습니다. 바꿀 수 없는 헤더는 규칙을 켜기 전에 알려 줍니다.',
         ],
       },
@@ -1148,7 +1158,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '정규식 캡처로 읽기 전용 API 버전 연결하기',
         paragraphs: [
           '두 캡처 그룹이 리소스 종류와 식별자를 유지하면서 /v1/을 /v2/로 바꿉니다. GET만 허용해 쓰기 의미가 바뀌는 일을 피합니다.',
-          '저장할 때 현재 브라우저가 정규식 지원을 확인합니다. 캡처 하나면 충분할 때는 와일드카드를 우선하세요.',
+          '저장할 때 현재 브라우저가 정규식 지원을 확인합니다. 각 *가 보존할 한 부분을 명확히 뜻한다면 간단한 와일드카드가 더 이해하기 쉽습니다.',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -1167,7 +1177,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
         points: [
           '대상은 HTTP 또는 HTTPS여야 합니다.',
-          '와일드카드와 정규식 캡처는 $1부터 $9까지 참조합니다.',
+          '간단한 와일드카드와 정규식 캡처는 $1부터 $9까지 참조합니다.',
           '쿼리 순서, 디코딩, 반복 키는 자동 정규화되지 않습니다.',
           '자기 자신으로의 리디렉션과 감지된 순환은 차단됩니다.',
         ],
@@ -1298,25 +1308,29 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'まず最も簡単な方法を選ぶ',
-        paragraphs: ['ほとんどのルールに正規表現は必要ありません。次の順で選びます。'],
+        title: '3 つの一致方式から選ぶ',
+        paragraphs: [
+          'ブラウザーのルール形式が 2 つ、より簡単な My Webrequest 形式が 1 つあります。ほとんどの場合は最初の方式で十分です。',
+        ],
         points: [
-          'URL フィルター：ドメイン、固定 URL、パスを簡単に指定できます。ただし $1 は作れません。',
-          'ワイルドカード：リダイレクト先に元の URL の一部を残したい場合は * を使います。',
-          '正規表現：複数の部分を正確に分ける場合や、選択肢が必要な場合だけ使います。',
+          'URL フィルター（推奨）：ドメイン、固定 URL、パスに適したブラウザー標準の構文です。$1 は作れません。',
+          '簡易ワイルドカード：My Webrequest が * ごとにキャプチャ値へ変換します。元の URL の一部を簡単に残すリダイレクトに向いています。',
+          '正規表現：厳密なキャプチャ、選択肢、高度な条件に使い、現在のブラウザーが対応状況を検証します。',
         ],
       },
       {
         title: '|| と ^ の意味',
         paragraphs: [
           'URL フィルターの || はドメイン名から一致させ、サブドメインも含めます。ドメイン直後の ^ は区切り文字または URL の末尾を必須にするため、example.com が example.company に誤って一致しません。| 一つは先頭または末尾を固定し、* は任意の数の文字に一致します。',
+          'これは WebExtension のサイト権限用マッチパターンではなく、declarativeNetRequest の URL フィルター構文です。必要な権限パターンは My Webrequest が自動で作成します。',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: '$1〜$9 の使い方',
+        title: 'キャプチャと $1〜$9',
         paragraphs: [
-          'これらはリダイレクト先でのみ使います。ワイルドカードでは最初の * が $1、次が $2 です。正規表現では最初のキャプチャ用 (...) が $1、次が $2 になります。URL フィルターはキャプチャ値を作りません。',
+          '簡易ワイルドカードでは最初の * が $1、次が $2 になります。正規表現では ^ と $ が URL の先頭と末尾、\\. がピリオドそのもの、.* が任意の文字列、(...) がキャプチャグループです。',
+          '$1〜$9 はリダイレクト先でのみ使います。URL フィルターの * は文字列に一致しますが、キャプチャはしません。',
           '最後に、リソースの種類、リクエストメソッド、リクエスト元のドメインで範囲をさらに絞れます。種類やメソッドを空欄にすると制限なしです。',
         ],
         code: matchingExamples.captures,
@@ -1332,7 +1346,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'リダイレクトとヘッダー',
         paragraphs: [
-          'リダイレクト先には HTTP または HTTPS の URL を指定します。ワイルドカードや正規表現でキャプチャした値は、$1〜$9 として使えます。',
+          'リダイレクト先には HTTP または HTTPS の URL を指定します。簡易ワイルドカードや正規表現でキャプチャした値は、$1〜$9 として使えます。',
           '変更できるのは、ブラウザが許可しているリクエストヘッダーだけです。対応していない名前は、有効にする前に表示されます。',
         ],
       },
@@ -1365,7 +1379,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '正規表現で読み取り専用 API を v1 から v2 へ切り替える',
         paragraphs: [
           '二つのキャプチャグループでリソースの種類と ID を残し、/v1/ だけを /v2/ に変えます。GET だけに限定することで、書き込みリクエストを誤って変更するのを防ぎます。',
-          '保存時に、現在のブラウザが正規表現に対応しているか確認します。キャプチャが一つで足りる場合は、より簡単なワイルドカードを優先してください。',
+          '保存時に、現在のブラウザーが正規表現に対応しているか確認します。* ごとに残したい一部分が明確なら、簡易ワイルドカードの方が分かりやすくなります。',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -1384,7 +1398,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
         points: [
           '宛先は HTTP または HTTPS に限られます。',
-          'ワイルドカードと正規表現のキャプチャは $1〜$9 で参照します。',
+          '簡易ワイルドカードと正規表現のキャプチャは $1〜$9 で参照します。',
           'クエリ順序、デコード、重複キーは自動で正規化されません。',
           '同じ URL へのリダイレクトや、検出されたループはブロックされます。',
         ],
@@ -1515,27 +1529,29 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'Commencez par la méthode la plus simple',
+        title: 'Choisir entre trois modes',
         paragraphs: [
-          'La plupart des règles n’ont pas besoin d’expression régulière. Choisissez dans cet ordre :',
+          'L’éditeur propose deux formats du navigateur et un format My Webrequest plus simple. Le premier suffit le plus souvent :',
         ],
         points: [
-          'Filtre d’URL : pour un domaine, une URL fixe ou un chemin. Simple et rapide, mais sans valeur $1.',
-          'Caractère générique : utilisez * si la redirection doit conserver une partie de l’URL d’origine.',
-          'Expression régulière : seulement pour plusieurs captures précises ou des alternatives.',
+          'Filtre d’URL (recommandé) : syntaxe native du navigateur pour un domaine, une URL fixe ou un chemin. Elle ne produit pas de valeur $1.',
+          'Joker simplifié : My Webrequest transforme chaque * en capture. Idéal pour une redirection simple qui conserve une partie de l’URL.',
+          'Expression régulière : pour des captures précises, des alternatives et une logique avancée ; le navigateur actif vérifie sa compatibilité.',
         ],
       },
       {
         title: 'Signification de || et ^',
         paragraphs: [
           'Dans un filtre d’URL, || commence au nom de domaine et inclut les sous-domaines. Le ^ placé après le domaine exige un séparateur ou la fin de l’URL : example.com ne correspond donc pas à example.company. Un seul | fixe le début ou la fin, tandis que * correspond à un nombre quelconque de caractères.',
+          'Il s’agit de la syntaxe urlFilter de declarativeNetRequest, pas du motif d’autorisation de site WebExtension. My Webrequest génère ce dernier automatiquement.',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: 'Utiliser $1 à $9',
+        title: 'Captures et $1 à $9',
         paragraphs: [
-          'Ces valeurs s’emploient uniquement dans la destination d’une redirection. Avec un joker, le premier * devient $1 et le deuxième $2. Avec une expression régulière, la première capture (...) devient $1, la deuxième $2, etc. Un filtre d’URL ne crée aucune capture.',
+          'En mode Joker simplifié, le premier * devient $1, le deuxième $2, etc. En mode Expression régulière, ^ et $ fixent le début et la fin de l’URL, \\. désigne un point littéral, .* n’importe quel texte et (...) chaque groupe capturé.',
+          '$1 à $9 s’utilisent uniquement dans la destination d’une redirection. Le * du filtre d’URL correspond à du texte, mais ne le capture jamais.',
           'Enfin, limitez davantage la règle par type de ressource, méthode et domaine initiateur. Laisser les types ou méthodes vides signifie qu’ils sont tous acceptés.',
         ],
         code: matchingExamples.captures,
@@ -1551,7 +1567,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Redirections et en-têtes',
         paragraphs: [
-          'La destination doit être une URL HTTP ou HTTPS. Les valeurs capturées par un joker ou une expression régulière peuvent être reprises avec $1 à $9.',
+          'La destination doit être une URL HTTP ou HTTPS. Les valeurs capturées par un joker simplifié ou une expression régulière peuvent être reprises avec $1 à $9.',
           'Seuls les en-têtes acceptés par le navigateur peuvent être supprimés ou définis. Les noms interdits sont signalés avant l’activation.',
         ],
       },
@@ -1584,7 +1600,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Relier une API en lecture seule avec des captures regex',
         paragraphs: [
           'Deux captures conservent la famille de ressource et son identifiant tout en remplaçant /v1/ par /v2/. La méthode GET évite de modifier la sémantique des écritures.',
-          'Le navigateur actif vérifie la compatibilité de l’expression lors de l’enregistrement. Préférez un joker si une seule capture suffit.',
+          'Le navigateur actif vérifie la compatibilité de l’expression lors de l’enregistrement. Si chaque * désigne clairement une partie à conserver, le joker simplifié est plus lisible.',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -1603,7 +1619,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
         points: [
           'La cible doit utiliser HTTP ou HTTPS.',
-          'Les captures joker ou regex sont référencées de $1 à $9.',
+          'Les captures du joker simplifié et de l’expression régulière sont référencées de $1 à $9.',
           'L’ordre, le décodage et les clés répétées d’une requête ne sont pas normalisés.',
           'Les auto-redirections et cycles détectés sont bloqués.',
         ],
@@ -1736,25 +1752,29 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
     ],
     matching: [
       {
-        title: 'Empieza por la opción más sencilla',
-        paragraphs: ['La mayoría de las reglas no necesitan expresiones regulares. Elige en este orden:'],
+        title: 'Elige entre tres modos',
+        paragraphs: [
+          'El editor ofrece dos formatos del navegador y uno más sencillo de My Webrequest. La primera opción basta casi siempre:',
+        ],
         points: [
-          'Filtro de URL: para un dominio, una URL fija o una ruta. Es sencillo y rápido, pero no genera $1.',
-          'Comodín: usa * si la redirección debe conservar una parte de la URL original.',
-          'Expresión regular: solo cuando necesites varias capturas precisas o alternativas.',
+          'Filtro de URL (recomendado): sintaxis nativa del navegador para un dominio, una URL fija o una ruta. No genera $1.',
+          'Comodín simple: My Webrequest convierte cada * en una captura. Sirve para redirecciones sencillas que conservan parte de la URL.',
+          'Expresión regular: para capturas precisas, alternativas y lógica avanzada; el navegador activo comprueba su compatibilidad.',
         ],
       },
       {
         title: 'Qué significan || y ^',
         paragraphs: [
           'En un filtro de URL, || empieza en el nombre de dominio e incluye sus subdominios. El ^ después del dominio exige un separador o el final de la URL, así example.com no coincide por error con example.company. Un solo | fija el inicio o el final; * coincide con cualquier cantidad de caracteres.',
+          'Esta es la sintaxis urlFilter de declarativeNetRequest, no el patrón de permisos de sitio de WebExtension. My Webrequest genera ese patrón automáticamente.',
         ],
         code: matchingExamples.urlFilter,
       },
       {
-        title: 'Cómo usar $1 a $9',
+        title: 'Capturas y $1 a $9',
         paragraphs: [
-          'Estos valores solo se usan en el destino de una redirección. Con un comodín, el primer * es $1 y el segundo, $2. Con una expresión regular, el primer grupo (...) es $1, el segundo es $2, y así sucesivamente. Un filtro de URL no crea capturas.',
+          'En modo Comodín simple, el primer * es $1, el segundo $2, etc. En modo Expresión regular, ^ y $ fijan el inicio y el final de la URL, \\. representa un punto literal, .* cualquier texto y (...) cada grupo capturado.',
+          '$1 a $9 solo se usan en el destino de una redirección. El * de un filtro de URL coincide con texto, pero nunca lo captura.',
           'Por último, puedes limitar la regla por tipo de recurso, método y dominio iniciador. Si dejas vacíos los tipos o métodos, se aceptan todos.',
         ],
         code: matchingExamples.captures,
@@ -1770,7 +1790,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Redirecciones y encabezados',
         paragraphs: [
-          'El destino debe ser una URL HTTP o HTTPS. Puedes reutilizar las capturas de un comodín o una expresión regular mediante $1 a $9.',
+          'El destino debe ser una URL HTTP o HTTPS. Puedes reutilizar las capturas de un comodín simple o una expresión regular mediante $1 a $9.',
           'Solo se pueden eliminar o definir los encabezados que admite el navegador. Los nombres no permitidos se indican antes de activar la regla.',
         ],
       },
@@ -1803,7 +1823,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Conectar una API de solo lectura con capturas regex',
         paragraphs: [
           'Dos capturas conservan la familia de recurso y el identificador mientras cambian /v1/ por /v2/. Limitar a GET evita alterar operaciones de escritura.',
-          'El navegador activo comprueba la expresión al guardar. Prefiere un comodín si basta una captura.',
+          'El navegador activo comprueba la expresión al guardar. Si cada * representa claramente una parte que quieres conservar, el comodín simple es más fácil de leer.',
         ],
         code: redirectExamples.apiBridge,
       },
@@ -1822,7 +1842,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
         points: [
           'El destino debe usar HTTP o HTTPS.',
-          'Las capturas de comodín o regex se referencian de $1 a $9.',
+          'Las capturas del comodín simple y la expresión regular se referencian de $1 a $9.',
           'El orden, decodificación y claves repetidas de la consulta no se normalizan.',
           'Las autorredirecciones y ciclos detectados se bloquean.',
         ],

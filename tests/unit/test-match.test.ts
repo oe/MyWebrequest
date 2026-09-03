@@ -4,7 +4,7 @@ import { sampleRules } from '@/domain/rules/fixtures';
 import { matchRule, urlFilterToRegExpSource, wildcardToRegExpSource } from '@/domain/rules/test-match';
 
 describe('matchRule', () => {
-  it('captures a wildcard and produces the redirect preview', () => {
+  it('keeps legacy wildcard redirects working in previews', () => {
     const rule = sampleRules[0];
     expect(rule).toBeDefined();
     if (!rule) return;
@@ -16,7 +16,7 @@ describe('matchRule', () => {
     });
   });
 
-  it('maps wildcard captures to $1, $2, and later destination references in order', () => {
+  it('maps legacy wildcard captures to $1, $2, and later destination references in order', () => {
     const base = sampleRules[0];
     expect(base).toBeDefined();
     if (!base) return;
@@ -49,7 +49,7 @@ describe('matchRule', () => {
     });
   });
 
-  it('escapes punctuation when compiling wildcards', () => {
+  it('escapes punctuation when compiling legacy wildcards', () => {
     expect(wildcardToRegExpSource('https://example.com/a?value=*')).toBe(
       '^https://example\\.com/a\\?value=(.*)$',
     );

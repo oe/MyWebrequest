@@ -23,7 +23,12 @@ import {
 } from '@/domain/rules/model';
 import type { RuleDiagnostic } from '@/domain/rules/diagnostics';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
-import { matchRule, type MatchResult } from '@/domain/rules/test-match';
+import {
+  matchRule,
+  urlFilterToRegExpSource,
+  wildcardToRegExpSource,
+  type MatchResult,
+} from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Button } from '@/ui/components/button';
@@ -410,16 +415,25 @@ export function RuleEditor({
                 disabled={readOnly}
                 onValueChange={(kind) => {
                   setRegexRuntimeError(null);
-                  setDraft((current) => ({
-                    ...current,
-                    condition: {
-                      ...current.condition,
-                      url: {
-                        kind: kind as Rule['condition']['url']['kind'],
-                        value: current.condition.url.value,
+                  setDraft((current) => {
+                    const value =
+                      kind === 'url-filter'
+                        ? '||example.com^'
+                        : kind === 'wildcard'
+                          ? 'https://example.com/*'
+                          : current.condition.url.kind === 'url-filter'
+                            ? urlFilterToRegExpSource(current.condition.url.value)
+                            : wildcardToRegExpSource(current.condition.url.value);
+                    return {
+                      ...current,
+                      condition: {
+                        ...current.condition,
+                        url: { kind: kind as Rule['condition']['url']['kind'], value },
                       },
-                    },
-                  }));
+                      permissionOrigins:
+                        kind === 'regex' ? current.permissionOrigins : permissionOriginsFromMatch(value),
+                    };
+                  });
                 }}
               >
                 <SelectTrigger id="rule-match-kind" className="w-full">
