@@ -2,8 +2,8 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://app.evecalm.com',
-  base: '/MyWebrequest',
+  site: 'https://webrequest.forth.ink',
+  base: '/',
   trailingSlash: 'always',
   integrations: [
     sitemap({

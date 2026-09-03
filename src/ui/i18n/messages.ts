@@ -90,6 +90,8 @@ export const en = {
   noMatchingRulesDescription: 'Try a different search or filter.',
   quotaUsage: 'Enabled rules',
   regexQuotaUsage: 'Regex-backed rules',
+  quotaRulesShort: 'Rules',
+  quotaRegexShort: 'Regex',
   quotaExceeded: 'The internal safety limit for enabled rules has been reached.',
   invalidRuleCannotEnable: 'Fix this rule before enabling it.',
   enableRule: 'Enable {name}',
@@ -241,6 +243,9 @@ export const en = {
   unknownReason: 'unsupported by its regular-expression engine',
   currentSite: 'Current site',
   unavailablePage: 'Unavailable on this page',
+  unsupportedPageTitle: 'This browser page cannot be changed',
+  unsupportedPageDescription:
+    'My Webrequest supports only http:// and https:// pages. Internal pages such as chrome://, edge://, and about: are protected by the browser.',
   allRulesPaused: 'All rules are paused',
   siteRulesOne: '1 rule for this site',
   siteRulesMany: '{count} rules for this site',

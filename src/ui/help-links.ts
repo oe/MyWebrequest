@@ -1,6 +1,6 @@
 import type { AppLocale } from '@/ui/i18n';
 
-export const HELP_SITE = 'https://app.evecalm.com/MyWebrequest';
+export const HELP_SITE = 'https://webrequest.forth.ink';
 
 const localeSegments: Record<AppLocale, string> = {
   en: '',

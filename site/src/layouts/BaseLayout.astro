@@ -18,9 +18,16 @@ const pageTitle = title ? `${title} · My Webrequest` : `My Webrequest — ${cop
 const pageDescription = description ?? copy.description;
 const canonical = new URL(localizedPath(locale, path), Astro.site);
 const socialImage = new URL(withBase('app-icon.svg'), Astro.site);
+const websiteSchema = {
+  '@type': 'WebSite',
+  name: 'My Webrequest',
+  alternateName: ['MyWebrequest', 'webrequest.forth.ink'],
+  url: new URL('/', Astro.site),
+};
 const softwareSchema = {
   '@type': 'SoftwareApplication',
   name: 'My Webrequest',
+  url: canonical,
   applicationCategory: 'BrowserApplication',
   operatingSystem: 'Chrome, Microsoft Edge, Firefox',
   browserRequirements: 'Manifest V3 compatible browser',
@@ -45,7 +52,7 @@ const schema = title
           isPartOf: {
             '@type': 'WebSite',
             name: 'My Webrequest',
-            url: new URL(localizedPath(locale), Astro.site),
+            url: new URL('/', Astro.site),
           },
           author: {
             '@type': 'Organization',
@@ -55,7 +62,9 @@ const schema = title
         },
       ],
     }
-  : { '@context': 'https://schema.org', ...softwareSchema };
+  : locale === 'en'
+    ? { '@context': 'https://schema.org', '@graph': [websiteSchema, softwareSchema] }
+    : { '@context': 'https://schema.org', ...softwareSchema };
 ---
 
 <!doctype html>

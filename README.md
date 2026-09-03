@@ -74,8 +74,9 @@ pnpm site:check
 pnpm site:build
 ```
 
-The static site is generated in `site/dist/` and published by `.github/workflows/pages.yml` to the GitHub
-Pages project URL. Its source, components, localized copy, and optimized image inputs live under `site/src/`.
+The static site is generated in `site/dist/` and published by `.github/workflows/pages.yml` to
+`https://webrequest.forth.ink/` through GitHub Pages. Its source, components, localized copy, and optimized
+image inputs live under `site/src/`.
 
 Create checksummed release candidates after the local gate passes:
 

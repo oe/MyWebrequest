@@ -209,12 +209,13 @@ export function RuleList({
                       >
                         <div className="flex min-w-0 flex-1 flex-col gap-1">
                           <span className="truncate text-sm font-medium">{rule.name}</span>
-                          <span className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground">
-                            <span>{localizedActionLabel(rule.action, t)}</span>
-                            <span aria-hidden="true">·</span>
-                            <span className="truncate font-mono">{rule.condition.url.value}</span>
+                          <span className="truncate font-mono text-xs text-muted-foreground">
+                            {rule.condition.url.value}
                           </span>
-                          <StatusBadge status={status} />
+                          <span className="flex min-w-0 items-center gap-1.5">
+                            <StatusBadge status={status} />
+                            <Badge variant="outline">{localizedActionLabel(rule.action, t)}</Badge>
+                          </span>
                         </div>
                         <ChevronRightIcon
                           className="size-4 shrink-0 text-muted-foreground"
@@ -246,16 +247,16 @@ export function RuleList({
       {quota ? (
         <div
           data-rule-quota
-          className="grid shrink-0 gap-1 border-t bg-background/70 px-4 py-2 text-xs text-muted-foreground supports-backdrop-filter:bg-background/60"
+          className="grid shrink-0 grid-cols-2 gap-3 border-t bg-background/70 px-4 py-2 text-xs text-muted-foreground supports-backdrop-filter:bg-background/60"
         >
-          <div className="flex items-center justify-between gap-3">
-            <span>{t('quotaUsage')}</span>
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            <span className="truncate">{t('quotaRulesShort')}</span>
             <span className="font-mono tabular-nums">
               {quota.used.toLocaleString()} / {quota.limit.toLocaleString()}
             </span>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            <span>{t('regexQuotaUsage')}</span>
+          <div className="flex min-w-0 items-center justify-between gap-2">
+            <span className="truncate">{t('quotaRegexShort')}</span>
             <span className="font-mono tabular-nums">
               {quota.regexUsed.toLocaleString()} / {quota.regexLimit.toLocaleString()}
             </span>

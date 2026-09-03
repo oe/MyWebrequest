@@ -5,12 +5,12 @@ import { supportedLocales } from '@/ui/i18n/core';
 
 describe('help links', () => {
   it.each([
-    ['en', 'https://app.evecalm.com/MyWebrequest/guides/quick-start/'],
-    ['zh-CN', 'https://app.evecalm.com/MyWebrequest/zh-CN/guides/quick-start/'],
-    ['ko', 'https://app.evecalm.com/MyWebrequest/ko/guides/quick-start/'],
-    ['ja', 'https://app.evecalm.com/MyWebrequest/ja/guides/quick-start/'],
-    ['fr', 'https://app.evecalm.com/MyWebrequest/fr/guides/quick-start/'],
-    ['es', 'https://app.evecalm.com/MyWebrequest/es/guides/quick-start/'],
+    ['en', 'https://webrequest.forth.ink/guides/quick-start/'],
+    ['zh-CN', 'https://webrequest.forth.ink/zh-CN/guides/quick-start/'],
+    ['ko', 'https://webrequest.forth.ink/ko/guides/quick-start/'],
+    ['ja', 'https://webrequest.forth.ink/ja/guides/quick-start/'],
+    ['fr', 'https://webrequest.forth.ink/fr/guides/quick-start/'],
+    ['es', 'https://webrequest.forth.ink/es/guides/quick-start/'],
   ] as const)('uses the published route for %s', (locale, expected) => {
     expect(helpUrl(locale)).toBe(expected);
   });

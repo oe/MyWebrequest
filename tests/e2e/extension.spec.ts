@@ -383,7 +383,7 @@ test('clean install exposes the product UI without required host access', async 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByRole('menuitem', { name: 'Help & guides' })).toHaveAttribute(
     'href',
-    'https://app.evecalm.com/MyWebrequest/guides/quick-start/',
+    'https://webrequest.forth.ink/guides/quick-start/',
   );
   const migrationMenuItem = options.getByRole('menuitem', { name: 'Legacy migration' });
   if (browserTarget === 'chrome') await expect(migrationMenuItem).toBeVisible();
@@ -407,6 +407,11 @@ test('clean install exposes the product UI without required host access', async 
     },
     action: { kind: 'block' },
   });
+
+  const popup = await context.newPage();
+  await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+  await expect(popup.getByText('This browser page cannot be changed', { exact: true })).toBeVisible();
+  await expect(popup.getByRole('button', { name: 'Create rule for this site' })).toBeDisabled();
   expect(origins).toEqual([]);
   expect(consoleIssues).toEqual([]);
 });
@@ -484,6 +489,9 @@ test('rule filters compose and quota statistics stay fixed below the scrolling l
   await actionFilter.click();
   await options.getByRole('option', { name: 'All actions' }).click();
   await expect(options.getByText('url-filter quota 0', { exact: true })).toBeVisible();
+  const firstRule = options.getByRole('listitem').filter({ hasText: 'url-filter quota 0' });
+  await expect(firstRule.getByText('Active', { exact: true })).toBeVisible();
+  await expect(firstRule.getByText('Block', { exact: true })).toBeVisible();
 
   const layoutBeforeScroll = await options.evaluate(() => {
     const list = document.querySelector<HTMLElement>('[data-rule-list]');
@@ -494,14 +502,19 @@ test('rule filters compose and quota statistics stay fixed below the scrolling l
     if (!list || !quota || !viewport) throw new Error('Rule list layout fixtures are missing.');
     const listBox = list.getBoundingClientRect();
     const quotaBox = quota.getBoundingClientRect();
+    const quotaItems = [...quota.children].map((item) => item.getBoundingClientRect());
     viewport.scrollTop = viewport.scrollHeight;
     return {
       bottomGap: Math.abs(listBox.bottom - quotaBox.bottom),
+      quotaHeight: quotaBox.height,
+      quotaItemTopDifference: Math.abs((quotaItems[0]?.top ?? 0) - (quotaItems[1]?.top ?? 0)),
       quotaTop: quotaBox.top,
       scrollTop: viewport.scrollTop,
     };
   });
   expect(layoutBeforeScroll.bottomGap).toBeLessThanOrEqual(1);
+  expect(layoutBeforeScroll.quotaHeight).toBeLessThanOrEqual(36);
+  expect(layoutBeforeScroll.quotaItemTopDifference).toBeLessThanOrEqual(1);
   expect(layoutBeforeScroll.scrollTop).toBeGreaterThan(0);
 
   const quotaTopAfterScroll = await options

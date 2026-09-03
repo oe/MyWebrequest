@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRightIcon,
+  CircleSlash2Icon,
   CirclePauseIcon,
   KeyRoundIcon,
   ListFilterIcon,
@@ -22,6 +23,7 @@ import { TooltipProvider } from '@/ui/components/tooltip';
 import { useRuleManager } from '@/ui/hooks/use-rule-manager';
 import { useI18n } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
+import { supportedPageOrigin } from '@/ui/lib/supported-page';
 
 function canUseExtensionTabs(): boolean {
   return typeof browser !== 'undefined' && Boolean(browser.tabs && browser.runtime?.id);
@@ -43,14 +45,15 @@ export function PopupApp() {
   useEffect(() => {
     if (!canUseExtensionTabs()) return;
     void browser.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
-      if (!tab?.url) return;
-      try {
-        setOrigin(new URL(tab.url).origin);
-      } catch {
-        setOrigin(t('unavailablePage'));
+      if (!tab?.url) {
+        setOrigin('');
+        return;
       }
+      setOrigin(supportedPageOrigin(tab.url) ?? '');
     });
-  }, [t]);
+  }, []);
+
+  const pageSupported = origin.startsWith('http://') || origin.startsWith('https://');
 
   const scopedEnabledRules = useMemo(
     () =>
@@ -59,15 +62,17 @@ export function PopupApp() {
           rule.enabled &&
           rule.migrationState === 'none' &&
           validateRule(rule).valid &&
+          pageSupported &&
           ruleMatchesOrigin(rule, origin),
       ),
-    [manager.rules, origin],
+    [manager.rules, origin, pageSupported],
   );
   const permissionScopedRules = scopedEnabledRules.filter(
     (rule) => requiredPermissionOrigins(rule).length > 0,
   );
-  const siteAccessState =
-    permissionScopedRules.length === 0
+  const siteAccessState = !pageSupported
+    ? 'unavailable'
+    : permissionScopedRules.length === 0
       ? 'not-needed'
       : permissionScopedRules.every((rule) => manager.permissions[rule.id] === true)
         ? 'granted'
@@ -94,7 +99,7 @@ export function PopupApp() {
   };
 
   const handleCreate = async () => {
-    if (creating) return;
+    if (creating || !pageSupported) return;
     setCreating(true);
     try {
       await manager.addRule(origin, t('untitledRule'));
@@ -124,30 +129,48 @@ export function PopupApp() {
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-1">
               <p className="text-xs font-medium text-muted-foreground">{t('currentSite')}</p>
-              <p className="truncate text-sm font-medium">{origin}</p>
+              <p className="truncate text-sm font-medium">{pageSupported ? origin : t('unavailablePage')}</p>
             </div>
-            <Badge variant={siteAccessState === 'required' ? 'warning' : 'secondary'}>
+            <Badge
+              variant={
+                siteAccessState === 'required'
+                  ? 'warning'
+                  : siteAccessState === 'unavailable'
+                    ? 'muted'
+                    : 'secondary'
+              }
+            >
               {t(
-                siteAccessState === 'granted'
-                  ? 'hostAccessGranted'
-                  : siteAccessState === 'required'
-                    ? 'hostAccessRequired'
-                    : 'hostAccessNotNeeded',
+                siteAccessState === 'unavailable'
+                  ? 'statusUnsupported'
+                  : siteAccessState === 'granted'
+                    ? 'hostAccessGranted'
+                    : siteAccessState === 'required'
+                      ? 'hostAccessRequired'
+                      : 'hostAccessNotNeeded',
               )}
             </Badge>
           </div>
 
-          <Alert variant={paused ? 'warning' : 'success'}>
-            {paused ? <CirclePauseIcon /> : <ShieldCheckIcon />}
-            <AlertTitle>
-              {paused
-                ? t('allRulesPaused')
-                : t(scopedEnabledRules.length === 1 ? 'siteRulesOne' : 'siteRulesMany', {
-                    count: scopedEnabledRules.length,
-                  })}
-            </AlertTitle>
-            <AlertDescription>{paused ? t('resumeRulesHelp') : t('localRulesHelp')}</AlertDescription>
-          </Alert>
+          {pageSupported ? (
+            <Alert variant={paused ? 'warning' : 'success'}>
+              {paused ? <CirclePauseIcon /> : <ShieldCheckIcon />}
+              <AlertTitle>
+                {paused
+                  ? t('allRulesPaused')
+                  : t(scopedEnabledRules.length === 1 ? 'siteRulesOne' : 'siteRulesMany', {
+                      count: scopedEnabledRules.length,
+                    })}
+              </AlertTitle>
+              <AlertDescription>{paused ? t('resumeRulesHelp') : t('localRulesHelp')}</AlertDescription>
+            </Alert>
+          ) : (
+            <Alert>
+              <CircleSlash2Icon />
+              <AlertTitle>{t('unsupportedPageTitle')}</AlertTitle>
+              <AlertDescription>{t('unsupportedPageDescription')}</AlertDescription>
+            </Alert>
+          )}
 
           <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
             <div className="flex min-w-0 flex-col gap-1">
@@ -163,7 +186,7 @@ export function PopupApp() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Button disabled={!origin.startsWith('http') || creating} onClick={() => void handleCreate()}>
+            <Button disabled={!pageSupported || creating} onClick={() => void handleCreate()}>
               <PlusIcon data-icon="inline-start" />
               {creating ? t('creating') : t('createSiteRule')}
             </Button>
