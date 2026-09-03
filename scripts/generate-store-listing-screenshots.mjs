@@ -184,56 +184,37 @@ function sceneHtml(scene) {
         z-index: 2;
         overflow: hidden;
         border: 1px solid rgba(23,32,42,.18);
-        border-radius: 18px;
+        border-radius: 14px;
         background: #f7f9fc;
         box-shadow: 0 24px 54px rgba(19,33,48,.16), inset 0 1px 0 rgba(255,255,255,.95);
-      }
-      .chrome {
-        position: absolute;
-        z-index: 2;
-        left: 0;
-        right: 0;
-        top: 0;
-        height: 38px;
-        background:
-          radial-gradient(circle at 22px 50%, #ff6b6b 0 5px, transparent 6px),
-          radial-gradient(circle at 43px 50%, #ffd43b 0 5px, transparent 6px),
-          radial-gradient(circle at 64px 50%, #51cf66 0 5px, transparent 6px),
-          linear-gradient(180deg, rgba(255,255,255,.98), rgba(236,241,248,.98));
-        border-bottom: 1px solid rgba(30,72,119,.12);
       }
       .window img {
         display: block;
         width: 100%;
-        height: calc(100% - 38px);
-        margin-top: 38px;
-        object-fit: cover;
-        object-position: center;
+        height: 100%;
+        object-fit: contain;
       }
-      .hero .copy { left: 78px; top: 58px; }
+      .hero .copy { left: 72px; top: 160px; width: 380px; }
       .hero .copy h1 { font-size: 62px; }
-      .hero .copy p { max-width: 650px; margin-top: 18px; font-size: 21px; }
-      .hero .mark { right: 64px; top: 58px; }
-      .hero .window { left: 72px; top: 292px; width: 1136px; height: 690px; transform: rotate(.25deg); }
+      .hero .copy p { max-width: 380px; margin-top: 22px; font-size: 21px; }
+      .hero .mark { right: 64px; top: 62px; }
+      .hero .window { right: 52px; top: 170px; width: 736px; height: 460px; }
 
-      .offset-right .copy { left: 72px; top: 96px; width: 470px; }
+      .offset-right .copy { left: 72px; top: 152px; width: 380px; }
       .offset-right .mark { left: 72px; bottom: 62px; }
-      .offset-right .window { right: -80px; top: 80px; width: 820px; height: 650px; transform: rotate(-.7deg); }
-      .offset-right .window img { width: 145%; max-width: none; transform: translateX(-31%); object-fit: cover; }
+      .offset-right .window { right: 52px; top: 170px; width: 736px; height: 460px; }
 
-      .split .copy { left: 72px; top: 122px; width: 450px; }
+      .split .copy { left: 72px; top: 152px; width: 380px; }
       .split .mark { left: 72px; bottom: 62px; }
-      .split .window { right: -54px; top: 76px; width: 750px; height: 650px; }
+      .split .window { right: 52px; top: 170px; width: 736px; height: 460px; }
 
-      .offset-left .copy { right: 70px; top: 92px; width: 455px; }
+      .offset-left .copy { right: 60px; top: 152px; width: 390px; }
       .offset-left .mark { right: 70px; bottom: 64px; }
-      .offset-left .window { left: -66px; top: 134px; width: 790px; height: 620px; transform: rotate(.65deg); }
-      .offset-left .window img { width: 136%; max-width: none; object-position: left center; }
+      .offset-left .window { left: 52px; top: 170px; width: 736px; height: 460px; }
 
-      .minimal .copy { left: 108px; top: 170px; width: 430px; }
+      .minimal .copy { left: 72px; top: 178px; width: 380px; }
       .minimal .mark { left: 108px; top: 72px; width: 76px; height: 76px; }
-      .minimal .window { right: -70px; top: 84px; width: 760px; height: 646px; transform: rotate(-.5deg); }
-      .minimal .window img { width: 132%; max-width: none; object-position: left center; }
+      .minimal .window { right: 52px; top: 170px; width: 736px; height: 460px; }
     </style>
     <main class="${scene.layout}">
       <img class="mark" alt="" src="data:image/svg+xml;base64,${encodedIcon}">
@@ -244,7 +225,6 @@ function sceneHtml(scene) {
         <p>${scene.subhead}</p>
       </section>
       <section class="window">
-        <div class="chrome"></div>
         <img alt="" src="data:image/png;base64,${encodedScreenshot}">
       </section>
     </main>
