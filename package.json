@@ -43,6 +43,7 @@
     "audit:store-assets": "node scripts/audit-store-assets.mjs",
     "capture:store-screenshots": "node scripts/capture-store-screenshots.mjs",
     "generate:brand-assets": "node scripts/generate-brand-assets.mjs",
+    "generate:store-listing-screenshots": "node scripts/generate-store-listing-screenshots.mjs",
     "audit:artifacts": "node scripts/audit-artifacts.mjs",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm site:check && pnpm site:build && pnpm security:audit && pnpm audit:store-metadata && pnpm build:browsers && pnpm e2e:chromium:run && pnpm audit:artifacts && pnpm lint:firefox",
     "e2e:chromium:run": "playwright test",

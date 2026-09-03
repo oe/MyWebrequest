@@ -51,3 +51,8 @@ Use the conservatively remastered blue-globe icon and the audited, product-frame
 `store-assets/`. Chrome requires the 440x280 small tile and can additionally use the 1400x560 marquee tile;
 Edge uses its own 440x280 copy. Do not substitute an unrelated symbol or upload a resized screenshot as
 promotional artwork.
+
+For Chrome's listing carousel, upload the five 1280x800 images from
+`store-assets/listing-screenshots/chrome/en-US/` in filename order. They are marketing compositions derived
+from the current audited Chrome captures; the three files under `store-assets/screenshots/chrome/` remain
+the unmodified provenance sources and are not the preferred listing uploads.

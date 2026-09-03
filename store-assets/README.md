@@ -4,6 +4,11 @@ The committed screenshots under `screenshots/<browser>/` are 1280x800, full-blee
 extension UI. Each browser set tells the same three-part product story: rule management, the bounded
 website-access explanation, and verified backup import preview.
 
+The upload-ready Chrome listing story lives under `listing-screenshots/chrome/en-US/`. It contains the
+recommended maximum of five 1280x800 images, adapting Goldie's product-first framing to Chrome's landscape
+format. These are deterministic compositions over the exact audited Chrome captures; the source captures
+remain untouched for release provenance.
+
 `listing/<locale>.json` contains paste-ready store metadata for English, Simplified Chinese, Korean,
 Japanese, French, and Spanish. The shared descriptions intentionally contain no browser-specific migration
 claim. Only `chromeLegacyMigrationNote` may be appended to the Chrome listing; it must never be copied to
@@ -37,6 +42,12 @@ Regenerate the icon and promotional assets with:
 
 ```bash
 pnpm generate:brand-assets
+```
+
+Regenerate the five Chrome listing screenshots after refreshing their source captures with:
+
+```bash
+pnpm generate:store-listing-screenshots
 ```
 
 Firefox capture uses a temporary isolated GeckoDriver profile and exact Firefox release archive:
