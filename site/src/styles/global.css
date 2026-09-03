@@ -456,8 +456,7 @@ h3 {
 
 .guide-layout {
   display: grid;
-  grid-template-columns: 200px minmax(0, 760px);
-  justify-content: center;
+  grid-template-columns: 200px minmax(0, 1fr);
   gap: 72px;
   align-items: start;
   padding-block: 72px 120px;
