@@ -1,0 +1,16 @@
+---
+import LegacyLocaleRedirect from '../../../components/LegacyLocaleRedirect.astro';
+import { guideSlugs, type GuideSlug } from '../../../content';
+
+export function getStaticPaths() {
+  return guideSlugs.map((slug) => ({ params: { slug }, props: { slug } }));
+}
+
+interface Props {
+  slug: GuideSlug;
+}
+
+const { slug } = Astro.props;
+---
+
+<LegacyLocaleRedirect path={`guides/${slug}`} />

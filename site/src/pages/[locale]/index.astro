@@ -1,11 +1,12 @@
 ---
 import HomePage from '../../components/HomePage.astro';
 import { locales, type Locale } from '../../content';
+import { localePathSegment } from '../../lib/routes';
 
 export function getStaticPaths() {
   return locales
     .filter((locale) => locale !== 'en')
-    .map((locale) => ({ params: { locale }, props: { locale } }));
+    .map((locale) => ({ params: { locale: localePathSegment(locale) }, props: { locale } }));
 }
 interface Props {
   locale: Locale;

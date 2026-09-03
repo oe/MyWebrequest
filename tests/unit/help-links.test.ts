@@ -6,7 +6,7 @@ import { supportedLocales } from '@/ui/i18n/core';
 describe('help links', () => {
   it.each([
     ['en', 'https://webrequest.forth.ink/guides/quick-start/'],
-    ['zh-CN', 'https://webrequest.forth.ink/zh-CN/guides/quick-start/'],
+    ['zh-CN', 'https://webrequest.forth.ink/zh-hans/guides/quick-start/'],
     ['ko', 'https://webrequest.forth.ink/ko/guides/quick-start/'],
     ['ja', 'https://webrequest.forth.ink/ja/guides/quick-start/'],
     ['fr', 'https://webrequest.forth.ink/fr/guides/quick-start/'],

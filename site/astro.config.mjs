@@ -7,15 +7,16 @@ export default defineConfig({
   trailingSlash: 'always',
   integrations: [
     sitemap({
+      filter: (page) => !new URL(page).pathname.startsWith('/zh-CN/'),
       i18n: {
         defaultLocale: 'en',
         locales: {
-          en: 'en-US',
-          'zh-CN': 'zh-CN',
-          ko: 'ko-KR',
-          ja: 'ja-JP',
-          fr: 'fr-FR',
-          es: 'es-ES',
+          en: 'en',
+          'zh-hans': 'zh-Hans',
+          ko: 'ko',
+          ja: 'ja',
+          fr: 'fr',
+          es: 'es',
         },
       },
     }),

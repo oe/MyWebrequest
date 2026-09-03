@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import icon from '../assets/app-icon.svg';
 import { homeCopy, localeNames, locales, type Locale } from '../content';
-import { localizedPath, withBase } from '../lib/routes';
+import { localeLanguageTag, localizedPath, withBase } from '../lib/routes';
 import '../styles/global.css';
 
 interface Props {
@@ -13,6 +13,7 @@ interface Props {
 }
 
 const { locale, title, description, path = '' } = Astro.props;
+const languageTag = localeLanguageTag(locale);
 const copy = homeCopy[locale];
 const pageTitle = title ? `${title} · My Webrequest` : `My Webrequest — ${copy.metaTitle}`;
 const pageDescription = description ?? copy.description;
@@ -33,7 +34,7 @@ const softwareSchema = {
   browserRequirements: 'Manifest V3 compatible browser',
   description: pageDescription,
   featureList: copy.capabilities.map((capability) => capability.title),
-  inLanguage: locale,
+  inLanguage: languageTag,
   isAccessibleForFree: true,
   codeRepository: 'https://github.com/oe/MyWebrequest',
   license: 'https://github.com/oe/MyWebrequest/blob/master/LICENSE',
@@ -47,7 +48,7 @@ const schema = title
           '@type': 'TechArticle',
           headline: title,
           description: pageDescription,
-          inLanguage: locale,
+          inLanguage: languageTag,
           mainEntityOfPage: canonical,
           isPartOf: {
             '@type': 'WebSite',
@@ -68,7 +69,7 @@ const schema = title
 ---
 
 <!doctype html>
-<html lang={locale}>
+<html lang={languageTag}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -81,7 +82,7 @@ const schema = title
       locales.map((alternate) => (
         <link
           rel="alternate"
-          hreflang={alternate}
+          hreflang={localeLanguageTag(alternate)}
           href={new URL(localizedPath(alternate, path), Astro.site)}
         />
       ))

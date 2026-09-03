@@ -1,0 +1,29 @@
+---
+import { localizedPath } from '../lib/routes';
+
+interface Props {
+  path?: string;
+}
+
+const { path = '' } = Astro.props;
+const targetPath = localizedPath('zh-CN', path);
+const targetUrl = new URL(targetPath, Astro.site);
+---
+
+<!doctype html>
+<html lang="zh-Hans">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="robots" content="noindex, follow" />
+    <meta http-equiv="refresh" content={`0; url=${targetUrl}`} />
+    <link rel="canonical" href={targetUrl} />
+    <title>页面已迁移 · My Webrequest</title>
+    <script is:inline define:vars={{ targetPath }}>
+      window.location.replace(`${targetPath}${window.location.search}${window.location.hash}`);
+    </script>
+  </head>
+  <body>
+    <p>简体中文页面已迁移。<a href={targetPath}>前往新地址</a></p>
+  </body>
+</html>
