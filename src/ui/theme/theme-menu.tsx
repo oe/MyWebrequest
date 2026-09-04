@@ -26,7 +26,7 @@ function PreferenceIcon({ preference }: { preference: ThemePreference }) {
   return <Icon aria-hidden="true" />;
 }
 
-function ThemeChoices() {
+function ThemeChoices({ inset = false }: { inset?: boolean }) {
   const { preference, setPreference } = useTheme();
   const { t } = useI18n();
 
@@ -40,7 +40,7 @@ function ThemeChoices() {
       {choices.map((choice) => {
         const Icon = choice.icon;
         return (
-          <DropdownMenuRadioItem key={choice.value} value={choice.value}>
+          <DropdownMenuRadioItem key={choice.value} value={choice.value} inset={inset}>
             <Icon />
             {t(choice.label)}
           </DropdownMenuRadioItem>
@@ -62,7 +62,7 @@ export function ThemeMenu({ variant = 'standalone' }: { variant?: 'standalone' |
           <PreferenceIcon preference={preference} />
           {t('theme')}
         </DropdownMenuLabel>
-        <ThemeChoices />
+        <ThemeChoices inset />
       </>
     );
   }

@@ -578,7 +578,10 @@ test('appearance follows the system and stays synchronized across extension surf
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByText('Appearance', { exact: true })).toBeVisible();
-  await expect(options.getByRole('menuitemradio', { name: 'Light', exact: true })).toBeVisible();
+  await expect(options.getByRole('menuitemradio', { name: 'Light', exact: true })).toHaveAttribute(
+    'data-inset',
+    'true',
+  );
   await options.getByRole('menuitemradio', { name: 'Light', exact: true }).click();
   await expect(options.locator('html')).toHaveAttribute('data-theme-preference', 'light');
   await expect(options.locator('html')).toHaveAttribute('data-theme', 'light');
