@@ -12,6 +12,6 @@ describe('extension product name', () => {
       appName?: { message?: string };
     };
 
-    expect(messages.appName?.message).toBe('My Webrequest');
+    expect(messages.appName?.message).toBe('RequestOrbit');
   });
 });

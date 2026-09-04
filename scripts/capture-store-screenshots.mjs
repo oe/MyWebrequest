@@ -270,7 +270,7 @@ async function captureChromium(target, artifact) {
       const input = document.querySelector('input[type="file"]');
       if (!(input instanceof HTMLInputElement)) throw new Error('Backup input is missing.');
       const transfer = new DataTransfer();
-      transfer.items.add(new File([text], 'my-webrequest-rules.json', { type: 'application/json' }));
+      transfer.items.add(new File([text], 'request-orbit-rules.json', { type: 'application/json' }));
       Object.defineProperty(input, 'files', { configurable: true, value: transfer.files });
       input.dispatchEvent(new Event('change', { bubbles: true }));
     }, screenshotBackup());
@@ -426,7 +426,7 @@ async function captureFirefox(artifact) {
     );
     await command('POST', `/session/${sessionId}/moz/context`, { context: 'content' });
     await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
-    await poll(`document.title`, 'My Webrequest');
+    await poll(`document.title`, 'RequestOrbit');
     await executeAsync(
       `const state = arguments[0]; const done = arguments[arguments.length - 1]; browser.storage.local.set({ requestRulesState: state, 'ui.locale': 'en' }).then(() => done(true), (error) => done({ error: String(error) }));`,
       [screenshotState()],
@@ -470,13 +470,13 @@ async function captureFirefox(artifact) {
       'Bounded website-access explanation before browser prompt',
     );
     await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
-    await poll(`document.title`, 'My Webrequest');
+    await poll(`document.title`, 'RequestOrbit');
     await clickNative('css selector', 'button[aria-label="Settings"]');
     await poll(`document.body.innerText.includes('Backup & restore')`, true);
     await clickNative('xpath', `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`);
     await poll(`document.body.innerText.includes('Export backup')`, true);
     await executeAsync(
-      `const text = arguments[0]; const done = arguments[arguments.length - 1]; const input = document.querySelector('input[type="file"]'); if (!(input instanceof HTMLInputElement)) return done({ error: 'Backup input is missing.' }); const transfer = new DataTransfer(); transfer.items.add(new File([text], 'my-webrequest-rules.json', { type: 'application/json' })); Object.defineProperty(input, 'files', { configurable: true, value: transfer.files }); input.dispatchEvent(new Event('change', { bubbles: true })); done(true);`,
+      `const text = arguments[0]; const done = arguments[arguments.length - 1]; const input = document.querySelector('input[type="file"]'); if (!(input instanceof HTMLInputElement)) return done({ error: 'Backup input is missing.' }); const transfer = new DataTransfer(); transfer.items.add(new File([text], 'request-orbit-rules.json', { type: 'application/json' })); Object.defineProperty(input, 'files', { configurable: true, value: transfer.files }); input.dispatchEvent(new Event('change', { bubbles: true })); done(true);`,
       [screenshotBackup()],
     );
     await poll(`document.body.innerText.includes('Import preview')`, true);

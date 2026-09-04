@@ -68,7 +68,7 @@ export function DataPanel({ state, recovery, onCommit, onRestore }: DataPanelPro
     setExporting(true);
     try {
       const backup = await createRuleBackup(state, new Date().toISOString());
-      downloadJson(backup, `my-webrequest-rules-${backup.exportedAt.slice(0, 10)}.json`);
+      downloadJson(backup, `request-orbit-rules-${backup.exportedAt.slice(0, 10)}.json`);
     } catch {
       toast.error(t('exportBackupError'));
     } finally {

@@ -18,7 +18,7 @@ const targetUrl = new URL(targetPath, Astro.site);
     <meta name="robots" content="noindex, follow" />
     <meta http-equiv="refresh" content={`0; url=${targetUrl}`} />
     <link rel="canonical" href={targetUrl} />
-    <title>页面已迁移 · My Webrequest</title>
+    <title>页面已迁移 · RequestOrbit</title>
     <script is:inline define:vars={{ targetPath }}>
       window.location.replace(`${targetPath}${window.location.search}${window.location.hash}`);
     </script>

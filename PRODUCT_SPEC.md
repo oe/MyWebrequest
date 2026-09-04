@@ -1,4 +1,4 @@
-# My Webrequest Product Specification
+# RequestOrbit Product Specification
 
 Status: Approved baseline; implementation in progress
 Last updated: 2026-09-04
@@ -8,7 +8,7 @@ Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGR
 
 ## 1. Product definition
 
-My Webrequest is a local-first browser extension for developers and advanced users who need to create,
+RequestOrbit is a local-first browser extension for developers and advanced users who need to create,
 test, enable, and manage request-handling rules without editing raw extension manifests or DNR JSON.
 
 The extension has one purpose:
@@ -17,8 +17,8 @@ The extension has one purpose:
 
 It is not a general browser utility, an ad blocker, a request recorder, or a replacement for Chrome DevTools.
 
-`My Webrequest` is the established product name. It must not be replaced by a descriptive feature label
-unless explicitly approved.
+`RequestOrbit` is the approved product name. `My Webrequest` is retained only where the product must
+identify the legacy Chrome release or compatibility identifiers that cannot safely change.
 
 ## 2. Users and jobs
 

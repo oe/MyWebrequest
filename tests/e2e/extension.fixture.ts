@@ -22,7 +22,7 @@ type ExtensionFixtures = {
 };
 
 async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
-  return worker.evaluate(() => chrome.runtime?.getManifest().name === 'My Webrequest').catch(() => false);
+  return worker.evaluate(() => chrome.runtime?.getManifest().name === 'RequestOrbit').catch(() => false);
 }
 
 export async function findExtensionWorker(
@@ -45,7 +45,7 @@ export async function findExtensionWorker(
       .catch(() => undefined);
     if (worker && (await matches(worker))) return worker;
   }
-  throw new Error('My Webrequest service worker did not start.');
+  throw new Error('RequestOrbit service worker did not start.');
 }
 
 async function launchExternalChromium(

@@ -32,7 +32,7 @@ const permissionDisclosure = section(listing, 'Permission disclosure');
 const normalizedPrivacy = privacy.replace(/\s+/g, ' ');
 const normalizedDetails = detailedDescription.replace(/\s+/g, ' ');
 
-assert.equal(name, 'My Webrequest', 'The store name must match the restored product identity.');
+assert.equal(name, 'RequestOrbit', 'The store name must match the restored product identity.');
 assert.ok(characterLength(singlePurpose) <= 1_000, 'The single-purpose statement is unexpectedly long.');
 assert.ok(
   characterLength(shortDescription) >= 20 && characterLength(shortDescription) <= 132,

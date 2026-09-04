@@ -1,4 +1,4 @@
-# My Webrequest Legacy Migration Plan
+# RequestOrbit Legacy Migration Plan
 
 Status: Implemented and regression-tested; signed-store upgrade validation pending
 Last updated: 2026-09-02

@@ -1,5 +1,5 @@
 {
-  "appName": { "message": "My Webrequest" },
+  "appName": { "message": "RequestOrbit" },
   "appDesc": { "message": "Crea, prueba y controla localmente las reglas de solicitud del navegador." },
-  "actionTitle": { "message": "Abrir My Webrequest" }
+  "actionTitle": { "message": "Abrir RequestOrbit" }
 }

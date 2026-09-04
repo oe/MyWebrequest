@@ -6,90 +6,90 @@
   },
   "targets": {
     "chrome": {
-      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-chrome.zip",
-      "sourceContentSha256": "4a644d4a06a8ddd14a730de4b969ffcab6aeb2abb7387c33a0115bf7f42d5545",
+      "sourceArtifact": "request-orbit-1.0.0-alpha.1-chrome.zip",
+      "sourceContentSha256": "f491d7d260feb94238a213a31b2f955566664582af9d7c3191ad2a7f14a5a227",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-02T17:30:22.891Z",
+      "capturedAt": "2026-09-04T00:37:39.717Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "399f7902e8ff423d6a3ee0081f02500c45696882f8ee9d87ca64de82d55f40aa",
+          "sha256": "ff8355d1b53235dfe548b1d39443f3de4af0d653109726e695184fe8bec76b27",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "f204b46845d29ea3fe55362f0ffb330fe3b70451ce44b7d187c466ac4a577fb6",
+          "sha256": "14b56e0bdabbf6fd766f6bc97b038c1595dda7e48ccd766f91a815e961a6cae6",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "692150e4ca2eb2f06fbc1281afbe7b06943fd651870adae128d351b9923add2a",
+          "sha256": "35163d051798c36d909866a4ced2a6f7d2c7c3c4de979eb143cc731bf3d3c575",
           "width": 1280,
           "height": 800
         }
       ]
     },
     "edge": {
-      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-edge.zip",
-      "sourceContentSha256": "612c5ac8634cf043c66fb92b980d839b13a82a02b698f5e7aa830ee665798b9b",
+      "sourceArtifact": "request-orbit-1.0.0-alpha.1-edge.zip",
+      "sourceContentSha256": "f9d1139e79efbd0c5a169b769b078601ad53da00aed3ff02b5378ad07aeb7c73",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-02T17:30:24.872Z",
+      "capturedAt": "2026-09-04T00:37:43.253Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "399f7902e8ff423d6a3ee0081f02500c45696882f8ee9d87ca64de82d55f40aa",
+          "sha256": "ff8355d1b53235dfe548b1d39443f3de4af0d653109726e695184fe8bec76b27",
           "width": 1280,
           "height": 800
         },
         {
           "path": "edge/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "f204b46845d29ea3fe55362f0ffb330fe3b70451ce44b7d187c466ac4a577fb6",
+          "sha256": "14b56e0bdabbf6fd766f6bc97b038c1595dda7e48ccd766f91a815e961a6cae6",
           "width": 1280,
           "height": 800
         },
         {
           "path": "edge/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "692150e4ca2eb2f06fbc1281afbe7b06943fd651870adae128d351b9923add2a",
+          "sha256": "35163d051798c36d909866a4ced2a6f7d2c7c3c4de979eb143cc731bf3d3c575",
           "width": 1280,
           "height": 800
         }
       ]
     },
     "firefox": {
-      "sourceArtifact": "my-webrequest-1.0.0-alpha.1-firefox.zip",
-      "sourceContentSha256": "df72a7919b68a3c37986eda5ecfd09ed7721be29183bc2783c83d8174bb7387d",
+      "sourceArtifact": "request-orbit-1.0.0-alpha.1-firefox.zip",
+      "sourceContentSha256": "ccdd09a54c54d25a0eeb86691c63e762b8582eac12ae48f1c3896611a6bfb31c",
       "browserName": "Firefox",
       "browserVersion": "155.0",
-      "capturedAt": "2026-09-02T17:30:30.667Z",
+      "capturedAt": "2026-09-04T00:49:51.039Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "5c071b0faffcb5b2f57d242bf4626005de7282b987ec671f7559cef65ece351f",
+          "sha256": "1b0fb952a56f1959c9c373c6061affbaee40c1e0aa83788770304bac9f91e35c",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "5710d042348dd918d145afa21f6698e4f265ec95d0ff3a0c8033dea785671fcf",
+          "sha256": "64b723288468d5a3275abcc6f0b7da7ff57627a99c2d5f12d5139cfaed29ebd7",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "2a7a1e5f3ae2173117ca84044276c071739aceb22ff96e4e3055213ab54d7447",
+          "sha256": "128ee32c08aaebf31a3efa8b3331f0c5cca75f1ffed6cd0e258e03f40e55a0a6",
           "width": 1280,
           "height": 800
         }

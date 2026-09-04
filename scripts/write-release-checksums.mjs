@@ -4,7 +4,7 @@ import { join } from 'node:path';
 
 const directory = join(process.cwd(), 'dist');
 const packageManifest = JSON.parse(await readFile(join(process.cwd(), 'package.json'), 'utf8'));
-const archivePrefix = `my-webrequest-${packageManifest.version}`;
+const archivePrefix = `request-orbit-${packageManifest.version}`;
 const expectedArchives = [
   `${archivePrefix}-chrome.zip`,
   `${archivePrefix}-edge.zip`,

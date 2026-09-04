@@ -2,7 +2,7 @@
 
 Last updated: 2026-09-01
 
-My Webrequest is a local-only browser extension. It does not collect, transmit, sell, or share personal
+RequestOrbit is a local-only browser extension. It does not collect, transmit, sell, or share personal
 data. It has no account system, analytics, advertising, telemetry, cloud synchronization, or
 product-owned network endpoint.
 
@@ -16,7 +16,7 @@ authentication data, or incognito activity.
 - `declarativeNetRequest` lets the browser apply user-authored request rules without the extension reading
   request contents. Safe block and HTTPS-upgrade rules need no website access.
 - `activeTab` lets the popup identify the current HTTP or HTTPS site after the user opens it.
-- Optional `http://*/*` and `https://*/*` host access is not granted at installation. My Webrequest asks
+- Optional `http://*/*` and `https://*/*` host access is not granted at installation. RequestOrbit asks
   only for the concrete request and, when required, initiator origins needed by a redirect or header rule
   when the user chooses to enable it.
 

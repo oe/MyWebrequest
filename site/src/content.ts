@@ -526,12 +526,12 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
       {
         title: 'Choose one of three match modes',
         paragraphs: [
-          'The editor has two browser rule formats and one simpler My Webrequest format. Most rules need only the first option:',
+          'The editor has two browser rule formats and one simpler RequestOrbit format. Most rules need only the first option:',
           'New rules start with URL filter. If an entry clearly looks like a regular expression, the editor suggests switching but never changes the mode by itself.',
         ],
         points: [
           'URL filter (recommended): browser-native pattern syntax for a domain, fixed URL, or path. It cannot create $1 values.',
-          'Simple wildcard: My Webrequest turns each * into a captured part. Use it for straightforward redirects that keep part of the original URL.',
+          'Simple wildcard: RequestOrbit turns each * into a captured part. Use it for straightforward redirects that keep part of the original URL.',
           'Regular expression: browser-checked syntax for precise captures, alternatives, and advanced logic. Support can vary by browser.',
         ],
       },
@@ -539,7 +539,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'What || and ^ mean',
         paragraphs: [
           'In a URL filter, || starts matching at a domain name and includes subdomains. The ^ after the domain requires a separator or the end of the URL, so example.com does not accidentally match example.company. A single | anchors the beginning or end; * matches any number of characters.',
-          'This is declarativeNetRequest URL-filter syntax, not a WebExtension host-permission match pattern. My Webrequest derives the required permission pattern for you.',
+          'This is declarativeNetRequest URL-filter syntax, not a WebExtension host-permission match pattern. RequestOrbit derives the required permission pattern for you.',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -568,7 +568,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'Redirects and headers',
         paragraphs: [
           'Redirect destinations must use HTTP or HTTPS. Values captured by Simple wildcard or Regular expression can be inserted as $1 through $9.',
-          'Header rules can remove or set browser-approved request headers. My Webrequest rejects forbidden names before activation.',
+          'Header rules can remove or set browser-approved request headers. RequestOrbit rejects forbidden names before activation.',
         ],
       },
     ],
@@ -625,7 +625,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
           'Targets must use HTTP or HTTPS.',
           'Simple-wildcard and regular-expression captures are referenced as $1 through $9.',
           'Query-string order, decoding, and repeated keys are not automatically normalized.',
-          'Avoid redirect cycles; My Webrequest blocks obvious self-redirects and detected cycles.',
+          'Avoid redirect cycles; RequestOrbit blocks obvious self-redirects and detected cycles.',
         ],
       },
     ],
@@ -638,7 +638,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'On-demand host access',
         paragraphs: [
           'The extension declares HTTP and HTTPS access as optional. It asks only when you enable a redirect or header rule that requires a specific origin.',
-          'Rules, backups, and test inputs remain in browser storage. My Webrequest has no analytics or remote rule service.',
+          'Rules, backups, and test inputs remain in browser storage. RequestOrbit has no analytics or remote rule service.',
         ],
       },
       {
@@ -699,14 +699,14 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
           'The rebuild deliberately does not restore broad, obsolete, or unrelated browser behavior.',
         ],
         points: [
-          'Request logging: use the browser Network panel or export a HAR during a focused debugging session. My Webrequest does not retain browsing history.',
+          'Request logging: use the browser Network panel or export a HAR during a focused debugging session. RequestOrbit does not retain browsing history.',
           'Global CORS override: configure the server, use a development reverse proxy, or run a dedicated local test environment. There is no safe global equivalent here.',
           'User-Agent override and presets: use browser developer tools for temporary testing or server-side feature flags.',
           'Programmable context-menu actions: use browser bookmarks for static destinations or a separately reviewed automation tool for scripted behavior.',
           'Google search redirect: configure the browser’s search engine, or create a narrow Redirect rule only when a fixed URL shape is sufficient.',
           'Google-to-useso CDN rewriting: remove the old rule and use a maintained CDN or self-hosted assets; the historical endpoint is obsolete.',
           'QR generation: use browser or operating-system sharing tools where available.',
-          'Icon styles, donation UI, telemetry, and remote services have no replacement inside My Webrequest.',
+          'Icon styles, donation UI, telemetry, and remote services have no replacement inside RequestOrbit.',
         ],
       },
       {
@@ -872,12 +872,12 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '三种匹配方式，怎么选',
         paragraphs: [
-          '编辑器提供两种浏览器规则格式，以及一种更容易上手的 My Webrequest 格式。大多数情况选第一种就够了：',
+          '编辑器提供两种浏览器规则格式，以及一种更容易上手的 RequestOrbit 格式。大多数情况选第一种就够了：',
           '新规则默认使用 URL 过滤器。输入内容明显像正则时，编辑器会建议切换，但不会擅自改变匹配方式。',
         ],
         points: [
           'URL 过滤器（推荐）：浏览器原生的简洁语法，适合域名、固定 URL 和路径，但不能生成 $1。',
-          '简易通配符：My Webrequest 会把每个 * 变成捕获值，适合重定向时简单保留原 URL 的一部分。',
+          '简易通配符：RequestOrbit 会把每个 * 变成捕获值，适合重定向时简单保留原 URL 的一部分。',
           '正则表达式：适合精确捕获、备选项和复杂条件；支持情况由当前浏览器检查。',
         ],
       },
@@ -885,7 +885,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '|| 和 ^ 是什么意思',
         paragraphs: [
           '在 URL 过滤器中，|| 表示从域名开始匹配，并包含它的子域名。域名后的 ^ 要求这里是分隔符或 URL 结尾，因此 example.com 不会误匹配 example.company。单个 | 用来限定开头或结尾，* 表示任意数量的字符。',
-          '这里使用的是 declarativeNetRequest 的 URL 过滤器语法，不是 WebExtension 的网站权限匹配格式；所需的权限格式会由 My Webrequest 自动生成。',
+          '这里使用的是 declarativeNetRequest 的 URL 过滤器语法，不是 WebExtension 的网站权限匹配格式；所需的权限格式会由 RequestOrbit 自动生成。',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -1021,14 +1021,14 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '已移除的功能，以及可以怎么替代',
         paragraphs: ['新版不再保留范围过大、已经过时，或与请求规则关系不大的功能。'],
         points: [
-          '请求日志：使用浏览器开发者工具的 Network 面板，或在调试时导出 HAR。My Webrequest 不会记录你的浏览历史。',
+          '请求日志：使用浏览器开发者工具的 Network 面板，或在调试时导出 HAR。RequestOrbit 不会记录你的浏览历史。',
           '全局修改 CORS：请配置服务端、使用开发反向代理，或搭建独立测试环境。新版不提供风险较高的全局开关。',
           '修改 User-Agent：临时测试可以使用浏览器开发者工具；长期差异更适合用服务端功能开关处理。',
           '可编程右键菜单：固定网址可以用书签；需要运行脚本时，请使用经过单独评估的自动化工具。',
           'Google 搜索重定向：优先修改浏览器默认搜索引擎；只有 URL 结构固定时，才适合用一条范围明确的重定向规则处理。',
           'Google 到 useso 的 CDN 改写：旧端点已经过时，请删除这类规则，改用仍在维护的 CDN 或自行托管资源。',
           '生成二维码：使用浏览器或操作系统自带的分享、二维码功能。',
-          '图标样式、捐赠界面、遥测和远端服务不再属于 My Webrequest 的功能范围。',
+          '图标样式、捐赠界面、遥测和远端服务不再属于 RequestOrbit 的功能范围。',
         ],
       },
       {
@@ -1091,12 +1091,12 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '세 가지 일치 방식 중 선택하기',
         paragraphs: [
-          '브라우저 규칙 형식 두 가지와 더 쉬운 My Webrequest 형식 한 가지가 있습니다. 대부분은 첫 번째 방식이면 충분합니다.',
+          '브라우저 규칙 형식 두 가지와 더 쉬운 RequestOrbit 형식 한 가지가 있습니다. 대부분은 첫 번째 방식이면 충분합니다.',
           '새 규칙은 URL 필터로 시작합니다. 입력이 정규식으로 명확하게 보이면 전환을 제안하지만, 모드를 자동으로 바꾸지는 않습니다.',
         ],
         points: [
           'URL 필터(권장): 도메인, 고정 URL, 경로에 알맞은 브라우저 기본 문법입니다. $1 값은 만들 수 없습니다.',
-          '간단한 와일드카드: My Webrequest가 각 *를 캡처 값으로 바꿉니다. 원래 URL의 일부를 간단히 보존하는 리디렉션에 알맞습니다.',
+          '간단한 와일드카드: RequestOrbit가 각 *를 캡처 값으로 바꿉니다. 원래 URL의 일부를 간단히 보존하는 리디렉션에 알맞습니다.',
           '정규식: 정확한 캡처, 선택지, 고급 조건에 사용하며 현재 브라우저가 지원 여부를 검사합니다.',
         ],
       },
@@ -1104,7 +1104,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '||와 ^의 의미',
         paragraphs: [
           'URL 필터에서 ||는 도메인 이름부터 일치하며 하위 도메인도 포함합니다. 도메인 뒤의 ^는 구분 문자나 URL 끝을 요구하므로 example.com이 example.company와 잘못 일치하지 않습니다. | 하나는 시작이나 끝을 고정하고, *는 임의 개수의 문자와 일치합니다.',
-          '이는 WebExtension 사이트 권한의 일치 패턴이 아니라 declarativeNetRequest URL 필터 문법입니다. 필요한 권한 패턴은 My Webrequest가 자동으로 만듭니다.',
+          '이는 WebExtension 사이트 권한의 일치 패턴이 아니라 declarativeNetRequest URL 필터 문법입니다. 필요한 권한 패턴은 RequestOrbit가 자동으로 만듭니다.',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -1248,7 +1248,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Google 검색 리디렉션: 브라우저 검색 엔진을 설정하거나 고정 URL 형식에만 제한된 Redirect 규칙을 사용하세요.',
           'Google-to-useso CDN 변경: 오래된 규칙을 제거하고 유지되는 CDN이나 자체 호스팅 자산을 사용하세요.',
           'QR 생성: 지원되는 브라우저 또는 운영체제 공유 도구를 사용하세요.',
-          '아이콘 스타일, 기부 UI, 원격 서비스와 분석 기능은 My Webrequest에서 대체하지 않습니다.',
+          '아이콘 스타일, 기부 UI, 원격 서비스와 분석 기능은 RequestOrbit에서 대체하지 않습니다.',
         ],
       },
       {
@@ -1313,12 +1313,12 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '3 つの一致方式から選ぶ',
         paragraphs: [
-          'ブラウザーのルール形式が 2 つ、より簡単な My Webrequest 形式が 1 つあります。ほとんどの場合は最初の方式で十分です。',
+          'ブラウザーのルール形式が 2 つ、より簡単な RequestOrbit 形式が 1 つあります。ほとんどの場合は最初の方式で十分です。',
           '新しいルールは URL フィルターで始まります。入力が明らかに正規表現なら切り替えを提案しますが、自動では変更しません。',
         ],
         points: [
           'URL フィルター（推奨）：ドメイン、固定 URL、パスに適したブラウザー標準の構文です。$1 は作れません。',
-          '簡易ワイルドカード：My Webrequest が * ごとにキャプチャ値へ変換します。元の URL の一部を簡単に残すリダイレクトに向いています。',
+          '簡易ワイルドカード：RequestOrbit が * ごとにキャプチャ値へ変換します。元の URL の一部を簡単に残すリダイレクトに向いています。',
           '正規表現：厳密なキャプチャ、選択肢、高度な条件に使い、現在のブラウザーが対応状況を検証します。',
         ],
       },
@@ -1326,7 +1326,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '|| と ^ の意味',
         paragraphs: [
           'URL フィルターの || はドメイン名から一致させ、サブドメインも含めます。ドメイン直後の ^ は区切り文字または URL の末尾を必須にするため、example.com が example.company に誤って一致しません。| 一つは先頭または末尾を固定し、* は任意の数の文字に一致します。',
-          'これは WebExtension のサイト権限用マッチパターンではなく、declarativeNetRequest の URL フィルター構文です。必要な権限パターンは My Webrequest が自動で作成します。',
+          'これは WebExtension のサイト権限用マッチパターンではなく、declarativeNetRequest の URL フィルター構文です。必要な権限パターンは RequestOrbit が自動で作成します。',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -1470,7 +1470,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Google 検索のリダイレクト：ブラウザの検索エンジンを設定するか、URL の形が固定されている場合だけ範囲を絞ったリダイレクトルールを作ります。',
           'Google-to-useso CDN 書き換え：旧ルールを削除し、保守中の CDN または自己ホスト資産へ移行します。',
           'QR 生成：利用可能なブラウザまたは OS の共有機能を使います。',
-          'アイコンスタイル、寄付 UI、テレメトリ、リモートサービスは My Webrequest 内で代替しません。',
+          'アイコンスタイル、寄付 UI、テレメトリ、リモートサービスは RequestOrbit 内で代替しません。',
         ],
       },
       {
@@ -1535,12 +1535,12 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Choisir entre trois modes',
         paragraphs: [
-          'L’éditeur propose deux formats du navigateur et un format My Webrequest plus simple. Le premier suffit le plus souvent :',
+          'L’éditeur propose deux formats du navigateur et un format RequestOrbit plus simple. Le premier suffit le plus souvent :',
           'Une nouvelle règle commence en mode Filtre d’URL. Si la saisie ressemble clairement à une expression régulière, l’éditeur propose de changer de mode sans jamais le faire automatiquement.',
         ],
         points: [
           'Filtre d’URL (recommandé) : syntaxe native du navigateur pour un domaine, une URL fixe ou un chemin. Elle ne produit pas de valeur $1.',
-          'Joker simplifié : My Webrequest transforme chaque * en capture. Idéal pour une redirection simple qui conserve une partie de l’URL.',
+          'Joker simplifié : RequestOrbit transforme chaque * en capture. Idéal pour une redirection simple qui conserve une partie de l’URL.',
           'Expression régulière : pour des captures précises, des alternatives et une logique avancée ; le navigateur actif vérifie sa compatibilité.',
         ],
       },
@@ -1548,7 +1548,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Signification de || et ^',
         paragraphs: [
           'Dans un filtre d’URL, || commence au nom de domaine et inclut les sous-domaines. Le ^ placé après le domaine exige un séparateur ou la fin de l’URL : example.com ne correspond donc pas à example.company. Un seul | fixe le début ou la fin, tandis que * correspond à un nombre quelconque de caractères.',
-          'Il s’agit de la syntaxe urlFilter de declarativeNetRequest, pas du motif d’autorisation de site WebExtension. My Webrequest génère ce dernier automatiquement.',
+          'Il s’agit de la syntaxe urlFilter de declarativeNetRequest, pas du motif d’autorisation de site WebExtension. RequestOrbit génère ce dernier automatiquement.',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -1694,7 +1694,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Redirection de recherche Google : configurez le moteur du navigateur ou une règle Redirect limitée à une forme d’URL fixe.',
           'Réécriture Google-to-useso : supprimez l’ancienne règle et choisissez un CDN maintenu ou des ressources auto-hébergées.',
           'QR : utilisez les outils de partage du navigateur ou du système lorsqu’ils existent.',
-          'Styles d’icône, dons, télémétrie et services distants n’ont pas de remplacement dans My Webrequest.',
+          'Styles d’icône, dons, télémétrie et services distants n’ont pas de remplacement dans RequestOrbit.',
         ],
       },
       {
@@ -1759,12 +1759,12 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Elige entre tres modos',
         paragraphs: [
-          'El editor ofrece dos formatos del navegador y uno más sencillo de My Webrequest. La primera opción basta casi siempre:',
+          'El editor ofrece dos formatos del navegador y uno más sencillo de RequestOrbit. La primera opción basta casi siempre:',
           'Las reglas nuevas empiezan con Filtro de URL. Si el contenido parece claramente una expresión regular, el editor propone cambiar de modo, pero nunca lo hace automáticamente.',
         ],
         points: [
           'Filtro de URL (recomendado): sintaxis nativa del navegador para un dominio, una URL fija o una ruta. No genera $1.',
-          'Comodín simple: My Webrequest convierte cada * en una captura. Sirve para redirecciones sencillas que conservan parte de la URL.',
+          'Comodín simple: RequestOrbit convierte cada * en una captura. Sirve para redirecciones sencillas que conservan parte de la URL.',
           'Expresión regular: para capturas precisas, alternativas y lógica avanzada; el navegador activo comprueba su compatibilidad.',
         ],
       },
@@ -1772,7 +1772,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: 'Qué significan || y ^',
         paragraphs: [
           'En un filtro de URL, || empieza en el nombre de dominio e incluye sus subdominios. El ^ después del dominio exige un separador o el final de la URL, así example.com no coincide por error con example.company. Un solo | fija el inicio o el final; * coincide con cualquier cantidad de caracteres.',
-          'Esta es la sintaxis urlFilter de declarativeNetRequest, no el patrón de permisos de sitio de WebExtension. My Webrequest genera ese patrón automáticamente.',
+          'Esta es la sintaxis urlFilter de declarativeNetRequest, no el patrón de permisos de sitio de WebExtension. RequestOrbit genera ese patrón automáticamente.',
         ],
         code: matchingExamples.urlFilter,
       },
@@ -1916,7 +1916,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
           'Redirección de búsqueda de Google: configura el buscador o una regla Redirect limitada a una forma de URL fija.',
           'Reescritura Google-to-useso: elimina la regla y usa un CDN mantenido o recursos autoalojados.',
           'QR: usa herramientas de compartir del navegador o sistema cuando estén disponibles.',
-          'Estilos de icono, donaciones, telemetría y servicios remotos no tienen sustituto dentro de My Webrequest.',
+          'Estilos de icono, donaciones, telemetría y servicios remotos no tienen sustituto dentro de RequestOrbit.',
         ],
       },
       {

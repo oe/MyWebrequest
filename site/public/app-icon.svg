@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title description">
-  <title id="title">My Webrequest</title>
-  <desc id="description">The classic My Webrequest blue globe, carefully remastered.</desc>
+  <title id="title">RequestOrbit</title>
+  <desc id="description">The classic RequestOrbit blue globe, carefully remastered.</desc>
   <defs>
     <radialGradient id="ocean" cx="0" cy="0" r="1" gradientTransform="translate(360 294) rotate(50) scale(715)" gradientUnits="userSpaceOnUse">
       <stop stop-color="#75DDFF"/>

@@ -173,6 +173,12 @@ partial historical checks remain pre-certification evidence.
   23 representative sync items, three disabled automatic candidates, export retention, application, and exact
   rollback. A same-ID production-overlay E2E staged 24 items after adding an independent page-storage item.
   This materially narrows but does not satisfy the outstanding store-signed upgrade row.
+- 2026-09-04: the product identity changed to `RequestOrbit` while preserving the Chrome signing key,
+  Firefox add-on ID, storage schema, backup format, and legacy `My Webrequest` migration references. The
+  six localized manifests and listings, Chrome/Edge/Firefox packages, product site, source captures,
+  five Chrome listing images, and promotional assets were rebuilt under the new identity. Formatting,
+  lint, type checking, 181 unit tests, 13 Chromium extension tests, Astro checks/build, security audit,
+  browser artifact audit, AMO lint, and the complete store-asset provenance audit passed.
 
 ## 2. Installed-browser matrix
 

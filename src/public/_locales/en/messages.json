@@ -1,11 +1,11 @@
 {
   "appName": {
-    "message": "My Webrequest"
+    "message": "RequestOrbit"
   },
   "appDesc": {
     "message": "Create, test, and control browser request rules locally."
   },
   "actionTitle": {
-    "message": "Open My Webrequest"
+    "message": "Open RequestOrbit"
   }
 }

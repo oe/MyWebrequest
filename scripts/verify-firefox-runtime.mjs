@@ -302,7 +302,7 @@ async function decideFixturePermission(allow) {
     !prompt.panelText.includes('localhost') ||
     !prompt.panelText.includes('127.0.0.1') ||
     prompt.notifications[0]?.id !== 'addon-webext-permissions-notification' ||
-    prompt.notifications[0]?.name !== 'My Webrequest'
+    prompt.notifications[0]?.name !== 'RequestOrbit'
   ) {
     throw new Error(
       `Firefox permission prompt did not describe the bounded fixture origins: ${JSON.stringify(prompt)}`,
@@ -389,11 +389,11 @@ try {
 
   await pollExtension(
     `({
-       appName: document.body?.innerText.includes('My Webrequest') ?? false,
+       appName: document.body?.innerText.includes('RequestOrbit') ?? false,
        lang: document.documentElement.lang,
        title: document.title,
      })`,
-    { appName: true, lang: 'en', title: 'My Webrequest' },
+    { appName: true, lang: 'en', title: 'RequestOrbit' },
   );
   const accessibilityState = await executeAsync(
     `const done = arguments[arguments.length - 1];
@@ -879,12 +879,12 @@ try {
   await command('POST', `/session/${sessionId}/url`, { url: popupUrl });
   await pollExtension(
     `({
-       appName: document.body?.innerText.includes('My Webrequest') ?? false,
+       appName: document.body?.innerText.includes('RequestOrbit') ?? false,
        lang: document.documentElement.lang,
        pauseControl: document.querySelector('[role="switch"][aria-label="Pause all rules"]') !== null,
        title: document.title,
      })`,
-    { appName: true, lang: 'en', pauseControl: true, title: 'My Webrequest' },
+    { appName: true, lang: 'en', pauseControl: true, title: 'RequestOrbit' },
   );
   await clickElement('css selector', '[role="switch"][aria-label="Pause all rules"]');
   await pollExtension(

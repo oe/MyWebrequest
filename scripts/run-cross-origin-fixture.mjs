@@ -7,7 +7,7 @@ const appHtml = `<!doctype html>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>My Webrequest cross-origin fixture</title>
+    <title>RequestOrbit cross-origin fixture</title>
     <style>
       body { font: 16px system-ui, sans-serif; max-width: 760px; margin: 48px auto; padding: 0 24px; }
       section { display: grid; gap: 12px; margin-block: 28px; }
@@ -16,7 +16,7 @@ const appHtml = `<!doctype html>
     </style>
   </head>
   <body>
-    <h1>My Webrequest cross-origin fixture</h1>
+    <h1>RequestOrbit cross-origin fixture</h1>
     <p>Initiator: <code>http://localhost:${PORT}</code>; request origin: <code>http://127.0.0.1:${PORT}</code>.</p>
     <section>
       <button id="redirect" type="button">Run redirect probe</button>

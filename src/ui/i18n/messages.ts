@@ -1,5 +1,5 @@
 export const en = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: 'Loading…',
   loadingRules: 'Loading request rules…',
   rules: 'Rules',
@@ -155,7 +155,7 @@ export const en = {
   urlFilterHelp: 'Browser-native pattern syntax for most rules. It does not create $1 values.',
   wildcard: 'Simple wildcard',
   wildcardShort: 'Wildcard',
-  wildcardHelp: 'My Webrequest’s simpler capture mode. Each * saves one part for a redirect.',
+  wildcardHelp: 'RequestOrbit’s simpler capture mode. Each * saves one part for a redirect.',
   regularExpression: 'Regular expression',
   regexShort: 'Regex',
   regexHelp: 'Browser-checked regular expressions for precise matching and redirect captures.',
@@ -186,7 +186,7 @@ export const en = {
     'This is request-rule syntax, not a WebExtension site-permission match pattern.',
   wildcardExample: 'For /users/file/42, $1 is users and $2 is 42.',
   wildcardCaptureHelp:
-    'This is a My Webrequest convenience mode, not native URL-filter syntax. Each * becomes one capture.',
+    'This is a RequestOrbit convenience mode, not native URL-filter syntax. Each * becomes one capture.',
   regexStartAnchor: 'Start of the URL.',
   regexLiteralDot: 'A literal dot. An unescaped dot means any character.',
   regexCaptureGroup: 'Capture a part for $1, $2, and so on.',
@@ -290,7 +290,7 @@ export const en = {
   unavailablePage: 'Unavailable on this page',
   unsupportedPageTitle: 'This browser page cannot be changed',
   unsupportedPageDescription:
-    'My Webrequest supports only http:// and https:// pages. Internal pages such as chrome://, edge://, and about: are protected by the browser.',
+    'RequestOrbit supports only http:// and https:// pages. Internal pages such as chrome://, edge://, and about: are protected by the browser.',
   allRulesPaused: 'All rules are paused',
   siteRulesOne: '1 rule for this site',
   siteRulesMany: '{count} rules for this site',

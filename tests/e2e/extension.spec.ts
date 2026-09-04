@@ -374,8 +374,8 @@ test('clean install exposes the product UI without required host access', async 
   options.on('pageerror', (error) => consoleIssues.push(`pageerror: ${error.message}`));
   await options.goto(`chrome-extension://${extensionId}/options.html`);
 
-  await expect(options).toHaveTitle('My Webrequest');
-  await expect(options.getByText('My Webrequest', { exact: true })).toBeVisible();
+  await expect(options).toHaveTitle('RequestOrbit');
+  await expect(options.getByText('RequestOrbit', { exact: true })).toBeVisible();
   const primaryNavigation = options.getByRole('navigation', { name: 'Primary navigation' });
   await expect(primaryNavigation.getByRole('button', { name: 'Rules' })).toBeVisible();
   await expect(primaryNavigation.getByText('Legacy migration')).toHaveCount(0);
@@ -383,7 +383,7 @@ test('clean install exposes the product UI without required host access', async 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByRole('menuitem', { name: 'Help & guides' })).toHaveAttribute(
     'href',
-    'https://webrequest.forth.ink/guides/quick-start/',
+    'https://request.forth.ink/guides/quick-start/',
   );
   const migrationMenuItem = options.getByRole('menuitem', { name: 'Legacy migration' });
   if (browserTarget === 'chrome') await expect(migrationMenuItem).toBeVisible();
@@ -400,7 +400,7 @@ test('clean install exposes the product UI without required host access', async 
   await expect(matchHelp.getByText('browser-native pattern syntax', { exact: false })).toBeVisible();
   await expect(matchHelp.getByRole('link', { name: 'See the matching guide' })).toHaveAttribute(
     'href',
-    'https://webrequest.forth.ink/guides/matching/',
+    'https://request.forth.ink/guides/matching/',
   );
   await options.keyboard.press('Escape');
 
@@ -413,7 +413,7 @@ test('clean install exposes the product UI without required host access', async 
   await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Wildcard');
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   await expect(matchHelp.getByText('Simple wildcard syntax', { exact: true })).toBeVisible();
-  await expect(matchHelp.getByText('My Webrequest convenience mode', { exact: false })).toBeVisible();
+  await expect(matchHelp.getByText('RequestOrbit convenience mode', { exact: false })).toBeVisible();
   await options.keyboard.press('Escape');
 
   await matchSyntax.click();
@@ -915,7 +915,7 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
-    await expect(options).toHaveTitle('My Webrequest');
+    await expect(options).toHaveTitle('RequestOrbit');
     expect(await options.evaluate(() => chrome.runtime.getManifest().version)).toBe('1.0.0');
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(

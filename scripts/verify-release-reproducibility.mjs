@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 
 const packageManifest = JSON.parse(await readFile(join(process.cwd(), 'package.json'), 'utf8'));
-const archivePrefix = `my-webrequest-${packageManifest.version}`;
+const archivePrefix = `request-orbit-${packageManifest.version}`;
 const archives = [
   `${archivePrefix}-chrome.zip`,
   `${archivePrefix}-edge.zip`,

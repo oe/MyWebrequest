@@ -38,7 +38,7 @@ const progressive = slug === 'advanced-examples' || slug === 'breaking-changes';
 <BaseLayout locale={locale} title={guide.title} description={guide.description} path={`guides/${slug}`}>
   <div class="guide-layout shell">
     <aside class="guide-sidebar">
-      <a class="back-link" href={localizedPath(locale)}><ArrowLeft size={15} />My Webrequest</a>
+      <a class="back-link" href={localizedPath(locale)}><ArrowLeft size={15} />RequestOrbit</a>
       <p>{copy.navGuides}</p>
       <nav class="guide-nav" aria-label={copy.navGuides}>
         {
@@ -65,7 +65,7 @@ const progressive = slug === 'advanced-examples' || slug === 'breaking-changes';
     </aside>
     <article class="guide-article">
       <header>
-        <p class="eyebrow">My Webrequest</p><h1>{guide.title}</h1><p class="lede">{guide.description}</p>
+        <p class="eyebrow">RequestOrbit</p><h1>{guide.title}</h1><p class="lede">{guide.description}</p>
       </header>
       {summarySection ? <GuideSection section={summarySection} /> : null}
       {

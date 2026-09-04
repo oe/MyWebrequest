@@ -1,7 +1,7 @@
 import type { Messages } from './messages';
 
 const zhCN = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: '正在加载…',
   loadingRules: '正在加载请求规则…',
   rules: '规则',
@@ -105,7 +105,7 @@ const zhCN = {
   urlFilterHelp: '浏览器原生的简洁匹配语法，适合大多数规则，但不会生成 $1。',
   wildcard: '简易通配符',
   wildcardShort: '通配符',
-  wildcardHelp: 'My Webrequest 提供的简易捕获模式；每个 * 都会为重定向保留一段内容。',
+  wildcardHelp: 'RequestOrbit 提供的简易捕获模式；每个 * 都会为重定向保留一段内容。',
   regularExpression: '正则表达式',
   regexShort: '正则',
   regexHelp: '使用由当前浏览器检查的正则表达式进行精确匹配，并可捕获重定向所需的内容。',
@@ -132,7 +132,7 @@ const zhCN = {
   urlFilterExample: '匹配 example.com 及其子域名，但不会匹配 example.company。',
   urlFilterNotPermissionPattern: '这是请求规则语法，不是 WebExtension 的网站权限匹配格式。',
   wildcardExample: '以 /users/file/42 为例，$1 是 users，$2 是 42。',
-  wildcardCaptureHelp: '这是 My Webrequest 提供的便捷模式，不是 URL 过滤器语法。每个 * 对应一个捕获值。',
+  wildcardCaptureHelp: '这是 RequestOrbit 提供的便捷模式，不是 URL 过滤器语法。每个 * 对应一个捕获值。',
   regexStartAnchor: 'URL 的开头。',
   regexLiteralDot: '匹配普通句点；不转义的点表示任意字符。',
   regexCaptureGroup: '捕获一段内容，依次对应 $1、$2……',
@@ -206,7 +206,7 @@ const zhCN = {
   unavailablePage: '此页面不可用',
   unsupportedPageTitle: '无法修改这个浏览器页面',
   unsupportedPageDescription:
-    'My Webrequest 仅支持 http:// 和 https:// 页面。chrome://、edge:// 和 about: 等浏览器内部页面受浏览器保护。',
+    'RequestOrbit 仅支持 http:// 和 https:// 页面。chrome://、edge:// 和 about: 等浏览器内部页面受浏览器保护。',
   allRulesPaused: '所有规则均已暂停',
   siteRulesOne: '此网站有 1 条规则',
   siteRulesMany: '此网站有 {count} 条规则',
@@ -361,7 +361,7 @@ const zhCN = {
 } satisfies Messages;
 
 const ko = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: '불러오는 중…',
   loadingRules: '요청 규칙을 불러오는 중…',
   rules: '규칙',
@@ -469,7 +469,7 @@ const ko = {
   urlFilterHelp: '대부분의 규칙에 알맞은 브라우저 기본 패턴 문법입니다. $1 값은 만들지 않습니다.',
   wildcard: '간단한 와일드카드',
   wildcardShort: '와일드카드',
-  wildcardHelp: 'My Webrequest의 간단한 캡처 방식입니다. 각 *가 리디렉션에 쓸 한 부분을 저장합니다.',
+  wildcardHelp: 'RequestOrbit의 간단한 캡처 방식입니다. 각 *가 리디렉션에 쓸 한 부분을 저장합니다.',
   regularExpression: '정규식',
   regexShort: '정규식',
   regexHelp: '정확한 일치와 리디렉션 캡처를 위해 현재 브라우저가 검사하는 정규식입니다.',
@@ -499,7 +499,7 @@ const ko = {
   urlFilterNotPermissionPattern: '요청 규칙 문법이며 WebExtension 사이트 권한 일치 패턴은 아닙니다.',
   wildcardExample: '/users/file/42에서는 $1이 users이고 $2가 42입니다.',
   wildcardCaptureHelp:
-    'URL 필터 문법이 아니라 My Webrequest가 제공하는 편의 기능입니다. 각 *가 캡처 하나가 됩니다.',
+    'URL 필터 문법이 아니라 RequestOrbit가 제공하는 편의 기능입니다. 각 *가 캡처 하나가 됩니다.',
   regexStartAnchor: 'URL의 시작입니다.',
   regexLiteralDot: '마침표 자체입니다. 이스케이프하지 않은 점은 임의의 문자입니다.',
   regexCaptureGroup: '일부를 캡처해 순서대로 $1, $2로 사용합니다.',
@@ -600,7 +600,7 @@ const ko = {
   unavailablePage: '이 페이지에서는 사용할 수 없음',
   unsupportedPageTitle: '이 브라우저 페이지는 변경할 수 없습니다',
   unsupportedPageDescription:
-    'My Webrequest는 http:// 및 https:// 페이지만 지원합니다. chrome://, edge://, about: 같은 브라우저 내부 페이지는 브라우저가 보호합니다.',
+    'RequestOrbit는 http:// 및 https:// 페이지만 지원합니다. chrome://, edge://, about: 같은 브라우저 내부 페이지는 브라우저가 보호합니다.',
   allRulesPaused: '모든 규칙이 일시 정지됨',
   siteRulesOne: '이 사이트에 규칙 1개',
   siteRulesMany: '이 사이트에 규칙 {count}개',
@@ -736,7 +736,7 @@ const ko = {
 } satisfies Messages;
 
 const ja = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: '読み込み中…',
   loadingRules: 'リクエストルールを読み込み中…',
   rules: 'ルール',
@@ -844,7 +844,7 @@ const ja = {
   urlFilterHelp: '多くのルールに適したブラウザー標準のパターン構文です。$1 は作りません。',
   wildcard: '簡易ワイルドカード',
   wildcardShort: 'ワイルドカード',
-  wildcardHelp: 'My Webrequest の簡単なキャプチャ方式です。* ごとにリダイレクト用の一部分を保存します。',
+  wildcardHelp: 'RequestOrbit の簡単なキャプチャ方式です。* ごとにリダイレクト用の一部分を保存します。',
   regularExpression: '正規表現',
   regexShort: '正規表現',
   regexHelp: '厳密な一致やリダイレクト用のキャプチャに使い、現在のブラウザーが検証する正規表現です。',
@@ -875,7 +875,7 @@ const ja = {
     'リクエストルールの構文であり、WebExtension のサイト権限用マッチパターンではありません。',
   wildcardExample: '/users/file/42 の場合、$1 は users、$2 は 42 です。',
   wildcardCaptureHelp:
-    'URL フィルターの構文ではなく、My Webrequest 独自の簡易機能です。* ごとに一つの値を取り込みます。',
+    'URL フィルターの構文ではなく、RequestOrbit 独自の簡易機能です。* ごとに一つの値を取り込みます。',
   regexStartAnchor: 'URL の先頭です。',
   regexLiteralDot: 'ピリオドそのものです。エスケープしない点は任意の一文字を表します。',
   regexCaptureGroup: '一部を取り込み、順に $1、$2 として使います。',
@@ -977,7 +977,7 @@ const ja = {
   unavailablePage: 'このページでは利用できません',
   unsupportedPageTitle: 'このブラウザーページは変更できません',
   unsupportedPageDescription:
-    'My Webrequest が対応するのは http:// と https:// のページだけです。chrome://、edge://、about: などのブラウザー内部ページは保護されています。',
+    'RequestOrbit が対応するのは http:// と https:// のページだけです。chrome://、edge://、about: などのブラウザー内部ページは保護されています。',
   allRulesPaused: 'すべてのルールを一時停止中',
   siteRulesOne: 'このサイトのルールは 1 件です',
   siteRulesMany: 'このサイトのルールは {count} 件です',
@@ -1113,7 +1113,7 @@ const ja = {
 } satisfies Messages;
 
 const fr = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: 'Chargement…',
   loadingRules: 'Chargement des règles…',
   rules: 'Règles',
@@ -1224,7 +1224,7 @@ const fr = {
     'Syntaxe native du navigateur, adaptée à la plupart des règles. Elle ne produit pas de valeur $1.',
   wildcard: 'Joker simplifié',
   wildcardShort: 'Joker',
-  wildcardHelp: 'Mode de capture simple de My Webrequest. Chaque * conserve une partie pour la redirection.',
+  wildcardHelp: 'Mode de capture simple de RequestOrbit. Chaque * conserve une partie pour la redirection.',
   regularExpression: 'Expression régulière',
   regexShort: 'Regex',
   regexHelp:
@@ -1256,7 +1256,7 @@ const fr = {
     'C’est la syntaxe d’une règle de requête, pas un motif d’autorisation de site WebExtension.',
   wildcardExample: 'Pour /users/file/42, $1 vaut users et $2 vaut 42.',
   wildcardCaptureHelp:
-    'Ce mode pratique est propre à My Webrequest, ce n’est pas la syntaxe du filtre d’URL. Chaque * crée une capture.',
+    'Ce mode pratique est propre à RequestOrbit, ce n’est pas la syntaxe du filtre d’URL. Chaque * crée une capture.',
   regexStartAnchor: 'Début de l’URL.',
   regexLiteralDot: 'Un point littéral. Sans échappement, le point désigne n’importe quel caractère.',
   regexCaptureGroup: 'Capture une partie pour $1, $2, etc.',
@@ -1362,7 +1362,7 @@ const fr = {
   unavailablePage: 'Indisponible sur cette page',
   unsupportedPageTitle: 'Cette page du navigateur ne peut pas être modifiée',
   unsupportedPageDescription:
-    'My Webrequest prend uniquement en charge les pages http:// et https://. Les pages internes comme chrome://, edge:// et about: sont protégées par le navigateur.',
+    'RequestOrbit prend uniquement en charge les pages http:// et https://. Les pages internes comme chrome://, edge:// et about: sont protégées par le navigateur.',
   allRulesPaused: 'Toutes les règles sont en pause',
   siteRulesOne: '1 règle pour ce site',
   siteRulesMany: '{count} règles pour ce site',
@@ -1507,7 +1507,7 @@ const fr = {
 } satisfies Messages;
 
 const es = {
-  appName: 'My Webrequest',
+  appName: 'RequestOrbit',
   loading: 'Cargando…',
   loadingRules: 'Cargando reglas…',
   rules: 'Reglas',
@@ -1616,7 +1616,7 @@ const es = {
   urlFilterHelp: 'Sintaxis nativa del navegador para la mayoría de reglas. No genera valores como $1.',
   wildcard: 'Comodín simple',
   wildcardShort: 'Comodín',
-  wildcardHelp: 'Modo de captura sencillo de My Webrequest. Cada * guarda una parte para la redirección.',
+  wildcardHelp: 'Modo de captura sencillo de RequestOrbit. Cada * guarda una parte para la redirección.',
   regularExpression: 'Expresión regular',
   regexShort: 'Regex',
   regexHelp: 'Expresión regular comprobada por el navegador activo para coincidencias precisas y capturas.',
@@ -1648,7 +1648,7 @@ const es = {
     'Es la sintaxis de una regla de solicitud, no un patrón de permisos de sitio WebExtension.',
   wildcardExample: 'En /users/file/42, $1 es users y $2 es 42.',
   wildcardCaptureHelp:
-    'Es un modo práctico propio de My Webrequest, no la sintaxis del filtro de URL. Cada * crea una captura.',
+    'Es un modo práctico propio de RequestOrbit, no la sintaxis del filtro de URL. Cada * crea una captura.',
   regexStartAnchor: 'Inicio de la URL.',
   regexLiteralDot: 'Un punto literal. Sin escapar, el punto representa cualquier carácter.',
   regexCaptureGroup: 'Captura una parte para usarla como $1, $2, etc.',
@@ -1751,7 +1751,7 @@ const es = {
   unavailablePage: 'No disponible en esta página',
   unsupportedPageTitle: 'Esta página del navegador no se puede modificar',
   unsupportedPageDescription:
-    'My Webrequest solo es compatible con páginas http:// y https://. Las páginas internas como chrome://, edge:// y about: están protegidas por el navegador.',
+    'RequestOrbit solo es compatible con páginas http:// y https://. Las páginas internas como chrome://, edge:// y about: están protegidas por el navegador.',
   allRulesPaused: 'Todas las reglas están en pausa',
   siteRulesOne: '1 regla para este sitio',
   siteRulesMany: '{count} reglas para este sitio',

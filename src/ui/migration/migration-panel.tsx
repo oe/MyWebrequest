@@ -302,7 +302,7 @@ export function MigrationPanel({
                         kind: 'my-webrequest-legacy-migration',
                         ...migration.bundle,
                       },
-                      `my-webrequest-migration-${migration.bundle.report.sourceFingerprint.slice(0, 12)}.json`,
+                      `request-orbit-migration-${migration.bundle.report.sourceFingerprint.slice(0, 12)}.json`,
                     )
                   }
                 >

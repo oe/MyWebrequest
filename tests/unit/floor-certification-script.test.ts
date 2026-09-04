@@ -20,7 +20,7 @@ async function fixtureRoot(): Promise<string> {
   await mkdir(dist);
   await writeFile(join(root, 'browser-support.json'), JSON.stringify(browserSupport), 'utf8');
 
-  const names = ['chrome', 'edge', 'firefox'].map((target) => `my-webrequest-1.0.0-alpha.1-${target}.zip`);
+  const names = ['chrome', 'edge', 'firefox'].map((target) => `request-orbit-1.0.0-alpha.1-${target}.zip`);
   const rows: string[] = [];
   for (const name of names) {
     const bytes = Buffer.from(`fixture:${name}`);
@@ -100,7 +100,7 @@ describe('browser floor certification script', () => {
 
   it('rejects an archive that changed after SHA256SUMS was written', async () => {
     const root = await fixtureRoot();
-    await writeFile(join(root, 'dist', 'my-webrequest-1.0.0-alpha.1-chrome.zip'), 'tampered archive', 'utf8');
+    await writeFile(join(root, 'dist', 'request-orbit-1.0.0-alpha.1-chrome.zip'), 'tampered archive', 'utf8');
 
     await expect(
       execFileAsync(process.execPath, [scriptPath], { env: certificationEnvironment(root) }),

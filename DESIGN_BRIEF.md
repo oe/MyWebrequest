@@ -1,4 +1,4 @@
-# My Webrequest Design Brief
+# RequestOrbit Design Brief
 
 Status: Direction selected and implemented as the V1 UI baseline  
 Last updated: 2026-08-31  
@@ -26,8 +26,8 @@ The UI should feel trustworthy, precise, calm, and fast. It should not resemble 
 
 ## 3. Product label and mock data
 
-Use `My Webrequest` as the product label. `Request Rules` may be used only as descriptive copy, never as
-the extension name.
+Use `RequestOrbit` as the product label. `My Webrequest` may appear only when identifying the legacy
+Chrome release; `Request Rules` may be used only as descriptive copy, never as the extension name.
 
 Use realistic mock rules:
 

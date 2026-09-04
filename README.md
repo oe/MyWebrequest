@@ -1,4 +1,4 @@
-# My Webrequest
+# RequestOrbit
 
 A local-first browser extension for creating, testing, and managing request rules. The current rewrite
 uses Manifest V3, WXT, React, TypeScript, Tailwind CSS, and shadcn's default `radix-nova` style with a
@@ -77,7 +77,7 @@ pnpm site:build
 ```
 
 The static site is generated in `site/dist/` and published by `.github/workflows/pages.yml` to
-`https://webrequest.forth.ink/` through GitHub Pages. Its source, components, localized copy, and optimized
+`https://request.forth.ink/` through GitHub Pages. Its source, components, localized copy, and optimized
 image inputs live under `site/src/`.
 
 Create checksummed release candidates after the local gate passes:

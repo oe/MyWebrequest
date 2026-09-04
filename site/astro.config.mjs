@@ -2,7 +2,7 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://webrequest.forth.ink',
+  site: 'https://request.forth.ink',
   base: '/',
   trailingSlash: 'always',
   integrations: [

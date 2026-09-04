@@ -4,11 +4,11 @@ Last updated: 2026-09-01
 
 ## Name
 
-My Webrequest
+RequestOrbit
 
 ## Single-purpose statement
 
-My Webrequest lets a user create, test, authorize, and manage local browser request rules.
+RequestOrbit lets a user create, test, authorize, and manage local browser request rules.
 
 ## Short description
 
@@ -16,7 +16,7 @@ Create local rules to block, redirect, upgrade, or modify matching browser reque
 
 ## Detailed description
 
-My Webrequest is a local-first request-rule manager for developers, QA engineers, support teams, and
+RequestOrbit is a local-first request-rule manager for developers, QA engineers, support teams, and
 advanced users. Its full-page editor makes Manifest V3 request rules understandable without requiring
 manual DNR JSON editing.
 

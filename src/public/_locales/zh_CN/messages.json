@@ -1,11 +1,11 @@
 {
   "appName": {
-    "message": "My Webrequest"
+    "message": "RequestOrbit"
   },
   "appDesc": {
     "message": "在本地创建、测试和管理浏览器请求规则。"
   },
   "actionTitle": {
-    "message": "打开 My Webrequest"
+    "message": "打开 RequestOrbit"
   }
 }

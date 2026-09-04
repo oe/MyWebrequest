@@ -1,5 +1,5 @@
 {
-  "name": "my-webrequest",
+  "name": "request-orbit",
   "version": "1.0.0-alpha.1",
   "description": "A local-first cross-browser request rule manager",
   "private": true,
