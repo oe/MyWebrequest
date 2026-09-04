@@ -394,10 +394,25 @@ test('clean install exposes the product UI without required host access', async 
   await expect(options.getByText('Examples are created disabled')).toBeVisible();
   await options.getByRole('button', { name: /Block analytics/ }).click();
   await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
+  await expect(options.getByText('Current matching scope', { exact: true })).toBeVisible();
+  await expect(options.getByText(/Matches this domain and its subdomains/)).toBeVisible();
+  const quickChecks = options.getByText('One-click boundary checks', { exact: true }).locator('..');
+  const matchingCheck = quickChecks.getByRole('button').filter({ hasText: 'Rule matches' });
+  const nonMatchingCheck = quickChecks.getByRole('button').filter({ hasText: 'No match' });
+  await expect(matchingCheck).toContainText('https://analytics.example.com/');
+  await expect(nonMatchingCheck).toContainText('https://not-matched.invalid/request-orbit-check');
+  await nonMatchingCheck.click();
+  await expect(
+    options.getByRole('alert').filter({ hasText: 'The URL does not match this rule.' }),
+  ).toBeVisible();
+  await matchingCheck.click();
+  await expect(options.getByRole('alert').filter({ hasText: 'Request blocked' })).toBeVisible();
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   const matchHelp = options.locator('[data-slot="popover-content"]');
   await expect(matchHelp.getByText('URL filter syntax', { exact: true })).toBeVisible();
   await expect(matchHelp.getByText('browser-native pattern syntax', { exact: false })).toBeVisible();
+  await expect(matchHelp.getByText('https://cdn.example.com/assets/app.css')).toBeVisible();
+  await expect(matchHelp.getByText('https://notexample.com/app.js')).toBeVisible();
   await expect(matchHelp.getByRole('link', { name: 'See the matching guide' })).toHaveAttribute(
     'href',
     'https://request.forth.ink/guides/matching/',
@@ -411,6 +426,7 @@ test('clean install exposes the product UI without required host access', async 
   await expect(options.getByRole('option')).toHaveCount(3);
   await options.getByRole('option', { name: 'Simple wildcard' }).click();
   await expect(matchSyntax).toHaveAccessibleName('Matching syntax: Wildcard');
+  await expect(options.getByText(/Captured parts: 1/)).toBeVisible();
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   await expect(matchHelp.getByText('Simple wildcard syntax', { exact: true })).toBeVisible();
   await expect(matchHelp.getByText('RequestOrbit convenience mode', { exact: false })).toBeVisible();

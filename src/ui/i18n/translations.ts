@@ -120,6 +120,15 @@ const zhCN = {
   useSimpleWildcard: '使用简易通配符',
   convertToRegularExpression: '转换为正则表达式',
   matchHelp: '普通规则用 URL 过滤器，简单捕获用简易通配符，复杂逻辑再用正则。',
+  matchGuidanceTitle: '当前匹配范围',
+  urlFilterDomainGuidance: '会匹配这个域名及其子域名；末尾的 ^ 可阻止相似域名误匹配。',
+  urlFilterExactGuidance: '只匹配一个完整 URL；增加路径或查询参数后将不再匹配。',
+  urlFilterPathGuidance: '* 可以匹配路径中的任意内容，但 URL 过滤器不会把它保存为 $1。',
+  urlFilterTextGuidance: '没有 | 锚点时，这段文字可能出现在 URL 的任意位置；精确匹配时请加锚点。',
+  wildcardGuidance: '要求整个 URL 完整匹配。当前有 {count} 个捕获位置，每个 * 依次对应 $1、$2……',
+  regexAnchoredGuidance: '^ 和 $ 会要求正则表达式匹配完整 URL。',
+  regexUnanchoredGuidance: '这条正则没有同时限定开头和结尾，因此可能只匹配 URL 的一部分。',
+  quickTestExamples: '一键验证匹配边界',
   matchSyntaxHelpLabel: '打开匹配语法帮助',
   matchSyntaxTitle: '这条 URL 会怎么匹配',
   urlFilterSyntaxTitle: 'URL 过滤器语法',
@@ -486,6 +495,17 @@ const ko = {
   useSimpleWildcard: '간단한 와일드카드 사용',
   convertToRegularExpression: '정규식으로 변환',
   matchHelp: '일반 규칙은 URL 필터, 간단한 캡처는 와일드카드, 고급 조건은 정규식을 사용하세요.',
+  matchGuidanceTitle: '현재 일치 범위',
+  urlFilterDomainGuidance:
+    '이 도메인과 하위 도메인에 일치합니다. 끝의 ^는 비슷한 도메인이 잘못 일치하는 것을 막습니다.',
+  urlFilterExactGuidance: '하나의 완전한 URL만 일치합니다. 경로나 쿼리가 추가되면 일치하지 않습니다.',
+  urlFilterPathGuidance: '*는 경로의 모든 텍스트와 일치하지만 URL 필터에서는 $1로 저장되지 않습니다.',
+  urlFilterTextGuidance:
+    '| 앵커가 없으면 URL 어디에서나 이 텍스트가 일치할 수 있습니다. 정확한 URL에는 앵커를 추가하세요.',
+  wildcardGuidance: '전체 URL이 일치해야 합니다. 캡처 수: {count}. 각 *는 차례로 $1, $2가 됩니다.',
+  regexAnchoredGuidance: '^와 $ 앵커가 정규식이 전체 URL과 일치하도록 제한합니다.',
+  regexUnanchoredGuidance: '양 끝이 고정되지 않아 URL의 일부만 일치할 수 있습니다.',
+  quickTestExamples: '한 번에 경계 확인',
   matchSyntaxHelpLabel: '일치 문법 도움말 열기',
   matchSyntaxTitle: '이 URL이 일치하는 방식',
   urlFilterSyntaxTitle: 'URL 필터 문법',
@@ -861,6 +881,18 @@ const ja = {
   useSimpleWildcard: '簡易ワイルドカードを使う',
   convertToRegularExpression: '正規表現に変換',
   matchHelp: '通常は URL フィルター、簡単なキャプチャはワイルドカード、高度な条件は正規表現を使います。',
+  matchGuidanceTitle: '現在の一致範囲',
+  urlFilterDomainGuidance:
+    'このドメインとサブドメインに一致します。末尾の ^ により、似たドメインへの誤一致を防ぎます。',
+  urlFilterExactGuidance: '完全な URL ひとつだけに一致します。パスやクエリが増えると一致しません。',
+  urlFilterPathGuidance: '* はパス内の任意の文字に一致しますが、URL フィルターでは $1 に保存されません。',
+  urlFilterTextGuidance:
+    '| アンカーがないため、URL の途中でも一致する可能性があります。完全一致にはアンカーを追加してください。',
+  wildcardGuidance:
+    'URL 全体が一致する必要があります。取り込み数は {count} 個で、各 * が順に $1、$2 になります。',
+  regexAnchoredGuidance: '^ と $ により、正規表現は URL 全体に一致する必要があります。',
+  regexUnanchoredGuidance: '両端が固定されていないため、URL の一部だけに一致する可能性があります。',
+  quickTestExamples: 'ワンクリックで境界を確認',
   matchSyntaxHelpLabel: '一致構文のヘルプを開く',
   matchSyntaxTitle: 'この URL の一致方法',
   urlFilterSyntaxTitle: 'URL フィルターの構文',
@@ -1242,6 +1274,21 @@ const fr = {
   useSimpleWildcard: 'Utiliser un joker simplifié',
   convertToRegularExpression: 'Convertir en expression régulière',
   matchHelp: 'Filtre d’URL au quotidien, joker simplifié pour les captures, regex pour la logique avancée.',
+  matchGuidanceTitle: 'Portée actuelle',
+  urlFilterDomainGuidance:
+    'Correspond à ce domaine et à ses sous-domaines. Le ^ final évite les domaines ressemblants.',
+  urlFilterExactGuidance:
+    'Correspond uniquement à une URL complète. Un chemin ou une requête supplémentaire ne correspond pas.',
+  urlFilterPathGuidance:
+    'Le * accepte tout texte dans ce chemin, mais le filtre d’URL ne le conserve pas dans $1.',
+  urlFilterTextGuidance:
+    'Sans ancres |, ce texte peut correspondre n’importe où dans l’URL. Ajoutez-les pour une URL exacte.',
+  wildcardGuidance:
+    'Toute l’URL doit correspondre. Parties capturées : {count}. Chaque * devient $1, $2, etc.',
+  regexAnchoredGuidance: 'Les ancres ^ et $ imposent une correspondance avec l’URL complète.',
+  regexUnanchoredGuidance:
+    'Cette expression n’est pas ancrée aux deux extrémités et peut ne viser qu’une partie de l’URL.',
+  quickTestExamples: 'Vérifier les limites en un clic',
   matchSyntaxHelpLabel: 'Ouvrir l’aide sur la syntaxe',
   matchSyntaxTitle: 'Comment cette URL est comparée',
   urlFilterSyntaxTitle: 'Syntaxe du filtre d’URL',
@@ -1634,6 +1681,21 @@ const es = {
   convertToRegularExpression: 'Convertir en expresión regular',
   matchHelp:
     'Filtro de URL para reglas habituales, comodín simple para capturas y regex para lógica avanzada.',
+  matchGuidanceTitle: 'Alcance actual',
+  urlFilterDomainGuidance:
+    'Coincide con este dominio y sus subdominios. El ^ final evita dominios con nombres parecidos.',
+  urlFilterExactGuidance:
+    'Solo coincide con una URL completa. Las rutas o consultas adicionales no coinciden.',
+  urlFilterPathGuidance:
+    'El * acepta cualquier texto en esta ruta, pero el filtro de URL no lo guarda como $1.',
+  urlFilterTextGuidance:
+    'Sin anclas |, este texto puede coincidir en cualquier parte de la URL. Añádelas para una URL exacta.',
+  wildcardGuidance:
+    'Debe coincidir toda la URL. Partes capturadas: {count}. Cada * se convierte en $1, $2, etc.',
+  regexAnchoredGuidance: 'Las anclas ^ y $ obligan a que la expresión coincida con toda la URL.',
+  regexUnanchoredGuidance:
+    'La expresión no está anclada en ambos extremos y puede coincidir solo con parte de una URL.',
+  quickTestExamples: 'Comprobar los límites con un clic',
   matchSyntaxHelpLabel: 'Abrir ayuda sobre la sintaxis',
   matchSyntaxTitle: 'Cómo se compara esta URL',
   urlFilterSyntaxTitle: 'Sintaxis del filtro de URL',

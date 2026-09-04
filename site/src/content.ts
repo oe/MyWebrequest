@@ -483,17 +483,31 @@ Destination   http://localhost:5173/checkout.js`,
 
 const matchingExamples = {
   urlFilter: `||example.com^
+  ✓ https://example.com/
+  ✓ https://api.example.com/v1/users
+  ✕ https://example.company/
+  ✕ https://notexample.com/
+
 |https://example.com/app.js|
-https://example.com/assets/*`,
+  ✓ https://example.com/app.js
+  ✕ https://example.com/app.js?v=2
+  ✕ https://cdn.example.com/app.js
+
+https://example.com/assets/*
+  ✓ https://example.com/assets/app.js
+  ✕ https://example.com/api/app.js`,
   captures: `Simple wildcard
 Match         https://api.example.com/v1/*
-Request       https://api.example.com/v1/users/42
+✓ Request     https://api.example.com/v1/users/42
+✕ Request     https://api.example.com/v2/users/42
 $1 = users/42
 Destination   http://localhost:3000/v1/$1
 
 Regular expression
 Match         ^https://api\\.example\\.com/v1/(users|projects)/([^?]+)$
-Request       https://api.example.com/v1/projects/alpha
+✓ Request     https://api.example.com/v1/projects/alpha
+✕ Request     https://api.example.com/v1/teams/alpha
+✕ Request     https://api.example.com/v1/projects/alpha?draft=1
 $1 = projects, $2 = alpha
 Destination   https://api.example.com/v2/$1/$2`,
 } as const;

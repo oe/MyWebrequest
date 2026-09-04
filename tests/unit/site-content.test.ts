@@ -106,9 +106,33 @@ describe('website content matrix', () => {
       expect(text).toContain('$1');
       expect(text).toContain('$2');
       expect(text).toContain('declarativeNetRequest');
+      expect(text).toContain('https://api.example.com/v1/users');
+      expect(text).toContain('https://example.company/');
+      expect(text).toContain('https://example.com/app.js?v=2');
+      expect(text).toContain('https://api.example.com/v1/teams/alpha');
       expect(matching.sections[0]?.points).toHaveLength(3);
       expect(matching.sections.filter((section) => section.code)).toHaveLength(2);
     }
+  });
+
+  it('keeps the documented match and non-match boundaries executable', () => {
+    const domain = redirectRule({ kind: 'url-filter', value: '||example.com^' }, 'https://target.example/');
+    const exact = redirectRule(
+      { kind: 'url-filter', value: '|https://example.com/app.js|' },
+      'https://target.example/',
+    );
+    const assets = redirectRule(
+      { kind: 'url-filter', value: 'https://example.com/assets/*' },
+      'https://target.example/',
+    );
+
+    expect(matchRule(domain, 'https://api.example.com/v1/users').matched).toBe(true);
+    expect(matchRule(domain, 'https://example.company/').matched).toBe(false);
+    expect(matchRule(domain, 'https://notexample.com/').matched).toBe(false);
+    expect(matchRule(exact, 'https://example.com/app.js').matched).toBe(true);
+    expect(matchRule(exact, 'https://example.com/app.js?v=2').matched).toBe(false);
+    expect(matchRule(assets, 'https://example.com/assets/app.js').matched).toBe(true);
+    expect(matchRule(assets, 'https://example.com/api/app.js').matched).toBe(false);
   });
 
   it('keeps the documented redirect capture recipes executable', () => {

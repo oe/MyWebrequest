@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { convertedMatchValue, regexWithWildcardCaptures, suggestedMatchKind } from '@/ui/rules/match-kind';
+import {
+  convertedMatchValue,
+  guidanceForMatch,
+  regexWithWildcardCaptures,
+  suggestedMatchKind,
+  suggestedTestUrls,
+} from '@/ui/rules/match-kind';
 
 describe('match syntax assistance', () => {
   it('suggests regex only for a strongly anchored expression', () => {
@@ -40,5 +46,34 @@ describe('match syntax assistance', () => {
 
   it('turns every wildcard into a redirect capture group', () => {
     expect(regexWithWildcardCaptures('https://example.com/*')).toBe('^https://example\\.com/(.*)$');
+  });
+
+  it('explains the effective scope of each matching style', () => {
+    expect(guidanceForMatch('url-filter', '||example.com^')).toEqual({ kind: 'url-filter-domain' });
+    expect(guidanceForMatch('url-filter', '|https://example.com/app.js|')).toEqual({
+      kind: 'url-filter-exact',
+    });
+    expect(guidanceForMatch('url-filter', 'https://example.com/assets/*')).toEqual({
+      kind: 'url-filter-path',
+    });
+    expect(guidanceForMatch('wildcard', 'https://example.com/*/file/*')).toEqual({
+      kind: 'wildcard',
+      captureCount: 2,
+    });
+    expect(guidanceForMatch('regex', '^https://example\\.com/(.*)$')).toEqual({
+      kind: 'regex-anchored',
+    });
+    expect(guidanceForMatch('regex', 'example\\.com')).toEqual({ kind: 'regex-unanchored' });
+  });
+
+  it('offers verified matching and non-matching URLs for common patterns', () => {
+    expect(suggestedTestUrls('url-filter', '||example.com^', '')).toEqual({
+      matching: 'https://example.com/example',
+      nonMatching: 'https://not-matched.invalid/request-orbit-check',
+    });
+    expect(suggestedTestUrls('wildcard', 'https://api.example.com/v1/*', '')).toEqual({
+      matching: 'https://api.example.com/v1/users/42',
+      nonMatching: 'https://not-matched.invalid/request-orbit-check',
+    });
   });
 });

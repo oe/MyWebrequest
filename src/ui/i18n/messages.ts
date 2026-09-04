@@ -172,6 +172,19 @@ export const en = {
   useSimpleWildcard: 'Use simple wildcard',
   convertToRegularExpression: 'Convert to regular expression',
   matchHelp: 'URL filter for everyday rules, simple wildcard for easy captures, or regex for advanced logic.',
+  matchGuidanceTitle: 'Current matching scope',
+  urlFilterDomainGuidance:
+    'Matches this domain and its subdomains. The trailing ^ prevents look-alike domains from matching.',
+  urlFilterExactGuidance: 'Matches one complete URL only. Extra paths or query strings do not match.',
+  urlFilterPathGuidance:
+    'The * can match any text in this path, but URL filters do not save that text for $1.',
+  urlFilterTextGuidance:
+    'Without | anchors, this text may match anywhere in the URL. Add anchors when you need an exact URL.',
+  wildcardGuidance: 'The whole URL must match. Captured parts: {count}. Each * becomes $1, $2, and so on.',
+  regexAnchoredGuidance: 'The ^ and $ anchors require the regular expression to match the complete URL.',
+  regexUnanchoredGuidance:
+    'This expression is not anchored at both ends, so it may match only part of a URL.',
+  quickTestExamples: 'One-click boundary checks',
   matchSyntaxHelpLabel: 'Open match syntax help',
   matchSyntaxTitle: 'How this URL is matched',
   urlFilterSyntaxTitle: 'URL filter syntax',

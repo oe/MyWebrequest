@@ -64,7 +64,10 @@ import { errorMessage } from '@/ui/lib/error-message';
 import { localizedResourceTypeLabel } from './filter-rules';
 import {
   convertedMatchValue,
+  guidanceForMatch,
   regexWithWildcardCaptures,
+  suggestedTestUrls,
+  type MatchGuidance,
   suggestedMatchKind,
   type MatchKind,
 } from './match-kind';
@@ -161,6 +164,25 @@ function matchResultText(result: MatchResult, t: Translate): string {
   return result.result;
 }
 
+function matchGuidanceText(guidance: MatchGuidance, t: Translate): string {
+  switch (guidance.kind) {
+    case 'url-filter-domain':
+      return t('urlFilterDomainGuidance');
+    case 'url-filter-exact':
+      return t('urlFilterExactGuidance');
+    case 'url-filter-path':
+      return t('urlFilterPathGuidance');
+    case 'url-filter-text':
+      return t('urlFilterTextGuidance');
+    case 'wildcard':
+      return t('wildcardGuidance', { count: guidance.captureCount });
+    case 'regex-anchored':
+      return t('regexAnchoredGuidance');
+    case 'regex-unanchored':
+      return t('regexUnanchoredGuidance');
+  }
+}
+
 function exampleUrlForRule(rule: Rule): string {
   const { kind, value } = rule.condition.url;
   if (kind === 'url-filter' && value.startsWith('||')) {
@@ -232,6 +254,14 @@ export function RuleEditor({
     draft.condition.url.kind === 'url-filter' &&
     /^https?:\/\//.test(draft.condition.url.value) &&
     draft.condition.url.value.includes('*');
+  const matchGuidance = useMemo(
+    () => guidanceForMatch(draft.condition.url.kind, draft.condition.url.value),
+    [draft.condition.url.kind, draft.condition.url.value],
+  );
+  const suggestedUrls = useMemo(
+    () => suggestedTestUrls(draft.condition.url.kind, draft.condition.url.value, testUrl),
+    [draft.condition.url.kind, draft.condition.url.value, testUrl],
+  );
 
   useEffect(() => {
     onDirtyChange(dirty);
@@ -289,6 +319,11 @@ export function RuleEditor({
 
   const runTest = () => {
     setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, testUrl) });
+  };
+
+  const runSuggestedTest = (url: string) => {
+    setTestUrl(url);
+    setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, url) });
   };
 
   const performSave = async () => {
@@ -514,6 +549,10 @@ export function RuleEditor({
                       : 'regexHelp',
                 )}
               </FieldDescription>
+              <div className="rounded-lg border bg-muted/35 p-3 text-sm">
+                <p className="font-medium text-foreground">{t('matchGuidanceTitle')}</p>
+                <p className="mt-1 text-muted-foreground">{matchGuidanceText(matchGuidance, t)}</p>
+              </div>
               {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
               {regexRuntimeError ? <FieldError>{regexRuntimeError}</FieldError> : null}
               {showMatchSuggestion && suggestedKind === 'regex' ? (
@@ -846,6 +885,45 @@ export function RuleEditor({
                 </InputGroupAddon>
               </InputGroup>
             </Field>
+            {suggestedUrls.matching || suggestedUrls.nonMatching ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium text-muted-foreground">{t('quickTestExamples')}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {suggestedUrls.matching ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-auto min-w-0 justify-start py-2.5 text-left"
+                      onClick={() => runSuggestedTest(suggestedUrls.matching!)}
+                    >
+                      <CheckCircle2Icon className="text-emerald-600" />
+                      <span className="min-w-0">
+                        <span className="block text-xs text-muted-foreground">{t('ruleMatches')}</span>
+                        <code className="block truncate font-mono text-xs text-foreground">
+                          {suggestedUrls.matching}
+                        </code>
+                      </span>
+                    </Button>
+                  ) : null}
+                  {suggestedUrls.nonMatching ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="h-auto min-w-0 justify-start py-2.5 text-left"
+                      onClick={() => runSuggestedTest(suggestedUrls.nonMatching!)}
+                    >
+                      <CircleAlertIcon className="text-amber-600" />
+                      <span className="min-w-0">
+                        <span className="block text-xs text-muted-foreground">{t('noMatch')}</span>
+                        <code className="block truncate font-mono text-xs text-foreground">
+                          {suggestedUrls.nonMatching}
+                        </code>
+                      </span>
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
             {testResult ? (
               <Alert variant={testResult.matched ? 'success' : 'default'}>
                 {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}

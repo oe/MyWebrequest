@@ -1,4 +1,4 @@
-import { CircleHelpIcon, ExternalLinkIcon } from 'lucide-react';
+import { CheckIcon, CircleHelpIcon, ExternalLinkIcon, XIcon } from 'lucide-react';
 
 import type { Rule } from '@/domain/rules/model';
 import { Button } from '@/ui/components/button';
@@ -14,6 +14,31 @@ import { helpUrl } from '@/ui/help-links';
 import { useI18n, type Translate } from '@/ui/i18n';
 
 type MatchKind = Rule['condition']['url']['kind'];
+
+function OutcomeExamples({ matches, misses, t }: { matches: string[]; misses: string[]; t: Translate }) {
+  return (
+    <div className="grid gap-2 text-xs">
+      <div className="grid gap-1.5">
+        <span className="font-medium text-foreground">{t('ruleMatches')}</span>
+        {matches.map((url) => (
+          <span key={url} className="flex min-w-0 items-start gap-2 text-muted-foreground">
+            <CheckIcon className="mt-0.5 size-3.5 shrink-0 text-emerald-600" aria-hidden="true" />
+            <code className="font-mono break-all">{url}</code>
+          </span>
+        ))}
+      </div>
+      <div className="grid gap-1.5">
+        <span className="font-medium text-foreground">{t('noMatch')}</span>
+        {misses.map((url) => (
+          <span key={url} className="flex min-w-0 items-start gap-2 text-muted-foreground">
+            <XIcon className="mt-0.5 size-3.5 shrink-0 text-destructive" aria-hidden="true" />
+            <code className="font-mono break-all">{url}</code>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function UrlFilterHelp({ t }: { t: Translate }) {
   const symbols = [
@@ -39,6 +64,11 @@ function UrlFilterHelp({ t }: { t: Translate }) {
         <code className="font-mono text-foreground">||example.com^</code>
         <span className="text-muted-foreground">{t('urlFilterExample')}</span>
       </div>
+      <OutcomeExamples
+        t={t}
+        matches={['https://example.com/app.js', 'https://cdn.example.com/assets/app.css']}
+        misses={['https://example.company/app.js', 'https://notexample.com/app.js']}
+      />
       <p className="text-xs text-muted-foreground">{t('urlFilterNotPermissionPattern')}</p>
     </div>
   );
@@ -55,6 +85,11 @@ function WildcardHelp({ t }: { t: Translate }) {
         <span className="text-muted-foreground">{t('redirectDestinationExample')}</span>
         <code className="font-mono break-all text-foreground">https://new.example.com/$1/$2</code>
       </div>
+      <OutcomeExamples
+        t={t}
+        matches={['https://example.com/users/file/42']}
+        misses={['http://example.com/users/file/42', 'https://example.com/users/42']}
+      />
       <p className="text-xs text-muted-foreground">{t('wildcardCaptureHelp')}</p>
     </div>
   );
@@ -91,6 +126,14 @@ function RegexHelp({ t }: { t: Translate }) {
         <span className="text-muted-foreground">{t('redirectDestinationExample')}</span>
         <code className="font-mono break-all text-foreground">https://api.example.com/v2/$1/$2</code>
       </div>
+      <OutcomeExamples
+        t={t}
+        matches={['https://api.example.com/v1/projects/alpha']}
+        misses={[
+          'https://api.example.com/v1/teams/alpha',
+          'https://api.example.com/v1/projects/alpha?draft=1',
+        ]}
+      />
       <p className="text-xs text-muted-foreground">{t('captureReferenceHelp')}</p>
     </div>
   );
@@ -108,7 +151,10 @@ export function MatchHelpPopover({ kind }: { kind: MatchKind }) {
           <CircleHelpIcon />
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-[min(22rem,calc(100vw-2rem))]">
+      <PopoverContent
+        align="start"
+        className="max-h-[min(32rem,calc(100vh-2rem))] w-[min(22rem,calc(100vw-2rem))] overflow-y-auto"
+      >
         <PopoverHeader>
           <PopoverTitle>
             {t(
