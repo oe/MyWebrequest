@@ -30,11 +30,11 @@ export function LanguageMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          className="w-full justify-start max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
+          className="w-full justify-start max-[1049px]:mx-auto max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
           variant="ghost"
           aria-label={t('language')}
         >
-          <LanguagesIcon data-icon="inline-start" />
+          <LanguagesIcon aria-hidden="true" />
           <span className="truncate max-[1049px]:sr-only">{t('language')}</span>
         </Button>
       </DropdownMenuTrigger>

@@ -45,12 +45,12 @@ export function SettingsMenu({
           className={cn(
             compact
               ? 'size-9 p-0'
-              : 'w-full justify-start max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0',
+              : 'w-full justify-start max-[1049px]:mx-auto max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0',
           )}
           variant={compact ? 'outline' : 'ghost'}
           aria-label={t('settings')}
         >
-          <SettingsIcon data-icon="inline-start" />
+          <SettingsIcon aria-hidden="true" />
           <span className={compact ? 'sr-only' : 'truncate max-[1049px]:sr-only'}>{t('settings')}</span>
         </Button>
       </DropdownMenuTrigger>

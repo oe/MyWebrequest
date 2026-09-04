@@ -380,6 +380,18 @@ test('clean install exposes the product UI without required host access', async 
   await expect(primaryNavigation.getByRole('button', { name: 'Rules' })).toBeVisible();
   await expect(primaryNavigation.getByText('Legacy migration')).toHaveCount(0);
 
+  await options.setViewportSize({ width: 1_000, height: 900 });
+  const sidebarBox = await options.locator('aside').boundingBox();
+  expect(sidebarBox).not.toBeNull();
+  for (const buttonName of ['Rules', 'Language', 'Settings']) {
+    const buttonBox = await options.getByRole('button', { name: buttonName, exact: true }).boundingBox();
+    expect(buttonBox).not.toBeNull();
+    expect(
+      Math.abs(sidebarBox!.x + sidebarBox!.width / 2 - (buttonBox!.x + buttonBox!.width / 2)),
+    ).toBeLessThanOrEqual(1);
+  }
+  await options.setViewportSize({ width: 1_280, height: 900 });
+
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
   await expect(options.getByRole('menuitem', { name: 'Help & guides' })).toHaveAttribute(
     'href',
@@ -394,6 +406,12 @@ test('clean install exposes the product UI without required host access', async 
   await expect(options.getByText('Examples are created disabled')).toBeVisible();
   await options.getByRole('button', { name: /Block analytics/ }).click();
   await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
+  const scriptResourceType = options
+    .getByRole('group', { name: 'Resource types' })
+    .getByRole('button', { name: 'Script', exact: true });
+  await scriptResourceType.click();
+  await expect(scriptResourceType).toHaveAttribute('aria-pressed', 'true');
+  await expect(scriptResourceType).toHaveAttribute('data-variant', 'default');
   await expect(options.getByText('Current matching scope', { exact: true })).toBeVisible();
   await expect(options.getByText(/Matches this domain and its subdomains/)).toBeVisible();
   const quickChecks = options.getByText('One-click boundary checks', { exact: true }).locator('..');
@@ -403,10 +421,24 @@ test('clean install exposes the product UI without required host access', async 
   await expect(nonMatchingCheck).toContainText('https://not-matched.invalid/request-orbit-check');
   await nonMatchingCheck.click();
   await expect(
-    options.getByRole('alert').filter({ hasText: 'The URL does not match this rule.' }),
+    options.getByRole('status').filter({ hasText: 'The URL does not match this rule.' }),
   ).toBeVisible();
   await matchingCheck.click();
-  await expect(options.getByRole('alert').filter({ hasText: 'Request blocked' })).toBeVisible();
+  await expect(options.getByRole('status').filter({ hasText: 'Request blocked' })).toBeVisible();
+  await expect(options.getByText('Live preview', { exact: true })).toBeVisible();
+  await expect(options.getByText(/updates as you type/)).toBeVisible();
+  const testUrl = options.getByRole('textbox', { name: 'Test URL' });
+  const testButton = options.getByRole('button', { name: 'Test rule' });
+  await testUrl.fill('https://not-matched.invalid/request-orbit-check');
+  await expect(
+    options.getByRole('status').filter({ hasText: 'The URL does not match this rule.' }),
+  ).toBeVisible();
+  await expect(testButton).toContainText('Test');
+  await testButton.click();
+  await expect(testButton).toContainText('Tested');
+  await testUrl.fill('https://analytics.example.com/app.js');
+  await expect(options.getByRole('status').filter({ hasText: 'Request blocked' })).toBeVisible();
+  await expect(testButton).toContainText('Test');
   await options.getByRole('button', { name: 'Open match syntax help' }).click();
   const matchHelp = options.locator('[data-slot="popover-content"]');
   await expect(matchHelp.getByText('URL filter syntax', { exact: true })).toBeVisible();
@@ -545,7 +577,8 @@ test('appearance follows the system and stays synchronized across extension surf
   await expect(options.locator('html')).toHaveClass(/dark/);
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
-  await options.getByRole('menuitem', { name: 'Appearance', exact: true }).hover();
+  await expect(options.getByText('Appearance', { exact: true })).toBeVisible();
+  await expect(options.getByRole('menuitemradio', { name: 'Light', exact: true })).toBeVisible();
   await options.getByRole('menuitemradio', { name: 'Light', exact: true }).click();
   await expect(options.locator('html')).toHaveAttribute('data-theme-preference', 'light');
   await expect(options.locator('html')).toHaveAttribute('data-theme', 'light');

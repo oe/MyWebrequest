@@ -37,7 +37,10 @@ export function AppSidebar({
       data-material="glass-sidebar"
       className="flex min-h-0 flex-col border-r p-3 max-[1049px]:items-center max-[799px]:hidden"
     >
-      <nav aria-label={t('primaryNavigation')} className="flex w-full flex-col gap-1">
+      <nav
+        aria-label={t('primaryNavigation')}
+        className="flex w-full flex-col gap-1 max-[1049px]:items-center"
+      >
         {items.map((item) => {
           const Icon = item.icon;
           const active = view === item.id;
@@ -47,11 +50,11 @@ export function AppSidebar({
               <TooltipTrigger asChild>
                 <Button
                   aria-current={active ? 'page' : undefined}
-                  className="relative w-full justify-start max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
+                  className="relative w-full justify-start max-[1049px]:mx-auto max-[1049px]:size-9 max-[1049px]:justify-center max-[1049px]:p-0"
                   variant={active ? 'secondary' : 'ghost'}
                   onClick={() => onViewChange(item.id)}
                 >
-                  <Icon data-icon="inline-start" />
+                  <Icon aria-hidden="true" />
                   <span className="max-[1049px]:sr-only">{item.label}</span>
                   {count > 0 ? (
                     <Badge

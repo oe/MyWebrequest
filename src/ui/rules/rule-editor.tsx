@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeftIcon,
+  CheckIcon,
   CheckCircle2Icon,
   CircleAlertIcon,
   CopyIcon,
@@ -27,6 +28,7 @@ import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { matchRule, type MatchResult } from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
+import { Badge } from '@/ui/components/badge';
 import { Button } from '@/ui/components/button';
 import {
   Dialog,
@@ -212,10 +214,7 @@ export function RuleEditor({
   const [draft, setDraft] = useState(rule);
   const [advanced, setAdvanced] = useState(false);
   const [testUrl, setTestUrl] = useState(initialTestUrl);
-  const [testedDraft, setTestedDraft] = useState<{ fingerprint: string; result: MatchResult } | null>(() => ({
-    fingerprint: JSON.stringify(rule),
-    result: matchRule(rule, initialTestUrl),
-  }));
+  const [confirmedPreview, setConfirmedPreview] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -226,7 +225,9 @@ export function RuleEditor({
 
   const validation = useMemo(() => validateRule(draft), [draft]);
   const draftFingerprint = useMemo(() => JSON.stringify(draft), [draft]);
-  const testResult = testedDraft?.fingerprint === draftFingerprint ? testedDraft.result : null;
+  const previewFingerprint = `${draftFingerprint}:${testUrl}`;
+  const testResult = useMemo(() => matchRule(draft, testUrl), [draft, testUrl]);
+  const previewConfirmed = confirmedPreview === previewFingerprint;
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(rule), [draft, rule]);
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
   const matchError = validation.errors.find((issue) => issue.field === 'match');
@@ -318,12 +319,12 @@ export function RuleEditor({
   };
 
   const runTest = () => {
-    setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, testUrl) });
+    setConfirmedPreview(previewFingerprint);
   };
 
   const runSuggestedTest = (url: string) => {
     setTestUrl(url);
-    setTestedDraft({ fingerprint: draftFingerprint, result: matchRule(draft, url) });
+    setConfirmedPreview(`${draftFingerprint}:${url}`);
   };
 
   const performSave = async () => {
@@ -587,7 +588,7 @@ export function RuleEditor({
                       key={type}
                       type="button"
                       size="sm"
-                      variant={selected ? 'secondary' : 'outline'}
+                      variant={selected ? 'default' : 'outline'}
                       aria-pressed={selected}
                       disabled={readOnly}
                       onClick={() =>
@@ -600,6 +601,7 @@ export function RuleEditor({
                         }))
                       }
                     >
+                      {selected ? <CheckIcon aria-hidden="true" /> : null}
                       {localizedResourceTypeLabel(type, t)}
                     </Button>
                   );
@@ -862,7 +864,10 @@ export function RuleEditor({
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1">
-              <h2 className="text-base font-medium">{t('testRule')}</h2>
+              <div className="flex items-center gap-2">
+                <h2 className="text-base font-medium">{t('testRule')}</h2>
+                <Badge variant="success">{t('livePreview')}</Badge>
+              </div>
               <p className="text-sm text-muted-foreground">{t('testRuleDescription')}</p>
             </div>
             <Field>
@@ -878,9 +883,17 @@ export function RuleEditor({
                   }}
                 />
                 <InputGroupAddon align="inline-end">
-                  <InputGroupButton aria-label={t('testRule')} onClick={runTest}>
-                    <PlayIcon data-icon="inline-start" />
-                    {t('test')}
+                  <InputGroupButton
+                    aria-label={t('testRule')}
+                    variant={previewConfirmed ? 'secondary' : 'ghost'}
+                    onClick={runTest}
+                  >
+                    {previewConfirmed ? (
+                      <CheckIcon data-icon="inline-start" />
+                    ) : (
+                      <PlayIcon data-icon="inline-start" />
+                    )}
+                    {t(previewConfirmed ? 'tested' : 'test')}
                   </InputGroupButton>
                 </InputGroupAddon>
               </InputGroup>
@@ -924,15 +937,16 @@ export function RuleEditor({
                 </div>
               </div>
             ) : null}
-            {testResult ? (
-              <Alert variant={testResult.matched ? 'success' : 'default'}>
-                {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
-                <AlertTitle>{t(testResult.matched ? 'ruleMatches' : 'noMatch')}</AlertTitle>
-                <AlertDescription className="font-mono break-all">
-                  {matchResultText(testResult, t)}
-                </AlertDescription>
-              </Alert>
-            ) : null}
+            <Alert role="status" aria-live="polite" variant={testResult.matched ? 'success' : 'default'}>
+              {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
+              <AlertTitle>{t(testResult.matched ? 'ruleMatches' : 'noMatch')}</AlertTitle>
+              <AlertDescription>
+                <span className="block font-mono break-all">{matchResultText(testResult, t)}</span>
+                <span className="mt-1 block text-xs">
+                  {t('previewUrl')}: <code className="font-mono break-all">{testUrl}</code>
+                </span>
+              </AlertDescription>
+            </Alert>
           </div>
 
           {advanced ? (

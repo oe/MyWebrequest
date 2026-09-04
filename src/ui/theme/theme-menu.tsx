@@ -8,9 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/ui/components/dropdown-menu';
 import { useI18n } from '@/ui/i18n';
@@ -58,15 +56,14 @@ export function ThemeMenu({ variant = 'standalone' }: { variant?: 'standalone' |
 
   if (variant === 'sub') {
     return (
-      <DropdownMenuSub>
-        <DropdownMenuSubTrigger>
+      <>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel className="flex items-center gap-1.5">
           <PreferenceIcon preference={preference} />
           {t('theme')}
-        </DropdownMenuSubTrigger>
-        <DropdownMenuSubContent className="w-40">
-          <ThemeChoices />
-        </DropdownMenuSubContent>
-      </DropdownMenuSub>
+        </DropdownMenuLabel>
+        <ThemeChoices />
+      </>
     );
   }
 
