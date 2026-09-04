@@ -1,4 +1,4 @@
-import { LaptopIcon, MoonIcon, SunIcon } from 'lucide-react';
+import { LaptopIcon, MoonIcon, SunIcon, SunMoonIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { Button } from '@/ui/components/button';
@@ -23,7 +23,7 @@ const choices = [
 
 function PreferenceIcon({ preference }: { preference: ThemePreference }) {
   const Icon = preference === 'dark' ? MoonIcon : preference === 'light' ? SunIcon : LaptopIcon;
-  return <Icon aria-hidden="true" />;
+  return <Icon className="size-4" aria-hidden="true" />;
 }
 
 function ThemeChoices({ inset = false }: { inset?: boolean }) {
@@ -59,7 +59,7 @@ export function ThemeMenu({ variant = 'standalone' }: { variant?: 'standalone' |
       <>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="flex items-center gap-1.5">
-          <PreferenceIcon preference={preference} />
+          <SunMoonIcon className="size-4" aria-hidden="true" />
           {t('theme')}
         </DropdownMenuLabel>
         <ThemeChoices inset />

@@ -577,7 +577,10 @@ test('appearance follows the system and stays synchronized across extension surf
   await expect(options.locator('html')).toHaveClass(/dark/);
 
   await options.getByRole('button', { name: 'Settings', exact: true }).click();
-  await expect(options.getByText('Appearance', { exact: true })).toBeVisible();
+  const appearanceLabel = options.getByText('Appearance', { exact: true });
+  await expect(appearanceLabel).toBeVisible();
+  await expect(appearanceLabel.locator('svg')).toHaveCSS('width', '16px');
+  await expect(appearanceLabel.locator('svg')).toHaveCSS('height', '16px');
   await expect(options.getByRole('menuitemradio', { name: 'Light', exact: true })).toHaveAttribute(
     'data-inset',
     'true',
