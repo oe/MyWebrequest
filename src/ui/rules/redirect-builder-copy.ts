@@ -18,7 +18,6 @@ type Copy = {
   advancedEdit: string;
   hostTarget: string;
 
-  inactive: string;
   title: string;
   intro: string;
   from: string;
@@ -61,7 +60,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: 'Advanced editor',
     hostTarget: 'Destination hostname',
 
-    inactive: 'Saved disabled. You can review and enable it in the editor.',
     title: 'Create a URL redirect',
     intro: 'Enter two addresses. We generate a rule you can test and adjust before enabling.',
     from: 'Original URL',
@@ -72,7 +70,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: 'URL to test',
     match: 'Will redirect to',
     miss: 'This URL will not redirect',
-    save: 'Save and review rule',
+    save: 'Save rule',
     advanced: 'Create an advanced rule',
     adjust: 'Adjust the generated pattern',
     reset: 'Regenerate from addresses',
@@ -102,7 +100,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: '高级编辑器',
     hostTarget: '目标主机名',
 
-    inactive: '规则会以停用状态保存，可在编辑器中确认后启用。',
     title: '创建网址跳转',
     intro: '填写两个网址，自动生成规则。你可以先测试或调整，确认后再启用。',
     from: '原网址',
@@ -112,7 +109,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: '用这个网址测试',
     match: '将跳转到',
     miss: '这个网址不会跳转',
-    save: '保存并查看规则',
+    save: '保存规则',
     advanced: '创建高级规则',
     adjust: '调整生成的匹配表达式',
     reset: '按网址重新生成',
@@ -143,7 +140,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: '고급 편집기',
     hostTarget: '대상 호스트 이름',
 
-    inactive: '비활성 상태로 저장됩니다. 편집기에서 확인한 후 활성화하세요.',
     title: 'URL 리디렉션 만들기',
     intro: '두 주소를 입력하면 규칙이 생성됩니다. 활성화 전에 테스트하거나 조정하세요.',
     from: '원래 URL',
@@ -153,7 +149,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: '테스트할 URL',
     match: '이동할 주소',
     miss: '이 URL은 리디렉션되지 않습니다',
-    save: '저장하고 규칙 확인',
+    save: '규칙 저장',
     advanced: '고급 규칙 만들기',
     adjust: '생성된 패턴 조정',
     reset: '주소에서 다시 생성',
@@ -184,7 +180,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: '高度な編集',
     hostTarget: '移動先ホスト名',
 
-    inactive: '無効の状態で保存します。編集画面で確認してから有効にできます。',
     title: 'URL リダイレクトを作成',
     intro: '2 つの URL からルールを自動生成します。有効にする前にテストや調整ができます。',
     from: '元の URL',
@@ -194,7 +189,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: 'テストする URL',
     match: '移動先',
     miss: 'この URL はリダイレクトされません',
-    save: '保存してルールを確認',
+    save: 'ルールを保存',
     advanced: '高度なルールを作成',
     adjust: '生成されたパターンを調整',
     reset: 'URL から再生成',
@@ -226,7 +221,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: 'Éditeur avancé',
     hostTarget: 'Hôte de destination',
 
-    inactive: 'La règle est enregistrée désactivée. Vérifiez-la dans l’éditeur avant de l’activer.',
     title: 'Créer une redirection URL',
     intro: 'Saisissez deux adresses. La règle générée peut être testée et ajustée avant activation.',
     from: 'URL originale',
@@ -236,7 +230,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: 'URL à tester',
     match: 'Redirection vers',
     miss: 'Cette URL ne sera pas redirigée',
-    save: 'Enregistrer et vérifier',
+    save: 'Enregistrer la règle',
     advanced: 'Créer une règle avancée',
     adjust: 'Ajuster le motif généré',
     reset: 'Régénérer depuis les adresses',
@@ -267,7 +261,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     advancedEdit: 'Editor avanzado',
     hostTarget: 'Host de destino',
 
-    inactive: 'Se guarda desactivada. Revísala en el editor antes de activarla.',
     title: 'Crear una redirección URL',
     intro: 'Introduce dos direcciones. Generamos una regla que puedes probar y ajustar antes de activarla.',
     from: 'URL original',
@@ -277,7 +270,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     test: 'URL para probar',
     match: 'Redirigirá a',
     miss: 'Esta URL no se redirigirá',
-    save: 'Guardar y revisar regla',
+    save: 'Guardar regla',
     advanced: 'Crear una regla avanzada',
     adjust: 'Ajustar el patrón generado',
     reset: 'Regenerar desde las direcciones',

@@ -1479,7 +1479,9 @@ test('two URLs generate a testable page redirect without activating it', async (
   await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/page?x=1');
   await dialog.getByRole('radio', { name: /All pages on this host/ }).check();
   await expect(dialog.getByRole('status').first()).toContainText('https://target.example/other');
-  await dialog.getByRole('button', { name: 'Save and review rule' }).click();
+  await expect(dialog.getByRole('switch', { name: 'Enabled', exact: true })).toBeChecked();
+  await dialog.getByRole('switch', { name: 'Enabled', exact: true }).uncheck();
+  await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue(
     'original.example → target.example',

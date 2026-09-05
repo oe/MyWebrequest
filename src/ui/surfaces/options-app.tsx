@@ -52,6 +52,7 @@ export function OptionsApp() {
   const [query, setQuery] = useState('');
   const [actionFilter, setActionFilter] = useState<RuleActionFilter>('all');
   const [resourceTypeFilter, setResourceTypeFilter] = useState<RuleResourceTypeFilter>('all');
+  const [newRuleId, setNewRuleId] = useState<string | null>(null);
   const [creating, setCreating] = useState(false);
   const [redirectOpen, setRedirectOpen] = useState(() =>
     new URLSearchParams(location.search).has('redirectFrom'),
@@ -124,6 +125,7 @@ export function OptionsApp() {
     const action = pendingNavigation.current;
     pendingNavigation.current = null;
     setEditorDirty(false);
+    setNewRuleId(null);
     setEditorEpoch((epoch) => epoch + 1);
     setDiscardOpen(false);
     action?.();
@@ -159,7 +161,7 @@ export function OptionsApp() {
     if (creating) return;
     setCreating(true);
     try {
-      await manager.addRule(undefined, t('untitledRule'), kind);
+      setNewRuleId((await manager.addRule(undefined, t('untitledRule'), kind)) ?? null);
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {
@@ -176,7 +178,7 @@ export function OptionsApp() {
       'remove-referrer': t('starterHeaderName'),
     };
     try {
-      await manager.addStarterRule(kind, names[kind]);
+      setNewRuleId((await manager.addStarterRule(kind, names[kind])) ?? null);
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {
@@ -385,8 +387,9 @@ export function OptionsApp() {
               </div>
               {selectedRule ? (
                 <RuleEditor
-                  key={`${selectedRule.id}:${editorEpoch}`}
+                  key={`${selectedRule.id}:${editorEpoch}:${newRuleId === selectedRule.id}`}
                   rule={selectedRule}
+                  initiallyEnabled={newRuleId === selectedRule.id}
                   status={manager.statuses[selectedRule.id] ?? 'disabled'}
                   hasPermission={manager.permissions[selectedRule.id] === true}
                   diagnostics={manager.diagnostics[selectedRule.id] ?? []}
@@ -396,7 +399,18 @@ export function OptionsApp() {
                   onDelete={manager.deleteRule}
                   onDirtyChange={handleDirtyChange}
                   onRestore={manager.undoDeleteRule}
-                  onSave={manager.saveRule}
+                  onSave={async (rule) => {
+                    const result = await manager.saveRule(rule);
+                    if (
+                      !result.stale &&
+                      result.regexSupported &&
+                      result.quotaAvailable &&
+                      result.cycleFree &&
+                      result.priorityConflictFree
+                    )
+                      setNewRuleId(null);
+                    return result;
+                  }}
                 />
               ) : (
                 <section className="hidden place-items-center p-8 text-center min-[800px]:grid">
@@ -484,7 +498,17 @@ export function OptionsApp() {
             setRedirectOpen(false);
             setRedirectFrom('');
           }}
-          onSave={manager.addGeneratedRule}
+          onSave={async (rule) => {
+            const result = await manager.addGeneratedRule(rule);
+            if (result.stale) throw new Error(t('draftChangedTitle'));
+            if (!result.cycleFree) throw new Error(t('redirectCycleBlocked'));
+            if (!result.priorityConflictFree) throw new Error(t('priorityConflictBlocked'));
+            if (!result.quotaAvailable) throw new Error(t('quotaExceeded'));
+            if (!result.regexSupported)
+              throw new Error(t('regexUnsupported', { reason: result.regexReason ?? t('unknownReason') }));
+            if (rule.enabled && !result.permissionGranted) toast.warning(t('permissionDenied'));
+            else toast.success(t(rule.enabled ? 'ruleSavedApplied' : 'ruleSaved'));
+          }}
         />
       ) : null}
       <Toaster position="top-right" offset={72} richColors />

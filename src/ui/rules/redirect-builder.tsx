@@ -8,6 +8,7 @@ import {
 } from '@/application/redirect-generator';
 import type { Rule } from '@/domain/rules/model';
 import { validateRule } from '@/domain/rules/validate';
+import { Switch } from '@/ui/components/switch';
 import { Button } from '@/ui/components/button';
 import {
   Dialog,
@@ -43,6 +44,7 @@ export function RedirectBuilder({
   const [from, setFrom] = useState(initial?.source ?? initialFrom);
   const [to, setTo] = useState(initial?.target ?? '');
   const [testUrl, setTestUrl] = useState<string | null>(null);
+  const [enabled, setEnabled] = useState(initialRule?.enabled ?? true);
   const [saving, setSaving] = useState(false);
   const [discarding, setDiscarding] = useState(false);
   const exact = useMemo(() => generateRedirectRule(base, from, to), [base, from, to]);
@@ -59,7 +61,7 @@ export function RedirectBuilder({
     if (!valid || saving) return;
     setSaving(true);
     try {
-      await onSave(initialRule ? { ...rule, name: initialRule.name, enabled: initialRule.enabled } : rule);
+      await onSave({ ...rule, name: initialRule?.name ?? rule.name, enabled });
       onClose();
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
@@ -72,7 +74,8 @@ export function RedirectBuilder({
     if (
       from !== (initial?.source ?? initialFrom) ||
       to !== (initial?.target ?? '') ||
-      scope !== (initial?.scope ?? 'exact')
+      scope !== (initial?.scope ?? 'exact') ||
+      enabled !== (initialRule?.enabled ?? true)
     )
       setDiscarding(true);
     else onClose();
@@ -249,7 +252,15 @@ export function RedirectBuilder({
                 />
                 <RedirectTestRow rule={rule} initialUrl={generated.target} />
               </details>
-              {!initialRule ? <p className="text-xs text-muted-foreground">{copy.inactive}</p> : null}
+              <Field orientation="horizontal">
+                <FieldLabel htmlFor="redirect-enabled">{t('enabled')}</FieldLabel>
+                <Switch
+                  id="redirect-enabled"
+                  checked={enabled}
+                  disabled={saving}
+                  onCheckedChange={setEnabled}
+                />
+              </Field>
             </section>
           ) : null}
         </div>

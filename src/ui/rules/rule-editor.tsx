@@ -81,6 +81,7 @@ import { PermissionScope } from './permission-scope';
 import { StatusBadge } from './status-badge';
 
 type RuleEditorProps = {
+  initiallyEnabled?: boolean;
   hasPermission: boolean;
   diagnostics: RuleDiagnostic[];
   rule: Rule;
@@ -215,6 +216,7 @@ function editableFingerprint(rule: Rule): string {
 }
 
 export function RuleEditor({
+  initiallyEnabled = false,
   diagnostics,
   hasPermission,
   rule,
@@ -232,7 +234,7 @@ export function RuleEditor({
   const [builderOpen, setBuilderOpen] = useState(false);
   const [rawEditor, setRawEditor] = useState(false);
   const initialTestUrl = exampleUrlForRule(rule);
-  const [draft, setDraft] = useState(rule);
+  const [draft, setDraft] = useState(() => (initiallyEnabled ? { ...rule, enabled: true } : rule));
   const simpleRedirect = useMemo(() => redirectBuilderState(draft), [draft]);
   const [baseline, setBaseline] = useState(rule);
   const [externalChange, setExternalChange] = useState(false);

@@ -90,7 +90,8 @@ export const en = {
   createFirstRule: 'Create first rule',
   createBlankRule: 'Create a URL redirect',
   learnRuleBasics: 'Learn the rule basics',
-  starterRulesDisabled: 'Examples are created disabled so you can review them safely.',
+  starterRulesDisabled:
+    'Review the example settings before saving. You can turn Enabled off to save without applying.',
   starterBlockTitle: 'Block analytics',
   starterBlockDescription: 'Start with a safe request-blocking example.',
   starterBlockName: 'Block analytics example',

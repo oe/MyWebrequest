@@ -530,9 +530,9 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         ],
       },
       {
-        title: 'Save, review, then enable',
+        title: 'Save the rule',
         paragraphs: [
-          'Save and review the rule in the editor. It stays disabled until you enable it. The browser asks for any required site access at that point.',
+          'New rules have Enabled on by default. Save to apply the rule and grant any required site access. Turn Enabled off before saving if you want to keep the rule without applying it.',
         ],
       },
     ],
@@ -884,9 +884,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
       },
       {
-        title: '保存后确认启用',
+        title: '保存规则',
         paragraphs: [
-          '点击“保存并查看规则”进入编辑器。规则仍然停用，可以继续调整；确认后再启用，需要网站权限时浏览器会提示授权。',
+          '新建规则默认打开“启用”。点击“保存规则”，需要网站权限时浏览器会提示授权；不想立即生效时，保存前关闭“启用”即可。',
         ],
       },
     ],
@@ -1105,9 +1105,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
       },
       {
-        title: '저장 후 활성화',
+        title: '규칙 저장',
         paragraphs: [
-          '저장하고 편집기에서 확인하세요. 규칙은 비활성 상태로 유지됩니다. 활성화할 때 필요한 사이트 접근 권한을 브라우저가 요청합니다.',
+          '새 규칙은 활성화가 기본으로 켜집니다. 저장할 때 필요한 사이트 권한을 허용하세요. 적용하지 않고 저장하려면 활성화를 끄세요.',
         ],
       },
     ],
@@ -1327,9 +1327,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
       },
       {
-        title: '保存してから有効化',
+        title: 'ルールを保存',
         paragraphs: [
-          '保存後、編集画面でルールを確認します。ルールは無効のままなので、確認してから有効にしてください。必要なサイト権限はブラウザが要求します。',
+          '新規ルールは有効が初期設定です。保存時に必要なサイト権限を許可してください。適用せずに保存する場合は有効をオフにします。',
         ],
       },
     ],
@@ -1549,9 +1549,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
       },
       {
-        title: 'Enregistrer puis activer',
+        title: 'Enregistrer la règle',
         paragraphs: [
-          'Enregistrez et vérifiez la règle dans l’éditeur. Elle reste désactivée jusqu’à votre confirmation. Le navigateur demande alors les accès nécessaires.',
+          'Les nouvelles règles sont activées par défaut. Enregistrez et autorisez les accès nécessaires. Désactivez la règle avant de sauvegarder si vous ne souhaitez pas l’appliquer.',
         ],
       },
     ],
@@ -1773,9 +1773,9 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         ],
       },
       {
-        title: 'Guardar y activar',
+        title: 'Guardar regla',
         paragraphs: [
-          'Guarda y revisa la regla en el editor. Seguirá desactivada hasta que la actives. El navegador pedirá los permisos necesarios en ese momento.',
+          'Las reglas nuevas están activadas por defecto. Guarda y concede los permisos necesarios. Desactiva la regla antes de guardar si no quieres aplicarla.',
         ],
       },
     ],

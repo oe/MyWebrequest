@@ -15,7 +15,7 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
   hostname differs, all pages on the original origin. Host replacement preserves paths and queries
   using native DNR transforms; ordinary exact rules use case-sensitive URL filters. Test additional
   URLs before saving. Recognizable rules reopen in a simple editor; advanced replacements are reviewed
-  and staged in the draft. New rules remain disabled until enabled explicitly.
+  and staged in the draft. New forms default to Enabled; users may switch it off before saving. Saving enabled rules uses the existing permission and conflict checks.
 - Manifest V3 extension shell with optional host permissions
 - Split-pane rule manager and compact popup
 - Block, redirect, request-header removal/set, and HTTPS-upgrade actions

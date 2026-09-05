@@ -141,7 +141,7 @@ export function useRuleManager() {
   );
 
   const saveRule = useCallback(
-    async (rule: Rule) => {
+    async (rule: Rule, isNew = false) => {
       const current = stateRef.current;
       if (!current) {
         return {
@@ -198,7 +198,7 @@ export function useRuleManager() {
         };
       }
       const latest = await loadState();
-      if (latest.rules[rule.id]?.updatedAt !== rule.updatedAt) {
+      if (isNew ? Boolean(latest.rules[rule.id]) : latest.rules[rule.id]?.updatedAt !== rule.updatedAt) {
         await adoptState(latest);
         return {
           permissionGranted,
@@ -209,14 +209,19 @@ export function useRuleManager() {
           stale: true,
         };
       }
-      await persist(upsertRule(latest, rule));
-      return {
+      // Permission prompts can stay open while another window edits rules.
+      // Recheck against the latest state before claiming the new rule applied.
+      const latestNext = upsertRule(latest, rule);
+      const latestDiagnostics = analyzeRuleState(latestNext)[rule.id] ?? [];
+      const result = {
         permissionGranted,
         regexSupported: true,
-        quotaAvailable: true,
-        cycleFree: true,
-        priorityConflictFree: true,
+        quotaAvailable: !rule.enabled || !createRuleRuntimePlan(latestNext).quotaBlockedRuleIds.has(rule.id),
+        cycleFree: !latestDiagnostics.some((item) => item.code === 'redirect-cycle'),
+        priorityConflictFree: !latestDiagnostics.some((item) => item.code === 'priority-conflict'),
       };
+      if (result.quotaAvailable && result.cycleFree && result.priorityConflictFree) await persist(latestNext);
+      return result;
     },
     [adoptState, permissions, persist],
   );
@@ -307,6 +312,7 @@ export function useRuleManager() {
       const rule = kind ? createOtherRule(kind, name ?? 'Untitled rule') : createRule(origin, name);
       await persist(upsertRule(current, rule));
       setSelectedId(rule.id);
+      return rule.id;
     },
     [persist],
   );
@@ -314,11 +320,18 @@ export function useRuleManager() {
   const addGeneratedRule = useCallback(
     async (rule: Rule) => {
       if (!validateRule(rule).valid) throw new Error('Invalid generated rule.');
-      const latest = await loadState();
-      await persist(upsertRule(latest, { ...rule, enabled: false }));
-      setSelectedId(rule.id);
+      const result = await saveRule(rule, true);
+      if (
+        !result.stale &&
+        result.regexSupported &&
+        result.quotaAvailable &&
+        result.cycleFree &&
+        result.priorityConflictFree
+      )
+        setSelectedId(rule.id);
+      return result;
     },
-    [persist],
+    [saveRule],
   );
 
   const addStarterRule = useCallback(
@@ -328,6 +341,7 @@ export function useRuleManager() {
       const rule = createStarterRule(kind, name);
       await persist(upsertRule(current, rule));
       setSelectedId(rule.id);
+      return rule.id;
     },
     [persist],
   );
