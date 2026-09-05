@@ -8,6 +8,9 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 
 ## Implemented baseline
 
+- Two-address redirect builder: generate an exact page-navigation rule, test another URL, adjust the
+  generated expression, and save disabled for review. The toolbar shortcut prefills the complete current
+  URL. Advanced rules remain available from the builder and the existing editor.
 - Manifest V3 extension shell with optional host permissions
 - Split-pane rule manager and compact popup
 - Block, redirect, request-header removal/set, and HTTPS-upgrade actions

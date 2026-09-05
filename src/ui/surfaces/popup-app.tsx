@@ -40,6 +40,7 @@ export function PopupApp() {
   const { t } = useI18n();
   const manager = useRuleManager();
   const [origin, setOrigin] = useState('https://api.example.com');
+  const [currentUrl, setCurrentUrl] = useState('');
   const [pausing, setPausing] = useState(false);
   const [creating, setCreating] = useState(false);
 
@@ -51,6 +52,7 @@ export function PopupApp() {
         return;
       }
       setOrigin(supportedPageOrigin(tab.url) ?? '');
+      setCurrentUrl(supportedPageOrigin(tab.url) ? tab.url : '');
     });
   }, []);
 
@@ -103,8 +105,9 @@ export function PopupApp() {
     if (creating || !pageSupported) return;
     setCreating(true);
     try {
-      await manager.addRule(origin, t('untitledRule'));
-      await openRuleManager();
+      await browser.tabs.create({
+        url: `${browser.runtime.getURL('/options.html')}?redirectFrom=${encodeURIComponent(currentUrl)}`,
+      });
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {

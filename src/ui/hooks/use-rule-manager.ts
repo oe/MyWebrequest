@@ -18,7 +18,7 @@ import {
 } from '@/application/rule-runtime-snapshot';
 import { analyzeRuleState, createRuleRuntimePlan, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
-import { deriveRuleStatus } from '@/domain/rules/validate';
+import { deriveRuleStatus, validateRule } from '@/domain/rules/validate';
 import type { RuleImportMode } from '@/application/rule-backup';
 import {
   clearRuleImportRecovery,
@@ -310,6 +310,16 @@ export function useRuleManager() {
     [persist],
   );
 
+  const addGeneratedRule = useCallback(
+    async (rule: Rule) => {
+      if (!validateRule(rule).valid) throw new Error('Invalid generated rule.');
+      const latest = await loadState();
+      await persist(upsertRule(latest, { ...rule, enabled: false }));
+      setSelectedId(rule.id);
+    },
+    [persist],
+  );
+
   const addStarterRule = useCallback(
     async (kind: StarterRuleKind, name: string) => {
       const current = stateRef.current;
@@ -417,6 +427,7 @@ export function useRuleManager() {
     adoptState,
     addRule,
     addStarterRule,
+    addGeneratedRule,
     copyRule,
     deleteRule,
     diagnostics,

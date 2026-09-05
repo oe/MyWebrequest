@@ -4,6 +4,11 @@ Status: Local candidate with the evidence below; the final commit still needs CI
 and signed store-upgrade verification before publication.
 Last updated: 2026-09-05
 
+Current follow-up: the two-address redirect builder changes the installed UI. Its new Chromium E2E
+scenario and updated screenshot provenance still need browser execution before this candidate can be
+certified. The current agent's browser URL policy blocks extension-page access; do not substitute
+historical screenshots or count source-level checks as installed UI verification.
+
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
 test date, and evidence for every completed row.
 

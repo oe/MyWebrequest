@@ -27,16 +27,16 @@ type EmptyRulesProps = {
 
 const starters = [
   {
-    kind: 'block-analytics',
-    icon: ShieldBanIcon,
-    title: 'starterBlockTitle',
-    description: 'starterBlockDescription',
-  },
-  {
     kind: 'redirect-local',
     icon: ArrowRightLeftIcon,
     title: 'starterRedirectTitle',
     description: 'starterRedirectDescription',
+  },
+  {
+    kind: 'block-analytics',
+    icon: ShieldBanIcon,
+    title: 'starterBlockTitle',
+    description: 'starterBlockDescription',
   },
   {
     kind: 'remove-referrer',
@@ -81,7 +81,7 @@ export function EmptyRules({ onCreate, onCreateStarter }: EmptyRulesProps) {
             })}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-1">
-            <Button variant="ghost" onClick={onCreate}>
+            <Button onClick={onCreate}>
               <PlusIcon data-icon="inline-start" />
               {t('createBlankRule')}
             </Button>

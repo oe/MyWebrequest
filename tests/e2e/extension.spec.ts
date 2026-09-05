@@ -1455,3 +1455,43 @@ test('a stalled preview worker times out without freezing the editor', async ({
   await options.getByRole('button', { name: 'Cancel', exact: true }).click();
   await options.close();
 });
+
+test('two URLs generate a testable page redirect without activating it', async ({
+  context,
+  extensionId,
+  extensionPage,
+}) => {
+  const options = await context.newPage();
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+  await options.getByRole('button', { name: 'Create redirect', exact: true }).click();
+  const dialog = options.getByRole('dialog');
+  await dialog.getByLabel('Original URL', { exact: true }).fill('https://original.example/page?x=1');
+  await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/new');
+  await expect(dialog.getByRole('status')).toContainText('https://target.example/new');
+  await options.keyboard.press('Escape');
+  await options.getByRole('button', { name: 'Keep editing', exact: true }).click();
+  await expect(dialog.getByLabel('Original URL', { exact: true })).toHaveValue(
+    'https://original.example/page?x=1',
+  );
+  await dialog.getByLabel('URL to test', { exact: true }).fill('https://original.example/other');
+  await expect(dialog.getByRole('status')).toHaveText('This URL will not redirect');
+  await dialog.getByText('Adjust the generated pattern', { exact: true }).click();
+  await dialog.getByRole('textbox', { name: 'Adjust the generated pattern' }).fill('[');
+  await expect(dialog.getByRole('button', { name: 'Save and review rule' })).toBeDisabled();
+  await dialog.getByRole('button', { name: 'Regenerate from addresses' }).click();
+  await expect(dialog.getByRole('status')).toContainText('https://target.example/new');
+  await dialog.getByRole('button', { name: 'Save and review rule' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue(
+    'original.example → target.example',
+  );
+  const stored = await extensionPage.evaluate(async () => {
+    const { requestRulesState } = await chrome.storage.local.get('requestRulesState');
+    const state = requestRulesState as StoredState;
+    return state.rules[state.order[0]!];
+  });
+  expect(stored?.enabled).toBe(false);
+  expect(stored?.condition.resourceTypes).toEqual(['main_frame']);
+  expect(stored?.permissionOrigins).toEqual(['https://original.example/*']);
+  await options.close();
+});

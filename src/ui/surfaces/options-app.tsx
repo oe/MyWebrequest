@@ -28,6 +28,7 @@ import { MigrationPanel } from '@/ui/migration/migration-panel';
 import { shouldShowMigrationNavigation } from '@/ui/migration/migration-navigation';
 import { AppSidebar, type OptionsView } from '@/ui/rules/app-sidebar';
 import { EmptyRules } from '@/ui/rules/empty-rules';
+import { RedirectBuilder } from '@/ui/rules/redirect-builder';
 import {
   ruleMatchesRuleList,
   type RuleActionFilter,
@@ -51,6 +52,18 @@ export function OptionsApp() {
   const [actionFilter, setActionFilter] = useState<RuleActionFilter>('all');
   const [resourceTypeFilter, setResourceTypeFilter] = useState<RuleResourceTypeFilter>('all');
   const [creating, setCreating] = useState(false);
+  const [redirectOpen, setRedirectOpen] = useState(() =>
+    new URLSearchParams(location.search).has('redirectFrom'),
+  );
+  const [redirectFrom, setRedirectFrom] = useState(
+    () => new URLSearchParams(location.search).get('redirectFrom') ?? '',
+  );
+  useEffect(() => {
+    const url = new URL(location.href);
+    if (!url.searchParams.has('redirectFrom')) return;
+    url.searchParams.delete('redirectFrom');
+    history.replaceState(null, '', url.href);
+  }, []);
   const [editorDirty, setEditorDirty] = useState(false);
   const [editorEpoch, setEditorEpoch] = useState(0);
   const [discardOpen, setDiscardOpen] = useState(false);
@@ -305,7 +318,7 @@ export function OptionsApp() {
               </Button>
             )}
             {view === 'rules' ? (
-              <Button disabled={creating} onClick={() => requestNavigation(() => void handleCreate())}>
+              <Button disabled={creating} onClick={() => requestNavigation(() => setRedirectOpen(true))}>
                 <PlusIcon data-icon="inline-start" />
                 {creating ? t('creating') : t('newRule')}
               </Button>
@@ -390,8 +403,10 @@ export function OptionsApp() {
             </>
           ) : (
             <EmptyRules
-              onCreate={() => void handleCreate()}
-              onCreateStarter={(kind) => void handleStarterCreate(kind)}
+              onCreate={() => setRedirectOpen(true)}
+              onCreateStarter={(kind) =>
+                kind === 'redirect-local' ? setRedirectOpen(true) : void handleStarterCreate(kind)
+              }
             />
           )}
         </div>
@@ -450,6 +465,17 @@ export function OptionsApp() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      {redirectOpen ? (
+        <RedirectBuilder
+          initialFrom={redirectFrom}
+          onClose={() => {
+            setRedirectOpen(false);
+            setRedirectFrom('');
+          }}
+          onSave={manager.addGeneratedRule}
+          onAdvanced={() => void handleCreate()}
+        />
+      ) : null}
       <Toaster position="top-right" offset={72} richColors />
     </TooltipProvider>
   );

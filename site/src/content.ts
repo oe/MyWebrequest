@@ -518,17 +518,21 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
     description: 'Create, test, and safely enable your first request rule.',
     sections: [
       {
-        title: 'Choose an example',
-        paragraphs: ['Open the rule manager and choose one of the three disabled, editable examples.'],
-      },
-      {
-        title: 'Set the target',
-        paragraphs: ['Replace example.com with the domain you intend to handle. Keep the rule disabled.'],
-      },
-      {
-        title: 'Test and enable',
+        title: 'Enter two addresses',
         paragraphs: [
-          'Test a representative URL, save, then enable. The browser shows any required access first.',
+          'Choose Create redirect and enter the original and destination URLs. A rule is generated automatically; it only affects opening that exact page, including query parameters.',
+        ],
+      },
+      {
+        title: 'Test or adjust',
+        paragraphs: [
+          'The original URL is prefilled for testing. Try another URL to check the boundary. Expand the generated pattern to adjust it, or regenerate it from the addresses.',
+        ],
+      },
+      {
+        title: 'Save, review, then enable',
+        paragraphs: [
+          'Save and review the rule in the editor. It stays disabled until you enable it. The browser asks for any required site access at that point.',
         ],
       },
     ],
@@ -541,7 +545,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
         title: 'Choose one of three match modes',
         paragraphs: [
           'The editor has two browser rule formats and one simpler RequestOrbit format. Most rules need only the first option:',
-          'New rules start with URL filter. If an entry clearly looks like a regular expression, the editor suggests switching but never changes the mode by itself.',
+          'Advanced blank rules start with URL filter. If an entry clearly looks like a regular expression, the editor suggests switching but never changes the mode by itself.',
         ],
         points: [
           'URL filter (recommended): browser-native pattern syntax for a domain, fixed URL, or path. It cannot create $1 values.',
@@ -868,17 +872,21 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   'zh-CN': {
     'quick-start': [
       {
-        title: '选一个示例',
-        paragraphs: ['打开规则管理器，从三个示例中选一个。示例默认关闭，可以放心修改。'],
-      },
-      {
-        title: '换成你的网址',
-        paragraphs: ['把 example.com 换成你要处理的域名，先不要启用规则。'],
-      },
-      {
-        title: '测试后再启用',
+        title: '填写两个网址',
         paragraphs: [
-          '用一个真实 URL 测试效果，确认无误后保存并启用。需要网站权限时，浏览器会先告诉你具体范围。',
+          '点击“创建跳转”，填写原网址和目标网址，系统会自动生成规则。默认只在打开这个完整网址时生效，包含查询参数。',
+        ],
+      },
+      {
+        title: '测试或调整',
+        paragraphs: [
+          '测试框默认填入原网址。换一个网址检查是否误匹配，也可以展开修改生成的表达式，或按填写的网址重新生成。',
+        ],
+      },
+      {
+        title: '保存后确认启用',
+        paragraphs: [
+          '点击“保存并查看规则”进入编辑器。规则仍然停用，可以继续调整；确认后再启用，需要网站权限时浏览器会提示授权。',
         ],
       },
     ],
@@ -887,7 +895,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
         title: '三种匹配方式，怎么选',
         paragraphs: [
           '编辑器提供两种浏览器规则格式，以及一种更容易上手的 RequestOrbit 格式。大多数情况选第一种就够了：',
-          '新规则默认使用 URL 过滤器。输入内容明显像正则时，编辑器会建议切换，但不会擅自改变匹配方式。',
+          '高级空白规则默认使用 URL 过滤器。输入内容明显像正则时，编辑器会建议切换，但不会擅自改变匹配方式。',
         ],
         points: [
           'URL 过滤器（推荐）：浏览器原生的简洁语法，适合域名、固定 URL 和路径，但不能生成 $1。',
@@ -1085,19 +1093,21 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ko: {
     'quick-start': [
       {
-        title: '예제 하나 고르기',
+        title: '두 주소 입력',
         paragraphs: [
-          '규칙 관리자에서 세 가지 예제 중 하나를 고르세요. 예제는 기본적으로 꺼져 있어 부담 없이 수정할 수 있습니다.',
+          '리디렉션 만들기에서 원래 URL과 대상 URL을 입력하세요. 쿼리 매개변수를 포함한 정확한 페이지 주소에만 적용되는 규칙이 자동 생성됩니다.',
         ],
       },
       {
-        title: '내 주소로 바꾸기',
-        paragraphs: ['example.com을 적용할 도메인으로 바꾸고, 아직 규칙은 켜지 마세요.'],
+        title: '테스트하거나 조정',
+        paragraphs: [
+          '원래 URL이 테스트 입력란에 자동으로 채워집니다. 다른 URL로 범위를 확인하고, 생성된 패턴을 조정하거나 주소에서 다시 생성하세요.',
+        ],
       },
       {
-        title: '테스트한 뒤 켜기',
+        title: '저장 후 활성화',
         paragraphs: [
-          '실제 URL로 결과를 확인한 뒤 저장하고 활성화하세요. 사이트 권한이 필요하면 브라우저가 먼저 범위를 알려 줍니다.',
+          '저장하고 편집기에서 확인하세요. 규칙은 비활성 상태로 유지됩니다. 활성화할 때 필요한 사이트 접근 권한을 브라우저가 요청합니다.',
         ],
       },
     ],
@@ -1305,21 +1315,21 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   ja: {
     'quick-start': [
       {
-        title: 'サンプルを一つ選ぶ',
+        title: '2 つの URL を入力',
         paragraphs: [
-          'ルール管理画面で、3 つのサンプルから一つ選びます。サンプルは最初から無効なので、安心して編集できます。',
+          'リダイレクトを作成で元の URL と移動先を入力します。クエリを含む完全なページ URL のみに一致するルールが自動生成されます。',
         ],
       },
       {
-        title: '自分の URL に置き換える',
+        title: 'テストや調整',
         paragraphs: [
-          'example.com を対象のドメインに置き換えます。この時点では、まだルールを有効にしません。',
+          'テスト欄には元の URL が入ります。別の URL で範囲を確認できます。生成されたパターンを調整したり、URL から再生成したりできます。',
         ],
       },
       {
-        title: 'テストしてから有効にする',
+        title: '保存してから有効化',
         paragraphs: [
-          '実際の URL で結果を確認し、問題がなければ保存して有効にします。サイトへのアクセス許可が必要な場合は、先に対象範囲が表示されます。',
+          '保存後、編集画面でルールを確認します。ルールは無効のままなので、確認してから有効にしてください。必要なサイト権限はブラウザが要求します。',
         ],
       },
     ],
@@ -1527,21 +1537,21 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   fr: {
     'quick-start': [
       {
-        title: 'Choisissez un exemple',
+        title: 'Saisir deux adresses',
         paragraphs: [
-          'Dans le gestionnaire, choisissez l’un des trois exemples. Ils sont désactivés par défaut et peuvent être modifiés sans risque.',
+          'Choisissez Créer une redirection, puis indiquez les URL originale et de destination. La règle générée concerne uniquement cette adresse de page exacte, paramètres compris.',
         ],
       },
       {
-        title: 'Remplacez l’adresse',
+        title: 'Tester ou ajuster',
         paragraphs: [
-          'Remplacez example.com par le domaine à traiter. Laissez la règle désactivée pour le moment.',
+          'L’URL originale est préremplie pour le test. Essayez une autre URL pour vérifier la portée. Vous pouvez ajuster le motif généré ou le régénérer depuis les adresses.',
         ],
       },
       {
-        title: 'Testez avant d’activer',
+        title: 'Enregistrer puis activer',
         paragraphs: [
-          'Vérifiez le résultat avec une URL réelle, puis enregistrez et activez la règle. Si un accès au site est nécessaire, le navigateur vous indique d’abord son périmètre.',
+          'Enregistrez et vérifiez la règle dans l’éditeur. Elle reste désactivée jusqu’à votre confirmation. Le navigateur demande alors les accès nécessaires.',
         ],
       },
     ],
@@ -1751,21 +1761,21 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
   es: {
     'quick-start': [
       {
-        title: 'Elige un ejemplo',
+        title: 'Introducir dos direcciones',
         paragraphs: [
-          'En el gestor encontrarás tres ejemplos. Están desactivados de forma predeterminada, así que puedes editarlos sin riesgo.',
+          'Elige Crear redirección e introduce las URL original y de destino. Se genera una regla para abrir esa dirección exacta, incluidos sus parámetros.',
         ],
       },
       {
-        title: 'Cambia la dirección',
+        title: 'Probar o ajustar',
         paragraphs: [
-          'Sustituye example.com por el dominio que quieres tratar. De momento, deja la regla desactivada.',
+          'La URL original se rellena para la prueba. Prueba otra dirección para comprobar el alcance. Puedes ajustar el patrón generado o regenerarlo desde las direcciones.',
         ],
       },
       {
-        title: 'Prueba antes de activar',
+        title: 'Guardar y activar',
         paragraphs: [
-          'Comprueba el resultado con una URL real y, si todo está bien, guarda y activa la regla. Si necesita acceso al sitio, el navegador te mostrará primero el alcance.',
+          'Guarda y revisa la regla en el editor. Seguirá desactivada hasta que la actives. El navegador pedirá los permisos necesarios en ese momento.',
         ],
       },
     ],
