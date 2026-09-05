@@ -20,6 +20,7 @@ export type RuleCondition = {
     | { kind: 'url-filter'; value: string }
     | { kind: 'wildcard'; value: string }
     | { kind: 'regex'; value: string };
+  isUrlFilterCaseSensitive?: boolean;
   resourceTypes?: ResourceType[];
   requestMethods?: Array<'connect' | 'delete' | 'get' | 'head' | 'options' | 'patch' | 'post' | 'put'>;
   initiatorDomains?: string[];
@@ -33,7 +34,7 @@ export type HeaderOperation = {
 
 export type RuleAction =
   | { kind: 'block' }
-  | { kind: 'redirect'; target: string }
+  | { kind: 'redirect'; target: string; transform?: { host: string } }
   | { kind: 'upgrade-scheme' }
   | { kind: 'modify-request-headers'; operations: HeaderOperation[] };
 
@@ -49,6 +50,7 @@ export type Rule = {
   condition: RuleCondition;
   action: RuleAction;
   permissionOrigins: string[];
+  redirectBuilder?: { source: string; target: string; scope: 'exact' | 'host' };
   migrationState: MigrationState;
   createdAt: string;
   updatedAt: string;

@@ -1,7 +1,11 @@
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { createRule } from '@/application/rule-service';
-import { generateRedirectRule } from '@/application/redirect-generator';
+import {
+  generateRedirectRule,
+  redirectBuilderState,
+  type RedirectScope,
+} from '@/application/redirect-generator';
 import type { Rule } from '@/domain/rules/model';
 import { validateRule } from '@/domain/rules/validate';
 import { Button } from '@/ui/components/button';
@@ -22,51 +26,42 @@ import { redirectBuilderCopy } from './redirect-builder-copy';
 
 export function RedirectBuilder({
   initialFrom = '',
+  initialRule,
   onClose,
   onSave,
   onAdvanced,
 }: {
   initialFrom?: string;
+  initialRule?: Rule;
   onClose: () => void;
   onSave: (rule: Rule) => Promise<void>;
   onAdvanced: () => void;
 }) {
   const { locale, t } = useI18n();
   const copy = redirectBuilderCopy[locale];
-  const [base] = useState(() => createRule());
-  const [from, setFrom] = useState(initialFrom);
-  const [to, setTo] = useState('');
+  const [base] = useState(() => initialRule ?? createRule());
+  const [initial] = useState(() => (initialRule ? redirectBuilderState(initialRule) : null));
+  const [scope, setScope] = useState<RedirectScope>(initial?.scope ?? 'exact');
+  const [from, setFrom] = useState(initial?.source ?? initialFrom);
+  const [to, setTo] = useState(initial?.target ?? '');
   const [testUrl, setTestUrl] = useState<string | null>(null);
-  const [pattern, setPattern] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [discarding, setDiscarding] = useState(false);
-  const generated = useMemo(() => generateRedirectRule(base, from, to), [base, from, to]);
-  const rule = useMemo(() => {
-    if (!generated.ok) return base;
-    return pattern === null
-      ? generated.rule
-      : {
-          ...generated.rule,
-          condition: { ...generated.rule.condition, url: { kind: 'regex' as const, value: pattern } },
-        };
-  }, [base, generated, pattern]);
+  const exact = useMemo(() => generateRedirectRule(base, from, to), [base, from, to]);
+  const generated = useMemo(
+    () => (scope === 'exact' ? exact : generateRedirectRule(base, from, to, scope)),
+    [base, from, to, scope, exact],
+  );
+  const rule = generated.ok ? generated.rule : base;
   const valid = generated.ok && validateRule(rule).valid;
   const candidate = testUrl ?? (generated.ok ? generated.source : from);
-  const normalizedCandidate = useMemo(() => {
-    try {
-      const url = new URL(candidate.trim());
-      url.hash = '';
-      return url.href;
-    } catch {
-      return candidate;
-    }
-  }, [candidate]);
+  const normalizedCandidate = normalizeTestUrl(candidate);
   const preview = useMatchPreview(rule, normalizedCandidate);
   const save = async () => {
     if (!valid || saving) return;
     setSaving(true);
     try {
-      await onSave(rule);
+      await onSave(initialRule ? { ...rule, name: initialRule.name, enabled: initialRule.enabled } : rule);
       onClose();
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
@@ -76,7 +71,12 @@ export function RedirectBuilder({
   };
   const requestClose = () => {
     if (saving) return;
-    if (from || to) setDiscarding(true);
+    if (
+      from !== (initial?.source ?? initialFrom) ||
+      to !== (initial?.target ?? '') ||
+      scope !== (initial?.scope ?? 'exact')
+    )
+      setDiscarding(true);
     else onClose();
   };
   if (discarding)
@@ -116,7 +116,7 @@ export function RedirectBuilder({
         onInteractOutside={(event) => event.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>{copy.title}</DialogTitle>
+          <DialogTitle>{initialRule ? copy.edit : copy.title}</DialogTitle>
           <DialogDescription>{copy.intro}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-4">
@@ -146,6 +146,30 @@ export function RedirectBuilder({
               onChange={(event) => setTo(event.target.value)}
             />
           </Field>
+          <fieldset className="flex flex-col gap-2" disabled={saving}>
+            <legend className="mb-2 text-sm font-medium">{copy.matchRule}</legend>
+            {(['exact', 'host'] as const).map((value) => (
+              <label
+                key={value}
+                className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+              >
+                <input
+                  type="radio"
+                  name="redirect-scope"
+                  value={value}
+                  checked={scope === value}
+                  disabled={value === 'host' && !(exact.ok && exact.hostAvailable) && scope !== 'host'}
+                  onChange={() => setScope(value)}
+                />
+                {copy[value]}
+                {value === 'host' && exact.ok && exact.hostAvailable ? (
+                  <span className="min-w-0 break-all text-muted-foreground">
+                    {new URL(exact.source).origin}
+                  </span>
+                ) : null}
+              </label>
+            ))}
+          </fieldset>
           {from && to && !generated.ok ? (
             <p role="alert" className="text-sm text-destructive">
               {copy[generated.error]}
@@ -157,32 +181,32 @@ export function RedirectBuilder({
               aria-label={copy.generated}
             >
               <h2 className="text-sm font-medium">{copy.generated}</h2>
-              <p className="text-sm text-muted-foreground">
-                {pattern === null ? copy.scope : t('testRuleDescription')}
-              </p>
-              <details>
-                <summary className="cursor-pointer text-sm">{copy.adjust}</summary>
-                <Input
-                  className="mt-2 font-mono text-xs"
-                  aria-label={copy.adjust}
-                  value={rule.condition.url.value}
-                  disabled={saving}
-                  onChange={(event) => setPattern(event.target.value)}
-                />
-                {pattern !== null ? (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    disabled={saving}
-                    onClick={() => {
-                      setPattern(null);
-                      setTestUrl(null);
-                    }}
-                  >
-                    {copy.reset}
-                  </Button>
-                ) : null}
-              </details>
+              <p className="text-sm text-muted-foreground">{scope === 'host' ? copy.hostHelp : copy.scope}</p>
+              <div className="text-sm">
+                <p className="font-medium">{copy.redirectRule}</p>
+                <p className="mt-1 font-mono break-all">
+                  {scope === 'host'
+                    ? `${new URL(generated.source).hostname} → ${new URL(generated.target).hostname}`
+                    : generated.target}
+                </p>
+              </div>
+              {initialRule && !initial ? (
+                <div className="space-y-2 rounded-md border p-3 text-sm">
+                  <p>{copy.replacement}</p>
+                  <p className="font-medium">{copy.before}</p>
+                  <pre className="text-xs break-all whitespace-pre-wrap">
+                    {JSON.stringify(
+                      { condition: initialRule.condition, action: initialRule.action },
+                      null,
+                      2,
+                    )}
+                  </pre>
+                  <p className="font-medium">{copy.after}</p>
+                  <pre className="text-xs break-all whitespace-pre-wrap">
+                    {JSON.stringify({ condition: rule.condition, action: rule.action }, null, 2)}
+                  </pre>
+                </div>
+              ) : null}
               {!valid ? (
                 <p role="alert" className="text-sm text-destructive">
                   {copy.invalid}
@@ -219,7 +243,15 @@ export function RedirectBuilder({
                   )
                 )}
               </div>
-              <p className="text-xs text-muted-foreground">{copy.inactive}</p>
+              <details>
+                <summary className="cursor-pointer text-sm">{copy.examples}</summary>
+                <RedirectTestRow
+                  rule={rule}
+                  initialUrl={new URL('/another-page?example=1', generated.source).href}
+                />
+                <RedirectTestRow rule={rule} initialUrl={generated.target} />
+              </details>
+              {!initialRule ? <p className="text-xs text-muted-foreground">{copy.inactive}</p> : null}
             </section>
           ) : null}
         </div>
@@ -228,24 +260,66 @@ export function RedirectBuilder({
             {t('cancel')}
           </Button>
           <Button disabled={!valid || saving} onClick={() => void save()}>
-            {saving ? t('saving') : copy.save}
+            {saving ? t('saving') : initialRule ? copy.apply : copy.save}
           </Button>
         </DialogFooter>
-        <Button
-          variant="link"
-          className="justify-self-start px-0"
-          disabled={saving || (generated.ok && !valid)}
-          onClick={() => {
-            if (valid) void save();
-            else {
-              onClose();
-              onAdvanced();
-            }
-          }}
-        >
-          {copy.advanced}
-        </Button>
+        {!initialRule && !generated.ok ? (
+          <Button
+            variant="link"
+            className="justify-self-start px-0"
+            disabled={saving || (generated.ok && !valid)}
+            onClick={() => {
+              if (valid) void save();
+              else {
+                onClose();
+                onAdvanced();
+              }
+            }}
+          >
+            {copy.advanced}
+          </Button>
+        ) : null}
       </DialogContent>
     </Dialog>
   );
+}
+
+function RedirectTestRow({ rule, initialUrl }: { rule: Rule; initialUrl: string }) {
+  const { locale, t } = useI18n();
+  const copy = redirectBuilderCopy[locale];
+  const [value, setValue] = useState<string | null>(null);
+  const candidate = value ?? initialUrl;
+  const preview = useMatchPreview(rule, normalizeTestUrl(candidate));
+  return (
+    <div className="mt-3 space-y-2">
+      <Input
+        aria-label={`${copy.examples}: ${initialUrl}`}
+        value={candidate}
+        onChange={(event) => setValue(event.target.value)}
+      />
+      <p className="text-sm break-all" role="status">
+        {preview.status === 'ready'
+          ? preview.result.matched
+            ? `${copy.match}: ${preview.result.result}`
+            : copy.miss
+          : t(
+              preview.status === 'timeout'
+                ? 'previewTimeout'
+                : preview.status === 'error'
+                  ? 'previewError'
+                  : 'previewPending',
+            )}
+      </p>
+    </div>
+  );
+}
+
+function normalizeTestUrl(value: string): string {
+  try {
+    const url = new URL(value.trim());
+    url.hash = '';
+    return url.href;
+  } catch {
+    return value;
+  }
 }

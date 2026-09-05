@@ -1475,11 +1475,10 @@ test('two URLs generate a testable page redirect without activating it', async (
   );
   await dialog.getByLabel('URL to test', { exact: true }).fill('https://original.example/other');
   await expect(dialog.getByRole('status')).toHaveText('This URL will not redirect');
-  await dialog.getByText('Adjust the generated pattern', { exact: true }).click();
-  await dialog.getByRole('textbox', { name: 'Adjust the generated pattern' }).fill('[');
-  await expect(dialog.getByRole('button', { name: 'Save and review rule' })).toBeDisabled();
-  await dialog.getByRole('button', { name: 'Regenerate from addresses' }).click();
-  await expect(dialog.getByRole('status')).toContainText('https://target.example/new');
+  await expect(dialog.getByRole('radio', { name: 'All pages on this host' })).toBeDisabled();
+  await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/page?x=1');
+  await dialog.getByRole('radio', { name: /All pages on this host/ }).check();
+  await expect(dialog.getByRole('status').first()).toContainText('https://target.example/other');
   await dialog.getByRole('button', { name: 'Save and review rule' }).click();
   await expect(dialog).toHaveCount(0);
   await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue(
@@ -1493,5 +1492,36 @@ test('two URLs generate a testable page redirect without activating it', async (
   expect(stored?.enabled).toBe(false);
   expect(stored?.condition.resourceTypes).toEqual(['main_frame']);
   expect(stored?.permissionOrigins).toEqual(['https://original.example/*']);
+  expect(stored?.action).toMatchObject({ kind: 'redirect', transform: { host: 'target.example' } });
+  await options.getByRole('button', { name: 'Edit URL redirect', exact: true }).click();
+  await expect(dialog.getByRole('radio', { name: /All pages on this host/ })).toBeChecked();
+  await expect(dialog.getByLabel('Original URL', { exact: true })).toHaveValue(
+    'https://original.example/page?x=1',
+  );
+  await dialog.getByRole('radio', { name: 'Only this URL', exact: true }).check();
+  await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/changed');
+  await dialog.getByRole('button', { name: 'Apply to draft' }).click();
+  const beforeSave = await extensionPage.evaluate(async () => {
+    const { requestRulesState } = await chrome.storage.local.get('requestRulesState');
+    const state = requestRulesState as StoredState;
+    return state.rules[state.order[0]!];
+  });
+  expect(beforeSave?.action).toEqual(stored?.action);
+  await options.getByRole('button', { name: 'Save changes', exact: true }).click();
+  await expect
+    .poll(async () =>
+      extensionPage.evaluate(async () => {
+        const { requestRulesState } = await chrome.storage.local.get('requestRulesState');
+        const state = requestRulesState as StoredState;
+        return state.rules[state.order[0]!]?.action;
+      }),
+    )
+    .toEqual({ kind: 'redirect', target: 'https://target.example/changed' });
+  await options.reload();
+  await options.getByRole('button', { name: 'Edit URL redirect', exact: true }).click();
+  await expect(dialog.getByRole('radio', { name: 'Only this URL', exact: true })).toBeChecked();
+  await expect(dialog.getByLabel('Destination URL', { exact: true })).toHaveValue(
+    'https://target.example/changed',
+  );
   await options.close();
 });

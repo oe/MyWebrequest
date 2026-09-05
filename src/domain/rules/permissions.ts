@@ -21,6 +21,8 @@ function normalizeMatchPatternHost(scheme: string, host: string): string | null 
 }
 
 export function permissionOriginsFromMatch(value: string): string[] {
+  if (value.startsWith('|') && !value.startsWith('||')) value = value.slice(1).replace(/\|$/, '');
+  if (value.startsWith('(?-i)^')) value = value.slice(5);
   if (value.startsWith('||')) {
     const host = value.slice(2).replace(/\^.*$/, '').replace(/^\*\./, '');
     return host ? permissionPatterns('*', `*.${host}`) : [];

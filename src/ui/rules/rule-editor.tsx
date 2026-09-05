@@ -1,3 +1,6 @@
+import { redirectBuilderState } from '@/application/redirect-generator';
+import { RedirectBuilder } from './redirect-builder';
+import { redirectBuilderCopy } from './redirect-builder-copy';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowLeftIcon,
@@ -193,6 +196,8 @@ function matchGuidanceText(guidance: MatchGuidance, t: Translate): string {
 }
 
 function exampleUrlForRule(rule: Rule): string {
+  const simple = redirectBuilderState(rule);
+  if (simple) return simple.source;
   const { kind, value } = rule.condition.url;
   if (kind === 'url-filter' && value.startsWith('||')) {
     const host = value.slice(2).replace(/\^.*$/, '');
@@ -222,9 +227,13 @@ export function RuleEditor({
   onSave,
   ruleIndex,
 }: RuleEditorProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const copy = redirectBuilderCopy[locale];
+  const [builderOpen, setBuilderOpen] = useState(false);
+  const [rawEditor, setRawEditor] = useState(false);
   const initialTestUrl = exampleUrlForRule(rule);
   const [draft, setDraft] = useState(rule);
+  const simpleRedirect = useMemo(() => redirectBuilderState(draft), [draft]);
   const [baseline, setBaseline] = useState(rule);
   const [externalChange, setExternalChange] = useState(false);
   if (baseline !== rule) {
@@ -549,272 +558,384 @@ export function RuleEditor({
                 onChange={(event) => setDraft((current) => ({ ...current, name: event.target.value }))}
               />
             </Field>
-            <Field data-invalid={Boolean(matchError || regexRuntimeError)}>
-              <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
-              <InputGroup>
-                <InputGroupInput
-                  id="rule-match"
-                  className="font-mono"
-                  value={draft.condition.url.value}
-                  disabled={readOnly}
-                  aria-invalid={Boolean(matchError || regexRuntimeError)}
-                  onChange={(event) => updateMatch(event.target.value)}
-                />
-                <InputGroupAddon align="inline-end">
-                  <Select
-                    value={draft.condition.url.kind}
-                    disabled={readOnly}
-                    onValueChange={(kind) => changeMatchKind(kind as MatchKind)}
-                  >
-                    <SelectTrigger
-                      size="sm"
-                      className="max-w-40"
-                      aria-label={t('matchSyntaxSelectorLabel', {
-                        syntax: t(
-                          draft.condition.url.kind === 'url-filter'
-                            ? 'urlFilterShort'
-                            : draft.condition.url.kind === 'wildcard'
-                              ? 'wildcardShort'
-                              : 'regexShort',
-                        ),
-                      })}
-                    >
-                      <SelectValue>
-                        {t(
-                          draft.condition.url.kind === 'url-filter'
-                            ? 'urlFilterShort'
-                            : draft.condition.url.kind === 'wildcard'
-                              ? 'wildcardShort'
-                              : 'regexShort',
-                        )}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent align="end">
-                      <SelectGroup>
-                        <SelectItem value="url-filter">{t('urlFilter')}</SelectItem>
-                        <SelectItem value="wildcard">{t('wildcard')}</SelectItem>
-                        <SelectItem value="regex">{t('regularExpression')}</SelectItem>
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                  <MatchHelpPopover kind={draft.condition.url.kind} />
-                </InputGroupAddon>
-              </InputGroup>
-              <FieldDescription>
-                {t(
-                  draft.condition.url.kind === 'url-filter'
-                    ? 'urlFilterHelp'
-                    : draft.condition.url.kind === 'wildcard'
-                      ? 'wildcardHelp'
-                      : 'regexHelp',
-                )}
-              </FieldDescription>
-              <div className="rounded-lg border bg-muted/35 p-3 text-sm">
-                <p className="font-medium text-foreground">{t('matchGuidanceTitle')}</p>
-                <p className="mt-1 text-muted-foreground">{matchGuidanceText(matchGuidance, t)}</p>
-              </div>
-              {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
-              {regexRuntimeError ? <FieldError>{regexRuntimeError}</FieldError> : null}
-              {showMatchSuggestion && suggestedKind === 'regex' ? (
-                <Alert>
-                  <SparklesIcon />
-                  <AlertTitle>{t('regexSuggestionTitle')}</AlertTitle>
-                  <AlertDescription className="flex flex-col gap-2">
-                    <span>{t('regexSuggestionDescription')}</span>
-                    <span className="flex flex-wrap gap-2">
-                      <Button size="xs" onClick={() => changeMatchKind('regex', true)}>
-                        {t('useRegularExpression')}
-                      </Button>
-                      <Button
-                        size="xs"
-                        variant="ghost"
-                        onClick={() => setDismissedMatchSuggestion(matchSuggestionKey)}
-                      >
-                        {t('keepCurrentSyntax')}
-                      </Button>
-                    </span>
-                  </AlertDescription>
-                </Alert>
-              ) : null}
-            </Field>
-            <Field>
-              <FieldLabel>{t('resourceTypes')}</FieldLabel>
-              <div className="flex flex-wrap gap-2" role="group" aria-label={t('resourceTypes')}>
-                {RESOURCE_TYPES.map((type) => {
-                  const selected = draft.condition.resourceTypes?.includes(type) ?? false;
-                  return (
-                    <Button
-                      key={type}
-                      type="button"
-                      size="sm"
-                      variant={selected ? 'default' : 'outline'}
-                      aria-pressed={selected}
-                      disabled={readOnly}
-                      onClick={() =>
-                        setDraft((current) => ({
-                          ...current,
-                          condition: {
-                            ...current.condition,
-                            resourceTypes: toggleValue(current.condition.resourceTypes, type),
-                          },
-                        }))
-                      }
-                    >
-                      {selected ? <CheckIcon aria-hidden="true" /> : null}
-                      {localizedResourceTypeLabel(type, t)}
-                    </Button>
-                  );
-                })}
-              </div>
-              <FieldDescription>{t('resourceTypesHelp')}</FieldDescription>
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="rule-action">{t('action')}</FieldLabel>
-              <Select
-                value={draft.action.kind}
-                disabled={readOnly}
-                onValueChange={(value) =>
-                  setDraft((current) => ({
-                    ...current,
-                    action: actionFromKind(
-                      value as RuleAction['kind'],
-                      current.action,
-                      current.condition.url.kind,
-                    ),
-                  }))
-                }
-              >
-                <SelectTrigger id="rule-action" className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="block">{t('blockRequest')}</SelectItem>
-                    <SelectItem value="redirect">{t('redirect')}</SelectItem>
-                    <SelectItem value="modify-request-headers">{t('modifyRequestHeader')}</SelectItem>
-                    <SelectItem value="upgrade-scheme">{t('upgradeHttps')}</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <FieldDescription>{t('actionHelp')}</FieldDescription>
-              {!advanced && initiatorError ? (
-                <FieldError>{validationMessage(initiatorError, t)}</FieldError>
-              ) : null}
-            </Field>
             {draft.action.kind === 'redirect' ? (
-              <Field data-invalid={Boolean(destinationError)}>
-                <FieldLabel htmlFor="rule-destination">{t('destination')}</FieldLabel>
-                <Input
-                  id="rule-destination"
-                  className="font-mono"
-                  value={draft.action.target}
-                  disabled={readOnly}
-                  aria-invalid={Boolean(destinationError)}
-                  onChange={(event) =>
-                    setDraft((current) => ({
-                      ...current,
-                      action: { kind: 'redirect', target: event.target.value },
-                    }))
-                  }
-                />
-                <FieldDescription>
-                  {t(draft.condition.url.kind === 'url-filter' ? 'destinationFixedHelp' : 'destinationHelp')}
-                </FieldDescription>
-                {destinationError?.code === 'capture-match-required' ? (
-                  <Alert variant="warning">
-                    <CircleAlertIcon />
-                    <AlertTitle>{t('captureModeNeededTitle')}</AlertTitle>
-                    <AlertDescription className="flex flex-col gap-2">
-                      <span>{t('captureModeNeededDescription')}</span>
-                      {captureQuickFixAvailable ? (
-                        <span className="flex flex-wrap gap-2">
-                          <Button
-                            size="xs"
-                            variant="outline"
-                            onClick={() => changeMatchKind('wildcard', true)}
-                          >
-                            {t('useSimpleWildcard')}
-                          </Button>
-                          <Button size="xs" variant="outline" onClick={convertUrlFilterToCapturingRegex}>
-                            {t('convertToRegularExpression')}
-                          </Button>
-                        </span>
-                      ) : null}
-                    </AlertDescription>
-                  </Alert>
-                ) : destinationError ? (
-                  <FieldError>{validationMessage(destinationError, t)}</FieldError>
+              <div className="space-y-3 rounded-lg border bg-muted/25 p-4">
+                {simpleRedirect ? (
+                  <>
+                    <p className="text-sm font-medium">
+                      {copy.matchRule}: {copy[simpleRedirect.scope]}
+                    </p>
+                    <p className="font-mono text-sm break-all">
+                      {simpleRedirect.scope === 'host'
+                        ? new URL(simpleRedirect.source).origin
+                        : simpleRedirect.source}
+                    </p>
+                    <p className="text-sm font-medium">{copy.redirectRule}</p>
+                    <p className="font-mono text-sm break-all">
+                      {simpleRedirect.scope === 'host'
+                        ? new URL(simpleRedirect.target).hostname
+                        : simpleRedirect.target}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {simpleRedirect.scope === 'host' ? copy.hostHelp : copy.scope}
+                    </p>
+                  </>
                 ) : null}
-              </Field>
+                <Button variant="outline" disabled={readOnly || saving} onClick={() => setBuilderOpen(true)}>
+                  {simpleRedirect ? copy.edit : copy.assisted}
+                </Button>
+                {simpleRedirect ? (
+                  <Button variant="ghost" aria-pressed={rawEditor} onClick={() => setRawEditor(!rawEditor)}>
+                    {copy.advancedEdit}
+                  </Button>
+                ) : null}
+              </div>
             ) : null}
-            {draft.action.kind === 'modify-request-headers' ? (
-              <Field data-invalid={Boolean(headerError)}>
-                <FieldLabel>{t('requestHeader')}</FieldLabel>
-                <div className="flex flex-col gap-3">
-                  {draft.action.operations.map((operation, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-[130px_minmax(0,1fr)_auto] gap-2 max-sm:grid-cols-[110px_minmax(0,1fr)_auto]"
-                    >
+            {!simpleRedirect || rawEditor ? (
+              <>
+                <Field data-invalid={Boolean(matchError || regexRuntimeError)}>
+                  <FieldLabel htmlFor="rule-match">{t('matchUrl')}</FieldLabel>
+                  <InputGroup>
+                    <InputGroupInput
+                      id="rule-match"
+                      className="font-mono"
+                      value={draft.condition.url.value}
+                      disabled={readOnly}
+                      aria-invalid={Boolean(matchError || regexRuntimeError)}
+                      onChange={(event) => updateMatch(event.target.value)}
+                    />
+                    <InputGroupAddon align="inline-end">
                       <Select
-                        value={operation.operation}
+                        value={draft.condition.url.kind}
                         disabled={readOnly}
-                        onValueChange={(value) => {
-                          const next: HeaderOperation = {
-                            header: operation.header,
-                            operation: value as HeaderOperation['operation'],
-                            ...(value === 'set' ? { value: operation.value ?? '' } : {}),
-                          };
-                          setDraft((current) => ({
-                            ...current,
-                            action:
-                              current.action.kind === 'modify-request-headers'
-                                ? {
-                                    ...current.action,
-                                    operations: current.action.operations.map((item, itemIndex) =>
-                                      itemIndex === index ? next : item,
-                                    ),
-                                  }
-                                : current.action,
-                          }));
-                        }}
+                        onValueChange={(kind) => changeMatchKind(kind as MatchKind)}
                       >
-                        <SelectTrigger aria-label={t('headerOperation')}>
-                          <SelectValue />
+                        <SelectTrigger
+                          size="sm"
+                          className="max-w-40"
+                          aria-label={t('matchSyntaxSelectorLabel', {
+                            syntax: t(
+                              draft.condition.url.kind === 'url-filter'
+                                ? 'urlFilterShort'
+                                : draft.condition.url.kind === 'wildcard'
+                                  ? 'wildcardShort'
+                                  : 'regexShort',
+                            ),
+                          })}
+                        >
+                          <SelectValue>
+                            {t(
+                              draft.condition.url.kind === 'url-filter'
+                                ? 'urlFilterShort'
+                                : draft.condition.url.kind === 'wildcard'
+                                  ? 'wildcardShort'
+                                  : 'regexShort',
+                            )}
+                          </SelectValue>
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent align="end">
                           <SelectGroup>
-                            <SelectItem value="remove">{t('removeHeader')}</SelectItem>
-                            <SelectItem value="set">{t('setHeader')}</SelectItem>
+                            <SelectItem value="url-filter">{t('urlFilter')}</SelectItem>
+                            <SelectItem value="wildcard">{t('wildcard')}</SelectItem>
+                            <SelectItem value="regex">{t('regularExpression')}</SelectItem>
                           </SelectGroup>
                         </SelectContent>
                       </Select>
-                      <Input
-                        value={operation.header}
-                        disabled={readOnly}
-                        aria-label={t('requestHeader')}
-                        aria-invalid={Boolean(headerError)}
-                        onChange={(event) =>
-                          setDraft((current) => ({
-                            ...current,
-                            action:
-                              current.action.kind === 'modify-request-headers'
-                                ? {
-                                    ...current.action,
-                                    operations: current.action.operations.map((item, itemIndex) =>
-                                      itemIndex === index ? { ...item, header: event.target.value } : item,
-                                    ),
-                                  }
-                                : current.action,
-                          }))
-                        }
-                      />
+                      <MatchHelpPopover kind={draft.condition.url.kind} />
+                    </InputGroupAddon>
+                  </InputGroup>
+                  <FieldDescription>
+                    {t(
+                      draft.condition.url.kind === 'url-filter'
+                        ? 'urlFilterHelp'
+                        : draft.condition.url.kind === 'wildcard'
+                          ? 'wildcardHelp'
+                          : 'regexHelp',
+                    )}
+                  </FieldDescription>
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={draft.condition.isUrlFilterCaseSensitive ?? false}
+                      disabled={readOnly}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          condition: { ...current.condition, isUrlFilterCaseSensitive: event.target.checked },
+                        }))
+                      }
+                    />
+                    {copy.caseSensitive}
+                  </label>
+                  <div className="rounded-lg border bg-muted/35 p-3 text-sm">
+                    <p className="font-medium text-foreground">{t('matchGuidanceTitle')}</p>
+                    <p className="mt-1 text-muted-foreground">{matchGuidanceText(matchGuidance, t)}</p>
+                  </div>
+                  {matchError ? <FieldError>{validationMessage(matchError, t)}</FieldError> : null}
+                  {regexRuntimeError ? <FieldError>{regexRuntimeError}</FieldError> : null}
+                  {showMatchSuggestion && suggestedKind === 'regex' ? (
+                    <Alert>
+                      <SparklesIcon />
+                      <AlertTitle>{t('regexSuggestionTitle')}</AlertTitle>
+                      <AlertDescription className="flex flex-col gap-2">
+                        <span>{t('regexSuggestionDescription')}</span>
+                        <span className="flex flex-wrap gap-2">
+                          <Button size="xs" onClick={() => changeMatchKind('regex', true)}>
+                            {t('useRegularExpression')}
+                          </Button>
+                          <Button
+                            size="xs"
+                            variant="ghost"
+                            onClick={() => setDismissedMatchSuggestion(matchSuggestionKey)}
+                          >
+                            {t('keepCurrentSyntax')}
+                          </Button>
+                        </span>
+                      </AlertDescription>
+                    </Alert>
+                  ) : null}
+                </Field>
+                <Field>
+                  <FieldLabel>{t('resourceTypes')}</FieldLabel>
+                  <div className="flex flex-wrap gap-2" role="group" aria-label={t('resourceTypes')}>
+                    {RESOURCE_TYPES.map((type) => {
+                      const selected = draft.condition.resourceTypes?.includes(type) ?? false;
+                      return (
+                        <Button
+                          key={type}
+                          type="button"
+                          size="sm"
+                          variant={selected ? 'default' : 'outline'}
+                          aria-pressed={selected}
+                          disabled={readOnly}
+                          onClick={() =>
+                            setDraft((current) => ({
+                              ...current,
+                              condition: {
+                                ...current.condition,
+                                resourceTypes: toggleValue(current.condition.resourceTypes, type),
+                              },
+                            }))
+                          }
+                        >
+                          {selected ? <CheckIcon aria-hidden="true" /> : null}
+                          {localizedResourceTypeLabel(type, t)}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  <FieldDescription>{t('resourceTypesHelp')}</FieldDescription>
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="rule-action">{t('action')}</FieldLabel>
+                  <Select
+                    value={draft.action.kind}
+                    disabled={readOnly}
+                    onValueChange={(value) =>
+                      setDraft((current) => ({
+                        ...current,
+                        action: actionFromKind(
+                          value as RuleAction['kind'],
+                          current.action,
+                          current.condition.url.kind,
+                        ),
+                      }))
+                    }
+                  >
+                    <SelectTrigger id="rule-action" className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="block">{t('blockRequest')}</SelectItem>
+                        <SelectItem value="redirect">{t('redirect')}</SelectItem>
+                        <SelectItem value="modify-request-headers">{t('modifyRequestHeader')}</SelectItem>
+                        <SelectItem value="upgrade-scheme">{t('upgradeHttps')}</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  <FieldDescription>{t('actionHelp')}</FieldDescription>
+                  {!advanced && initiatorError ? (
+                    <FieldError>{validationMessage(initiatorError, t)}</FieldError>
+                  ) : null}
+                </Field>
+                {draft.action.kind === 'redirect' ? (
+                  <Field data-invalid={Boolean(destinationError)}>
+                    <FieldLabel htmlFor="rule-destination">
+                      {draft.action.transform ? copy.hostTarget : t('destination')}
+                    </FieldLabel>
+                    <Input
+                      id="rule-destination"
+                      className="font-mono"
+                      value={draft.action.transform?.host ?? draft.action.target}
+                      disabled={readOnly}
+                      aria-invalid={Boolean(destinationError)}
+                      onChange={(event) =>
+                        setDraft((current) => ({
+                          ...current,
+                          action:
+                            current.action.kind === 'redirect' && current.action.transform
+                              ? { ...current.action, transform: { host: event.target.value } }
+                              : { kind: 'redirect', target: event.target.value },
+                        }))
+                      }
+                    />
+                    <FieldDescription>
+                      {draft.action.transform
+                        ? copy.hostHelp
+                        : t(
+                            draft.condition.url.kind === 'url-filter'
+                              ? 'destinationFixedHelp'
+                              : 'destinationHelp',
+                          )}
+                    </FieldDescription>
+                    {destinationError?.code === 'capture-match-required' ? (
+                      <Alert variant="warning">
+                        <CircleAlertIcon />
+                        <AlertTitle>{t('captureModeNeededTitle')}</AlertTitle>
+                        <AlertDescription className="flex flex-col gap-2">
+                          <span>{t('captureModeNeededDescription')}</span>
+                          {captureQuickFixAvailable ? (
+                            <span className="flex flex-wrap gap-2">
+                              <Button
+                                size="xs"
+                                variant="outline"
+                                onClick={() => changeMatchKind('wildcard', true)}
+                              >
+                                {t('useSimpleWildcard')}
+                              </Button>
+                              <Button size="xs" variant="outline" onClick={convertUrlFilterToCapturingRegex}>
+                                {t('convertToRegularExpression')}
+                              </Button>
+                            </span>
+                          ) : null}
+                        </AlertDescription>
+                      </Alert>
+                    ) : destinationError ? (
+                      <FieldError>{validationMessage(destinationError, t)}</FieldError>
+                    ) : null}
+                  </Field>
+                ) : null}
+                {draft.action.kind === 'modify-request-headers' ? (
+                  <Field data-invalid={Boolean(headerError)}>
+                    <FieldLabel>{t('requestHeader')}</FieldLabel>
+                    <div className="flex flex-col gap-3">
+                      {draft.action.operations.map((operation, index) => (
+                        <div
+                          key={index}
+                          className="grid grid-cols-[130px_minmax(0,1fr)_auto] gap-2 max-sm:grid-cols-[110px_minmax(0,1fr)_auto]"
+                        >
+                          <Select
+                            value={operation.operation}
+                            disabled={readOnly}
+                            onValueChange={(value) => {
+                              const next: HeaderOperation = {
+                                header: operation.header,
+                                operation: value as HeaderOperation['operation'],
+                                ...(value === 'set' ? { value: operation.value ?? '' } : {}),
+                              };
+                              setDraft((current) => ({
+                                ...current,
+                                action:
+                                  current.action.kind === 'modify-request-headers'
+                                    ? {
+                                        ...current.action,
+                                        operations: current.action.operations.map((item, itemIndex) =>
+                                          itemIndex === index ? next : item,
+                                        ),
+                                      }
+                                    : current.action,
+                              }));
+                            }}
+                          >
+                            <SelectTrigger aria-label={t('headerOperation')}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectItem value="remove">{t('removeHeader')}</SelectItem>
+                                <SelectItem value="set">{t('setHeader')}</SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            value={operation.header}
+                            disabled={readOnly}
+                            aria-label={t('requestHeader')}
+                            aria-invalid={Boolean(headerError)}
+                            onChange={(event) =>
+                              setDraft((current) => ({
+                                ...current,
+                                action:
+                                  current.action.kind === 'modify-request-headers'
+                                    ? {
+                                        ...current.action,
+                                        operations: current.action.operations.map((item, itemIndex) =>
+                                          itemIndex === index
+                                            ? { ...item, header: event.target.value }
+                                            : item,
+                                        ),
+                                      }
+                                    : current.action,
+                              }))
+                            }
+                          />
+                          <Button
+                            type="button"
+                            size="icon"
+                            variant="ghost"
+                            disabled={readOnly || headerOperationCount === 1}
+                            aria-label={t('removeHeaderOperation', { index: index + 1 })}
+                            onClick={() =>
+                              setDraft((current) => ({
+                                ...current,
+                                action:
+                                  current.action.kind === 'modify-request-headers'
+                                    ? {
+                                        ...current.action,
+                                        operations: current.action.operations.filter(
+                                          (_, itemIndex) => itemIndex !== index,
+                                        ),
+                                      }
+                                    : current.action,
+                              }))
+                            }
+                          >
+                            <XIcon />
+                          </Button>
+                          {operation.operation === 'set' ? (
+                            <Input
+                              className="col-start-2"
+                              value={operation.value ?? ''}
+                              disabled={readOnly}
+                              aria-label={t('headerValue')}
+                              placeholder={t('headerValue')}
+                              onChange={(event) =>
+                                setDraft((current) => ({
+                                  ...current,
+                                  action:
+                                    current.action.kind === 'modify-request-headers'
+                                      ? {
+                                          ...current.action,
+                                          operations: current.action.operations.map((item, itemIndex) =>
+                                            itemIndex === index
+                                              ? { ...item, value: event.target.value }
+                                              : item,
+                                          ),
+                                        }
+                                      : current.action,
+                                }))
+                              }
+                            />
+                          ) : null}
+                        </div>
+                      ))}
                       <Button
                         type="button"
-                        size="icon"
-                        variant="ghost"
-                        disabled={readOnly || headerOperationCount === 1}
-                        aria-label={t('removeHeaderOperation', { index: index + 1 })}
+                        className="self-start"
+                        size="sm"
+                        variant="outline"
+                        disabled={readOnly || draft.action.operations.length >= 20}
                         onClick={() =>
                           setDraft((current) => ({
                             ...current,
@@ -822,70 +943,24 @@ export function RuleEditor({
                               current.action.kind === 'modify-request-headers'
                                 ? {
                                     ...current.action,
-                                    operations: current.action.operations.filter(
-                                      (_, itemIndex) => itemIndex !== index,
-                                    ),
+                                    operations: [
+                                      ...current.action.operations,
+                                      { header: '', operation: 'remove' },
+                                    ],
                                   }
                                 : current.action,
                           }))
                         }
                       >
-                        <XIcon />
+                        <PlusIcon />
+                        {t('addHeaderOperation')}
                       </Button>
-                      {operation.operation === 'set' ? (
-                        <Input
-                          className="col-start-2"
-                          value={operation.value ?? ''}
-                          disabled={readOnly}
-                          aria-label={t('headerValue')}
-                          placeholder={t('headerValue')}
-                          onChange={(event) =>
-                            setDraft((current) => ({
-                              ...current,
-                              action:
-                                current.action.kind === 'modify-request-headers'
-                                  ? {
-                                      ...current.action,
-                                      operations: current.action.operations.map((item, itemIndex) =>
-                                        itemIndex === index ? { ...item, value: event.target.value } : item,
-                                      ),
-                                    }
-                                  : current.action,
-                            }))
-                          }
-                        />
-                      ) : null}
                     </div>
-                  ))}
-                  <Button
-                    type="button"
-                    className="self-start"
-                    size="sm"
-                    variant="outline"
-                    disabled={readOnly || draft.action.operations.length >= 20}
-                    onClick={() =>
-                      setDraft((current) => ({
-                        ...current,
-                        action:
-                          current.action.kind === 'modify-request-headers'
-                            ? {
-                                ...current.action,
-                                operations: [
-                                  ...current.action.operations,
-                                  { header: '', operation: 'remove' },
-                                ],
-                              }
-                            : current.action,
-                      }))
-                    }
-                  >
-                    <PlusIcon />
-                    {t('addHeaderOperation')}
-                  </Button>
-                </div>
-                <FieldDescription>{t('headerHelp')}</FieldDescription>
-                {headerError ? <FieldError>{validationMessage(headerError, t)}</FieldError> : null}
-              </Field>
+                    <FieldDescription>{t('headerHelp')}</FieldDescription>
+                    {headerError ? <FieldError>{validationMessage(headerError, t)}</FieldError> : null}
+                  </Field>
+                ) : null}
+              </>
             ) : null}
           </FieldGroup>
 
@@ -1144,6 +1219,18 @@ export function RuleEditor({
         </div>
       </footer>
 
+      {builderOpen ? (
+        <RedirectBuilder
+          initialRule={draft}
+          onClose={() => setBuilderOpen(false)}
+          onAdvanced={() => setRawEditor(true)}
+          onSave={async (next) => {
+            setDraft(next);
+            setTestUrl(next.redirectBuilder?.source ?? exampleUrlForRule(next));
+            setRawEditor(false);
+          }}
+        />
+      ) : null}
       <Dialog open={deleteOpen} onOpenChange={(open) => !deleting && setDeleteOpen(open)}>
         <DialogContent>
           <DialogHeader>

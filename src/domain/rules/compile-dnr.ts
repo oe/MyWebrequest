@@ -48,6 +48,7 @@ export type DnrRule = {
   id: number;
   priority: number;
   condition: {
+    isUrlFilterCaseSensitive?: boolean;
     urlFilter?: string;
     regexFilter?: string;
     resourceTypes?: string[];
@@ -57,7 +58,10 @@ export type DnrRule = {
   action:
     | { type: 'block' }
     | { type: 'upgradeScheme' }
-    | { type: 'redirect'; redirect: { url: string } | { regexSubstitution: string } }
+    | {
+        type: 'redirect';
+        redirect: { url: string } | { regexSubstitution: string } | { transform: { host: string } };
+      }
     | {
         type: 'modifyHeaders';
         requestHeaders: Array<{ header: string; operation: HeaderOperation['operation']; value?: string }>;
@@ -81,6 +85,8 @@ export function compileDnrRule(rule: Rule, targetBrowser = import.meta.env.BROWS
   if (rule.condition.url.kind === 'wildcard')
     condition.regexFilter = wildcardToRegExpSource(rule.condition.url.value);
   if (rule.condition.url.kind === 'regex') condition.regexFilter = rule.condition.url.value;
+  if (rule.condition.isUrlFilterCaseSensitive !== undefined)
+    condition.isUrlFilterCaseSensitive = rule.condition.isUrlFilterCaseSensitive;
   condition.resourceTypes = rule.condition.resourceTypes?.length
     ? rule.condition.resourceTypes
     : targetBrowser === 'firefox'
@@ -100,9 +106,11 @@ export function compileDnrRule(rule: Rule, targetBrowser = import.meta.env.BROWS
     case 'redirect':
       action = {
         type: 'redirect',
-        redirect: /\$\d/.test(rule.action.target)
-          ? { regexSubstitution: toDnrRegexSubstitution(rule.action.target) }
-          : { url: rule.action.target },
+        redirect: rule.action.transform
+          ? { transform: rule.action.transform }
+          : /\$\d/.test(rule.action.target)
+            ? { regexSubstitution: toDnrRegexSubstitution(rule.action.target) }
+            : { url: rule.action.target },
       };
       break;
     case 'modify-request-headers':

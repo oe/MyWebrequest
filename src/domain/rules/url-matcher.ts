@@ -44,8 +44,8 @@ export function urlFilterToRegExpSource(value: string): string {
 // matching for both urlFilter and regexFilter. RE2 avoids JS backtracking stalls.
 const matchers = new Map<string, RE2JS>();
 
-export function compileUrlMatcher(condition: Rule['condition']['url']): RE2JS {
-  const key = `${condition.kind}:${condition.value}`;
+export function compileUrlMatcher(condition: Rule['condition']['url'], caseSensitive = false): RE2JS {
+  const key = `${caseSensitive}:${condition.kind}:${condition.value}`;
   const cached = matchers.get(key);
   if (cached) return cached;
   const source =
@@ -54,7 +54,7 @@ export function compileUrlMatcher(condition: Rule['condition']['url']): RE2JS {
       : condition.kind === 'regex'
         ? condition.value
         : urlFilterToRegExpSource(condition.value);
-  const matcher = RE2JS.compile(source, RE2JS.CASE_INSENSITIVE);
+  const matcher = RE2JS.compile(source, caseSensitive ? 0 : RE2JS.CASE_INSENSITIVE);
   if (matchers.size >= 1_000) matchers.delete(matchers.keys().next().value!);
   matchers.set(key, matcher);
   return matcher;

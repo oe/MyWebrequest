@@ -46,6 +46,7 @@ function usesRegexFilter(rule: Rule): boolean {
 function normalizedCondition(rule: Rule): string {
   return JSON.stringify({
     url: rule.condition.url,
+    isUrlFilterCaseSensitive: rule.condition.isUrlFilterCaseSensitive ?? false,
     resourceTypes: [...(rule.condition.resourceTypes ?? [])].sort(),
     requestMethods: [...(rule.condition.requestMethods ?? [])].sort(),
     initiatorDomains: [...(rule.condition.initiatorDomains ?? [])].sort(),
@@ -61,12 +62,16 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
   const other: Array<{ id: string; test: (url: string) => boolean }> = [];
   for (const rule of redirects) {
     const { kind, value } = rule.condition.url;
-    if (kind === 'url-filter' && /^\|https?:\/\/[^*^|]+\|$/.test(value)) {
+    if (
+      !rule.condition.isUrlFilterCaseSensitive &&
+      kind === 'url-filter' &&
+      /^\|https?:\/\/[^*^|]+\|$/.test(value)
+    ) {
       const url = value.slice(1, -1).toLowerCase();
       exact.set(url, [...(exact.get(url) ?? []), rule.id]);
     } else {
       try {
-        const matcher = compileUrlMatcher(rule.condition.url);
+        const matcher = compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
         other.push({ id: rule.id, test: (url) => matcher.test(url) });
       } catch {
         // The browser support check rejects unsupported regex syntax before activation.
@@ -76,7 +81,9 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
   const destinations = new Map<string, string[]>();
   const edges = new Map<string, string[]>();
   for (const rule of redirects) {
-    const target = rule.action.target;
+    const targetUrl = new URL(rule.action.target);
+    if (rule.action.transform) targetUrl.hostname = rule.action.transform.host;
+    const target = targetUrl.href;
     let matches = destinations.get(target);
     if (!matches) {
       matches = [
@@ -86,6 +93,29 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
       destinations.set(target, matches);
     }
     edges.set(rule.id, matches);
+  }
+  // Also connect host transforms to exact destinations at paths other than
+  // the saved example. Pairwise scope checks keep this bounded to O(n²).
+  const witnesses = redirects.flatMap((rule) => {
+    const { kind, value } = rule.condition.url;
+    if (kind !== 'url-filter' || !/^\|https?:\/\/[^*^|]+\|?$/.test(value)) return [];
+    const url = new URL(value.replace(/^\|/, '').replace(/\|$/, ''));
+    return [{ id: rule.id, url }];
+  });
+  for (const rule of redirects) {
+    if (!rule.action.transform) continue;
+    const origin = /^\|(https?:\/\/[^/*^|]+)\//.exec(rule.condition.url.value)?.[1];
+    if (rule.condition.url.kind !== 'url-filter' || !origin) continue;
+    const sourceHost = new URL(origin).hostname;
+    const matcher = compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
+    const related = new Set(edges.get(rule.id));
+    for (const witness of witnesses) {
+      if (witness.url.hostname !== rule.action.transform.host) continue;
+      const source = new URL(witness.url.href);
+      source.hostname = sourceHost;
+      if (matcher.test(source.href)) related.add(witness.id);
+    }
+    edges.set(rule.id, [...related]);
   }
   return edges;
 }

@@ -526,7 +526,7 @@ const enGuides: Record<GuideSlug, GuideCopy> = {
       {
         title: 'Test or adjust',
         paragraphs: [
-          'The original URL is prefilled for testing. Try another URL to check the boundary. Expand the generated pattern to adjust it, or regenerate it from the addresses.',
+          'Choose only this URL, or all pages on the original host when only the hostname differs. Host replacement preserves paths and query parameters, with the original protocol and port and no subdomains. Test additional URLs to check the scope. Use Edit URL redirect to adjust a saved rule; changes are applied to a draft before saving.',
         ],
       },
       {
@@ -880,7 +880,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '测试或调整',
         paragraphs: [
-          '测试框默认填入原网址。换一个网址检查是否误匹配，也可以展开修改生成的表达式，或按填写的网址重新生成。',
+          '选择“仅这个网址”；若两网址仅主机名不同，也可选择“这个网站的所有页面”，保留路径和查询参数，限定原协议与端口，不含子域名。用更多网址检查范围。已有规则可通过“编辑网址跳转”调整，修改先应用到草稿，再保存。',
         ],
       },
       {
@@ -1101,7 +1101,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: '테스트하거나 조정',
         paragraphs: [
-          '원래 URL이 테스트 입력란에 자동으로 채워집니다. 다른 URL로 범위를 확인하고, 생성된 패턴을 조정하거나 주소에서 다시 생성하세요.',
+          '이 URL만 적용하거나, 호스트 이름만 다를 때 해당 호스트의 모든 페이지를 선택하세요. 경로와 쿼리를 유지하며 원래 프로토콜과 포트만 적용하고 하위 도메인은 제외합니다. 추가 URL로 테스트하세요. 저장된 규칙은 URL 리디렉션 편집에서 수정하고 초안에 적용한 후 저장합니다.',
         ],
       },
       {
@@ -1323,7 +1323,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'テストや調整',
         paragraphs: [
-          'テスト欄には元の URL が入ります。別の URL で範囲を確認できます。生成されたパターンを調整したり、URL から再生成したりできます。',
+          'この URL のみを選ぶか、ホスト名だけが異なる場合はそのホストの全ページを選びます。パスとクエリを保持し、元のプロトコルとポートに限定します。サブドメインは含みません。追加の URL でテストできます。保存済みルールは URL リダイレクトを編集から変更し、下書きに適用してから保存します。',
         ],
       },
       {
@@ -1545,7 +1545,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Tester ou ajuster',
         paragraphs: [
-          'L’URL originale est préremplie pour le test. Essayez une autre URL pour vérifier la portée. Vous pouvez ajuster le motif généré ou le régénérer depuis les adresses.',
+          'Choisissez cette URL uniquement, ou toutes les pages de cet hôte si seul le nom d’hôte diffère. Le chemin et les paramètres sont conservés, avec le protocole et le port d’origine, sans sous-domaines. Testez d’autres URL. Pour une règle existante, utilisez Modifier la redirection, appliquez au brouillon puis enregistrez.',
         ],
       },
       {
@@ -1769,7 +1769,7 @@ const localizedSections: Record<Exclude<Locale, 'en'>, Record<GuideSlug, GuideCo
       {
         title: 'Probar o ajustar',
         paragraphs: [
-          'La URL original se rellena para la prueba. Prueba otra dirección para comprobar el alcance. Puedes ajustar el patrón generado o regenerarlo desde las direcciones.',
+          'Elige solo esta URL, o todas las páginas del host si únicamente cambia su nombre. Se conservan ruta y parámetros, con el protocolo y puerto originales y sin subdominios. Prueba otras URL. Para una regla existente, usa Editar redirección, aplica los cambios al borrador y guarda.',
         ],
       },
       {

@@ -31,6 +31,7 @@ export const ruleSchema = z.object({
       z.object({ kind: z.literal('wildcard'), value: z.string().min(1).max(2_000) }),
       z.object({ kind: z.literal('regex'), value: z.string().min(1).max(2_000) }),
     ]),
+    isUrlFilterCaseSensitive: z.boolean().optional(),
     resourceTypes: z.array(z.enum(RESOURCE_TYPES)).max(RESOURCE_TYPES.length).optional(),
     requestMethods: z
       .array(z.enum(['connect', 'delete', 'get', 'head', 'options', 'patch', 'post', 'put']))
@@ -40,13 +41,27 @@ export const ruleSchema = z.object({
   }),
   action: z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('block') }),
-    z.object({ kind: z.literal('redirect'), target: z.string().min(1).max(2_000) }),
+    z.object({
+      kind: z.literal('redirect'),
+      target: z.string().min(1).max(2_000),
+      transform: z
+        .object({ host: z.string().min(1).max(253) })
+        .strict()
+        .optional(),
+    }),
     z.object({ kind: z.literal('upgrade-scheme') }),
     z.object({
       kind: z.literal('modify-request-headers'),
       operations: z.array(headerOperationSchema).min(1).max(20),
     }),
   ]),
+  redirectBuilder: z
+    .object({
+      source: z.string().max(2_000),
+      target: z.string().max(2_000),
+      scope: z.enum(['exact', 'host']),
+    })
+    .optional(),
   permissionOrigins: z.array(z.string().min(1).max(2_000)).max(100),
   migrationState: z.enum(['none', 'review-required', 'removed', 'unsupported']),
   createdAt: z.string().datetime(),

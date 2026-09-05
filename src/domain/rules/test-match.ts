@@ -25,7 +25,7 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
 
   let captures: string[];
   try {
-    const expression = compileUrlMatcher(rule.condition.url);
+    const expression = compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
     const match = expression.matcher(candidateUrl);
     if (!match.find()) {
       return { matched: false, reason: 'The URL does not match this rule.', reasonCode: 'url-no-match' };
@@ -53,6 +53,15 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
         captures,
       };
     case 'redirect':
+      if (rule.action.transform) {
+        try {
+          const target = new URL(candidateUrl);
+          target.hostname = rule.action.transform.host;
+          return { matched: true, result: target.href, captures };
+        } catch {
+          return { matched: false, reason: 'Invalid URL', reasonCode: 'url-no-match' };
+        }
+      }
       return {
         matched: true,
         result: rule.action.target.replace(

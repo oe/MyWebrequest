@@ -74,7 +74,7 @@ export function validateRule(rule: Rule): ValidationResult {
 
   if (rule.condition.url.kind === 'regex') {
     try {
-      compileUrlMatcher(rule.condition.url);
+      compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
     } catch {
       errors.push({ field: 'match', code: 'regex-invalid', message: 'The regular expression is not valid.' });
     }
@@ -109,6 +109,16 @@ export function validateRule(rule: Rule): ValidationResult {
   }
 
   if (rule.action.kind === 'redirect') {
+    if (rule.action.transform) {
+      const host = rule.action.transform.host;
+      if (!domainPattern.test(host) || new URL('https://' + host).hostname !== host) {
+        errors.push({
+          field: 'destination',
+          code: 'redirect-url-invalid',
+          message: 'Enter a valid destination hostname.',
+        });
+      }
+    }
     const target = rule.action.target.replace(/\$\d+/g, 'capture');
     try {
       const url = new URL(target);
