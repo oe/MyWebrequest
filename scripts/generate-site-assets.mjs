@@ -1,5 +1,8 @@
+import { verifyScreenshotSources } from './verify-screenshot-sources.mjs';
 import { copyFile, readFile } from 'node:fs/promises';
 import { chromium } from '@playwright/test';
+
+await verifyScreenshotSources(process.cwd(), ['chrome']);
 
 const screenshot = 'store-assets/screenshots/chrome/01-rules-overview.png';
 await copyFile(screenshot, 'site/src/assets/rules-overview.png');

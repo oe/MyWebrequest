@@ -1,3 +1,4 @@
+import { verifyScreenshotSources } from './verify-screenshot-sources.mjs';
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -5,6 +6,8 @@ import { join } from 'node:path';
 import { chromium } from '@playwright/test';
 
 const root = process.cwd();
+await verifyScreenshotSources(process.cwd(), ['chrome']);
+
 const outputRoot = join(root, 'store-assets', 'listing-screenshots', 'chrome', 'en-US');
 const manifestPath = join(root, 'store-assets', 'listing-screenshots', 'manifest.json');
 const iconPath = join(root, 'store-assets', 'brand', 'app-icon.svg');
