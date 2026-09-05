@@ -8,6 +8,9 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 
 ## Implemented baseline
 
+- Dedicated Create redirect button and Other rules menu in the toolbar and empty state.
+  Blocking, HTTPS upgrades and request headers open their corresponding editors directly.
+
 - Two-address redirect builder for creation and editing: choose an exact URL or, when only the
   hostname differs, all pages on the original origin. Host replacement preserves paths and queries
   using native DNR transforms; ordinary exact rules use case-sensitive URL filters. Test additional

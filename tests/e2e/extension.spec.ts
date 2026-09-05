@@ -1463,7 +1463,7 @@ test('two URLs generate a testable page redirect without activating it', async (
 }) => {
   const options = await context.newPage();
   await options.goto(`chrome-extension://${extensionId}/options.html`);
-  await options.getByRole('button', { name: 'Create redirect', exact: true }).click();
+  await options.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
   const dialog = options.getByRole('dialog');
   await dialog.getByLabel('Original URL', { exact: true }).fill('https://original.example/page?x=1');
   await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/new');

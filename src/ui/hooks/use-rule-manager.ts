@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   createRule,
+  createOtherRule,
   createStarterRule,
   duplicateRule,
   removeRule,
@@ -9,7 +10,7 @@ import {
   updatePausedState,
   upsertRule,
 } from '@/application/rule-service';
-import type { StarterRuleKind } from '@/application/rule-service';
+import type { StarterRuleKind, OtherRuleKind } from '@/application/rule-service';
 import { commitRuleState } from '@/application/rule-transaction';
 import {
   readRuleRuntimeSnapshot,
@@ -300,10 +301,10 @@ export function useRuleManager() {
   );
 
   const addRule = useCallback(
-    async (origin?: string, name?: string) => {
+    async (origin?: string, name?: string, kind?: OtherRuleKind) => {
       const current = stateRef.current;
       if (!current) return;
-      const rule = createRule(origin, name);
+      const rule = kind ? createOtherRule(kind, name ?? 'Untitled rule') : createRule(origin, name);
       await persist(upsertRule(current, rule));
       setSelectedId(rule.id);
     },

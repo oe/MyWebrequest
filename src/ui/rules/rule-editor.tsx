@@ -1223,7 +1223,6 @@ export function RuleEditor({
         <RedirectBuilder
           initialRule={draft}
           onClose={() => setBuilderOpen(false)}
-          onAdvanced={() => setRawEditor(true)}
           onSave={async (next) => {
             setDraft(next);
             setTestUrl(next.redirectBuilder?.source ?? exampleUrlForRule(next));

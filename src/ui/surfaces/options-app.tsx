@@ -1,8 +1,9 @@
+import { CreateRuleActions } from '@/ui/rules/create-rule-actions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArchiveRestoreIcon, ListFilterIcon, PlusIcon, SearchIcon } from 'lucide-react';
+import { ArchiveRestoreIcon, ListFilterIcon, SearchIcon } from 'lucide-react';
 import { toast } from 'sonner';
 
-import type { StarterRuleKind } from '@/application/rule-service';
+import type { StarterRuleKind, OtherRuleKind } from '@/application/rule-service';
 import type { Rule } from '@/domain/rules/model';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
 import { supportsLegacyMigration } from '@/infrastructure/browser-capabilities';
@@ -154,11 +155,11 @@ export function OptionsApp() {
   const handleResourceTypeFilterChange = (nextResourceType: RuleResourceTypeFilter) =>
     applyListCriteria({ query, action: actionFilter, resourceType: nextResourceType });
 
-  const handleCreate = async () => {
+  const handleCreate = async (kind: OtherRuleKind) => {
     if (creating) return;
     setCreating(true);
     try {
-      await manager.addRule(undefined, t('untitledRule'));
+      await manager.addRule(undefined, t('untitledRule'), kind);
     } catch (error) {
       toast.error(errorMessage(error, t('createRuleError')));
     } finally {
@@ -239,7 +240,7 @@ export function OptionsApp() {
 
   return (
     <TooltipProvider>
-      <main className="grid h-screen min-h-[600px] grid-rows-[64px_minmax(0,1fr)] overflow-hidden">
+      <main className="grid h-screen min-h-[600px] grid-rows-[minmax(64px,auto)_minmax(0,1fr)] overflow-hidden">
         <header
           data-material="glass-bar"
           className="relative grid grid-cols-[200px_minmax(320px,420px)_minmax(0,1fr)] items-center border-b max-[1049px]:grid-cols-[64px_340px_minmax(0,1fr)] max-[799px]:grid-cols-[1fr_auto]"
@@ -278,7 +279,7 @@ export function OptionsApp() {
               </p>
             )}
           </div>
-          <div className="flex justify-end gap-2 px-4 max-[799px]:px-3">
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 px-4 py-2 max-[799px]:px-3">
             <div className="min-[800px]:hidden">
               <LanguageMenu />
             </div>
@@ -318,10 +319,15 @@ export function OptionsApp() {
               </Button>
             )}
             {view === 'rules' ? (
-              <Button disabled={creating} onClick={() => requestNavigation(() => setRedirectOpen(true))}>
-                <PlusIcon data-icon="inline-start" />
-                {creating ? t('creating') : t('newRule')}
-              </Button>
+              <CreateRuleActions
+                disabled={creating}
+                onRedirect={() => requestNavigation(() => setRedirectOpen(true))}
+                onOther={(kind) =>
+                  requestNavigation(() => {
+                    void handleCreate(kind);
+                  })
+                }
+              />
             ) : null}
           </div>
         </header>
@@ -403,6 +409,12 @@ export function OptionsApp() {
             </>
           ) : (
             <EmptyRules
+              creating={creating}
+              onOther={(kind) =>
+                requestNavigation(() => {
+                  void handleCreate(kind);
+                })
+              }
               onCreate={() => setRedirectOpen(true)}
               onCreateStarter={(kind) =>
                 kind === 'redirect-local' ? setRedirectOpen(true) : void handleStarterCreate(kind)
@@ -473,7 +485,6 @@ export function OptionsApp() {
             setRedirectFrom('');
           }}
           onSave={manager.addGeneratedRule}
-          onAdvanced={() => void handleCreate()}
         />
       ) : null}
       <Toaster position="top-right" offset={72} richColors />

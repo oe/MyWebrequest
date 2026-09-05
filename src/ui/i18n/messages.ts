@@ -77,6 +77,7 @@ export const en = {
   openRules: 'Open rules',
   migration: 'Migration',
   newRule: 'Create redirect',
+  otherRules: 'Other rules',
   untitledRule: 'Untitled rule',
   creating: 'Creating…',
   selectRule: 'Select a rule',

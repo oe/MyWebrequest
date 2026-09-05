@@ -4,6 +4,8 @@ import { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
 export { permissionOriginsFromMatch } from '@/domain/rules/permissions';
 
+export type OtherRuleKind = 'block' | 'upgrade-scheme' | 'modify-request-headers';
+
 export type StarterRuleKind = 'block-analytics' | 'redirect-local' | 'remove-referrer';
 
 export function createRule(origin?: string, name = 'Untitled rule'): Rule {
@@ -24,6 +26,17 @@ export function createRule(origin?: string, name = 'Untitled rule'): Rule {
     createdAt: now,
     updatedAt: now,
   };
+}
+
+export function createOtherRule(kind: OtherRuleKind, name: string): Rule {
+  const rule = createRule(undefined, name);
+  if (kind === 'modify-request-headers')
+    return {
+      ...rule,
+      condition: { ...rule.condition, resourceTypes: ['main_frame'] },
+      action: { kind, operations: [{ header: 'Referer', operation: 'remove' }] },
+    };
+  return { ...rule, action: { kind } };
 }
 
 export function createStarterRule(kind: StarterRuleKind, name: string): Rule {

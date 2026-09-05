@@ -1,13 +1,13 @@
+import { CreateRuleActions } from './create-rule-actions';
 import {
   ArrowRightLeftIcon,
   BookOpenIcon,
   ListPlusIcon,
-  PlusIcon,
   ShieldBanIcon,
   WandSparklesIcon,
 } from 'lucide-react';
 
-import type { StarterRuleKind } from '@/application/rule-service';
+import type { StarterRuleKind, OtherRuleKind } from '@/application/rule-service';
 import { Button } from '@/ui/components/button';
 import {
   Empty,
@@ -22,6 +22,8 @@ import { useI18n } from '@/ui/i18n';
 
 type EmptyRulesProps = {
   onCreate: () => void;
+  onOther: (kind: OtherRuleKind) => void;
+  creating: boolean;
   onCreateStarter: (kind: StarterRuleKind) => void;
 };
 
@@ -46,7 +48,7 @@ const starters = [
   },
 ] as const;
 
-export function EmptyRules({ onCreate, onCreateStarter }: EmptyRulesProps) {
+export function EmptyRules({ onCreate, onCreateStarter, onOther, creating }: EmptyRulesProps) {
   const { locale, t } = useI18n();
   return (
     <section className="col-span-2 grid place-items-center overflow-auto p-6 max-[799px]:col-span-1">
@@ -61,11 +63,13 @@ export function EmptyRules({ onCreate, onCreateStarter }: EmptyRulesProps) {
           <EmptyDescription>{t('noRulesDescription')}</EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="max-w-xl gap-3">
+          <CreateRuleActions onRedirect={onCreate} onOther={onOther} disabled={creating} />
           <div className="grid w-full grid-cols-3 gap-2 max-[639px]:grid-cols-1">
             {starters.map((starter) => {
               const Icon = starter.icon;
               return (
                 <Button
+                  disabled={creating}
                   key={starter.kind}
                   className="h-auto min-h-24 flex-col items-start justify-start gap-2 p-3 text-left whitespace-normal"
                   variant="outline"
@@ -81,10 +85,6 @@ export function EmptyRules({ onCreate, onCreateStarter }: EmptyRulesProps) {
             })}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-1">
-            <Button onClick={onCreate}>
-              <PlusIcon data-icon="inline-start" />
-              {t('createBlankRule')}
-            </Button>
             <Button asChild variant="link">
               <a href={helpUrl(locale)} target="_blank" rel="noreferrer">
                 <BookOpenIcon data-icon="inline-start" />

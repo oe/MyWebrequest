@@ -29,13 +29,11 @@ export function RedirectBuilder({
   initialRule,
   onClose,
   onSave,
-  onAdvanced,
 }: {
   initialFrom?: string;
   initialRule?: Rule;
   onClose: () => void;
   onSave: (rule: Rule) => Promise<void>;
-  onAdvanced: () => void;
 }) {
   const { locale, t } = useI18n();
   const copy = redirectBuilderCopy[locale];
@@ -263,22 +261,6 @@ export function RedirectBuilder({
             {saving ? t('saving') : initialRule ? copy.apply : copy.save}
           </Button>
         </DialogFooter>
-        {!initialRule && !generated.ok ? (
-          <Button
-            variant="link"
-            className="justify-self-start px-0"
-            disabled={saving || (generated.ok && !valid)}
-            onClick={() => {
-              if (valid) void save();
-              else {
-                onClose();
-                onAdvanced();
-              }
-            }}
-          >
-            {copy.advanced}
-          </Button>
-        ) : null}
       </DialogContent>
     </Dialog>
   );
