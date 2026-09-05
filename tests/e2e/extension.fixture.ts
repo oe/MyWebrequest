@@ -166,7 +166,7 @@ export const test = base.extend<ExtensionFixtures>({
     if (browserName !== 'chromium') throw new Error('Extension E2E requires Playwright Chromium.');
     const target = process.env.MWR_BROWSER_TARGET === 'edge' ? 'edge' : 'chrome';
     const extensionPath = path.resolve(
-      process.env.MWR_EXTENSION_PATH ?? path.join(process.cwd(), `dist/${target}-mv3`),
+      process.env.MWR_EXTENSION_PATH ?? path.join(process.cwd(), `dist/${target}`),
     );
     const launched = await launchChromiumExtensionContext(extensionPath, ignoreHTTPSErrors);
     try {

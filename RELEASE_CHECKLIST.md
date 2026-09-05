@@ -1,8 +1,8 @@
 # Release Checklist
 
-Status: Current-browser and Firefox 142 matrices plus listing assets complete; Chrome/Edge 121 and store
-portal certification pending
-Last updated: 2026-09-02
+Status: Local candidate with the evidence below; the final commit still needs CI browser-floor certification
+and signed store-upgrade verification before publication.
+Last updated: 2026-09-05
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
 test date, and evidence for every completed row.
@@ -32,6 +32,24 @@ wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 Only evidence explicitly reflected in the matrices below satisfies a release row. Build-only, static, or
 partial historical checks remain pre-certification evidence.
+
+- 2026-09-05: hardened the rule editor against unsaved-draft loss and external edits; URL previews now
+  follow DNR's default case-insensitive matching, run in a cancellable worker, and use RE2 instead of
+  backtracking JavaScript expressions. The 16-test Chromium suite proves these regressions alongside
+  the existing permission, migration, backup, and live request behavior. All 188 unit tests pass.
+- 2026-09-05: on this local machine, diagnostics for 1,000 distinct exact-URL redirect rules fell from
+  11,071 ms to 16 ms. Options startup with 500 such rules fell from 4,372 ms to 475 ms. A separate
+  1,000-rule non-exact URL-filter case took 576 ms. These are local fixture measurements, not a
+  universal latency guarantee. Compiled matchers, indexed exact destinations, and one iterative
+  graph traversal replace repeated validation and per-rule cycle traversal.
+- 2026-09-05: Firefox 155.0 passed the production ZIP runtime verifier, including all six locales,
+  backup, native permission denial/grant/revocation/re-grant, cross-origin redirect/header effects,
+  quota limits, and reload recovery. The verifier now supports Firefox's newer `moz-button` controls.
+- 2026-09-05: refreshed all three browsers' screenshot provenance, store listing/promotional images,
+  and the site's real product screenshot and PNG sharing card. The site now explains developer-preview
+  availability, minimum browsers, and local installation; mobile navigation is collapsible. Privacy
+  copy explicitly covers user-entered secrets and unencrypted backups. Public deployment, final-commit
+  CI, signed upgrades, and store submission are separate remaining release gates.
 
 - 2026-09-01: the production options UI switched among all six release languages, retained the selected
   language after reload, supported arrow-key rule navigation, and produced no console warning or error in

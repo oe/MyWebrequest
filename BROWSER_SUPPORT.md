@@ -1,16 +1,16 @@
 # Browser Support Plan
 
-Status: Current-browser and Firefox 142 certification complete; Chrome/Edge 121 and store portals pending
-Last updated: 2026-09-02
+Status: Local candidate checks updated 2026-09-05; final-commit CI floor certification and store portals pending
+Last updated: 2026-09-05
 
 ## Current matrix
 
-| Target         | Manifest | Minimum | Build output       | Current evidence                                                  | Release status            |
-| -------------- | -------- | ------- | ------------------ | ----------------------------------------------------------------- | ------------------------- |
-| Chrome         | MV3      | 121     | `dist/chrome-mv3`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
-| Microsoft Edge | MV3      | 121     | `dist/edge-mv3`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
-| Firefox        | MV3      | 142     | `dist/firefox-mv3` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
-| Safari         | TBD      | TBD     | None               | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
+| Target         | Manifest | Minimum | Build output   | Current evidence                                                  | Release status            |
+| -------------- | -------- | ------- | -------------- | ----------------------------------------------------------------- | ------------------------- |
+| Chrome         | MV3      | 121     | `dist/chrome`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
+| Microsoft Edge | MV3      | 121     | `dist/edge`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
+| Firefox        | MV3      | 142     | `dist/firefox` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
+| Safari         | TBD      | TBD     | None           | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
 
 `Current runtime certified` means the unpacked artifact passed the recorded local installed-extension
 checks on the listed browser version. It does not mean store-ready: the older-release matrix, remaining
@@ -56,7 +56,7 @@ DNR scenarios, signed-artifact upgrade test, and store validation are still requ
 - Microsoft Edge 152.0.0.0: no-host-access install; all-resource block including top-level navigation;
   request-header permission and live modification; pause/resume; popup/options synchronization; extension
   reload recovery. Header fixture received `X-E2E-Test: edge-pass`.
-- Firefox 154.0.1: temporary install from `dist/firefox-mv3`; all-resource block including top-level
+- Firefox 154.0.1: temporary install from `dist/firefox`; all-resource block including top-level
   navigation; request-header permission requested from the originating click; pause/resume; popup/options
   synchronization; background reload recovery. Header fixture received `X-E2E-Test: firefox-pass`.
 - Chrome, Edge, and Firefox were reloaded again after the product-name and initial migration-navigation

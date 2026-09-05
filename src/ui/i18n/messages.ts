@@ -1,4 +1,16 @@
 export const en = {
+  previewPending: 'Checking URL…',
+  previewUnavailable: 'Preview unavailable',
+  previewTimeout: 'This preview took too long and was stopped. Simplify the pattern or shorten the test URL.',
+  previewError: 'The preview could not run. Edit the URL to retry.',
+  previewUnsupported:
+    'This pattern is not supported by the preview engine. The browser must also approve it before activation.',
+  draftChangedTitle: 'The saved rule changed',
+  draftChangedDescription:
+    'Your unsaved draft is still here. Load the saved version, or keep your draft to review and save over it.',
+  reloadSavedRule: 'Load saved version',
+  keepDraft: 'Keep my draft',
+
   appName: 'RequestOrbit',
   loading: 'Loading…',
   loadingRules: 'Loading request rules…',
@@ -253,7 +265,7 @@ export const en = {
   concreteHostHelp: 'Use a concrete HTTP or HTTPS host so the extension can request narrow access.',
   testRule: 'Test rule',
   testRuleDescription:
-    'Uses the unsaved rule and updates as you type. This preview sends no request and does not change live browser behavior.',
+    'Checks the URL only, without sending a request. Matching ignores case unless a regex overrides it. Resource types, methods, initiators, permissions, and other rules can change the actual outcome.',
   livePreview: 'Live preview',
   testUrl: 'Test URL',
   test: 'Test',

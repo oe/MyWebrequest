@@ -1,5 +1,5 @@
 import type { Rule, StoredState } from './model';
-import { matchRule } from './test-match';
+import { compileUrlMatcher } from './test-match';
 import { validateRule } from './validate';
 
 export const INTERNAL_DYNAMIC_RULE_LIMIT = 4_500;
@@ -25,11 +25,18 @@ export type RuleRuntimePlan = {
   quotaBlockedRuleIds: ReadonlySet<string>;
 };
 
+const runnableCache = new WeakMap<StoredState, Rule[]>();
+const diagnosticsCache = new WeakMap<StoredState, Record<string, RuleDiagnostic[]>>();
+
 function runnableRules(state: StoredState): Rule[] {
-  return state.order.flatMap((id) => {
+  const cached = runnableCache.get(state);
+  if (cached) return cached;
+  const rules = state.order.flatMap((id) => {
     const rule = state.rules[id];
     return rule?.enabled && rule.migrationState === 'none' && validateRule(rule).valid ? [rule] : [];
   });
+  runnableCache.set(state, rules);
+  return rules;
 }
 
 function usesRegexFilter(rule: Rule): boolean {
@@ -50,32 +57,95 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
     (rule): rule is Rule & { action: Extract<Rule['action'], { kind: 'redirect' }> } =>
       rule.action.kind === 'redirect' && !/\$\d+/.test(rule.action.target),
   );
-  return new Map(
-    redirects.map((rule) => [
-      rule.id,
-      redirects
-        .filter((candidate) => matchRule(candidate, rule.action.target).matched)
-        .map((candidate) => candidate.id),
-    ]),
-  );
+  const exact = new Map<string, string[]>();
+  const other: Array<{ id: string; test: (url: string) => boolean }> = [];
+  for (const rule of redirects) {
+    const { kind, value } = rule.condition.url;
+    if (kind === 'url-filter' && /^\|https?:\/\/[^*^|]+\|$/.test(value)) {
+      const url = value.slice(1, -1).toLowerCase();
+      exact.set(url, [...(exact.get(url) ?? []), rule.id]);
+    } else {
+      try {
+        const matcher = compileUrlMatcher(rule.condition.url);
+        other.push({ id: rule.id, test: (url) => matcher.test(url) });
+      } catch {
+        // The browser support check rejects unsupported regex syntax before activation.
+      }
+    }
+  }
+  const destinations = new Map<string, string[]>();
+  const edges = new Map<string, string[]>();
+  for (const rule of redirects) {
+    const target = rule.action.target;
+    let matches = destinations.get(target);
+    if (!matches) {
+      matches = [
+        ...(exact.get(target.toLowerCase()) ?? []),
+        ...other.filter((candidate) => candidate.test(target)).map((candidate) => candidate.id),
+      ];
+      destinations.set(target, matches);
+    }
+    edges.set(rule.id, matches);
+  }
+  return edges;
 }
 
-function reachesStart(
-  startId: string,
-  currentId: string,
-  edges: ReadonlyMap<string, string[]>,
-  visited: Set<string>,
-): boolean {
-  for (const nextId of edges.get(currentId) ?? []) {
-    if (nextId === startId) return true;
-    if (visited.has(nextId)) continue;
-    visited.add(nextId);
-    if (reachesStart(startId, nextId, edges, visited)) return true;
+// Iterative strongly-connected components avoid a fresh graph traversal for
+// every rule and do not overflow the JS stack on long redirect chains.
+function cycleRuleIds(edges: ReadonlyMap<string, string[]>): Set<string> {
+  const visited = new Set<string>();
+  const order: string[] = [];
+  const reverse = new Map<string, string[]>();
+  for (const [id, nextIds] of edges) {
+    for (const next of nextIds) {
+      const incoming = reverse.get(next) ?? [];
+      incoming.push(id);
+      reverse.set(next, incoming);
+    }
+    if (visited.has(id)) continue;
+    const stack: Array<{ id: string; index: number }> = [{ id, index: 0 }];
+    visited.add(id);
+    while (stack.length) {
+      const frame = stack[stack.length - 1]!;
+      const next = (edges.get(frame.id) ?? [])[frame.index++];
+      if (next !== undefined) {
+        if (!visited.has(next)) {
+          visited.add(next);
+          stack.push({ id: next, index: 0 });
+        }
+      } else {
+        order.push(frame.id);
+        stack.pop();
+      }
+    }
   }
-  return false;
+  const assigned = new Set<string>();
+  const cyclic = new Set<string>();
+  for (const id of order.reverse()) {
+    if (assigned.has(id)) continue;
+    const component: string[] = [];
+    const stack = [id];
+    assigned.add(id);
+    while (stack.length) {
+      const current = stack.pop()!;
+      component.push(current);
+      for (const previous of reverse.get(current) ?? []) {
+        if (!assigned.has(previous)) {
+          assigned.add(previous);
+          stack.push(previous);
+        }
+      }
+    }
+    if (component.length > 1 || edges.get(id)?.includes(id)) {
+      for (const member of component) cyclic.add(member);
+    }
+  }
+  return cyclic;
 }
 
 export function analyzeRuleState(state: StoredState): Record<string, RuleDiagnostic[]> {
+  const cached = diagnosticsCache.get(state);
+  if (cached) return cached;
   const rules = runnableRules(state);
   const diagnostics: Record<string, RuleDiagnostic[]> = {};
   const add = (id: string, diagnostic: RuleDiagnostic) => {
@@ -103,11 +173,13 @@ export function analyzeRuleState(state: StoredState): Record<string, RuleDiagnos
   }
 
   const edges = redirectEdges(rules.filter((rule) => !diagnostics[rule.id]?.length));
-  for (const ruleId of edges.keys()) {
-    if (reachesStart(ruleId, ruleId, edges, new Set([ruleId]))) {
-      add(ruleId, { code: 'redirect-cycle', relatedRuleIds: edges.get(ruleId) ?? [] });
-    }
+  for (const ruleId of cycleRuleIds(edges)) {
+    add(ruleId, {
+      code: 'redirect-cycle',
+      relatedRuleIds: (edges.get(ruleId) ?? []).slice(0, MAX_RELATED_RULE_IDS),
+    });
   }
+  diagnosticsCache.set(state, diagnostics);
 
   return diagnostics;
 }

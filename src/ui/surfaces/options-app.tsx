@@ -52,6 +52,7 @@ export function OptionsApp() {
   const [resourceTypeFilter, setResourceTypeFilter] = useState<RuleResourceTypeFilter>('all');
   const [creating, setCreating] = useState(false);
   const [editorDirty, setEditorDirty] = useState(false);
+  const [editorEpoch, setEditorEpoch] = useState(0);
   const [discardOpen, setDiscardOpen] = useState(false);
   const [pendingPermissionRule, setPendingPermissionRule] = useState<Rule | null>(null);
   const [pendingRuleIds, setPendingRuleIds] = useState<Set<string>>(() => new Set());
@@ -109,6 +110,7 @@ export function OptionsApp() {
     const action = pendingNavigation.current;
     pendingNavigation.current = null;
     setEditorDirty(false);
+    setEditorEpoch((epoch) => epoch + 1);
     setDiscardOpen(false);
     action?.();
   };
@@ -195,7 +197,7 @@ export function OptionsApp() {
     }
   };
 
-  const handleToggle = (id: string, enabled: boolean) => {
+  const toggleSavedRule = (id: string, enabled: boolean) => {
     const rule = manager.state?.rules[id];
     if (enabled && manager.statuses[id] === 'invalid') {
       manager.setSelectedId(id);
@@ -207,6 +209,11 @@ export function OptionsApp() {
       return;
     }
     void performToggle(id, enabled);
+  };
+
+  const handleToggle = (id: string, enabled: boolean) => {
+    if (id === manager.selectedId) requestNavigation(() => toggleSavedRule(id, enabled));
+    else toggleSavedRule(id, enabled);
   };
 
   if (manager.loading || !manager.state) {
@@ -359,7 +366,7 @@ export function OptionsApp() {
               </div>
               {selectedRule ? (
                 <RuleEditor
-                  key={`${selectedRule.id}:${selectedRule.updatedAt}`}
+                  key={`${selectedRule.id}:${editorEpoch}`}
                   rule={selectedRule}
                   status={manager.statuses[selectedRule.id] ?? 'disabled'}
                   hasPermission={manager.permissions[selectedRule.id] === true}

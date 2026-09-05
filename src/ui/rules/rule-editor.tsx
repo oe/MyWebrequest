@@ -25,7 +25,7 @@ import {
 } from '@/domain/rules/model';
 import type { RuleDiagnostic } from '@/domain/rules/diagnostics';
 import { requiredPermissionOrigins } from '@/domain/rules/permissions';
-import { matchRule, type MatchResult } from '@/domain/rules/test-match';
+import { type MatchResult } from '@/domain/rules/test-match';
 import { validateRule, type ValidationIssue } from '@/domain/rules/validate';
 import { Alert, AlertDescription, AlertTitle } from '@/ui/components/alert';
 import { Badge } from '@/ui/components/badge';
@@ -61,6 +61,7 @@ import {
 import { Separator } from '@/ui/components/separator';
 import { Switch } from '@/ui/components/switch';
 import { Textarea } from '@/ui/components/textarea';
+import { useMatchPreview } from '@/ui/hooks/use-match-preview';
 import { useI18n, type Translate } from '@/ui/i18n';
 import { errorMessage } from '@/ui/lib/error-message';
 import { localizedResourceTypeLabel } from './filter-rules';
@@ -68,7 +69,6 @@ import {
   convertedMatchValue,
   guidanceForMatch,
   regexWithWildcardCaptures,
-  suggestedTestUrls,
   type MatchGuidance,
   suggestedMatchKind,
   type MatchKind,
@@ -94,6 +94,7 @@ type RuleEditorProps = {
     quotaAvailable: boolean;
     cycleFree: boolean;
     priorityConflictFree: boolean;
+    stale?: boolean;
   }>;
   ruleIndex: number;
 };
@@ -157,7 +158,13 @@ function validationMessage(issue: ValidationIssue, t: Translate): string {
 
 function matchResultText(result: MatchResult, t: Translate): string {
   if (!result.matched) {
-    return t(result.reasonCode === 'invalid-rule' ? 'matchInvalidRule' : 'matchUrlMismatch');
+    return t(
+      result.reasonCode === 'unsupported-pattern'
+        ? 'previewUnsupported'
+        : result.reasonCode === 'invalid-rule'
+          ? 'matchInvalidRule'
+          : 'matchUrlMismatch',
+    );
   }
   if (result.resultCode === 'request-blocked') return t('matchRequestBlocked');
   if (result.resultCode === 'header-operations') {
@@ -196,6 +203,12 @@ function exampleUrlForRule(rule: Rule): string {
   return 'https://example.com/';
 }
 
+function editableFingerprint(rule: Rule): string {
+  const { updatedAt, ...editable } = rule;
+  void updatedAt;
+  return JSON.stringify(editable);
+}
+
 export function RuleEditor({
   diagnostics,
   hasPermission,
@@ -212,6 +225,20 @@ export function RuleEditor({
   const { t } = useI18n();
   const initialTestUrl = exampleUrlForRule(rule);
   const [draft, setDraft] = useState(rule);
+  const [baseline, setBaseline] = useState(rule);
+  const [externalChange, setExternalChange] = useState(false);
+  if (baseline !== rule) {
+    if (
+      editableFingerprint(draft) === editableFingerprint(baseline) ||
+      editableFingerprint(draft) === editableFingerprint(rule)
+    ) {
+      setDraft(rule);
+      setExternalChange(false);
+    } else {
+      setExternalChange(true);
+    }
+    setBaseline(rule);
+  }
   const [advanced, setAdvanced] = useState(false);
   const [testUrl, setTestUrl] = useState(initialTestUrl);
   const [confirmedPreview, setConfirmedPreview] = useState<string | null>(null);
@@ -226,9 +253,10 @@ export function RuleEditor({
   const validation = useMemo(() => validateRule(draft), [draft]);
   const draftFingerprint = useMemo(() => JSON.stringify(draft), [draft]);
   const previewFingerprint = `${draftFingerprint}:${testUrl}`;
-  const testResult = useMemo(() => matchRule(draft, testUrl), [draft, testUrl]);
+  const preview = useMatchPreview(draft, testUrl);
+  const testResult = preview.status === 'ready' ? preview.result : null;
   const previewConfirmed = confirmedPreview === previewFingerprint;
-  const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(rule), [draft, rule]);
+  const dirty = useMemo(() => editableFingerprint(draft) !== editableFingerprint(rule), [draft, rule]);
   const readOnly = draft.migrationState === 'removed' || draft.migrationState === 'unsupported';
   const matchError = validation.errors.find((issue) => issue.field === 'match');
   const destinationError = validation.errors.find((issue) => issue.field === 'destination');
@@ -259,10 +287,8 @@ export function RuleEditor({
     () => guidanceForMatch(draft.condition.url.kind, draft.condition.url.value),
     [draft.condition.url.kind, draft.condition.url.value],
   );
-  const suggestedUrls = useMemo(
-    () => suggestedTestUrls(draft.condition.url.kind, draft.condition.url.value, testUrl),
-    [draft.condition.url.kind, draft.condition.url.value, testUrl],
-  );
+  const suggestedUrls =
+    preview.status === 'ready' ? preview.suggestions : { matching: undefined, nonMatching: undefined };
 
   useEffect(() => {
     onDirtyChange(dirty);
@@ -328,11 +354,13 @@ export function RuleEditor({
   };
 
   const performSave = async () => {
-    if (!validation.valid || saving) return;
+    if (!validation.valid || saving || externalChange) return;
     setSaving(true);
     try {
       const result = await onSave(draft);
-      if (!result.quotaAvailable) {
+      if (result.stale) {
+        setExternalChange(true);
+      } else if (!result.quotaAvailable) {
         toast.error(t('quotaExceeded'));
       } else if (!result.cycleFree) {
         toast.error(t('redirectCycleBlocked'));
@@ -480,6 +508,37 @@ export function RuleEditor({
             </Alert>
           ) : null}
 
+          {externalChange ? (
+            <Alert variant="warning" role="alert">
+              <CircleAlertIcon />
+              <AlertTitle>{t('draftChangedTitle')}</AlertTitle>
+              <AlertDescription>
+                <p>{t('draftChangedDescription')}</p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setDraft(rule);
+                      setExternalChange(false);
+                    }}
+                  >
+                    {t('reloadSavedRule')}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setDraft((current) => ({ ...current, updatedAt: rule.updatedAt }));
+                      setExternalChange(false);
+                    }}
+                  >
+                    {t('keepDraft')}
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          ) : null}
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="rule-name">{t('ruleName')}</FieldLabel>
@@ -866,7 +925,7 @@ export function RuleEditor({
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
                 <h2 className="text-base font-medium">{t('testRule')}</h2>
-                <Badge variant="success">{t('livePreview')}</Badge>
+                <Badge variant="secondary">{t('livePreview')}</Badge>
               </div>
               <p className="text-sm text-muted-foreground">{t('testRuleDescription')}</p>
             </div>
@@ -937,11 +996,33 @@ export function RuleEditor({
                 </div>
               </div>
             ) : null}
-            <Alert role="status" aria-live="polite" variant={testResult.matched ? 'success' : 'default'}>
-              {testResult.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
-              <AlertTitle>{t(testResult.matched ? 'ruleMatches' : 'noMatch')}</AlertTitle>
+            <Alert role="status" aria-live="polite" variant={testResult?.matched ? 'success' : 'default'}>
+              {testResult?.matched ? <CheckCircle2Icon /> : <CircleAlertIcon />}
+              <AlertTitle>
+                {t(
+                  testResult
+                    ? testResult.matched
+                      ? 'ruleMatches'
+                      : testResult.reasonCode === 'unsupported-pattern'
+                        ? 'previewUnavailable'
+                        : 'noMatch'
+                    : preview.status === 'pending'
+                      ? 'previewPending'
+                      : 'previewUnavailable',
+                )}
+              </AlertTitle>
               <AlertDescription>
-                <span className="block font-mono break-all">{matchResultText(testResult, t)}</span>
+                <span className="block font-mono break-all">
+                  {testResult
+                    ? matchResultText(testResult, t)
+                    : t(
+                        preview.status === 'timeout'
+                          ? 'previewTimeout'
+                          : preview.status === 'error'
+                            ? 'previewError'
+                            : 'previewPending',
+                      )}
+                </span>
                 <span className="mt-1 block text-xs">
                   {t('previewUrl')}: <code className="font-mono break-all">{testUrl}</code>
                 </span>
@@ -1043,7 +1124,14 @@ export function RuleEditor({
           >
             {t(advanced ? 'hideAdvanced' : 'advancedSettings')}
           </Button>
-          <Button className="max-[479px]:w-full" variant="outline" onClick={() => setDraft(rule)}>
+          <Button
+            className="max-[479px]:w-full"
+            variant="outline"
+            onClick={() => {
+              setDraft(rule);
+              setExternalChange(false);
+            }}
+          >
             {t('cancel')}
           </Button>
           <Button

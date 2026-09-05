@@ -1,6 +1,16 @@
 import type { Messages } from './messages';
 
 const zhCN = {
+  previewPending: '正在检查 URL…',
+  previewUnavailable: '无法预览',
+  previewTimeout: '预览耗时过长，已停止。请简化匹配规则或缩短测试 URL。',
+  previewError: '预览未能运行。修改 URL 后可重试。',
+  previewUnsupported: '预览引擎不支持此表达式。启用前还需通过浏览器检查。',
+  draftChangedTitle: '已保存的规则发生了变化',
+  draftChangedDescription: '未保存的草稿仍然保留。你可以载入已保存版本，或保留草稿，检查后覆盖保存。',
+  reloadSavedRule: '载入已保存版本',
+  keepDraft: '保留我的草稿',
+
   appName: 'RequestOrbit',
   loading: '正在加载…',
   loadingRules: '正在加载请求规则…',
@@ -194,7 +204,7 @@ const zhCN = {
   concreteHostHelp: '请使用明确的 HTTP 或 HTTPS 主机，以便扩展仅申请必要范围的权限。',
   testRule: '测试规则',
   testRuleDescription:
-    '使用尚未保存的规则，并会随着输入实时更新。预览不会发送请求，也不会改变浏览器中的实际行为。',
+    '仅检查 URL，不会发送请求。默认不区分大小写，正则可自行覆盖。资源类型、请求方法、来源网页、权限及其他规则仍会影响实际结果。',
   livePreview: '实时预览',
   testUrl: '测试 URL',
   test: '测试',
@@ -374,6 +384,17 @@ const zhCN = {
 } satisfies Messages;
 
 const ko = {
+  previewPending: 'URL 확인 중…',
+  previewUnavailable: '미리보기 사용 불가',
+  previewTimeout: '미리보기가 너무 오래 걸려 중지되었습니다. 패턴이나 테스트 URL을 줄이세요.',
+  previewError: '미리보기를 실행하지 못했습니다. URL을 수정하여 다시 시도하세요.',
+  previewUnsupported: '미리보기 엔진이 지원하지 않는 패턴입니다. 활성화 전에 브라우저 검사도 필요합니다.',
+  draftChangedTitle: '저장된 규칙이 변경되었습니다',
+  draftChangedDescription:
+    '저장하지 않은 초안은 유지됩니다. 저장된 버전을 불러오거나 초안을 검토한 후 덮어쓸 수 있습니다.',
+  reloadSavedRule: '저장된 버전 불러오기',
+  keepDraft: '내 초안 유지',
+
   appName: 'RequestOrbit',
   loading: '불러오는 중…',
   loadingRules: '요청 규칙을 불러오는 중…',
@@ -576,7 +597,7 @@ const ko = {
   concreteHostHelp: '확장 프로그램이 필요한 범위만 요청하도록 구체적인 HTTP 또는 HTTPS 호스트를 사용하세요.',
   testRule: '규칙 테스트',
   testRuleDescription:
-    '저장하지 않은 규칙을 사용하며 입력하는 즉시 업데이트됩니다. 요청을 보내거나 실제 브라우저 동작을 바꾸지 않습니다.',
+    '요청을 보내지 않고 URL만 검사합니다. 정규식에서 지정하지 않으면 대소문자를 구분하지 않습니다. 리소스 유형, 메서드, 시작 도메인, 권한 및 다른 규칙은 실제 결과에 영향을 줍니다.',
   livePreview: '실시간 미리보기',
   testUrl: '테스트 URL',
   test: '테스트',
@@ -764,6 +785,17 @@ const ko = {
 } satisfies Messages;
 
 const ja = {
+  previewPending: 'URL を確認中…',
+  previewUnavailable: 'プレビューを利用できません',
+  previewTimeout: '時間がかかりすぎたため停止しました。パターンやテスト URL を短くしてください。',
+  previewError: 'プレビューを実行できませんでした。URL を編集して再試行してください。',
+  previewUnsupported: 'このパターンはプレビューで未対応です。有効化前にブラウザーの検査も必要です。',
+  draftChangedTitle: '保存済みのルールが変更されました',
+  draftChangedDescription:
+    '未保存の下書きは保持されています。保存済みの版を読み込むか、下書きを確認して上書き保存できます。',
+  reloadSavedRule: '保存済みの版を読み込む',
+  keepDraft: '下書きを保持',
+
   appName: 'RequestOrbit',
   loading: '読み込み中…',
   loadingRules: 'リクエストルールを読み込み中…',
@@ -970,7 +1002,7 @@ const ja = {
   concreteHostHelp: '必要最小限の権限を要求できるよう、具体的な HTTP または HTTPS ホストを指定してください。',
   testRule: 'ルールをテスト',
   testRuleDescription:
-    '未保存のルールを使用し、入力に合わせて更新します。リクエストは送信せず、ブラウザーの実際の動作も変更しません。',
+    'リクエストを送らず URL のみを確認します。正規表現で指定しない限り大文字小文字を区別しません。リソース種別、メソッド、起点、権限、他のルールにより実際の結果は変わります。',
   livePreview: 'ライブプレビュー',
   testUrl: 'テスト URL',
   test: 'テスト',
@@ -1157,6 +1189,19 @@ const ja = {
 } satisfies Messages;
 
 const fr = {
+  previewPending: 'Vérification de l’URL…',
+  previewUnavailable: 'Aperçu indisponible',
+  previewTimeout:
+    'L’aperçu a été arrêté car il prenait trop de temps. Simplifiez le motif ou raccourcissez l’URL.',
+  previewError: 'Impossible de lancer l’aperçu. Modifiez l’URL pour réessayer.',
+  previewUnsupported:
+    'Ce motif n’est pas pris en charge par l’aperçu. Le navigateur doit aussi le valider avant activation.',
+  draftChangedTitle: 'La règle enregistrée a changé',
+  draftChangedDescription:
+    'Votre brouillon est conservé. Chargez la version enregistrée ou conservez votre brouillon pour le vérifier avant de la remplacer.',
+  reloadSavedRule: 'Charger la version enregistrée',
+  keepDraft: 'Conserver mon brouillon',
+
   appName: 'RequestOrbit',
   loading: 'Chargement…',
   loadingRules: 'Chargement des règles…',
@@ -1371,7 +1416,7 @@ const fr = {
   concreteHostHelp: 'Utilisez un hôte HTTP ou HTTPS précis afin que l’extension demande un accès limité.',
   testRule: 'Tester la règle',
   testRuleDescription:
-    'Utilise la règle non enregistrée et se met à jour pendant la saisie. Aucun envoi ni changement du comportement réel du navigateur.',
+    'Vérifie uniquement l’URL, sans requête. La casse est ignorée sauf indication dans une regex. Types de ressources, méthodes, initiateurs, autorisations et autres règles peuvent modifier le résultat réel.',
   livePreview: 'Aperçu en direct',
   testUrl: 'URL de test',
   test: 'Tester',
@@ -1570,6 +1615,18 @@ const fr = {
 } satisfies Messages;
 
 const es = {
+  previewPending: 'Comprobando URL…',
+  previewUnavailable: 'Vista previa no disponible',
+  previewTimeout: 'La vista previa tardó demasiado y se detuvo. Simplifica el patrón o acorta la URL.',
+  previewError: 'No se pudo ejecutar la vista previa. Edita la URL para reintentar.',
+  previewUnsupported:
+    'La vista previa no admite este patrón. El navegador también debe validarlo antes de activarlo.',
+  draftChangedTitle: 'La regla guardada ha cambiado',
+  draftChangedDescription:
+    'Tu borrador sigue aquí. Carga la versión guardada o conserva tu borrador para revisarlo antes de sobrescribirla.',
+  reloadSavedRule: 'Cargar versión guardada',
+  keepDraft: 'Conservar mi borrador',
+
   appName: 'RequestOrbit',
   loading: 'Cargando…',
   loadingRules: 'Cargando reglas…',
@@ -1781,7 +1838,7 @@ const es = {
   concreteHostHelp: 'Usa un host HTTP o HTTPS concreto para que la extensión solicite un acceso limitado.',
   testRule: 'Probar regla',
   testRuleDescription:
-    'Usa la regla sin guardar y se actualiza mientras escribes. No envía solicitudes ni cambia el comportamiento real del navegador.',
+    'Solo comprueba la URL, sin enviar solicitudes. Ignora mayúsculas salvo que la regex indique lo contrario. Los recursos, métodos, iniciadores, permisos y otras reglas pueden cambiar el resultado real.',
   livePreview: 'Vista previa en vivo',
   testUrl: 'URL de prueba',
   test: 'Probar',

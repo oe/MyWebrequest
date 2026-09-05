@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import { ArrowRight, Check, CodeXml, LockKeyhole, Sparkles } from '@lucide/astro';
 import rulesOverview from '../assets/rules-overview.png';
+import { releaseCopy } from '../release-copy';
 import { homeCopy, type Locale } from '../content';
 import { githubUrl, localizedPath } from '../lib/routes';
 import BaseLayout from '../layouts/BaseLayout.astro';
@@ -12,6 +13,7 @@ interface Props {
 }
 const { locale } = Astro.props;
 const copy = homeCopy[locale];
+const release = releaseCopy[locale];
 ---
 
 <BaseLayout locale={locale}>
@@ -22,22 +24,33 @@ const copy = homeCopy[locale];
       <p class="lede">{copy.description}</p>
       <div class="hero-actions">
         <a class="button primary" href={localizedPath(locale, 'guides/quick-start')}
-          >{copy.quickStart}<ArrowRight size={16} /></a
+          >{release.installTitle}<ArrowRight size={16} /></a
         >
         <a class="button secondary" href={githubUrl()}><CodeXml size={16} />{copy.github}</a>
       </div>
       <p class="compatibility"><Check size={15} aria-hidden="true" />{copy.compatibility}</p>
     </div>
-    <div class="product-frame" aria-label="RequestOrbit rule manager preview">
-      <div class="window-bar"><span></span><span></span><span></span><small>RequestOrbit</small></div>
-      <Image
-        src={rulesOverview}
-        alt="RequestOrbit rule manager showing a redirect rule"
-        widths={[640, 960, 1280]}
-        sizes="(max-width: 800px) 94vw, 52vw"
-        loading="eager"
-      />
-    </div>
+    <figure class="product-preview">
+      <a
+        class="product-frame"
+        href={rulesOverview.src}
+        target="_blank"
+        rel="noreferrer"
+        aria-label={release.screenshotLink}
+      >
+        <Image
+          src={rulesOverview}
+          alt={release.screenshotAlt}
+          widths={[640, 960, 1280]}
+          sizes="(max-width: 1050px) 94vw, 52vw"
+          loading="eager"
+        />
+      </a>
+      <figcaption>
+        {release.screenshotCaption}
+        <a href={rulesOverview.src} target="_blank" rel="noreferrer">{release.screenshotLink}</a>
+      </figcaption>
+    </figure>
   </section>
 
   <section class="section workflow-section">

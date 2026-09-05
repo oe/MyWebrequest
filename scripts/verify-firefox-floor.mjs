@@ -14,7 +14,7 @@ const child = spawn(
   [
     'run',
     '--source-dir',
-    'dist/firefox-mv3',
+    'dist/firefox',
     '--firefox',
     firefox,
     '--no-reload',

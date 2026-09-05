@@ -25,7 +25,7 @@ const now = '2026-09-01T00:00:00.000Z';
 const execFileAsync = promisify(execFile);
 const browserTarget = process.env.MWR_BROWSER_TARGET === 'edge' ? 'edge' : 'chrome';
 const productionExtensionPath = resolve(
-  process.env.MWR_EXTENSION_PATH ?? join(process.cwd(), `dist/${browserTarget}-mv3`),
+  process.env.MWR_EXTENSION_PATH ?? join(process.cwd(), `dist/${browserTarget}`),
 );
 
 const languageChoices: Record<AppLocale, string> = {
@@ -426,7 +426,7 @@ test('clean install exposes the product UI without required host access', async 
   await matchingCheck.click();
   await expect(options.getByRole('status').filter({ hasText: 'Request blocked' })).toBeVisible();
   await expect(options.getByText('Live preview', { exact: true })).toBeVisible();
-  await expect(options.getByText(/updates as you type/)).toBeVisible();
+  await expect(options.getByText(/Checks the URL only/)).toBeVisible();
   const testUrl = options.getByRole('textbox', { name: 'Test URL' });
   const testButton = options.getByRole('button', { name: 'Test rule' });
   await testUrl.fill('https://not-matched.invalid/request-orbit-check');
@@ -1327,4 +1327,131 @@ test('block rules reconcile across popup pause and service-worker restart', asyn
   } finally {
     await close(server);
   }
+});
+
+test('URL previews agree with real case-insensitive blocking and survive nested regexes', async ({
+  context,
+  extensionId,
+  extensionPage,
+}) => {
+  const server = http.createServer((_request, response) => response.end('allowed control'));
+  await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+  try {
+    const address = server.address();
+    if (!address || typeof address === 'string') throw new Error('Missing fixture address.');
+    const rule: Rule = {
+      ...blockRule(address.port),
+      condition: {
+        url: { kind: 'url-filter', value: `|http://127.0.0.1:${address.port}/lower|` },
+        resourceTypes: ['main_frame'],
+      },
+    };
+    await extensionPage.evaluate(
+      async (state) => chrome.storage.local.set({ requestRulesState: state }),
+      stateWith([rule]),
+    );
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${extensionId}/options.html`);
+    await options.getByLabel('Test URL', { exact: true }).fill(`http://127.0.0.1:${address.port}/LOWER`);
+    await expect(options.getByRole('status').filter({ hasText: 'Request blocked' })).toBeVisible();
+    const request = await context.newPage();
+    await expect(request.goto(`http://127.0.0.1:${address.port}/LOWER`)).rejects.toThrow(
+      /ERR_BLOCKED_BY_CLIENT/,
+    );
+    const control = await context.newPage();
+    await control.goto(`http://127.0.0.1:${address.port}/allowed`);
+    await expect(control.locator('body')).toHaveText('allowed control');
+    await control.close();
+    await options.getByLabel('Test URL', { exact: true }).fill(`http://127.0.0.1:${address.port}/allowed`);
+    await expect(
+      options.getByRole('status').filter({ hasText: 'The URL does not match this rule.' }),
+    ).toBeVisible();
+    const regexRule: Rule = {
+      ...rule,
+      enabled: false,
+      condition: { url: { kind: 'regex', value: '^(a+)+$' } },
+      updatedAt: new Date().toISOString(),
+    };
+    await extensionPage.evaluate(
+      async (state) => chrome.storage.local.set({ requestRulesState: state }),
+      stateWith([regexRule]),
+    );
+    await expect(options.getByLabel('Match URL', { exact: true })).toHaveValue('^(a+)+$');
+    await options.getByLabel('Test URL', { exact: true }).fill(`${'a'.repeat(32)}!`);
+    await expect(
+      options.getByRole('status').filter({ hasText: 'The URL does not match this rule.' }),
+    ).toBeVisible();
+    await options.getByLabel('Rule name', { exact: true }).fill('The editor is responsive');
+    await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue('The editor is responsive');
+    await options.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await options.close();
+    await request.close();
+  } finally {
+    server.closeAllConnections();
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve())),
+    );
+  }
+});
+
+test('dirty drafts survive list toggles and changes from another options page', async ({
+  context,
+  extensionId,
+  extensionPage,
+}) => {
+  const rule = { ...quotaRules(1, 'url-filter')[0]!, enabled: false };
+  await extensionPage.evaluate(
+    async (state) => chrome.storage.local.set({ requestRulesState: state }),
+    stateWith([rule]),
+  );
+  const options = await context.newPage();
+  const other = await context.newPage();
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+  await other.goto(`chrome-extension://${extensionId}/options.html`);
+  await options.getByLabel('Rule name', { exact: true }).fill('Unsaved work');
+  await options.getByRole('switch', { name: `Enable ${rule.name}`, exact: true }).click();
+  await expect(options.getByRole('dialog')).toBeVisible();
+  await options.getByRole('button', { name: 'Keep editing', exact: true }).click();
+  await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved work');
+  await other.getByLabel('Rule name', { exact: true }).fill('Saved elsewhere');
+  await other.getByRole('button', { name: 'Save changes', exact: true }).click();
+  await expect(options.getByText('The saved rule changed', { exact: true })).toBeVisible();
+  await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved work');
+  await options.getByRole('button', { name: 'Keep my draft', exact: true }).click();
+  await options.getByRole('button', { name: 'Save changes', exact: true }).click();
+  await expect(other.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved work');
+  await options.getByLabel('Rule name', { exact: true }).fill('Discard this draft');
+  await options.getByRole('switch', { name: 'Enable Unsaved work', exact: true }).click();
+  await options.getByRole('button', { name: 'Discard changes', exact: true }).click();
+  await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue('Unsaved work');
+  await expect(options.getByRole('switch', { name: 'Disable Unsaved work', exact: true })).toBeChecked();
+  await options.close();
+  await other.close();
+});
+
+test('a stalled preview worker times out without freezing the editor', async ({
+  context,
+  extensionId,
+  extensionPage,
+}) => {
+  await extensionPage.evaluate(
+    async (state) => chrome.storage.local.set({ requestRulesState: state }),
+    stateWith(quotaRules(1, 'url-filter')),
+  );
+  const options = await context.newPage();
+  await options.addInitScript(() => {
+    // Deliberately stall only the dedicated preview worker to exercise its deadline.
+    window.Worker = class {
+      postMessage() {}
+      terminate() {}
+    } as unknown as typeof Worker;
+  });
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+  await expect(
+    options.getByRole('status').filter({ hasText: 'This preview took too long and was stopped.' }),
+  ).toBeVisible();
+  await options.getByLabel('Rule name', { exact: true }).fill('Still editable');
+  await expect(options.getByLabel('Rule name', { exact: true })).toHaveValue('Still editable');
+  await options.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await options.close();
 });

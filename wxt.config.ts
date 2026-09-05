@@ -7,6 +7,7 @@ export default defineConfig({
   srcDir: 'src',
   publicDir: 'src/public',
   outDir: 'dist',
+  outDirTemplate: '{{browser}}{{modeSuffix}}',
   modules: ['@wxt-dev/module-react'],
   zip: {
     // Store screenshots and the standalone documentation website are not part

@@ -1,5 +1,9 @@
 import type { Rule } from '@/domain/rules/model';
-import { urlFilterToRegExpSource, wildcardToRegExpSource } from '@/domain/rules/test-match';
+import {
+  compileUrlMatcher,
+  urlFilterToRegExpSource,
+  wildcardToRegExpSource,
+} from '@/domain/rules/test-match';
 
 export type MatchKind = Rule['condition']['url']['kind'];
 
@@ -45,13 +49,7 @@ export function guidanceForMatch(kind: MatchKind, value: string): MatchGuidance 
 
 function patternMatches(kind: MatchKind, value: string, candidate: string): boolean {
   try {
-    const source =
-      kind === 'wildcard'
-        ? wildcardToRegExpSource(value)
-        : kind === 'url-filter'
-          ? urlFilterToRegExpSource(value)
-          : value;
-    return new RegExp(source).test(candidate);
+    return compileUrlMatcher({ kind, value }).test(candidate);
   } catch {
     return false;
   }

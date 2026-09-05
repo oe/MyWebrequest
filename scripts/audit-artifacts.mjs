@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const targets = ['chrome-mv3', 'edge-mv3', 'firefox-mv3'];
+const targets = ['chrome', 'edge', 'firefox'];
 const expectedPermissions = ['activeTab', 'declarativeNetRequest', 'storage'];
 const expectedOptionalHosts = ['http://*/*', 'https://*/*'];
 const expectedLocales = ['en', 'es', 'fr', 'ja', 'ko', 'zh_CN'];
@@ -42,7 +42,7 @@ for (const target of targets) {
   assert.equal(manifest.content_scripts, undefined, `${target} must not inject content scripts.`);
   assert.equal(manifest.externally_connectable, undefined, `${target} must not expose external messaging.`);
   assert.deepEqual(manifest.icons, expectedIcons, `${target} does not expose the complete icon matrix.`);
-  if (target === 'firefox-mv3') {
+  if (target === 'firefox') {
     assert.equal(
       manifest.browser_specific_settings?.gecko?.strict_min_version,
       browserSupport.firefoxMinimum,
@@ -61,7 +61,7 @@ for (const target of targets) {
       undefined,
       `${target} must not contain Firefox-only metadata.`,
     );
-    if (target === 'chrome-mv3') {
+    if (target === 'chrome') {
       assert.equal(
         manifest.key,
         browserSupport.chromeLegacyPublicKey,

@@ -1,6 +1,7 @@
 import type { Rule, RuleStatus } from './model';
 import { requiresInitiatorPermission } from './permissions';
 import { ruleSchema } from './schema';
+import { compileUrlMatcher } from './url-matcher';
 
 export type ValidationIssue = {
   field: 'name' | 'match' | 'initiators' | 'destination' | 'headers' | 'permission' | 'rule';
@@ -73,7 +74,7 @@ export function validateRule(rule: Rule): ValidationResult {
 
   if (rule.condition.url.kind === 'regex') {
     try {
-      new RegExp(rule.condition.url.value);
+      compileUrlMatcher(rule.condition.url);
     } catch {
       errors.push({ field: 'match', code: 'regex-invalid', message: 'The regular expression is not valid.' });
     }

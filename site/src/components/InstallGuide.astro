@@ -1,0 +1,28 @@
+---
+import browserSupport from '../../../browser-support.json';
+import type { Locale } from '../content';
+import { githubUrl } from '../lib/routes';
+import { releaseCopy } from '../release-copy';
+const { locale } = Astro.props as { locale: Locale };
+const copy = releaseCopy[locale];
+---
+
+<section class="install-guide" id="install">
+  <h2>{copy.installTitle}</h2>
+  <p>{copy.availability}</p>
+  <p>
+    {copy.minimumLabel}: Chrome {browserSupport.chromiumMinimum}+ · Edge {browserSupport.chromiumMinimum}+ ·
+    Firefox {browserSupport.firefoxMinimum}+
+  </p>
+  <a class="text-link" href={githubUrl()}>{copy.sourceLabel}</a>
+  <details>
+    <summary>{copy.localTitle}</summary>
+    <p>{copy.localDescription}</p>
+    <pre><code>git clone https://github.com/oe/MyWebrequest.git
+cd MyWebrequest
+pnpm install --frozen-lockfile
+pnpm build:browsers</code></pre>
+    <p>{copy.chromiumSteps}</p>
+    <p>{copy.firefoxSteps}</p>
+  </details>
+</section>

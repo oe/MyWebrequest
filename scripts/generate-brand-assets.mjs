@@ -211,7 +211,7 @@ const browser = await chromium.launch({ executablePath: chromium.executablePath(
 const browserVersion = browser.version();
 try {
   const page = await browser.newPage({ colorScheme: 'light', reducedMotion: 'reduce' });
-  for (const size of [16, 32, 48, 96, 128]) {
+  for (const size of process.argv.includes('--promo-only') ? [] : [16, 32, 48, 96, 128]) {
     await renderIcon(page, size, join(runtimeIconRoot, `${size}.png`));
   }
   await renderIcon(page, 300, join(promotionalRoot, 'edge', 'logo-300.png'));

@@ -181,7 +181,7 @@ async function command(method, path, body) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok || payload.value?.error) {
     throw new Error(
-      `WebDriver ${method} ${path} failed: ${payload.value?.message ?? response.statusText}\n${driverLogs}`,
+      `WebDriver ${method} ${path} failed: ${payload.value?.message ?? payload.value?.error ?? response.statusText}\n${driverLogs}`,
     );
   }
   return payload.value;
@@ -287,7 +287,7 @@ async function decideFixturePermission(allow) {
        done({
          panelState: panel?.state ?? null,
          panelText: panel?.textContent ?? '',
-         buttons: [...document.querySelectorAll('#notification-popup button')]
+         buttons: [...document.querySelectorAll('#notification-popup button, #notification-popup moz-button')]
            .map((button) => button.label)
            .filter(Boolean),
          notifications: [...document.querySelectorAll('#notification-popup popupnotification')]
@@ -313,9 +313,9 @@ async function decideFixturePermission(allow) {
   const actionResult = await executeAsync(
     `const actionLabel = arguments[0];
      const done = arguments[arguments.length - 1];
-     const button = [...document.querySelectorAll('#notification-popup button')]
+     const button = [...document.querySelectorAll('#notification-popup button, #notification-popup moz-button')]
        .find((candidate) => candidate.label === actionLabel);
-     if (!button) return done({ error: actionLabel + ' button is missing.' });
+     if (!button) return done({ error: actionLabel + ' button is missing: ' + [...document.querySelectorAll('#notification-popup button, #notification-popup moz-button')].map((candidate) => candidate.label).join(', ') });
      button.click();
      done(true);`,
     [actionLabel],

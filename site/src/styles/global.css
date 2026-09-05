@@ -282,15 +282,6 @@ p {
     0 18px 42px rgb(0 0 0 / 28%),
     inset 0 0 0 1px rgb(224 236 248 / 7%);
 }
-:root[data-theme='dark'] .window-bar {
-  background: rgb(25 36 49 / 88%);
-}
-:root[data-theme='dark'] .window-bar span {
-  background: #607286;
-}
-:root[data-theme='dark'] .window-bar small {
-  color: #93a3b4;
-}
 :root[data-theme='dark'] .workflow-section,
 :root[data-theme='dark'] .guide-section {
   background: rgb(24 36 49 / 58%);
@@ -355,7 +346,7 @@ p {
   align-items: center;
   gap: 7px;
   margin-bottom: 20px;
-  color: #28628f;
+  color: var(--blue-deep);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.11em;
@@ -439,34 +430,11 @@ h3 {
     0 18px 42px rgb(25 51 78 / 9%),
     inset 0 0 0 1px rgb(34 57 82 / 7%);
   backdrop-filter: blur(16px);
-  transform: perspective(1500px) rotateY(-2deg) rotateX(1deg);
+  display: block;
 }
 .product-frame > img {
   width: 100%;
   height: auto;
-}
-.window-bar {
-  position: relative;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 13px;
-  border-bottom: 1px solid var(--soft-line);
-  background: rgb(245 248 251 / 78%);
-}
-.window-bar span {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #cbd3dc;
-}
-.window-bar small {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #7c8794;
-  font-size: 10px;
 }
 
 .section {
@@ -1024,5 +992,71 @@ h3 {
   :root[data-theme='dark'] .theme-options,
   :root[data-theme='dark'] .product-frame {
     background: #182431;
+  }
+}
+
+.product-preview {
+  min-width: 0;
+  margin: 0;
+}
+.product-preview figcaption {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.product-preview figcaption a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.guide-directory > summary {
+  display: none;
+}
+.install-guide {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--glass);
+}
+.install-guide h2 {
+  font-size: 24px;
+}
+.install-guide > p {
+  margin-top: 14px;
+}
+.install-guide details {
+  margin-top: 20px;
+}
+.install-guide summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.install-guide details p {
+  margin-top: 16px;
+}
+@media (max-width: 760px) {
+  .guide-directory {
+    margin-top: 20px;
+  }
+  .guide-directory > summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 44px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .guide-directory > summary::-webkit-details-marker {
+    display: none;
+  }
+  .guide-directory .guide-nav {
+    margin-top: 8px;
+  }
+  .guide-layout {
+    gap: 24px;
+    padding-top: 22px;
+  }
+  .install-guide {
+    padding: 20px;
   }
 }

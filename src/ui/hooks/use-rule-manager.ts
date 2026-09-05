@@ -196,7 +196,19 @@ export function useRuleManager() {
           priorityConflictFree: true,
         };
       }
-      await persist(nextState);
+      const latest = await loadState();
+      if (latest.rules[rule.id]?.updatedAt !== rule.updatedAt) {
+        await adoptState(latest);
+        return {
+          permissionGranted,
+          regexSupported: true,
+          quotaAvailable: true,
+          cycleFree: true,
+          priorityConflictFree: true,
+          stale: true,
+        };
+      }
+      await persist(upsertRule(latest, rule));
       return {
         permissionGranted,
         regexSupported: true,
@@ -205,7 +217,7 @@ export function useRuleManager() {
         priorityConflictFree: true,
       };
     },
-    [permissions, persist],
+    [adoptState, permissions, persist],
   );
 
   const toggleRule = useCallback(

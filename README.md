@@ -49,7 +49,9 @@ pnpm exec playwright install chromium --no-shell
 pnpm dev
 ```
 
-Load `dist/chrome-mv3-dev` as an unpacked extension when developing against Chrome.
+Load `dist/chrome-dev` as an unpacked extension when developing against Chrome.
+The `-dev` directory contains the development build with hot reload; use `dist/chrome`
+from `pnpm build:chrome` for standalone use without the development server.
 
 Run the complete local quality gate with:
 
@@ -66,7 +68,7 @@ pnpm build:firefox
 pnpm build:browsers
 ```
 
-Artifacts are written to `dist/chrome-mv3`, `dist/edge-mv3`, and `dist/firefox-mv3`.
+Artifacts are written to `dist/chrome`, `dist/edge`, and `dist/firefox`.
 
 Run or build the website with:
 
@@ -90,3 +92,9 @@ The same command is the CI quality gate. Every successful run uploads the exact 
 and Firefox source archives together with `SHA256SUMS` for installed-browser certification. It also audits
 the committed browser-specific 1280x800 listing screenshots against those exact archive checksums. See
 [store-assets/README.md](store-assets/README.md) for capture and review instructions.
+
+After changing the product UI, rebuild the browser ZIPs and checksums before capturing new screenshots.
+Then regenerate promotional assets with `node scripts/generate-brand-assets.mjs --promo-only`, run
+`pnpm generate:store-listing-screenshots`, and run `pnpm generate:site-assets` to refresh the website's
+complete product screenshot and social sharing card. Finish with `pnpm release:package`; do not edit
+sources while this gate checks archive reproducibility.

@@ -346,7 +346,7 @@ UI state must be derived from stored rule, grant state, compiler result, and ins
 - Verify popup, options, keyboard, theme, and language surfaces.
 
 The repository runs a Playwright Chromium extension suite in the default quality gate. It launches the
-production `dist/chrome-mv3` build in an isolated persistent profile and currently proves clean-install
+production `dist/chrome` build in an isolated persistent profile and currently proves clean-install
 permissions, warning/error-free options startup, options/settings navigation, real DNR blocking,
 popup-driven pause/resume synchronization,
 DNR continuity after forced service-worker termination and event-driven restart, a real host-permission-free

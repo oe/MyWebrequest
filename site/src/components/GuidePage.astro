@@ -11,6 +11,8 @@ import {
   type Locale,
 } from '../content';
 import { githubUrl, localizedPath } from '../lib/routes';
+import { releaseCopy } from '../release-copy';
+import InstallGuide from './InstallGuide.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import GuideSection from './GuideSection.astro';
 
@@ -39,34 +41,49 @@ const progressive = slug === 'advanced-examples' || slug === 'breaking-changes';
   <div class="guide-layout shell">
     <aside class="guide-sidebar">
       <a class="back-link" href={localizedPath(locale)}><ArrowLeft size={15} />RequestOrbit</a>
-      <p>{copy.navGuides}</p>
-      <nav class="guide-nav" aria-label={copy.navGuides}>
-        {
-          guideGroups.map((group) => (
-            <details open={group === currentGroup}>
-              <summary>
-                <span>{guideGroupCopy[locale][group].title}</span>
-                <ChevronDown aria-hidden="true" size={15} />
-              </summary>
-              <div>
-                {guideGroupSlugs[group].map((item) => (
-                  <a
-                    aria-current={item === slug ? 'page' : undefined}
-                    href={localizedPath(locale, `guides/${item}`)}
-                  >
-                    {guideCopy(locale, item).title}
-                  </a>
-                ))}
-              </div>
-            </details>
-          ))
-        }
-      </nav>
+      <details class="guide-directory" open>
+        <summary>{releaseCopy[locale].browseGuides}<ChevronDown size={16} aria-hidden="true" /></summary>
+        <nav class="guide-nav" aria-label={copy.navGuides}>
+          {
+            guideGroups.map((group) => (
+              <details open={group === currentGroup}>
+                <summary>
+                  <span>{guideGroupCopy[locale][group].title}</span>
+                  <ChevronDown aria-hidden="true" size={15} />
+                </summary>
+                <div>
+                  {guideGroupSlugs[group].map((item) => (
+                    <a
+                      aria-current={item === slug ? 'page' : undefined}
+                      href={localizedPath(locale, `guides/${item}`)}
+                    >
+                      {guideCopy(locale, item).title}
+                    </a>
+                  ))}
+                </div>
+              </details>
+            ))
+          }
+        </nav>
+      </details>
+      <script is:inline>
+        (() => {
+          const directory = document.querySelector('.guide-directory');
+          const viewport = window.matchMedia('(max-width: 760px)');
+          const sync = () => {
+            if (directory) directory.open = !viewport.matches;
+          };
+          sync();
+          viewport.addEventListener('change', sync);
+        })();
+      </script>
     </aside>
     <article class="guide-article">
       <header>
         <p class="eyebrow">RequestOrbit</p><h1>{guide.title}</h1><p class="lede">{guide.description}</p>
       </header>
+      {slug === 'quick-start' ? <InstallGuide locale={locale} /> : null}
+      {slug === 'permissions' ? <p class="guide-callout">{releaseCopy[locale].secretNotice}</p> : null}
       {summarySection ? <GuideSection section={summarySection} /> : null}
       {
         detailSections.map((section, sectionIndex) => (

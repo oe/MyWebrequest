@@ -7,13 +7,13 @@ const webExtBin = fileURLToPath(
 );
 const validatorNode = process.env.WEB_EXT_NODE || process.execPath;
 const firefoxOutputDirectory = fileURLToPath(
-  new URL("../dist/firefox-mv3/", import.meta.url),
+  new URL("../dist/firefox/", import.meta.url),
 );
 
 const args = [
   "lint",
   "--source-dir",
-  "dist/firefox-mv3",
+  "dist/firefox",
   "--output=json",
   "--boring",
 ];

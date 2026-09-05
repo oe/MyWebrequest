@@ -10,7 +10,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-04T00:37:44.442Z",
+  "generatedAt": "2026-09-05T08:45:49.384Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
@@ -18,15 +18,15 @@
     },
     {
       "path": "store-assets/screenshots/chrome/01-rules-overview.png",
-      "sha256": "ff8355d1b53235dfe548b1d39443f3de4af0d653109726e695184fe8bec76b27"
+      "sha256": "29c6bf76008e6e19870777e6fb82007d4e5c4a0e3f9625451c5fee18c15adbf1"
     },
     {
       "path": "store-assets/screenshots/chrome/02-permission-explanation.png",
-      "sha256": "14b56e0bdabbf6fd766f6bc97b038c1595dda7e48ccd766f91a815e961a6cae6"
+      "sha256": "7e8c9dd093a0babaffaa14d0015531dc22381e6bb8987918ff3374cf4130a44c"
     },
     {
       "path": "store-assets/screenshots/chrome/03-backup-restore.png",
-      "sha256": "35163d051798c36d909866a4ced2a6f7d2c7c3c4de979eb143cc731bf3d3c575"
+      "sha256": "e6f07d3e0eb2fc58a4d58a06867f77a089576abe52d062757d7730cacd8bb342"
     }
   ],
   "assets": [
@@ -36,7 +36,7 @@
       "source": "store-assets/screenshots/chrome/01-rules-overview.png",
       "headline": "Request rules, made clear.",
       "subhead": "Create, test, and manage browser request rules without editing raw DNR JSON.",
-      "sha256": "277b5ea73b358e036816aa9719a1c7023ac8b423a6fadd21fd62ccb251bc9be5",
+      "sha256": "104e5298e0eaf175aac018b966ee50121377384ea6208be88a5f93a164fa1f2b",
       "width": 1280,
       "height": 800
     },
@@ -46,7 +46,7 @@
       "source": "store-assets/screenshots/chrome/01-rules-overview.png",
       "headline": "Match with precision.",
       "subhead": "Use wildcards, regular expressions, resource types, methods, and priorities.",
-      "sha256": "f9d0c99a4ec1d79427e0fc1609a0ee4fb0f53fb6072292e4104e0542e417ea26",
+      "sha256": "b4bd5f424a6595c18e592857512d635204aea9bb80658353cbfed4367accebde",
       "width": 1280,
       "height": 800
     },
@@ -56,7 +56,7 @@
       "source": "store-assets/screenshots/chrome/02-permission-explanation.png",
       "headline": "Access only when needed.",
       "subhead": "Review the exact website origins before continuing to the browser prompt.",
-      "sha256": "c9b2972adc0b3fe7ab5c075e0abd11c4cb9b6f55daaf87c5c20ad8e4a96e2923",
+      "sha256": "008b04fa1574aaba76094fc8d5ab278088e24aa14e985a6d6110bbf43d17ad02",
       "width": 1280,
       "height": 800
     },
@@ -66,7 +66,7 @@
       "source": "store-assets/screenshots/chrome/03-backup-restore.png",
       "headline": "Preview before you import.",
       "subhead": "See additions, updates, conflicts, and import mode before any rule changes.",
-      "sha256": "627e69b943725f2e87b7e68048fd97a1efd2898165bcfdf8c43cbde194b3f58b",
+      "sha256": "4de411b2e1505ef14326b4d6bccfac6391575303bace9a0f48bb9c9ea7871b16",
       "width": 1280,
       "height": 800
     },
@@ -76,7 +76,7 @@
       "source": "store-assets/screenshots/chrome/03-backup-restore.png",
       "headline": "Local by design.",
       "subhead": "Rules, backups, and settings stay on this device.",
-      "sha256": "c5b6036e788b67b490fb7abc6961b9daded2da4f53fdbe2c2cc7c22b0e3be5ce",
+      "sha256": "ad8840a47ced0de435de38e50d593d1ce88c471f61b95e5c54cca1e490f464d6",
       "width": 1280,
       "height": 800
     }

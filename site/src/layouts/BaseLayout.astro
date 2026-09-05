@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import browserSupport from '../../../browser-support.json';
 import icon from '../assets/app-icon.svg';
 import ThemePicker from '../components/ThemePicker.astro';
 import { homeCopy, localeNames, locales, type Locale } from '../content';
@@ -19,7 +20,7 @@ const copy = homeCopy[locale];
 const pageTitle = title ? `${title} · RequestOrbit` : `RequestOrbit — ${copy.metaTitle}`;
 const pageDescription = description ?? copy.description;
 const canonical = new URL(localizedPath(locale, path), Astro.site);
-const socialImage = new URL(withBase('app-icon.svg'), Astro.site);
+const socialImage = new URL(withBase('social-preview.png'), Astro.site);
 const websiteSchema = {
   '@type': 'WebSite',
   name: 'RequestOrbit',
@@ -32,7 +33,7 @@ const softwareSchema = {
   url: canonical,
   applicationCategory: 'BrowserApplication',
   operatingSystem: 'Chrome, Microsoft Edge, Firefox',
-  browserRequirements: 'Manifest V3 compatible browser',
+  browserRequirements: `Chrome ${browserSupport.chromiumMinimum}+, Microsoft Edge ${browserSupport.chromiumMinimum}+, Firefox ${browserSupport.firefoxMinimum}+`,
   description: pageDescription,
   featureList: copy.capabilities.map((capability) => capability.title),
   inLanguage: languageTag,
@@ -117,7 +118,10 @@ const schema = title
     <meta property="og:description" content={pageDescription} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={socialImage} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />
     <title>{pageTitle}</title>

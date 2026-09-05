@@ -150,3 +150,36 @@ describe('rule diagnostics', () => {
     ).toBe(true);
   });
 });
+
+it('finds cycles without flagging a chain that only leads into them', () => {
+  const base = sampleRules[0]!;
+  const rules = ['a', 'b', 'c', 'd'].map((id, index): Rule => ({
+    ...base,
+    id,
+    dnrId: 8000 + index,
+    condition: {
+      url: { kind: 'url-filter', value: `|https://${id}.example/|` },
+      resourceTypes: ['main_frame'],
+    },
+    action: { kind: 'redirect', target: `https://${['b', 'c', 'b', 'd'][index]}.example/` },
+  }));
+  const diagnostics = analyzeRuleState(stateWith(rules));
+  expect(Object.keys(diagnostics).sort()).toEqual(['b', 'c', 'd']);
+});
+
+it('handles a complete quota-sized redirect chain without recursion or false cycles', () => {
+  const base = sampleRules[0]!;
+  const rules = Array.from({ length: 4_500 }, (_, i): Rule => ({
+    ...base,
+    id: `chain-${i}`,
+    dnrId: 10000 + i,
+    condition: {
+      url: { kind: 'url-filter', value: `|https://chain.example/${i}|` },
+      resourceTypes: ['main_frame'],
+    },
+    action: { kind: 'redirect', target: `https://chain.example/${i + 1}` },
+  }));
+  expect(analyzeRuleState(stateWith(rules))).toEqual({});
+  rules[4499] = { ...rules[4499]!, action: { kind: 'redirect', target: 'https://chain.example/0' } };
+  expect(Object.keys(analyzeRuleState(stateWith(rules)))).toHaveLength(4500);
+});

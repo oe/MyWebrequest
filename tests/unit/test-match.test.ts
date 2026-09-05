@@ -73,3 +73,44 @@ describe('matchRule', () => {
     expect(path.test('https://example.com/images/app.js')).toBe(false);
   });
 });
+
+it('uses the browser default case-insensitive semantics for every match syntax', () => {
+  const base = sampleRules[0]!;
+  for (const url of [
+    { kind: 'url-filter' as const, value: '|https://example.com/lower|' },
+    { kind: 'wildcard' as const, value: 'https://example.com/*' },
+    { kind: 'regex' as const, value: '^https://example\\.com/lower$' },
+  ]) {
+    expect(
+      matchRule(
+        { ...base, condition: { ...base.condition, url }, action: { kind: 'block' } },
+        'https://example.com/LOWER',
+      ).matched,
+    ).toBe(true);
+  }
+});
+
+it('handles nested repetition without backtracking and respects explicit regex flags', () => {
+  const base = sampleRules[0]!;
+  const rule = {
+    ...base,
+    condition: { ...base.condition, url: { kind: 'regex' as const, value: '^(a+)+$' } },
+    action: { kind: 'block' as const },
+  };
+  expect(matchRule(rule, `${'a'.repeat(10_000)}!`).matched).toBe(false);
+  expect(
+    matchRule(
+      { ...rule, condition: { ...rule.condition, url: { kind: 'regex', value: '(?-i)^lower$' } } },
+      'lower',
+    ).matched,
+  ).toBe(true);
+  expect(
+    matchRule(
+      { ...rule, condition: { ...rule.condition, url: { kind: 'regex', value: '(?-i)^lower$' } } },
+      'LOWER',
+    ).matched,
+  ).toBe(false);
+  expect(
+    matchRule({ ...rule, condition: { ...rule.condition, url: { kind: 'regex', value: '(a)\\1' } } }, 'aa'),
+  ).toMatchObject({ matched: false, reasonCode: 'invalid-rule' });
+});

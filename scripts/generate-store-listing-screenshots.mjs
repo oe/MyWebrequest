@@ -25,7 +25,7 @@ const scenes = [
     filename: '01-request-rules-made-clear.png',
     source: 'rules',
     layout: 'hero',
-    eyebrow: 'MY WEBREQUEST',
+    eyebrow: 'REQUESTORBIT',
     headline: 'Request rules,\nmade clear.',
     subhead: 'Create, test, and manage browser request rules without editing raw DNR JSON.',
     background: '#f2efe8',
