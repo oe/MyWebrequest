@@ -1005,10 +1005,6 @@ h3 {
   line-height: 1.7;
   color: var(--muted);
 }
-.product-preview figcaption a {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
 .guide-directory > summary {
   display: none;
 }

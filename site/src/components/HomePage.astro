@@ -31,13 +31,7 @@ const release = releaseCopy[locale];
       <p class="compatibility"><Check size={15} aria-hidden="true" />{copy.compatibility}</p>
     </div>
     <figure class="product-preview">
-      <a
-        class="product-frame"
-        href={rulesOverview.src}
-        target="_blank"
-        rel="noreferrer"
-        aria-label={release.screenshotLink}
-      >
+      <div class="product-frame">
         <Image
           src={rulesOverview}
           alt={release.screenshotAlt}
@@ -45,10 +39,9 @@ const release = releaseCopy[locale];
           sizes="(max-width: 1050px) 94vw, 52vw"
           loading="eager"
         />
-      </a>
+      </div>
       <figcaption>
         {release.screenshotCaption}
-        <a href={rulesOverview.src} target="_blank" rel="noreferrer">{release.screenshotLink}</a>
       </figcaption>
     </figure>
   </section>
