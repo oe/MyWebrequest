@@ -39,19 +39,19 @@ export function CreateRuleActions({
             <ChevronDownIcon data-icon="inline-end" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent align="end" className="w-max max-w-[calc(100vw-1rem)] min-w-56">
           <DropdownMenuGroup>
             <DropdownMenuItem onSelect={() => onOther('block')}>
               <ShieldBanIcon />
-              {t('blockRequest')}
+              <span className="truncate">{t('blockRequest')}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onOther('upgrade-scheme')}>
               <ArrowUpRightIcon />
-              {t('upgradeHttps')}
+              <span className="truncate">{t('upgradeHttps')}</span>
             </DropdownMenuItem>
             <DropdownMenuItem onSelect={() => onOther('modify-request-headers')}>
               <SlidersHorizontalIcon />
-              {t('modifyRequestHeader')}
+              <span className="truncate">{t('modifyRequestHeader')}</span>
             </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
