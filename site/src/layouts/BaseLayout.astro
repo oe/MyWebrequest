@@ -139,8 +139,7 @@ const schema = title
           <a href={localizedPath(locale, 'guides/quick-start')}>{copy.navGuides}</a>
           <a href={localizedPath(locale, 'guides/permissions')}>{copy.navPrivacy}</a>
           <a href="https://github.com/oe/MyWebrequest">{copy.openGithub}</a>
-          <ThemePicker locale={locale} />
-          <details class="locale-menu">
+          <details class="locale-menu" data-header-menu>
             <summary>{localeNames[locale]}</summary>
             <div class="locale-options">
               {
@@ -152,9 +151,34 @@ const schema = title
               }
             </div>
           </details>
+          <ThemePicker locale={locale} />
         </nav>
       </div>
     </header>
+    <script>
+      const menus = [...document.querySelectorAll<HTMLDetailsElement>('[data-header-menu]')];
+      const closeOutside = (target: EventTarget | null) => {
+        for (const menu of menus) {
+          if (target instanceof Node && !menu.contains(target)) menu.open = false;
+        }
+      };
+      document.addEventListener('click', (event) => closeOutside(event.target));
+      document.addEventListener('focusin', (event) => closeOutside(event.target));
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        for (const menu of menus) {
+          if (!menu.open) continue;
+          menu.open = false;
+          menu.querySelector('summary')?.focus();
+          event.preventDefault();
+        }
+      });
+      for (const menu of menus) {
+        menu.addEventListener('toggle', () => {
+          if (menu.open) closeOutside(menu);
+        });
+      }
+    </script>
     <main id="main">
       <slot />
     </main>

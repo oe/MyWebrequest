@@ -17,7 +17,7 @@ const labels: Record<Locale, { label: string; system: string; light: string; dar
 const copy = labels[locale];
 ---
 
-<details class="theme-menu" data-theme-picker>
+<details class="theme-menu" data-theme-picker data-header-menu>
   <summary aria-label={copy.label} title={copy.label}>
     <span class="theme-icon-set" aria-hidden="true">
       <svg class="theme-icon theme-icon-system" viewBox="0 0 24 24">
@@ -97,6 +97,7 @@ const copy = labels[locale];
         control.addEventListener('click', () => {
           applyTheme(control.getAttribute('data-theme-value'), true);
           picker.removeAttribute('open');
+          picker.querySelector('summary')?.focus();
         });
         control.addEventListener('keydown', (event) => {
           const direction = ['ArrowRight', 'ArrowDown'].includes(event.key)

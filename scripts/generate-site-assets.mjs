@@ -22,8 +22,8 @@ try {
       .screenshot { width: 680px; height: 425px; object-fit: contain; border: 1px solid #d4deeb; border-radius: 10px; box-shadow: 0 18px 48px #17385820; }
     </style>
     <header><img src="data:image/svg+xml;base64,${icon}" />RequestOrbit</header>
-    <main><div class="copy"><h1>Redirect APIs.<br>Block requests.<br>Stay in control.</h1>
-    <p>Local browser rules.<br>No account. No cloud sync.<br>request.forth.ink</p></div>
+    <main><div class="copy"><h1>Make links go<br>where you want</h1>
+    <p>Your own URL redirects.<br>No account. Rules stay local.<br>request.forth.ink</p></div>
     <img class="screenshot" src="data:image/png;base64,${encoded}" /></main>
   `);
   await page.locator('.screenshot').evaluate((img) => img.decode());

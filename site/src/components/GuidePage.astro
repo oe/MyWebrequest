@@ -80,7 +80,9 @@ const progressive = slug === 'advanced-examples' || slug === 'breaking-changes';
     </aside>
     <article class="guide-article">
       <header>
-        <p class="eyebrow">RequestOrbit</p><h1>{guide.title}</h1><p class="lede">{guide.description}</p>
+        <p class="eyebrow">RequestOrbit</p><h1>{guide.title}</h1><p class="lede">
+          {guide.description.replace(/[。.]$/, '')}
+        </p>
       </header>
       {slug === 'quick-start' ? <InstallGuide locale={locale} /> : null}
       {slug === 'permissions' ? <p class="guide-callout">{releaseCopy[locale].secretNotice}</p> : null}
