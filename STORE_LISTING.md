@@ -1,6 +1,6 @@
 # Store Listing Baseline
 
-Last updated: 2026-09-01
+Last updated: 2026-09-05
 
 ## Name
 
@@ -8,17 +8,15 @@ RequestOrbit
 
 ## Single-purpose statement
 
-RequestOrbit lets a user create, test, authorize, and manage local browser request rules.
+RequestOrbit lets users customize where URLs lead, test their redirects, and manage local browser request rules.
 
 ## Short description
 
-Create local rules to block, redirect, upgrade, or modify matching browser requests.
+Create your own URL redirects. Choose the scope, test the result, and keep rules local.
 
 ## Detailed description
 
-RequestOrbit is a local-first request-rule manager for developers, QA engineers, support teams, and
-advanced users. Its full-page editor makes Manifest V3 request rules understandable without requiring
-manual DNR JSON editing.
+Make links go where you want. RequestOrbit lets you create your own URL redirects by entering an original and a destination address, without writing regular expressions. Choose only that exact URL, or all pages on the original host when the two addresses differ only in hostname. Host replacement keeps paths and query parameters, uses the original protocol and port, and excludes subdomains. Test additional URLs before saving. New rules default to Enabled; turn the switch off if you want to save without applying. Saved redirects can be adjusted through the same simple editor.
 
 Supported V1 actions include blocking requests, fixed or capture-based redirects, HTTP-to-HTTPS upgrade,
 and removing or setting request headers. Conditions include URL filters, wildcards, regular expressions,
@@ -52,7 +50,6 @@ Use the conservatively remastered blue-globe icon and the audited, product-frame
 Edge uses its own 440x280 copy. Do not substitute an unrelated symbol or upload a resized screenshot as
 promotional artwork.
 
-For Chrome's listing carousel, upload the five 1280x800 images from
-`store-assets/listing-screenshots/chrome/en-US/` in filename order. They are marketing compositions derived
-from the current audited Chrome captures; the three files under `store-assets/screenshots/chrome/` remain
-the unmodified provenance sources and are not the preferred listing uploads.
+The existing listing and promotional PNGs are stale and must not be submitted. The prepared replacement
+story is in [store-assets/REFRESH_BRIEF.md](store-assets/REFRESH_BRIEF.md). Capture the current installed
+product before generating replacement artwork, then audit the image and archive provenance together.

@@ -3,7 +3,7 @@
     "message": "RequestOrbit"
   },
   "appDesc": {
-    "message": "Create, test, and control browser request rules locally."
+    "message": "Create your own URL redirects. Choose the scope, test the result, and keep rules local."
   },
   "actionTitle": {
     "message": "Open RequestOrbit"

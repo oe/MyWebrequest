@@ -1,5 +1,11 @@
 {
-  "appName": { "message": "RequestOrbit" },
-  "appDesc": { "message": "브라우저 요청 규칙을 기기에서 만들고 테스트하고 관리합니다." },
-  "actionTitle": { "message": "RequestOrbit 열기" }
+  "appName": {
+    "message": "RequestOrbit"
+  },
+  "appDesc": {
+    "message": "URL 이동 규칙을 직접 만드세요. 범위를 선택하고 결과를 테스트하며 규칙은 기기에 보관합니다."
+  },
+  "actionTitle": {
+    "message": "RequestOrbit 열기"
+  }
 }

@@ -1,7 +1,7 @@
 # Release Checklist
 
-Status: Local candidate with the evidence below; the final commit still needs CI browser-floor certification
-and signed store-upgrade verification before publication.
+Status: NO-GO for public release. Current installed-UI verification, refreshed store image provenance,
+final-commit CI browser-floor certification and signed store-upgrade verification remain outstanding.
 Last updated: 2026-09-05
 
 Current follow-up: the two-address redirect builder now includes exact/host scope selection, native host transforms, extra test URLs, and draft-based editing. The toolbar and empty state also expose dedicated redirect creation and an Other rules menu. New forms now default to Enabled with a user-controlled switch; saving new redirects uses the same permission, conflict and cycle checks as editing. These changes affect the installed UI. Its new Chromium E2E
@@ -38,6 +38,13 @@ tested package and submitted package are identical. The report generator refuses
 wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
+
+- 2026-09-05 final review: `audit:store-assets` fails because the Chrome capture belongs to older release
+  contents. All affected source/promotional image rows are pending again. The latest remote CI remains
+  on `6756f065`, before the current local UI changes. The public `request.forth.ink/zh-hans/` endpoint
+  responds with HTTPS 200 and Pages reports an approved certificate; domain configuration is no longer
+  the blocker. See [RELEASE_REVIEW_2026-09-05.md](RELEASE_REVIEW_2026-09-05.md) and
+  [the image refresh brief](store-assets/REFRESH_BRIEF.md).
 
 Only evidence explicitly reflected in the matrices below satisfies a release row. Build-only, static, or
 partial historical checks remain pre-certification evidence.
@@ -264,9 +271,9 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
 | Six localized descriptions and screenshot captions             | ✓                | ✓            | ✓   |
 | Legacy migration copy is limited to the Chrome listing         | ✓                | ✓            | ✓   |
-| Screenshots come from the exact checksummed release artifact   | ✓                | ✓            | ✓   |
+| Screenshots come from the exact checksummed release artifact   | ☐                | ☐            | ☐   |
 | Original store icon and generated runtime icon matrix          | ✓                | ✓            | ✓   |
-| Audited 440x280 promotional tile                               | ✓                | ✓            | N/A |
+| Audited 440x280 promotional tile                               | ☐                | ☐            | N/A |
 | Signed upgrade from the previous public version preserves data | ☐                | N/A          | N/A |
 
 ## 4. Sign-off record

@@ -3,7 +3,7 @@
     "message": "RequestOrbit"
   },
   "appDesc": {
-    "message": "在本地创建、测试和管理浏览器请求规则。"
+    "message": "自己定义网址跳转，选择生效范围、测试结果，规则保存在本机。"
   },
   "actionTitle": {
     "message": "打开 RequestOrbit"

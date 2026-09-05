@@ -1,19 +1,20 @@
 # Browser Support Plan
 
-Status: Local candidate checks updated 2026-09-05; final-commit CI floor certification and store portals pending
+Status: Current UI/runtime changes are NOT certified for release; historical evidence retained below. Updated 2026-09-05.
 Last updated: 2026-09-05
 
 ## Current matrix
 
-| Target         | Manifest | Minimum | Build output   | Current evidence                                                  | Release status            |
-| -------------- | -------- | ------- | -------------- | ----------------------------------------------------------------- | ------------------------- |
-| Chrome         | MV3      | 121     | `dist/chrome`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Current runtime certified |
-| Microsoft Edge | MV3      | 121     | `dist/edge`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Current runtime certified |
-| Firefox        | MV3      | 142     | `dist/firefox` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Current runtime certified |
-| Safari         | TBD      | TBD     | None           | WXT feasibility only; no Xcode conversion or API spike            | Deferred                  |
+| Target         | Manifest | Minimum | Build output   | Current evidence                                                  | Release status              |
+| -------------- | -------- | ------- | -------------- | ----------------------------------------------------------------- | --------------------------- |
+| Chrome         | MV3      | 121     | `dist/chrome`  | Chrome 152 installed-extension DNR, permission, popup, lifecycle  | Historical runtime evidence |
+| Microsoft Edge | MV3      | 121     | `dist/edge`    | Edge 152 installed-extension DNR, permission, popup, lifecycle    | Historical runtime evidence |
+| Firefox        | MV3      | 142     | `dist/firefox` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Historical runtime evidence |
+| Safari         | TBD      | TBD     | None           | WXT feasibility only; no Xcode conversion or API spike            | Deferred                    |
 
-`Current runtime certified` means the unpacked artifact passed the recorded local installed-extension
-checks on the listed browser version. It does not mean store-ready: the older-release matrix, remaining
+`Historical runtime evidence` refers to the older artifact used for the recorded checks. It does not certify
+the new redirect generator, host transforms, guided editing, creation menus, or default-enabled save flow.
+Those changes still need installed-browser and final-commit CI checks. It does not mean store-ready: the older-release matrix, remaining
 DNR scenarios, signed-artifact upgrade test, and store validation are still required.
 
 ## Decisions

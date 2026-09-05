@@ -1,5 +1,11 @@
 {
-  "appName": { "message": "RequestOrbit" },
-  "appDesc": { "message": "Créez, testez et gérez localement les règles de requête du navigateur." },
-  "actionTitle": { "message": "Ouvrir RequestOrbit" }
+  "appName": {
+    "message": "RequestOrbit"
+  },
+  "appDesc": {
+    "message": "Créez vos redirections URL, choisissez leur portée et testez le résultat. Les règles restent sur votre appareil."
+  },
+  "actionTitle": {
+    "message": "Ouvrir RequestOrbit"
+  }
 }

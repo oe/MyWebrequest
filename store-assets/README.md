@@ -1,5 +1,9 @@
 # Store assets
 
+**Current status (2026-09-05): the PNGs below are stale, not upload-ready.**
+The source capture hashes do not match the latest archives. See [REFRESH_BRIEF.md](REFRESH_BRIEF.md)
+for the prepared replacement story. Refresh real captures before rendering replacement artwork.
+
 The committed screenshots under `screenshots/<browser>/` are 1280x800, full-bleed captures of the real
 extension UI. Each browser set tells the same three-part product story: rule management, the bounded
 website-access explanation, and verified backup import preview.
@@ -18,7 +22,7 @@ The canonical icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` r
 16/32/48/96/128px PNG matrix, Edge's 300px listing logo, Chrome/Edge 440x280 promotional tiles, and Chrome's
 optional 1400x560 marquee tile. The promotional artwork adapts Goldie's product-first framing to extension
 store proportions: the legacy blue globe stays recognizable while verified, current UI is presented inside a
-browser-window frame. The saturated full-bleed artwork avoids relying on marketing copy that cannot be
+bounded frame that preserves the complete real product header. The saturated full-bleed artwork avoids relying on marketing copy that cannot be
 localized in Chrome's global promotional-image fields.
 
 - Chrome Web Store accepts 1280x800 or 640x400 screenshots and recommends the larger size.
