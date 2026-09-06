@@ -403,7 +403,11 @@ test('clean install exposes the product UI without required host access', async 
   await options.keyboard.press('Escape');
 
   await expect(options.getByRole('heading', { name: 'No rules yet' })).toBeVisible();
-  await expect(options.getByText('Examples are created disabled')).toBeVisible();
+  await expect(
+    options.getByText(
+      'Review the example settings before saving. You can turn Enabled off to save without applying.',
+    ),
+  ).toBeVisible();
   await options.getByRole('button', { name: /Block analytics/ }).click();
   await expect(options.getByRole('textbox', { name: 'Rule name' })).toHaveValue('Block analytics example');
   const scriptResourceType = options
@@ -522,7 +526,7 @@ test('clean install exposes the product UI without required host access', async 
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
   await expect(popup.getByText('This browser page cannot be changed', { exact: true })).toBeVisible();
-  await expect(popup.getByRole('button', { name: 'Create rule for this site' })).toBeDisabled();
+  await expect(popup.getByRole('button', { name: 'Redirect this URL' })).toBeDisabled();
   expect(origins).toEqual([]);
   expect(consoleIssues).toEqual([]);
 });
