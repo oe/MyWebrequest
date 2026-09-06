@@ -1,3 +1,4 @@
+import { UpgradeNotice } from '@/ui/migration/upgrade-guide';
 import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRightIcon,
@@ -133,6 +134,14 @@ export function PopupApp() {
         <Separator />
 
         <section className="flex flex-col gap-4 p-4">
+          <UpgradeNotice
+            popup
+            onReview={() => {
+              void browser.tabs
+                .create({ url: `${browser.runtime.getURL('/options.html')}?view=migration` })
+                .catch((error: unknown) => toast.error(errorMessage(error, t('openRuleManagerError'))));
+            }}
+          />
           <div className="flex items-start justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-1">
               <p className="text-xs font-medium text-muted-foreground">{t('currentSite')}</p>

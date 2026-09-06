@@ -1,7 +1,7 @@
 # RequestOrbit Legacy Migration Plan
 
 Status: Implemented and regression-tested; signed-store upgrade validation pending
-Last updated: 2026-09-02
+Last updated: 2026-09-06
 Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
 
 ## 1. Migration promise
@@ -19,6 +19,21 @@ Every legacy item receives an explicit outcome:
 - `unsupported`: intent is preserved as data but cannot be enabled.
 - `removed-feature`: the old feature no longer exists.
 - `invalid`: the source data cannot be parsed safely.
+
+## Upgrade guidance
+
+Chrome records an update from a `0.x` version without opening an unsolicited browser tab.
+On the first subsequent visit to the rule manager, a six-language guide explains the
+My Webrequest → RequestOrbit rename, the redirect builder, disabled imported rules,
+on-demand site access and removed legacy features. Detecting retained legacy data is
+also a fallback when the install event was missed.
+
+The guide offers the preserved migration report as a downloadable backup when available,
+opens migration review, or lets the user defer. A local, versioned acknowledgment prevents
+repeated automatic presentation; it does not approve migration or activate any rule.
+Pending legacy data keeps a reminder in both the popup and manager. Settings can reopen
+the guide. Fresh installations do not automatically show it, and Edge/Firefox do not
+expose this Chrome-only legacy flow. Signed-store upgrade verification remains pending.
 
 ## 2. Legacy identity evidence and remaining precondition
 

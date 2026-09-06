@@ -1,3 +1,4 @@
+import { supportsLegacyMigration } from '@/infrastructure/browser-capabilities';
 import { createReconciliationScheduler } from '@/application/reconciliation-scheduler';
 import { reconcileDynamicRules } from '@/infrastructure/rule-runtime';
 import { loadState, RULES_STORAGE_KEY } from '@/infrastructure/rule-store';
@@ -12,7 +13,18 @@ const scheduler = createReconciliationScheduler(reconcile, (error) => {
 });
 
 export default defineBackground(() => {
-  browser.runtime.onInstalled.addListener(scheduler.schedule);
+  browser.runtime.onInstalled.addListener((details) => {
+    scheduler.schedule();
+    if (
+      supportsLegacyMigration() &&
+      details.reason === 'update' &&
+      details.previousVersion?.startsWith('0.')
+    ) {
+      void browser.storage.local.set({ requestOrbitLegacyUpgrade: true }).catch((error: unknown) => {
+        console.error('Could not record legacy upgrade.', error);
+      });
+    }
+  });
   browser.runtime.onStartup.addListener(scheduler.schedule);
 
   browser.storage.onChanged.addListener((changes, areaName) => {

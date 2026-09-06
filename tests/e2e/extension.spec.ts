@@ -975,6 +975,35 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
     await expect(options).toHaveTitle('RequestOrbit');
+    const guide = options.getByRole('dialog');
+    await expect(guide.getByRole('heading', { name: 'My Webrequest is now RequestOrbit' })).toBeVisible();
+    const upgradeBackup = options.waitForEvent('download');
+    await guide.getByRole('button', { name: 'Export report', exact: true }).click();
+    expect((await upgradeBackup).suggestedFilename()).toMatch(/^request-orbit-migration-.*\.json$/);
+    await options.setViewportSize({ width: 390, height: 844 });
+    await expect(guide.getByRole('button', { name: 'Later', exact: true })).toBeInViewport();
+    await expect(guide.getByRole('button', { name: 'Review and back up old rules' })).toBeInViewport();
+    await options.screenshot({ path: '/tmp/requestorbit-upgrade-guide-mobile.png' });
+    await options.setViewportSize({ width: 1280, height: 800 });
+    await expect.poll(async () => (await guide.boundingBox())!.width).toBeLessThanOrEqual(576);
+    await options.screenshot({ path: '/tmp/requestorbit-upgrade-guide.png' });
+    await options.evaluate(() => chrome.storage.local.set({ 'ui.locale': 'zh-CN' }));
+    await expect(guide.getByRole('heading', { name: 'My Webrequest 现已更名为 RequestOrbit' })).toBeVisible();
+    await options.screenshot({ path: '/tmp/requestorbit-upgrade-guide-zh.png' });
+    await options.evaluate(() => chrome.storage.local.set({ 'ui.locale': 'en' }));
+    await guide.getByRole('button', { name: 'Later', exact: true }).click();
+    await options.reload();
+    await expect(options.getByRole('dialog')).toHaveCount(0);
+    await expect(options.getByRole('button', { name: 'Old rules need attention' })).toBeVisible();
+    const popup = await launched.context.newPage();
+    await popup.goto(`chrome-extension://${extensionId}/popup.html`);
+    await expect(popup.getByRole('button', { name: /My Webrequest is now RequestOrbit/ })).toBeVisible();
+    await popup.close();
+    await options.getByRole('button', { name: 'Settings', exact: true }).last().click();
+    await options.getByRole('menuitem', { name: 'Upgrade guide', exact: true }).click();
+    await expect(guide).toBeVisible();
+    await guide.getByRole('button', { name: 'Review and back up old rules' }).click();
+    await expect(options.getByRole('heading', { name: 'Legacy migration' })).toBeVisible();
     expect(await options.evaluate(() => chrome.runtime.getManifest().version)).toBe('1.0.0');
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(
@@ -1017,6 +1046,7 @@ test('legacy localStorage is reviewed, exported, applied disabled, and rolled ba
     }
   }, legacyFixture);
   await options.reload();
+  await options.getByRole('dialog').getByRole('button', { name: 'Later', exact: true }).click();
 
   const primaryNavigation = options.getByRole('navigation', { name: 'Primary navigation' });
   const migrationButton = primaryNavigation.getByRole('button', { name: 'Legacy migration' });
@@ -1608,4 +1638,27 @@ test('guided host redirects preserve paths and queries without matching other po
     await close(otherServer);
     await rm(fixture.directory, { recursive: true, force: true });
   }
+});
+
+test('fresh installs do not show legacy upgrade guidance; a recorded legacy update shows it once', async ({
+  context,
+  extensionId,
+}) => {
+  const options = await context.newPage();
+  await options.goto(`chrome-extension://${extensionId}/options.html`);
+  await expect(
+    options.locator('header').getByRole('button', { name: 'Create redirect', exact: true }),
+  ).toBeVisible();
+  await expect(options.getByRole('dialog')).toHaveCount(0);
+  await expect(options.getByRole('button', { name: 'Old rules need attention' })).toHaveCount(0);
+  await options.evaluate(() => chrome.storage.local.set({ requestOrbitLegacyUpgrade: true }));
+  if (browserTarget !== 'chrome') {
+    await expect(options.getByRole('dialog')).toHaveCount(0);
+    return;
+  }
+  await expect(options.getByRole('heading', { name: 'My Webrequest is now RequestOrbit' })).toBeVisible();
+  await options.getByRole('button', { name: 'Later', exact: true }).click();
+  await options.reload();
+  await expect(options.getByRole('dialog')).toHaveCount(0);
+  await expect(options.getByRole('button', { name: 'Old rules need attention' })).toHaveCount(0);
 });

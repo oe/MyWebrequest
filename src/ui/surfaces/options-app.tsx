@@ -1,3 +1,4 @@
+import { UpgradeNotice } from '@/ui/migration/upgrade-guide';
 import { CreateRuleActions } from '@/ui/rules/create-rule-actions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArchiveRestoreIcon, ListFilterIcon, SearchIcon } from 'lucide-react';
@@ -48,7 +49,11 @@ export function OptionsApp() {
   const manager = useRuleManager();
   const migrationAvailable = supportsLegacyMigration();
   const migrationManager = useMigrationManager(migrationAvailable);
-  const [view, setView] = useState<OptionsView>('rules');
+  const [view, setView] = useState<OptionsView>(() =>
+    supportsLegacyMigration() && new URLSearchParams(location.search).get('view') === 'migration'
+      ? 'migration'
+      : 'rules',
+  );
   const [query, setQuery] = useState('');
   const [actionFilter, setActionFilter] = useState<RuleActionFilter>('all');
   const [resourceTypeFilter, setResourceTypeFilter] = useState<RuleResourceTypeFilter>('all');
@@ -282,6 +287,10 @@ export function OptionsApp() {
             )}
           </div>
           <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 px-4 py-2 max-[799px]:px-3">
+            <UpgradeNotice
+              legacyDetected={migrationManager.detection !== 'none'}
+              onReview={() => requestNavigation(() => setView('migration'))}
+            />
             <div className="min-[800px]:hidden">
               <LanguageMenu />
             </div>

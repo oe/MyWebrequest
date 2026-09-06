@@ -45,6 +45,12 @@ wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
 
+- 2026-09-06: added a six-language, once-per-upgrade guide for legacy Chrome users, with rename and
+  feature-change explanations, backup export, migration review, deferred reminders and a Settings
+  entry. Headed same-ID upgrade tests cover acknowledgment persistence, popup reminders, backup
+  download, reopening, desktop/mobile layouts and Chinese rendering. Fresh installs do not auto-open
+  the guide; Edge and Firefox keep the Chrome-only flow hidden. The browser suite now has 19 scenarios.
+
 - 2026-09-06: the complete Node 24 `pnpm release:package` gate passed locally, including 209 unit
   tests, 18 Chromium scenarios, package/security/metadata checks, fresh image provenance and byte-for-byte
   reproducibility of all four archives. Edge passed 16 applicable scenarios (two Chrome-only migration
