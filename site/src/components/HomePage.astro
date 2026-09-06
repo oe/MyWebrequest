@@ -1,5 +1,6 @@
 ---
 import { Image } from 'astro:assets';
+import browserSupport from '../../../browser-support.json';
 import { ArrowRight, Check, CodeXml, LockKeyhole, Sparkles } from '@lucide/astro';
 import rulesOverview from '../assets/rules-overview.png';
 import { releaseCopy } from '../release-copy';
@@ -23,8 +24,16 @@ const release = releaseCopy[locale];
       <h1>{copy.title}</h1>
       <p class="lede">{copy.description}</p>
       <div class="hero-actions">
-        <a class="button primary" href={localizedPath(locale, 'guides/quick-start')}
-          >{release.installTitle}<ArrowRight size={16} /></a
+        <a
+          class="button primary"
+          data-install-link
+          data-chrome-label={release.chromeInstall}
+          data-chrome-url={`https://chromewebstore.google.com/detail/${browserSupport.chromeLegacyExtensionId}`}
+          href={localizedPath(locale, 'guides/quick-start')}
+          ><span data-install-label>{release.installTitle}</span><ArrowRight
+            size={16}
+            aria-hidden="true"
+          /></a
         >
         <a class="button secondary" href={githubUrl()}><CodeXml size={16} />{copy.github}</a>
       </div>
@@ -105,3 +114,24 @@ const release = releaseCopy[locale];
     >
   </section>
 </BaseLayout>
+
+<script>
+  const browser = navigator as Navigator & {
+    userAgentData?: { mobile: boolean; brands: { brand: string; version: string }[] };
+  };
+  const desktopChrome = browser.userAgentData
+    ? !browser.userAgentData.mobile &&
+      browser.userAgentData.brands.some(({ brand }) => brand === 'Google Chrome')
+    : /Chrome\//.test(browser.userAgent) &&
+      !/Android|Mobile|Edg\/|OPR\/|SamsungBrowser\//.test(browser.userAgent);
+
+  if (desktopChrome) {
+    for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-install-link]')) {
+      const label = link.querySelector('[data-install-label]');
+      if (label && link.dataset.chromeUrl && link.dataset.chromeLabel) {
+        link.href = link.dataset.chromeUrl;
+        label.textContent = link.dataset.chromeLabel;
+      }
+    }
+  }
+</script>
