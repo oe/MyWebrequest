@@ -1,7 +1,7 @@
 # Browser Support Plan
 
-Status: Current UI/runtime changes are NOT certified for release; historical evidence retained below. Updated 2026-09-05.
-Last updated: 2026-09-05
+Status: Current UI/runtime changes are NOT certified for release; historical evidence retained below. Updated 2026-09-06.
+Last updated: 2026-09-06
 
 ## Current matrix
 
@@ -12,10 +12,12 @@ Last updated: 2026-09-05
 | Firefox        | MV3      | 142     | `dist/firefox` | Firefox 154 installed-extension DNR, permission, popup, lifecycle | Historical runtime evidence |
 | Safari         | TBD      | TBD     | None           | WXT feasibility only; no Xcode conversion or API spike            | Deferred                    |
 
-`Historical runtime evidence` refers to the older artifact used for the recorded checks. It does not certify
-the new redirect generator, host transforms, guided editing, creation menus, or default-enabled save flow.
-Those changes still need installed-browser and final-commit CI checks. It does not mean store-ready: the older-release matrix, remaining
-DNR scenarios, signed-artifact upgrade test, and store validation are still required.
+The detailed tables below retain historical evidence. On 2026-09-06 the current local candidate was
+additionally exercised in Chromium 151, Edge 152 and Firefox 155. Source captures from each current archive
+are recorded in `store-assets/screenshots/manifest.json`. The redirect builder now has a fixed action footer
+and an opaque dialog background; its desktop and compact layout and real host-transform boundaries have
+explicit regression coverage. Current local verification does not certify the minimum-version matrix,
+a store-signed update, or portal acceptance. See `RELEASE_CHECKLIST.md` for outstanding gates.
 
 ## Decisions
 

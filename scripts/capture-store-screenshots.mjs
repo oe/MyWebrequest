@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { basename, join, resolve } from 'node:path';
 import { promisify } from 'node:util';
 
-import { chromium } from '@playwright/test';
+import { chromium, expect } from '@playwright/test';
 import { hashArchiveContents } from './hash-archive-contents.mjs';
 
 const execFileAsync = promisify(execFile);
@@ -230,6 +230,7 @@ async function captureChromium(target, artifact) {
         chrome.storage.local.set({
           requestRulesState: state,
           'ui.locale': 'en',
+          'ui.theme': 'light',
         }),
       screenshotState(),
     );
@@ -250,6 +251,8 @@ async function captureChromium(target, artifact) {
     const files = [];
     const capture = async (filename, purpose) => {
       const path = join(outputDirectory, filename);
+      await page.evaluate(async () => document.fonts.ready);
+      await page.waitForTimeout(180);
       await page.screenshot({ path, animations: 'disabled' });
       files.push({ filename, purpose });
     };
@@ -276,6 +279,49 @@ async function captureChromium(target, artifact) {
     }, screenshotBackup());
     await page.getByRole('heading', { name: 'Import preview' }).waitFor({ state: 'visible' });
     await capture('03-backup-restore.png', 'Local checksummed backup and safe import entry point');
+
+    await page.getByRole('button', { name: 'Rules', exact: true }).click();
+    await page.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Original URL', { exact: true }).fill('https://old.example/articles/42?lang=en');
+    await dialog
+      .getByLabel('Destination URL', { exact: true })
+      .fill('https://new.example/articles/42?lang=en');
+    await expect(dialog.getByRole('status')).toContainText('https://new.example/articles/42?lang=en');
+    await expect(dialog.getByRole('button', { name: 'Save rule', exact: true })).toBeInViewport();
+    await expect(dialog.getByRole('switch', { name: 'Enabled', exact: true })).toBeChecked();
+    await capture(
+      '04-create-redirect.png',
+      'Two-address redirect creation with default Enabled and exact URL preview',
+    );
+    await dialog.getByRole('radio', { name: /All pages on this host/ }).check();
+    await dialog.getByLabel('URL to test', { exact: true }).fill('https://old.example/about?ref=home');
+    await expect(dialog.getByRole('status')).toContainText('https://new.example/about?ref=home');
+    await capture(
+      '05-host-scope.png',
+      'Host-only replacement preserves paths and queries within the original origin',
+    );
+    await dialog.locator('summary').click();
+    await expect(dialog.getByRole('status').last()).toContainText('This URL will not redirect');
+    await expect(dialog.getByRole('button', { name: 'Save rule', exact: true })).toBeInViewport();
+    await capture('06-test-urls.png', 'Additional matching and non-matching URL previews');
+    await dialog.locator('summary').click();
+    await dialog.getByRole('switch', { name: 'Enabled', exact: true }).uncheck();
+    await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Edit URL redirect', exact: true })).toBeVisible();
+    await expect(page.getByLabel('Rule name', { exact: true })).toHaveValue('old.example → new.example');
+    await page
+      .locator('[data-radix-scroll-area-viewport]')
+      .last()
+      .evaluate((el) => {
+        el.scrollTop = 0;
+      });
+    await expect(page.locator('[data-sonner-toast]')).toHaveCount(0, { timeout: 10_000 });
+    await capture(
+      '07-edit-redirect.png',
+      'Saved disabled host redirect in the simple editor with creation actions',
+    );
 
     if (consoleIssues.length > 0) {
       throw new Error(`${target} emitted console issues: ${consoleIssues.join('\n')}`);
@@ -428,7 +474,7 @@ async function captureFirefox(artifact) {
     await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
     await poll(`document.title`, 'RequestOrbit');
     await executeAsync(
-      `const state = arguments[0]; const done = arguments[arguments.length - 1]; browser.storage.local.set({ requestRulesState: state, 'ui.locale': 'en' }).then(() => done(true), (error) => done({ error: String(error) }));`,
+      `const state = arguments[0]; const done = arguments[arguments.length - 1]; browser.storage.local.set({ requestRulesState: state, 'ui.locale': 'en', 'ui.theme': 'light' }).then(() => done(true), (error) => done({ error: String(error) }));`,
       [screenshotState()],
     );
     await poll(`document.querySelectorAll('button[data-rule-select]').length`, 4);
@@ -456,6 +502,9 @@ async function captureFirefox(artifact) {
     await mkdir(outputDirectory, { recursive: true });
     const files = [];
     const capture = async (filename, purpose) => {
+      await executeAsync(
+        `const done = arguments[arguments.length - 1]; document.fonts.ready.then(() => setTimeout(() => done(true), 180));`,
+      );
       const encoded = await command('GET', `/session/${sessionId}/screenshot`);
       await writeFile(join(outputDirectory, filename), Buffer.from(encoded, 'base64'));
       files.push({ filename, purpose });
@@ -481,6 +530,58 @@ async function captureFirefox(artifact) {
     );
     await poll(`document.body.innerText.includes('Import preview')`, true);
     await capture('03-backup-restore.png', 'Local checksummed backup and safe import entry point');
+
+    await clickNative('xpath', "//button[normalize-space(.)='Rules']");
+    await clickNative('xpath', "//button[normalize-space(.)='Create redirect']");
+    const fill = async (selector, value) => {
+      const element = await command('POST', `/session/${sessionId}/element`, {
+        using: 'css selector',
+        value: selector,
+      });
+      const elementId = element[webdriverElementKey];
+      await command('POST', `/session/${sessionId}/element/${elementId}/clear`, {});
+      await command('POST', `/session/${sessionId}/element/${elementId}/value`, { text: value });
+    };
+    await fill('#redirect-from', 'https://old.example/articles/42?lang=en');
+    await fill('#redirect-to', 'https://new.example/articles/42?lang=en');
+    await poll(
+      `document.querySelector('[role="dialog"] [role="status"]')?.innerText.includes('https://new.example/articles/42?lang=en')`,
+      true,
+    );
+    await poll(`document.querySelector('#redirect-enabled')?.getAttribute('aria-checked')`, 'true');
+    await capture(
+      '04-create-redirect.png',
+      'Two-address redirect creation with default Enabled and exact URL preview',
+    );
+    await clickNative('css selector', 'input[name="redirect-scope"][value="host"]');
+    await fill('#redirect-test', 'https://old.example/about?ref=home');
+    await poll(
+      `document.querySelector('[role="dialog"] [role="status"]')?.innerText.includes('https://new.example/about?ref=home')`,
+      true,
+    );
+    await capture(
+      '05-host-scope.png',
+      'Host-only replacement preserves paths and queries within the original origin',
+    );
+    await clickNative('css selector', '[role="dialog"] summary');
+    await poll(
+      `[...document.querySelectorAll('[role="dialog"] [role="status"]')].at(-1)?.innerText.includes('This URL will not redirect')`,
+      true,
+    );
+    await capture('06-test-urls.png', 'Additional matching and non-matching URL previews');
+    await clickNative('css selector', '[role="dialog"] summary');
+    await clickNative('css selector', '#redirect-enabled');
+    await clickNative('xpath', "//button[normalize-space(.)='Save rule']");
+    await poll(`document.querySelector('[role="dialog"]') === null`, true);
+    await poll(`document.body.innerText.includes('Edit URL redirect')`, true);
+    await executeAsync(
+      `const done = arguments[arguments.length - 1]; document.querySelectorAll('[data-radix-scroll-area-viewport]').forEach(el => { el.scrollTop = 0; }); done(true);`,
+    );
+    await poll(`document.querySelectorAll('[data-sonner-toast]').length`, 0);
+    await capture(
+      '07-edit-redirect.png',
+      'Saved disabled host redirect in the simple editor with creation actions',
+    );
 
     return { browserName: 'Firefox', browserVersion: session.capabilities.browserVersion, files };
   } finally {

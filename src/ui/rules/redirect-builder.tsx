@@ -112,7 +112,7 @@ export function RedirectBuilder({
       }}
     >
       <DialogContent
-        className="max-h-[90dvh] overflow-y-auto sm:max-w-xl"
+        className="flex max-h-[90dvh] flex-col overflow-hidden sm:max-w-4xl"
         showCloseButton={false}
         onInteractOutside={(event) => event.preventDefault()}
       >
@@ -120,62 +120,64 @@ export function RedirectBuilder({
           <DialogTitle>{initialRule ? copy.edit : copy.title}</DialogTitle>
           <DialogDescription>{copy.intro}</DialogDescription>
         </DialogHeader>
-        <div className="flex flex-col gap-4">
-          <Field>
-            <FieldLabel htmlFor="redirect-from">{copy.from}</FieldLabel>
-            <Input
-              id="redirect-from"
-              type="url"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="https://example.com/page"
-              value={from}
-              disabled={saving}
-              onChange={(event) => setFrom(event.target.value)}
-            />
-          </Field>
-          <Field>
-            <FieldLabel htmlFor="redirect-to">{copy.to}</FieldLabel>
-            <Input
-              id="redirect-to"
-              type="url"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="https://other.example/page"
-              value={to}
-              disabled={saving}
-              onChange={(event) => setTo(event.target.value)}
-            />
-          </Field>
-          <fieldset className="flex flex-col gap-2" disabled={saving}>
-            <legend className="mb-2 text-sm font-medium">{copy.matchRule}</legend>
-            {(['exact', 'host'] as const).map((value) => (
-              <label
-                key={value}
-                className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
-              >
-                <input
-                  type="radio"
-                  name="redirect-scope"
-                  value={value}
-                  checked={scope === value}
-                  disabled={value === 'host' && !(exact.ok && exact.hostAvailable) && scope !== 'host'}
-                  onChange={() => setScope(value)}
-                />
-                {copy[value]}
-                {value === 'host' && exact.ok && exact.hostAvailable ? (
-                  <span className="min-w-0 break-all text-muted-foreground">
-                    {new URL(exact.source).origin}
-                  </span>
-                ) : null}
-              </label>
-            ))}
-          </fieldset>
-          {from && to && !generated.ok ? (
-            <p role="alert" className="text-sm text-destructive">
-              {copy[generated.error]}
-            </p>
-          ) : null}
+        <div className="grid min-h-0 gap-4 overflow-y-auto md:grid-cols-2">
+          <div className="flex min-w-0 flex-col gap-4">
+            <Field>
+              <FieldLabel htmlFor="redirect-from">{copy.from}</FieldLabel>
+              <Input
+                id="redirect-from"
+                type="url"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="https://example.com/page"
+                value={from}
+                disabled={saving}
+                onChange={(event) => setFrom(event.target.value)}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="redirect-to">{copy.to}</FieldLabel>
+              <Input
+                id="redirect-to"
+                type="url"
+                autoComplete="off"
+                spellCheck={false}
+                placeholder="https://other.example/page"
+                value={to}
+                disabled={saving}
+                onChange={(event) => setTo(event.target.value)}
+              />
+            </Field>
+            <fieldset className="flex flex-col gap-2" disabled={saving}>
+              <legend className="mb-2 text-sm font-medium">{copy.matchRule}</legend>
+              {(['exact', 'host'] as const).map((value) => (
+                <label
+                  key={value}
+                  className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary/5"
+                >
+                  <input
+                    type="radio"
+                    name="redirect-scope"
+                    value={value}
+                    checked={scope === value}
+                    disabled={value === 'host' && !(exact.ok && exact.hostAvailable) && scope !== 'host'}
+                    onChange={() => setScope(value)}
+                  />
+                  {copy[value]}
+                  {value === 'host' && exact.ok && exact.hostAvailable ? (
+                    <span className="min-w-0 break-all text-muted-foreground">
+                      {new URL(exact.source).origin}
+                    </span>
+                  ) : null}
+                </label>
+              ))}
+            </fieldset>
+            {from && to && !generated.ok ? (
+              <p role="alert" className="text-sm text-destructive">
+                {copy[generated.error]}
+              </p>
+            ) : null}
+          </div>
           {generated.ok ? (
             <section
               className="flex flex-col gap-3 rounded-lg border bg-muted/25 p-4"
@@ -264,7 +266,7 @@ export function RedirectBuilder({
             </section>
           ) : null}
         </div>
-        <DialogFooter>
+        <DialogFooter className="shrink-0 border-t pt-4">
           <Button variant="outline" disabled={saving} onClick={requestClose}>
             {t('cancel')}
           </Button>

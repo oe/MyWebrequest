@@ -198,6 +198,11 @@
   }
 }
 
+/* Keep dialog text readable when a browser accepts backdrop-filter but does not render it. */
+[data-slot='dialog-content'] {
+  background-color: var(--background);
+}
+
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   [data-material^='glass-'],
   [data-slot='dialog-content'],

@@ -38,7 +38,19 @@ export async function verifyScreenshotSources(root, targets = ['chrome', 'edge',
     );
     assert.equal(typeof entry.browserVersion, 'string');
     assert.ok(entry.browserVersion.length > 0);
-    assert.equal(entry.files.length, 3, `${target} must provide the complete three-screenshot story.`);
+    assert.deepEqual(
+      entry.files.map((file) => file.path).sort(),
+      [
+        '01-rules-overview.png',
+        '02-permission-explanation.png',
+        '03-backup-restore.png',
+        '04-create-redirect.png',
+        '05-host-scope.png',
+        '06-test-urls.png',
+        '07-edit-redirect.png',
+      ].map((name) => `${target}/${name}`),
+      `${target} must provide all seven current UI capture scenarios.`,
+    );
     for (const file of entry.files) {
       const buffer = await readFile(join(assetRoot, file.path));
       assert.equal(buffer.subarray(0, 8).toString('hex'), '89504e470d0a1a0a', `${file.path} is not PNG.`);

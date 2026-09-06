@@ -7,22 +7,22 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "request-orbit-1.0.0-alpha.1-chrome.zip",
-      "sourceContentSha256": "aadee366d2b870818685b610ee5ae38c30007572c9d0fef2c722f3bc0fa67242",
+      "sourceContentSha256": "420852a645e9ef89020edb9434b9bc66d3a8875ee83f66c869fd1e669346174a",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-05T08:45:13.238Z",
+      "capturedAt": "2026-09-06T14:51:43.611Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "29c6bf76008e6e19870777e6fb82007d4e5c4a0e3f9625451c5fee18c15adbf1",
+          "sha256": "aba5abc8521bd1e3f7513868da626e3d556d2bfe39323d671406bc7b99db2af6",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "7e8c9dd093a0babaffaa14d0015531dc22381e6bb8987918ff3374cf4130a44c",
+          "sha256": "6ecced79b71d4e3e10d188cf933992dfc004db961e6377c4939b133f397001dc",
           "width": 1280,
           "height": 800
         },
@@ -32,27 +32,55 @@
           "sha256": "e6f07d3e0eb2fc58a4d58a06867f77a089576abe52d062757d7730cacd8bb342",
           "width": 1280,
           "height": 800
+        },
+        {
+          "path": "chrome/04-create-redirect.png",
+          "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
+          "sha256": "e16a3acab5ad8518e59b81afb8a13f3aaa453b49c2d928770f7cd08a8f08f273",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "chrome/05-host-scope.png",
+          "purpose": "Host-only replacement preserves paths and queries within the original origin",
+          "sha256": "682f52c78b1e58c53afff6534e1f0c938cf689ea14849a9ea9af8201dcddd9e8",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "chrome/06-test-urls.png",
+          "purpose": "Additional matching and non-matching URL previews",
+          "sha256": "cbc4a48712596b862f2ff53f3988a188f149e06d1ee43801dc86e91b652bf582",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "chrome/07-edit-redirect.png",
+          "purpose": "Saved disabled host redirect in the simple editor with creation actions",
+          "sha256": "93984b4f0dadb0b83c3e60f542d052d4f5df0755d09a093eede959d18b73e913",
+          "width": 1280,
+          "height": 800
         }
       ]
     },
     "edge": {
       "sourceArtifact": "request-orbit-1.0.0-alpha.1-edge.zip",
-      "sourceContentSha256": "bd89fa1f369de49f9bca5cc03e772a67987e8a1c39856271254e9501c278c80b",
+      "sourceContentSha256": "fe26d58012f6052681e8c72b257f6510fea463f59c569a555601bda1791a59c5",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.53",
-      "capturedAt": "2026-09-05T08:45:16.679Z",
+      "capturedAt": "2026-09-06T14:51:52.937Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "29c6bf76008e6e19870777e6fb82007d4e5c4a0e3f9625451c5fee18c15adbf1",
+          "sha256": "aba5abc8521bd1e3f7513868da626e3d556d2bfe39323d671406bc7b99db2af6",
           "width": 1280,
           "height": 800
         },
         {
           "path": "edge/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "7e8c9dd093a0babaffaa14d0015531dc22381e6bb8987918ff3374cf4130a44c",
+          "sha256": "6ecced79b71d4e3e10d188cf933992dfc004db961e6377c4939b133f397001dc",
           "width": 1280,
           "height": 800
         },
@@ -62,34 +90,90 @@
           "sha256": "e6f07d3e0eb2fc58a4d58a06867f77a089576abe52d062757d7730cacd8bb342",
           "width": 1280,
           "height": 800
+        },
+        {
+          "path": "edge/04-create-redirect.png",
+          "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
+          "sha256": "3c79ca4d1d6aa090d9ca1b8f2bbe5132bbf2284ad0e48e634289819b3dba54d5",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "edge/05-host-scope.png",
+          "purpose": "Host-only replacement preserves paths and queries within the original origin",
+          "sha256": "bbe95fcc09bb73a64b9c2f9423e486189dbf191eb5fb2e5eb921ea3719e016ac",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "edge/06-test-urls.png",
+          "purpose": "Additional matching and non-matching URL previews",
+          "sha256": "bdc027012495683eb1b627d2920841df0ddcb09b625561ce5cc2332e897e9411",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "edge/07-edit-redirect.png",
+          "purpose": "Saved disabled host redirect in the simple editor with creation actions",
+          "sha256": "873595d6972e116a573cc16fc7e2f01aa1d7421e8e23d42a18318d0b3f136e63",
+          "width": 1280,
+          "height": 800
         }
       ]
     },
     "firefox": {
       "sourceArtifact": "request-orbit-1.0.0-alpha.1-firefox.zip",
-      "sourceContentSha256": "5394301bb609ca818bdd6ca9b4cbf7d89ac414b8e7d49117a0a07490c8994540",
+      "sourceContentSha256": "622530644e47226dbd43d01503a92221729b1cc23f57196ebb480192779017ef",
       "browserName": "Firefox",
       "browserVersion": "155.0",
-      "capturedAt": "2026-09-05T08:45:21.262Z",
+      "capturedAt": "2026-09-06T14:52:13.772Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
           "purpose": "Rule list, live status, quota, and editor",
-          "sha256": "236d5211d329587fb93aae9a17fc8ecec1632b4bd87daa5c16f4026fcac1e472",
+          "sha256": "278f39c93ada74bc29915dc29600e852e2b624ef2eb990e2de35ffa164a3d4ff",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/02-permission-explanation.png",
           "purpose": "Bounded website-access explanation before browser prompt",
-          "sha256": "ef057893eed843e3320e30c620359fe8f44549003e9cbafb29708aa1c087cd0b",
+          "sha256": "b425bcc9e695600c1eae8bde70bb633d191888d589b346f3effb589be043ac52",
           "width": 1280,
           "height": 800
         },
         {
           "path": "firefox/03-backup-restore.png",
           "purpose": "Local checksummed backup and safe import entry point",
-          "sha256": "3809bfd4fbc7b783b1340d0436024ab067e3000b46ea7c0c627a36a7509ae166",
+          "sha256": "6b95b5c286266eeee1059945c8bd4089fc81f9ca1c59edfd4791a2f9260999f6",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/04-create-redirect.png",
+          "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
+          "sha256": "400d4ca59347584b42e2244656f5a18e22ca98ad772cca4e488a1c5c9e649bd0",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/05-host-scope.png",
+          "purpose": "Host-only replacement preserves paths and queries within the original origin",
+          "sha256": "1116238ce839e3e02a00d7457e3041fe156821a1ac4efa529199c3b206716ed0",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/06-test-urls.png",
+          "purpose": "Additional matching and non-matching URL previews",
+          "sha256": "735edff82ee64c72c8a3df22ed096aa05a14c5bd0bd2628f77a5073425f4f7c4",
+          "width": 1280,
+          "height": 800
+        },
+        {
+          "path": "firefox/07-edit-redirect.png",
+          "purpose": "Saved disabled host redirect in the simple editor with creation actions",
+          "sha256": "f66ada6d8663f0b5e69bdb0a9c757f900ae22fa428f5568d0b4d747ad8f3325f",
           "width": 1280,
           "height": 800
         }

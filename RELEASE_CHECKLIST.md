@@ -1,17 +1,23 @@
 # Release Checklist
 
-Status: NO-GO for public release. Current installed-UI verification, refreshed store image provenance,
-final-commit CI browser-floor certification and signed store-upgrade verification remain outstanding.
-Last updated: 2026-09-05
+Status: Public release still pending final-commit CI, signed store-upgrade verification and store approval.
+Last updated: 2026-09-06
 
-Current follow-up: the two-address redirect builder now includes exact/host scope selection, native host transforms, extra test URLs, and draft-based editing. The toolbar and empty state also expose dedicated redirect creation and an Other rules menu. New forms now default to Enabled with a user-controlled switch; saving new redirects uses the same permission, conflict and cycle checks as editing. These changes affect the installed UI. Its new Chromium E2E
-scenario and updated screenshot provenance still need browser execution before this candidate can be
-certified. The current agent's browser URL policy blocks extension-page access; do not substitute
-historical screenshots or count source-level checks as installed UI verification.
-Source verification for this follow-up: 209 unit tests, TypeScript, ESLint, site check/build,
-Chrome/Edge/Firefox builds and archives, artifact audit, and Firefox package lint passed on 2026-09-05.
-The authored browser scenario covers scope selection, editing into a draft, saving and reopening;
-it has not been executed for this follow-up.
+The current local candidate includes the two-address redirect builder, fixed visible footer controls,
+and opaque dialog backgrounds. Fresh captures from all three current archives cover creation, host scope,
+additional URL previews, simple editing, rule management, permission explanation and backup import.
+Store artwork and the local website image now use these captures. The source audit still rejects stale
+archives or altered images; capture provenance lives in `store-assets/screenshots/manifest.json`.
+
+Local runtime evidence from this review: Chrome for Testing 151 and Edge 152 ran the browser suite;
+Firefox 155 passed the exact-ZIP runtime verifier. Native Chromium permission denial/grant/revocation/
+re-grant and toolbar-popup pause/resume were exercised against a local HTTP fixture; Edge's native
+permission grant and toolbar popup were also checked. The follow-up regression scenarios check visible
+Save/Cancel controls at 1280x800, 640x800 and 390x844, and real host transforms with preserved paths/queries,
+other-port/subdomain exclusions and document-only scope. This does not certify a store-signed upgrade.
+
+The candidate has not been pushed, deployed, submitted, or published. The production website still needs
+an authorized deployment; its local six-language workflow copy now matches default-enabled rule creation.
 
 Never mark a browser supported from build output alone. Record the browser version, artifact checksum,
 test date, and evidence for every completed row.
@@ -38,6 +44,16 @@ tested package and submitted package are identical. The report generator refuses
 wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
+
+- 2026-09-06: the complete Node 24 `pnpm release:package` gate passed locally, including 209 unit
+  tests, 18 Chromium scenarios, package/security/metadata checks, fresh image provenance and byte-for-byte
+  reproducibility of all four archives. Edge passed 16 applicable scenarios (two Chrome-only migration
+  scenarios skipped). This is a local candidate gate; final-commit remote CI and store gates remain open.
+
+- 2026-09-06: replaced the stale three-scene-only capture contract with seven current UI scenarios per
+  browser, regenerated the five Chrome listing images and promotional/site artwork, and passed the
+  source/dimension/hash audit. Removed the promotional renderer's old product name, artificial window
+  controls, rotation and cropping. Do not infer store acceptance or remote CI from this local result.
 
 - 2026-09-05 final review: `audit:store-assets` fails because the Chrome capture belongs to older release
   contents. All affected source/promotional image rows are pending again. The latest remote CI remains
@@ -271,9 +287,9 @@ A newer browser passing does not certify these rows. Chromium and Edge use versi
 | Privacy statement matches runtime and contains no telemetry    | ✓                | ✓            | ✓   |
 | Six localized descriptions and screenshot captions             | ✓                | ✓            | ✓   |
 | Legacy migration copy is limited to the Chrome listing         | ✓                | ✓            | ✓   |
-| Screenshots come from the exact checksummed release artifact   | ☐                | ☐            | ☐   |
+| Screenshots come from the exact checksummed release artifact   | ✓                | ✓            | ✓   |
 | Original store icon and generated runtime icon matrix          | ✓                | ✓            | ✓   |
-| Audited 440x280 promotional tile                               | ☐                | ☐            | N/A |
+| Audited 440x280 promotional tile                               | ✓                | ✓            | N/A |
 | Signed upgrade from the previous public version preserves data | ☐                | N/A          | N/A |
 
 ## 4. Sign-off record

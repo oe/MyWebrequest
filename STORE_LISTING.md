@@ -1,6 +1,6 @@
 # Store Listing Baseline
 
-Last updated: 2026-09-05
+Last updated: 2026-09-06
 
 ## Name
 
@@ -50,6 +50,6 @@ Use the conservatively remastered blue-globe icon and the audited, product-frame
 Edge uses its own 440x280 copy. Do not substitute an unrelated symbol or upload a resized screenshot as
 promotional artwork.
 
-The existing listing and promotional PNGs are stale and must not be submitted. The prepared replacement
-story is in [store-assets/REFRESH_BRIEF.md](store-assets/REFRESH_BRIEF.md). Capture the current installed
-product before generating replacement artwork, then audit the image and archive provenance together.
+The listing and promotional PNGs were refreshed from the current archives on 2026-09-06 and passed
+the local provenance audit. They remain unsubmitted. See [store-assets/REFRESH_BRIEF.md](store-assets/REFRESH_BRIEF.md)
+for the story and remaining localization work. Re-run the audit against the final archives before uploading.

@@ -28,8 +28,9 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox: open about:debugging → This Firefox → Load Temporary Add-on, then select dist/firefox/manifest.json. Temporary installs are removed when Firefox restarts.',
     sourceLabel: 'View source',
-    screenshotAlt: 'RequestOrbit rule editor with URL matching guidance and a disabled example',
-    screenshotCaption: 'Actual rule editor. The URL preview does not send a request.',
+    screenshotAlt:
+      'RequestOrbit redirect builder with original and destination URLs, exact scope and live preview',
+    screenshotCaption: 'Actual redirect builder. The URL preview does not send a request.',
     browseGuides: 'Browse guides',
     secretNotice:
       'URLs and request headers you enter may contain tokens or other private information. They are saved locally and included in unencrypted backups. Review backups before sharing them.',
@@ -45,8 +46,8 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox：打开 about:debugging → 此 Firefox → 临时载入附加组件，选择 dist/firefox/manifest.json。重启 Firefox 后临时安装会移除。',
     sourceLabel: '查看源码',
-    screenshotAlt: 'RequestOrbit 规则编辑器，展示 URL 匹配说明和停用的示例规则',
-    screenshotCaption: '真实规则编辑器。URL 预览不会发送请求。',
+    screenshotAlt: 'RequestOrbit 跳转向导，展示原网址、目标网址、精确范围和实时预览',
+    screenshotCaption: '真实跳转向导。URL 预览不会发送请求。',
     browseGuides: '浏览指南',
     secretNotice:
       '你填写的网址或请求头可能含有令牌等隐私信息。这些内容会在本地保存，并包含在未加密的备份中。分享备份前请检查其中的内容。',
@@ -63,8 +64,8 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox: about:debugging → 이 Firefox → 임시 부가 기능 로드에서 dist/firefox/manifest.json을 선택하세요. Firefox를 재시작하면 임시 설치가 제거됩니다.',
     sourceLabel: '소스 보기',
-    screenshotAlt: 'URL 일치 안내와 비활성 예제가 있는 RequestOrbit 규칙 편집기',
-    screenshotCaption: '실제 규칙 편집기입니다. URL 미리보기는 요청을 보내지 않습니다.',
+    screenshotAlt: '원본 URL, 대상 URL, 정확한 범위와 미리보기를 보여 주는 RequestOrbit 리디렉션 편집기',
+    screenshotCaption: '실제 리디렉션 편집기입니다. URL 미리보기는 요청을 보내지 않습니다.',
     browseGuides: '가이드 둘러보기',
     secretNotice:
       '입력한 URL이나 요청 헤더에 토큰 또는 개인정보가 포함될 수 있습니다. 이 내용은 로컬에 저장되며 암호화되지 않은 백업에 포함됩니다. 공유 전에 백업을 확인하세요.',
@@ -81,8 +82,8 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox: about:debugging → この Firefox → 一時的なアドオンを読み込む、から dist/firefox/manifest.json を選択します。Firefox を再起動すると一時的なインストールは削除されます。',
     sourceLabel: 'ソースを見る',
-    screenshotAlt: 'URL の一致範囲と無効のサンプルを示す RequestOrbit ルール編集画面',
-    screenshotCaption: '実際のルール編集画面です。URL プレビューはリクエストを送信しません。',
+    screenshotAlt: '元の URL、転送先 URL、完全一致の範囲とプレビューを示す RequestOrbit リダイレクト作成画面',
+    screenshotCaption: '実際のリダイレクト作成画面です。URL プレビューはリクエストを送信しません。',
     browseGuides: 'ガイドを見る',
     secretNotice:
       '入力した URL やリクエストヘッダーにはトークンなどの個人情報が含まれる場合があります。ローカルに保存され、暗号化されていないバックアップにも含まれます。共有前に内容を確認してください。',
@@ -100,8 +101,9 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox : ouvrez about:debugging → Ce Firefox → Charger un module complémentaire temporaire, puis choisissez dist/firefox/manifest.json. L’installation temporaire disparaît au redémarrage de Firefox.',
     sourceLabel: 'Voir le code source',
-    screenshotAlt: 'Éditeur RequestOrbit avec explication du filtre URL et exemple désactivé',
-    screenshotCaption: 'Le véritable éditeur. L’aperçu URL n’envoie aucune requête.',
+    screenshotAlt:
+      'Créateur de redirections RequestOrbit avec URL source, destination, portée exacte et aperçu',
+    screenshotCaption: 'Le véritable créateur de redirections. L’aperçu URL n’envoie aucune requête.',
     browseGuides: 'Parcourir les guides',
     secretNotice:
       'Les URL et en-têtes saisis peuvent contenir des jetons ou des informations privées. Ils sont enregistrés localement et inclus dans les sauvegardes non chiffrées. Vérifiez les sauvegardes avant de les partager.',
@@ -119,8 +121,9 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
     firefoxSteps:
       'Firefox: abre about:debugging → Este Firefox → Cargar complemento temporal y selecciona dist/firefox/manifest.json. La instalación temporal se elimina al reiniciar Firefox.',
     sourceLabel: 'Ver código fuente',
-    screenshotAlt: 'Editor de RequestOrbit con ayuda de coincidencia URL y un ejemplo desactivado',
-    screenshotCaption: 'Editor real. La vista previa de URL no envía solicitudes.',
+    screenshotAlt:
+      'Creador de redirecciones de RequestOrbit con URL original, destino, alcance exacto y vista previa',
+    screenshotCaption: 'Creador de redirecciones real. La vista previa de URL no envía solicitudes.',
     browseGuides: 'Explorar guías',
     secretNotice:
       'Las URL y los encabezados que escribas pueden contener tokens u otra información privada. Se guardan localmente y se incluyen en copias sin cifrar. Revísalas antes de compartirlas.',

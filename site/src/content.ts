@@ -128,7 +128,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     workflowEyebrow: 'A safer way to work',
     workflowTitle: 'Build a rule, check it, then turn it on',
     workflowDescription:
-      'Every step stays visible. Examples and imported rules remain off until you have reviewed them.',
+      'New rules default to Enabled and apply when saved with any required permission. Turn Enabled off to save without applying. Imported rules remain off for review.',
     steps: [
       {
         title: 'Choose what to match',
@@ -177,7 +177,8 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     compatibility: 'Chrome · Edge · Firefox',
     workflowEyebrow: '更稳妥的使用方式',
     workflowTitle: '先创建、再测试，确认无误后启用',
-    workflowDescription: '每一步都清楚可见。示例规则和迁移来的规则会保持关闭，直到你亲自确认。',
+    workflowDescription:
+      '新建规则默认启用，保存并授予所需权限后生效。只想保存时，可先关闭“启用”；导入和迁移的规则仍保持关闭，等待检查。',
     steps: [
       {
         title: '确定匹配范围',
@@ -217,7 +218,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     workflowEyebrow: '더 안전한 사용 흐름',
     workflowTitle: '만들고, 확인한 다음, 활성화하세요',
     workflowDescription:
-      '설정 과정을 단계별로 확인할 수 있습니다. 예제와 가져온 규칙은 직접 검토하기 전까지 꺼진 상태로 유지됩니다.',
+      '새 규칙은 기본적으로 활성화되며 저장하고 필요한 권한을 허용하면 적용됩니다. 적용하지 않고 저장하려면 활성화를 끄세요. 가져온 규칙은 검토할 때까지 꺼진 상태입니다.',
     steps: [
       {
         title: '대상 범위 정하기',
@@ -265,7 +266,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     workflowEyebrow: '安心して使える手順',
     workflowTitle: '作成して、確かめてから、有効にする',
     workflowDescription:
-      '設定内容を一つずつ確認できます。サンプルや移行したルールは、自分で確認するまで無効のままです。',
+      '新規ルールは初期状態で有効です。保存して必要な権限を許可すると適用されます。適用せずに保存する場合は有効をオフにしてください。インポートしたルールは確認するまで無効です。',
     steps: [
       {
         title: '対象を絞り込む',
@@ -318,7 +319,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     workflowEyebrow: 'Une méthode plus sûre',
     workflowTitle: 'Créez la règle, testez-la, puis activez-la',
     workflowDescription:
-      'Chaque étape reste visible. Les exemples et les règles importées restent désactivés tant que vous ne les avez pas vérifiés.',
+      'Les nouvelles règles sont activées par défaut et appliquées après enregistrement et autorisation. Désactivez-les pour enregistrer sans appliquer. Les règles importées restent désactivées pour vérification.',
     steps: [
       {
         title: 'Définir ce qui doit correspondre',
@@ -384,7 +385,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     workflowEyebrow: 'Una forma más segura de trabajar',
     workflowTitle: 'Crea la regla, compruébala y luego actívala',
     workflowDescription:
-      'Cada paso queda a la vista. Los ejemplos y las reglas importadas siguen desactivados hasta que los revises.',
+      'Las reglas nuevas están activadas por defecto y se aplican al guardarlas con los permisos necesarios. Desactívalas para guardar sin aplicar. Las reglas importadas permanecen desactivadas para su revisión.',
     steps: [
       {
         title: 'Define qué debe coincidir',

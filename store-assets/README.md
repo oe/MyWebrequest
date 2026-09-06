@@ -1,17 +1,17 @@
 # Store assets
 
-**Current status (2026-09-05): the PNGs below are stale, not upload-ready.**
-The source capture hashes do not match the latest archives. See [REFRESH_BRIEF.md](REFRESH_BRIEF.md)
-for the prepared replacement story. Refresh real captures before rendering replacement artwork.
+**Current status (2026-09-06): refreshed locally from the current release archives; not submitted.**
+The provenance and dimension audit passes. Any later extension changes require fresh captures again.
 
-The committed screenshots under `screenshots/<browser>/` are 1280x800, full-bleed captures of the real
-extension UI. Each browser set tells the same three-part product story: rule management, the bounded
-website-access explanation, and verified backup import preview.
+The 1280x800 originals under `screenshots/<browser>/` cover seven real UI states: rule management,
+bounded permission explanation, backup import preview, two-address creation, host scope, additional test
+URLs, and simple editing. Each browser is captured from its own checksummed archive in an isolated profile.
 
-The upload-ready Chrome listing story lives under `listing-screenshots/chrome/en-US/`. It contains the
-recommended maximum of five 1280x800 images, adapting Goldie's product-first framing to Chrome's landscape
-format. These are deterministic compositions over the exact audited Chrome captures; the source captures
-remain untouched for release provenance.
+The five English Chrome listing images under `listing-screenshots/chrome/en-US/` use the current creation,
+host scope, test, edit and backup captures. They preserve the entire source image and product header,
+without a fabricated browser bar, rotation or cropping. English is the currently prepared image locale;
+localized descriptions are available separately below. Additional localized screenshots remain optional
+follow-up work, not evidence already captured.
 
 `listing/<locale>.json` contains paste-ready store metadata for English, Simplified Chinese, Korean,
 Japanese, French, and Spanish. The shared descriptions intentionally contain no browser-specific migration
@@ -20,10 +20,8 @@ Edge Add-ons or AMO.
 
 The canonical icon lives at `brand/app-icon.svg`. `pnpm generate:brand-assets` renders the runtime
 16/32/48/96/128px PNG matrix, Edge's 300px listing logo, Chrome/Edge 440x280 promotional tiles, and Chrome's
-optional 1400x560 marquee tile. The promotional artwork adapts Goldie's product-first framing to extension
-store proportions: the legacy blue globe stays recognizable while verified, current UI is presented inside a
-bounded frame that preserves the complete real product header. The saturated full-bleed artwork avoids relying on marketing copy that cannot be
-localized in Chrome's global promotional-image fields.
+optional 1400x560 marquee tile. The promotional artwork preserves the blue globe and complete current UI. The small tiles contain no
+marketing text; the optional marquee names RequestOrbit. No artificial browser controls are added.
 
 - Chrome Web Store accepts 1280x800 or 640x400 screenshots and recommends the larger size.
 - Chrome Web Store requires a 440x280 small promotional tile and accepts an optional 1400x560 marquee tile.

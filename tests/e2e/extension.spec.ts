@@ -1466,12 +1466,14 @@ test('two URLs generate a testable page redirect without activating it', async (
   extensionPage,
 }) => {
   const options = await context.newPage();
+  await options.setViewportSize({ width: 1280, height: 800 });
   await options.goto(`chrome-extension://${extensionId}/options.html`);
   await options.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
   const dialog = options.getByRole('dialog');
   await dialog.getByLabel('Original URL', { exact: true }).fill('https://original.example/page?x=1');
   await dialog.getByLabel('Destination URL', { exact: true }).fill('https://target.example/new');
   await expect(dialog.getByRole('status')).toContainText('https://target.example/new');
+  await expect(dialog.getByRole('button', { name: 'Save rule', exact: true })).toBeInViewport();
   await options.keyboard.press('Escape');
   await options.getByRole('button', { name: 'Keep editing', exact: true }).click();
   await expect(dialog.getByLabel('Original URL', { exact: true })).toHaveValue(
@@ -1484,6 +1486,20 @@ test('two URLs generate a testable page redirect without activating it', async (
   await dialog.getByRole('radio', { name: /All pages on this host/ }).check();
   await expect(dialog.getByRole('status').first()).toContainText('https://target.example/other');
   await expect(dialog.getByRole('switch', { name: 'Enabled', exact: true })).toBeChecked();
+  await dialog.locator('summary').click();
+  await expect(dialog.getByRole('status').last()).toContainText('This URL will not redirect');
+  for (const viewport of [
+    { width: 1280, height: 800 },
+    { width: 640, height: 800 },
+    { width: 390, height: 844 },
+  ]) {
+    await options.setViewportSize(viewport);
+    await expect(dialog.getByRole('button', { name: 'Save rule', exact: true })).toBeInViewport();
+    await expect(dialog.getByRole('button', { name: 'Cancel', exact: true })).toBeInViewport();
+    expect(await dialog.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  }
+  await options.setViewportSize({ width: 1280, height: 800 });
+  await dialog.locator('summary').click();
   await dialog.getByRole('switch', { name: 'Enabled', exact: true }).uncheck();
   await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
   await expect(dialog).toHaveCount(0);
@@ -1530,4 +1546,66 @@ test('two URLs generate a testable page redirect without activating it', async (
     'https://target.example/changed',
   );
   await options.close();
+});
+
+test('guided host redirects preserve paths and queries without matching other ports or subdomains', async () => {
+  const hits: string[] = [];
+  const respond = (request: http.IncomingMessage, response: http.ServerResponse) => {
+    const received = `${request.headers.host}${request.url}`;
+    hits.push(received);
+    response.setHeader('access-control-allow-origin', '*');
+    response.setHeader('content-type', 'text/plain');
+    response.end(received);
+  };
+  const server = http.createServer(respond);
+  const otherServer = http.createServer(respond);
+  const port = await listen(server);
+  const otherPort = await listen(otherServer);
+  const fixture = await extensionWithFixtureHostAccess();
+  let closeContext: (() => Promise<void>) | undefined;
+  try {
+    const launched = await launchChromiumExtensionContext(fixture.extensionPath);
+    closeContext = launched.close;
+    const context = launched.context;
+    const worker = await findExtensionWorker(context);
+    const id = new URL(worker.url()).host;
+    const options = await context.newPage();
+    await options.goto(`chrome-extension://${id}/options.html`);
+    await options.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
+    const dialog = options.getByRole('dialog');
+    await dialog.getByLabel('Original URL', { exact: true }).fill(`http://localhost:${port}/article?id=42`);
+    await dialog
+      .getByLabel('Destination URL', { exact: true })
+      .fill(`http://127.0.0.1:${port}/article?id=42`);
+    await dialog.getByRole('radio', { name: /All pages on this host/ }).check();
+    await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect
+      .poll(() => worker.evaluate(async () => (await chrome.declarativeNetRequest.getDynamicRules()).length))
+      .toBe(1);
+    await options.reload();
+    await expect(options.getByRole('button', { name: 'Edit URL redirect', exact: true })).toBeVisible();
+    const probe = await context.newPage();
+    for (const path of ['/article?id=42', '/another/path?x=a%2Fb&x=2']) {
+      await probe.goto(`http://localhost:${port}${path}`);
+      expect(probe.url()).toBe(`http://127.0.0.1:${port}${path}`);
+      await expect(probe.locator('body')).toHaveText(`127.0.0.1:${port}${path}`);
+      expect(hits).not.toContain(`localhost:${port}${path}`);
+    }
+    for (const origin of [`http://localhost:${otherPort}`, `http://sub.localhost:${port}`]) {
+      await probe.goto(`${origin}/control`);
+      expect(probe.url()).toBe(`${origin}/control`);
+      await expect(probe.locator('body')).toHaveText(`${new URL(origin).host}/control`);
+    }
+    const fetchedUrl = await probe.evaluate(
+      async (url) => (await fetch(url)).url,
+      `http://localhost:${port}/fetch-control`,
+    );
+    expect(fetchedUrl).toBe(`http://localhost:${port}/fetch-control`);
+  } finally {
+    await closeContext?.();
+    await close(server);
+    await close(otherServer);
+    await rm(fixture.directory, { recursive: true, force: true });
+  }
 });

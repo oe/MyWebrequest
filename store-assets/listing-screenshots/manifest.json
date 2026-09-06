@@ -10,19 +10,27 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-05T08:45:49.384Z",
+  "generatedAt": "2026-09-06T14:52:15.689Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
       "sha256": "deffcda1955ca725f283b92c028fbbd56c587cf168da174d8270370142bab893"
     },
     {
-      "path": "store-assets/screenshots/chrome/01-rules-overview.png",
-      "sha256": "29c6bf76008e6e19870777e6fb82007d4e5c4a0e3f9625451c5fee18c15adbf1"
+      "path": "store-assets/screenshots/chrome/04-create-redirect.png",
+      "sha256": "e16a3acab5ad8518e59b81afb8a13f3aaa453b49c2d928770f7cd08a8f08f273"
     },
     {
-      "path": "store-assets/screenshots/chrome/02-permission-explanation.png",
-      "sha256": "7e8c9dd093a0babaffaa14d0015531dc22381e6bb8987918ff3374cf4130a44c"
+      "path": "store-assets/screenshots/chrome/05-host-scope.png",
+      "sha256": "682f52c78b1e58c53afff6534e1f0c938cf689ea14849a9ea9af8201dcddd9e8"
+    },
+    {
+      "path": "store-assets/screenshots/chrome/06-test-urls.png",
+      "sha256": "cbc4a48712596b862f2ff53f3988a188f149e06d1ee43801dc86e91b652bf582"
+    },
+    {
+      "path": "store-assets/screenshots/chrome/07-edit-redirect.png",
+      "sha256": "93984b4f0dadb0b83c3e60f542d052d4f5df0755d09a093eede959d18b73e913"
     },
     {
       "path": "store-assets/screenshots/chrome/03-backup-restore.png",
@@ -31,42 +39,42 @@
   ],
   "assets": [
     {
-      "path": "store-assets/listing-screenshots/chrome/en-US/01-request-rules-made-clear.png",
+      "path": "store-assets/listing-screenshots/chrome/en-US/01-create-your-redirect.png",
       "locale": "en-US",
-      "source": "store-assets/screenshots/chrome/01-rules-overview.png",
-      "headline": "Request rules, made clear.",
-      "subhead": "Create, test, and manage browser request rules without editing raw DNR JSON.",
-      "sha256": "104e5298e0eaf175aac018b966ee50121377384ea6208be88a5f93a164fa1f2b",
+      "source": "store-assets/screenshots/chrome/04-create-redirect.png",
+      "headline": "Make links go where you want.",
+      "subhead": "Enter two addresses. Preview the result before saving.",
+      "sha256": "0dbb5203ab6727780682473cfb388c6f14c9b94c2be854763ddf0a650e5dd680",
       "width": 1280,
       "height": 800
     },
     {
-      "path": "store-assets/listing-screenshots/chrome/en-US/02-match-with-precision.png",
+      "path": "store-assets/listing-screenshots/chrome/en-US/02-one-url-or-whole-site.png",
       "locale": "en-US",
-      "source": "store-assets/screenshots/chrome/01-rules-overview.png",
-      "headline": "Match with precision.",
-      "subhead": "Use wildcards, regular expressions, resource types, methods, and priorities.",
-      "sha256": "b4bd5f424a6595c18e592857512d635204aea9bb80658353cbfed4367accebde",
+      "source": "store-assets/screenshots/chrome/05-host-scope.png",
+      "headline": "One URL or the whole site.",
+      "subhead": "Replace the host. Keep paths, queries, protocol, and port.",
+      "sha256": "0c586b7e86c7883c21ffaf8da3aa9e2177bcf972517327eb03d17a90a6d04431",
       "width": 1280,
       "height": 800
     },
     {
-      "path": "store-assets/listing-screenshots/chrome/en-US/03-access-only-when-needed.png",
+      "path": "store-assets/listing-screenshots/chrome/en-US/03-test-before-saving.png",
       "locale": "en-US",
-      "source": "store-assets/screenshots/chrome/02-permission-explanation.png",
-      "headline": "Access only when needed.",
-      "subhead": "Review the exact website origins before continuing to the browser prompt.",
-      "sha256": "008b04fa1574aaba76094fc8d5ab278088e24aa14e985a6d6110bbf43d17ad02",
+      "source": "store-assets/screenshots/chrome/06-test-urls.png",
+      "headline": "Test before you save.",
+      "subhead": "Try more URLs and see which ones redirect.",
+      "sha256": "89e51bafe7f6e7249ef28f6615656538bc13c963027157c23586636968ed0d84",
       "width": 1280,
       "height": 800
     },
     {
-      "path": "store-assets/listing-screenshots/chrome/en-US/04-preview-before-import.png",
+      "path": "store-assets/listing-screenshots/chrome/en-US/04-edit-your-redirects.png",
       "locale": "en-US",
-      "source": "store-assets/screenshots/chrome/03-backup-restore.png",
-      "headline": "Preview before you import.",
-      "subhead": "See additions, updates, conflicts, and import mode before any rule changes.",
-      "sha256": "4de411b2e1505ef14326b4d6bccfac6391575303bace9a0f48bb9c9ea7871b16",
+      "source": "store-assets/screenshots/chrome/07-edit-redirect.png",
+      "headline": "Change your redirects anytime.",
+      "subhead": "Reopen the simple editor. Save disabled or apply with permission.",
+      "sha256": "f689e943ab2e4c42689a2fb286e8ebd4e50a468808bad2a4fc361a3618678221",
       "width": 1280,
       "height": 800
     },
@@ -74,9 +82,9 @@
       "path": "store-assets/listing-screenshots/chrome/en-US/05-local-by-design.png",
       "locale": "en-US",
       "source": "store-assets/screenshots/chrome/03-backup-restore.png",
-      "headline": "Local by design.",
-      "subhead": "Rules, backups, and settings stay on this device.",
-      "sha256": "ad8840a47ced0de435de38e50d593d1ce88c471f61b95e5c54cca1e490f464d6",
+      "headline": "Your rules stay on your device.",
+      "subhead": "No account. Export a backup and preview imports before applying.",
+      "sha256": "18e99e9df26f6c711a005910c68354ae3cda5d884f34583a6d49ae99ce61bb17",
       "width": 1280,
       "height": 800
     }

@@ -18,8 +18,8 @@ assert.deepEqual(
   promotionalManifest.sources.map((source) => source.path).sort(),
   [
     'store-assets/brand/app-icon.svg',
-    'store-assets/screenshots/chrome/01-rules-overview.png',
-    'store-assets/screenshots/chrome/02-permission-explanation.png',
+    'store-assets/screenshots/chrome/04-create-redirect.png',
+    'store-assets/screenshots/chrome/05-host-scope.png',
   ],
   'The promotional artwork source set is incomplete or contains an unexpected file.',
 );
@@ -78,9 +78,11 @@ assert.deepEqual(
   listingScreenshotManifest.sources.map((source) => source.path).sort(),
   [
     'store-assets/brand/app-icon.svg',
-    'store-assets/screenshots/chrome/01-rules-overview.png',
-    'store-assets/screenshots/chrome/02-permission-explanation.png',
     'store-assets/screenshots/chrome/03-backup-restore.png',
+    'store-assets/screenshots/chrome/04-create-redirect.png',
+    'store-assets/screenshots/chrome/05-host-scope.png',
+    'store-assets/screenshots/chrome/06-test-urls.png',
+    'store-assets/screenshots/chrome/07-edit-redirect.png',
   ],
   'The listing screenshot source set is incomplete or contains an unexpected file.',
 );
