@@ -579,7 +579,12 @@ export function RuleEditor({
                         : simpleRedirect.target}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {simpleRedirect.scope === 'host' ? copy.hostHelp : copy.scope}
+                      {simpleRedirect.scope === 'host'
+                        ? copy.hostHelp
+                        : simpleRedirect.scope === 'path'
+                          ? copy.queryHelp
+                          : copy.scope}{' '}
+                      {simpleRedirect.scope === 'exact' ? copy.exactHashHelp : copy.hashHelp}
                     </p>
                   </>
                 ) : null}
@@ -778,18 +783,20 @@ export function RuleEditor({
                           action:
                             current.action.kind === 'redirect' && current.action.transform
                               ? { ...current.action, transform: { host: event.target.value } }
-                              : { kind: 'redirect', target: event.target.value },
+                              : { ...current.action, kind: 'redirect', target: event.target.value },
                         }))
                       }
                     />
                     <FieldDescription>
-                      {draft.action.transform
-                        ? copy.hostHelp
-                        : t(
-                            draft.condition.url.kind === 'url-filter'
-                              ? 'destinationFixedHelp'
-                              : 'destinationHelp',
-                          )}
+                      {draft.action.preserveQuery
+                        ? copy.queryHelp
+                        : draft.action.transform
+                          ? copy.hostHelp
+                          : t(
+                              draft.condition.url.kind === 'url-filter'
+                                ? 'destinationFixedHelp'
+                                : 'destinationHelp',
+                            )}
                     </FieldDescription>
                     {destinationError?.code === 'capture-match-required' ? (
                       <Alert variant="warning">

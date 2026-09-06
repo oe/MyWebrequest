@@ -908,6 +908,62 @@ try {
   await command('DELETE', `/session/${sessionId}/window`);
   await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
 
+  // Exercise the installed builder and actual navigations, including fragments (not sent in HTTP).
+  await executeAsync(
+    `const done = arguments[arguments.length - 1]; browser.storage.local.set({ requestRulesState: { schemaVersion: 1, rules: {}, order: [], settings: { globallyPaused: false } } }).then(() => done(true));`,
+  );
+  await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 0);
+  await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
+  await pollExtension(
+    `Array.from(document.querySelectorAll('button')).some((button) => button.textContent.trim() === 'Create redirect')`,
+    true,
+  );
+  await clickElement('xpath', `//button[normalize-space(.)='Create redirect']`, 0);
+  await pollExtension(`Boolean(document.querySelector('#redirect-from'))`, true);
+  for (const [selector, value] of [
+    ['#redirect-from', `http://127.0.0.1:${fixture.port}/redirect/query?example=1`],
+    ['#redirect-to', `http://localhost:${fixture.port}/target/query`],
+  ]) {
+    const element = await findElement('css selector', selector);
+    await command('POST', `/session/${sessionId}/element/${element}/clear`, {});
+    await command('POST', `/session/${sessionId}/element/${element}/value`, { text: value });
+  }
+  await clickElement('xpath', `//label[contains(., 'Ignore query')]/input[@type='checkbox']`);
+  await clickElement('xpath', `//button[normalize-space(.)='Save rule']`);
+  try {
+    await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 1);
+  } catch (error) {
+    const details = await executeAsync(
+      `const done = arguments[arguments.length - 1]; Promise.all([browser.storage.local.get('requestRulesState'), browser.permissions.getAll()]).then(([state, permissions]) => done({ state, permissions, text: document.body.innerText }));`,
+    );
+    throw new Error(`${error.message} Builder diagnostics: ${JSON.stringify(details)}`);
+  }
+  await command('POST', `/session/${sessionId}/window`, { handle: testWindow.handle });
+  for (const suffix of ['', '?', '#', '?x=a%2Fb&x=2&space=a+b', '?q=%23hash#old', '#old']) {
+    await command('POST', `/session/${sessionId}/url`, { url: 'about:blank' });
+    await command('POST', `/session/${sessionId}/url`, {
+      url: `http://127.0.0.1:${fixture.port}/redirect/query${suffix}`,
+    });
+    const actual = await command('GET', `/session/${sessionId}/url`);
+    const expected = `http://localhost:${fixture.port}/target/query${suffix}`;
+    if (actual !== expected)
+      throw new Error(`Firefox query/hash redirect mismatch: ${actual} != ${expected}`);
+  }
+  await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+  await executeAsync(
+    `const done = arguments[arguments.length - 1]; (async () => { const { requestRulesState: state } = await browser.storage.local.get('requestRulesState'); state.rules[state.order[0]].action.target += '#fixed'; await browser.storage.local.set({ requestRulesState: state }); return true; })().then(done);`,
+  );
+  await pollExtension(
+    `(await browser.declarativeNetRequest.getDynamicRules())[0]?.action.redirect?.transform?.fragment`,
+    '#fixed',
+  );
+  await command('POST', `/session/${sessionId}/window`, { handle: testWindow.handle });
+  await command('POST', `/session/${sessionId}/url`, {
+    url: `http://127.0.0.1:${fixture.port}/redirect/query?x=2#old`,
+  });
+  await pollExtension(`location.href`, `http://localhost:${fixture.port}/target/query?x=2#fixed`);
+  await command('POST', `/session/${sessionId}/window`, { handle: extensionHandle });
+
   const installQuotaState = async (count, kind) => {
     const result = await executeAsync(
       `const count = arguments[0];
@@ -986,7 +1042,7 @@ try {
   await pollExtension(`(await browser.declarativeNetRequest.getDynamicRules()).length`, 4_500, 60_000);
 
   console.log(
-    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, six locales, keyboard/reduced-motion/200% zoom accessibility, verified backup export/import, popup storage synchronization, hostless block and HTTPS upgrade, permission denial/grant/revocation/re-grant, cross-origin redirect/header enforcement, 900 regex rules, 4,500 total rules, and add-on reload recovery.`,
+    `Firefox runtime verifier passed on ${session.capabilities.browserVersion}: exact artifact install, six locales, keyboard/reduced-motion/200% zoom accessibility, verified backup export/import, popup storage synchronization, hostless block and HTTPS upgrade, permission denial/grant/revocation/re-grant, cross-origin redirect/header enforcement, 900 regex rules, 4,500 total rules, query-preserving path redirects with inherited/overridden fragments, and add-on reload recovery.`,
   );
 } catch (error) {
   if (driverLogs) console.error(driverLogs);

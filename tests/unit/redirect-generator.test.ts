@@ -184,3 +184,63 @@ it('keeps bounded host permissions when an anchored generated pattern is edited'
   expect(permissionOriginsFromMatch('|https://a.test/')).toEqual(['https://a.test/*']);
   expect(permissionOriginsFromMatch('(?-i)^https://a\\.test/Path$')).toEqual(['https://a.test/*']);
 });
+
+it('preserves raw queries and hash semantics for exactly one path, including storage round trips', () => {
+  const generated = generateRedirectRule(
+    createRule(),
+    'https://a.test:8443/Page?example=1#example',
+    'https://b.test:9443/New',
+    'path',
+  );
+  if (!generated.ok) throw new Error('generation failed');
+  const restored = ruleSchema.parse(JSON.parse(JSON.stringify(generated.rule))) as Rule;
+  expect(redirectBuilderState(restored)).toEqual(generated.rule.redirectBuilder);
+  for (const suffix of ['', '?', '?x=a%2Fb&x=2&space=a+b&empty=', '?q=%23hash#section', '#section']) {
+    expect(matchRule(restored, 'https://a.test:8443/Page' + suffix)).toMatchObject({
+      matched: true,
+      result: 'https://b.test:9443/New' + suffix,
+    });
+  }
+  for (const candidate of [
+    'https://a.test:8443/page?x=1',
+    'https://a.test:8443/Page/child?x=1',
+    'https://a.test:8443/Page2',
+    'https://a.test/Page',
+    'https://sub.a.test:8443/Page',
+    'http://a.test:8443/Page',
+  ]) {
+    expect(matchRule(restored, candidate).matched).toBe(false);
+  }
+  expect(compileDnrRule(restored)).toMatchObject({
+    ok: true,
+    rule: {
+      action: { redirect: { transform: { scheme: 'https', host: 'b.test', port: '9443', path: '/New' } } },
+    },
+  });
+  const fixedHash = generateRedirectRule(
+    createRule(),
+    'https://a.test/Page',
+    'https://b.test/New#fixed',
+    'path',
+  );
+  if (!fixedHash.ok) throw new Error('generation failed');
+  expect(matchRule(fixedHash.rule, 'https://a.test/Page?x=1#old')).toMatchObject({
+    matched: true,
+    result: 'https://b.test/New?x=1#fixed',
+  });
+  expect(
+    redirectBuilderState({ ...restored, action: { kind: 'redirect', target: generated.target } }),
+  ).toBeNull();
+});
+
+it('rejects ambiguous destination queries and path-preserving self redirects', () => {
+  for (const target of ['https://b.test/new?x=1', 'https://b.test/new?']) {
+    expect(generateRedirectRule(createRule(), 'https://a.test/page', target, 'path')).toEqual({
+      ok: false,
+      error: 'targetQuery',
+    });
+  }
+  expect(
+    generateRedirectRule(createRule(), 'https://a.test/page?x=1', 'https://a.test/page#new', 'path'),
+  ).toEqual({ ok: false, error: 'same' });
+});

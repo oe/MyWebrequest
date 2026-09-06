@@ -45,6 +45,13 @@ wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
 
+- 2026-09-06: added opt-in single-path redirects that ignore query/fragment when matching, preserve
+  incoming query bytes and inherit the incoming fragment unless a destination fragment is supplied.
+  Destination queries and self-redirects are rejected. Existing strict URL rules retain their behavior,
+  including not matching visits with fragments; the six-language builder explains the distinction.
+  Regression coverage includes encoded/repeated query parameters, fragments, path exclusions and
+  reopening the saved rule. The browser suite now has 20 scenarios.
+
 - 2026-09-06: added a six-language, once-per-upgrade guide for legacy Chrome users, with rename and
   feature-change explanations, backup export, migration review, deferred reminders and a Settings
   entry. Headed same-ID upgrade tests cover acknowledgment persistence, popup reminders, backup

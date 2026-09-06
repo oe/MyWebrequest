@@ -54,7 +54,7 @@ export function RedirectBuilder({
   );
   const rule = generated.ok ? generated.rule : base;
   const valid = generated.ok && validateRule(rule).valid;
-  const candidate = testUrl ?? (generated.ok ? generated.source : from);
+  const candidate = testUrl ?? from;
   const normalizedCandidate = normalizeTestUrl(candidate);
   const preview = useMatchPreview(rule, normalizedCandidate);
   const save = async () => {
@@ -159,7 +159,7 @@ export function RedirectBuilder({
                     type="radio"
                     name="redirect-scope"
                     value={value}
-                    checked={scope === value}
+                    checked={value === 'exact' ? scope !== 'host' : scope === value}
                     disabled={value === 'host' && !(exact.ok && exact.hostAvailable) && scope !== 'host'}
                     onChange={() => setScope(value)}
                   />
@@ -172,6 +172,21 @@ export function RedirectBuilder({
                 </label>
               ))}
             </fieldset>
+            {scope !== 'host' ? (
+              <label className="flex cursor-pointer items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={scope === 'path'}
+                  disabled={saving}
+                  onChange={(event) => setScope(event.target.checked ? 'path' : 'exact')}
+                />
+                <span>{copy.preserveQuery}</span>
+              </label>
+            ) : null}
+            <p className="text-xs text-muted-foreground">
+              {scope === 'exact' ? copy.exactHashHelp : copy.hashHelp}
+            </p>
             {from && to && !generated.ok ? (
               <p role="alert" className="text-sm text-destructive">
                 {copy[generated.error]}
@@ -184,7 +199,9 @@ export function RedirectBuilder({
               aria-label={copy.generated}
             >
               <h2 className="text-sm font-medium">{copy.generated}</h2>
-              <p className="text-sm text-muted-foreground">{scope === 'host' ? copy.hostHelp : copy.scope}</p>
+              <p className="text-sm text-muted-foreground">
+                {scope === 'host' ? copy.hostHelp : scope === 'path' ? copy.queryHelp : copy.scope}
+              </p>
               <div className="text-sm">
                 <p className="font-medium">{copy.redirectRule}</p>
                 <p className="mt-1 font-mono break-all">
@@ -312,7 +329,6 @@ function RedirectTestRow({ rule, initialUrl }: { rule: Rule; initialUrl: string 
 function normalizeTestUrl(value: string): string {
   try {
     const url = new URL(value.trim());
-    url.hash = '';
     return url.href;
   } catch {
     return value;

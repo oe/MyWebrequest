@@ -60,7 +60,10 @@ export type DnrRule = {
     | { type: 'upgradeScheme' }
     | {
         type: 'redirect';
-        redirect: { url: string } | { regexSubstitution: string } | { transform: { host: string } };
+        redirect:
+          | { url: string }
+          | { regexSubstitution: string }
+          | { transform: { host: string; scheme?: string; port?: string; path?: string; fragment?: string } };
       }
     | {
         type: 'modifyHeaders';
@@ -106,11 +109,23 @@ export function compileDnrRule(rule: Rule, targetBrowser = import.meta.env.BROWS
     case 'redirect':
       action = {
         type: 'redirect',
-        redirect: rule.action.transform
-          ? { transform: rule.action.transform }
-          : /\$\d/.test(rule.action.target)
-            ? { regexSubstitution: toDnrRegexSubstitution(rule.action.target) }
-            : { url: rule.action.target },
+        redirect: rule.action.preserveQuery
+          ? {
+              transform: {
+                scheme: new URL(rule.action.target).protocol.slice(0, -1),
+                host: new URL(rule.action.target).hostname,
+                port: new URL(rule.action.target).port,
+                path: new URL(rule.action.target).pathname,
+                ...(rule.action.target.includes('#')
+                  ? { fragment: '#' + rule.action.target.split('#').slice(1).join('#') }
+                  : {}),
+              },
+            }
+          : rule.action.transform
+            ? { transform: rule.action.transform }
+            : /\$\d/.test(rule.action.target)
+              ? { regexSubstitution: toDnrRegexSubstitution(rule.action.target) }
+              : { url: rule.action.target },
       };
       break;
     case 'modify-request-headers':

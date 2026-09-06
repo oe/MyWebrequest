@@ -34,7 +34,7 @@ export type HeaderOperation = {
 
 export type RuleAction =
   | { kind: 'block' }
-  | { kind: 'redirect'; target: string; transform?: { host: string } }
+  | { kind: 'redirect'; target: string; preserveQuery?: boolean; transform?: { host: string } }
   | { kind: 'upgrade-scheme' }
   | { kind: 'modify-request-headers'; operations: HeaderOperation[] };
 
@@ -50,7 +50,7 @@ export type Rule = {
   condition: RuleCondition;
   action: RuleAction;
   permissionOrigins: string[];
-  redirectBuilder?: { source: string; target: string; scope: 'exact' | 'host' };
+  redirectBuilder?: { source: string; target: string; scope: 'exact' | 'path' | 'host' };
   migrationState: MigrationState;
   createdAt: string;
   updatedAt: string;

@@ -1662,3 +1662,100 @@ test('fresh installs do not show legacy upgrade guidance; a recorded legacy upda
   await expect(options.getByRole('dialog')).toHaveCount(0);
   await expect(options.getByRole('button', { name: 'Old rules need attention' })).toHaveCount(0);
 });
+
+test('one-path redirects retain raw queries and apply explicit or inherited fragments', async () => {
+  const server = http.createServer((request, response) => {
+    response.setHeader('content-type', 'text/plain');
+    response.end(request.url);
+  });
+  const port = await listen(server);
+  const fixture = await extensionWithFixtureHostAccess();
+  let closeContext: (() => Promise<void>) | undefined;
+  try {
+    const launched = await launchChromiumExtensionContext(fixture.extensionPath);
+    closeContext = launched.close;
+    const worker = await findExtensionWorker(launched.context);
+    const id = new URL(worker.url()).host;
+    const options = await launched.context.newPage();
+    await options.goto(`chrome-extension://${id}/options.html`);
+    await options.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
+    const dialog = options.getByRole('dialog');
+    await dialog
+      .getByLabel('Original URL', { exact: true })
+      .fill(`http://localhost:${port}/Page?example=1#example`);
+    const destination = dialog.getByLabel('Destination URL', { exact: true });
+    await destination.fill(`http://127.0.0.1:${port}/New?bad=1`);
+    await dialog.getByRole('checkbox', { name: /Ignore query/ }).check();
+    await expect(dialog.getByRole('button', { name: 'Save rule', exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('alert')).toContainText('Remove ?query');
+    await destination.fill(`http://127.0.0.1:${port}/New`);
+    await dialog
+      .getByLabel('URL to test', { exact: true })
+      .fill(`http://localhost:${port}/Page?x=a%2Fb&x=2#old`);
+    await expect(dialog.getByRole('status')).toContainText(`http://127.0.0.1:${port}/New?x=a%2Fb&x=2#old`);
+    await options.evaluate(() => chrome.storage.local.set({ 'ui.locale': 'zh-CN' }));
+    await expect(dialog.getByRole('checkbox', { name: /忽略 query/ })).toBeChecked();
+    await options.screenshot({ path: '/tmp/requestorbit-query-zh.png' });
+    await options.setViewportSize({ width: 390, height: 844 });
+    await expect(dialog.getByRole('button', { name: '保存规则', exact: true })).toBeInViewport();
+    await expect.poll(async () => (await dialog.boundingBox())!.width).toBeLessThanOrEqual(358);
+    await options.screenshot({ path: '/tmp/requestorbit-query-mobile.png' });
+    await options.setViewportSize({ width: 1280, height: 800 });
+    await options.evaluate(() => chrome.storage.local.set({ 'ui.locale': 'en' }));
+    await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await expect
+      .poll(() => worker.evaluate(async () => (await chrome.declarativeNetRequest.getDynamicRules()).length))
+      .toBe(1);
+    const probe = await launched.context.newPage();
+    for (const suffix of ['', '?', '#', '?x=a%2Fb&x=2&empty=&space=a+b', '?q=%23hash#old', '#old']) {
+      await probe.goto('about:blank');
+      await probe.goto(`http://localhost:${port}/Page${suffix}`);
+      expect(probe.url()).toBe(`http://127.0.0.1:${port}/New${suffix}`);
+      await expect(probe.locator('body')).toHaveText(`/New${suffix.split('#')[0]}`);
+    }
+    for (const path of ['/page?x=1', '/Page/child?x=1', '/Page2']) {
+      await probe.goto(`http://localhost:${port}${path}`);
+      expect(probe.url()).toBe(`http://localhost:${port}${path}`);
+    }
+    await options.reload();
+    await options.getByRole('button', { name: 'Edit URL redirect', exact: true }).click();
+    await expect(dialog.getByRole('checkbox', { name: /Ignore query/ })).toBeChecked();
+    await destination.fill(`http://127.0.0.1:${port}/New#fixed`);
+    await options.setViewportSize({ width: 390, height: 844 });
+    await expect(dialog.getByRole('button', { name: 'Apply to draft', exact: true })).toBeInViewport();
+    await options.setViewportSize({ width: 1280, height: 800 });
+    await dialog.getByRole('button', { name: 'Apply to draft', exact: true }).click();
+    await options.getByRole('button', { name: 'Save changes', exact: true }).click();
+    await expect
+      .poll(() =>
+        worker.evaluate(
+          async () =>
+            (await chrome.declarativeNetRequest.getDynamicRules())[0]?.action.redirect?.transform?.fragment,
+        ),
+      )
+      .toBe('#fixed');
+    await probe.goto(`http://localhost:${port}/Page?x=2#old`);
+    expect(probe.url()).toBe(`http://127.0.0.1:${port}/New?x=2#fixed`);
+    await options.getByRole('button', { name: 'Edit URL redirect', exact: true }).click();
+    await dialog.getByRole('checkbox', { name: /Ignore query/ }).uncheck();
+    await dialog.getByRole('button', { name: 'Apply to draft', exact: true }).click();
+    await options.getByRole('button', { name: 'Save changes', exact: true }).click();
+    await expect
+      .poll(() =>
+        worker.evaluate(
+          async () => (await chrome.declarativeNetRequest.getDynamicRules())[0]?.action.redirect?.url,
+        ),
+      )
+      .toBe(`http://127.0.0.1:${port}/New#fixed`);
+    await probe.goto('about:blank');
+    await probe.goto(`http://localhost:${port}/Page#old`);
+    expect(probe.url()).toBe(`http://localhost:${port}/Page#old`);
+    await probe.goto('about:blank');
+    await probe.goto(`http://localhost:${port}/Page`);
+    expect(probe.url()).toBe(`http://127.0.0.1:${port}/New#fixed`);
+  } finally {
+    await closeContext?.();
+    await close(server);
+    await rm(fixture.directory, { recursive: true, force: true });
+  }
+});

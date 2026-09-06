@@ -1,6 +1,12 @@
 import type { AppLocale } from '@/ui/i18n';
 
 type Copy = {
+  path: string;
+  preserveQuery: string;
+  queryHelp: string;
+  hashHelp: string;
+  exactHashHelp: string;
+  targetQuery: string;
   caseSensitive: string;
   edit: string;
   exact: string;
@@ -40,6 +46,16 @@ type Copy = {
 };
 export const redirectBuilderCopy: Record<AppLocale, Copy> = {
   en: {
+    exactHashHelp:
+      'Strict URL matching also includes #hash. The original example cannot contain a hash, so visits with a hash do not match this mode. Enable query/hash ignoring in the redirect builder to ignore both query and hash when matching. A destination #hash sets the landing section.',
+    path: 'Only this path (any query)',
+    preserveQuery: 'Ignore query and #hash when matching; keep query parameters',
+    queryHelp:
+      'Match the same protocol, hostname, port and path, with or without ?query. Ignore any query in the original example; forward the actual incoming query without reordering or merging it. The destination must not contain a query.',
+    hashHelp:
+      '#hash does not participate in matching in this mode. A destination #hash replaces the incoming hash; without one, the browser keeps the incoming hash. Changing only #hash within an open page does not trigger a network redirect.',
+    targetQuery:
+      'Remove ?query from the destination to preserve incoming parameters. A destination #hash is allowed.',
     caseSensitive: 'Match path and parameters case-sensitively',
     edit: 'Edit URL redirect',
     exact: 'Only this URL',
@@ -82,6 +98,15 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     long: 'These addresses are too long for a browser rule.',
   },
   'zh-CN': {
+    exactHashHelp:
+      '严格匹配模式也会匹配 #hash。来源示例不支持填写 hash，因此带 hash 的访问不会匹配此模式。若需匹配这类访问，请在跳转向导中开启忽略 query 和 hash 的选项。目标填写的 #hash 用于指定落地位置。',
+    path: '仅此路径（任意查询参数）',
+    preserveQuery: '忽略 query 和 #hash 匹配，并保留原查询参数',
+    queryHelp:
+      '精确匹配协议、主机名、端口和路径；带或不带 ?查询参数都匹配。来源示例中的参数会被忽略，实际访问的参数原样带到目标，不排序、不合并。目标网址不能填写查询参数。',
+    hashHelp:
+      '本模式匹配时忽略 #hash。目标填写 #hash 时替换原 hash；目标未填写时，浏览器保留原 hash。已打开页面内仅改变 #hash，不会触发网络跳转规则。',
+    targetQuery: '请移除目标网址的 ?查询参数，才能保留实际访问的原参数。目标可以填写 #hash。',
     caseSensitive: '路径和参数区分大小写',
     edit: '编辑网址跳转',
     exact: '仅这个网址',
@@ -121,6 +146,15 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     long: '网址过长，无法生成浏览器规则。',
   },
   ko: {
+    exactHashHelp:
+      '정확한 URL 일치는 #hash도 포함합니다. 원본 예시에 hash를 사용할 수 없으므로 hash가 있는 방문은 이 모드와 일치하지 않습니다. 리디렉션 도우미에서 쿼리/hash 무시 옵션을 켜면 쿼리와 hash를 모두 무시하고 일치시킵니다. 대상 #hash는 이동할 위치를 지정합니다.',
+    path: '이 경로만 (모든 쿼리)',
+    preserveQuery: '쿼리와 #hash를 무시하고 일치시키며 쿼리 매개변수 유지',
+    queryHelp:
+      '프로토콜, 호스트, 포트와 경로가 같으면 ?쿼리 유무에 관계없이 일치합니다. 원본 예시의 쿼리는 무시하고 실제 요청의 쿼리를 재정렬하거나 병합하지 않고 전달합니다. 대상에는 쿼리를 입력하지 마세요.',
+    hashHelp:
+      '이 모드에서는 #hash를 일치 조건에서 제외합니다. 대상의 #hash는 기존 hash를 대체하며, 없으면 브라우저가 기존 hash를 유지합니다. 열린 페이지에서 #hash만 변경하면 네트워크 리디렉션이 실행되지 않습니다.',
+    targetQuery: '실제 요청의 매개변수를 유지하려면 대상의 ?쿼리를 제거하세요. 대상 #hash는 허용됩니다.',
     caseSensitive: '경로와 매개변수 대소문자 구분',
     edit: 'URL 리디렉션 편집',
     exact: '이 URL만',
@@ -161,6 +195,16 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     long: '브라우저 규칙으로 사용하기에 주소가 너무 깁니다.',
   },
   ja: {
+    exactHashHelp:
+      '完全一致モードでは #hash も照合します。元の例に hash は指定できないため、hash 付きのアクセスはこのモードに一致しません。リダイレクトガイドでクエリ/hash の除外を有効にするとクエリと hash の両方を照合から除外します。転送先の #hash は移動先の位置を指定します。',
+    path: 'このパスのみ（任意のクエリ）',
+    preserveQuery: 'クエリと #hash を照合から除外し、クエリを引き継ぐ',
+    queryHelp:
+      'プロトコル、ホスト名、ポート、パスを完全一致で照合し、?クエリの有無は問いません。元の例のクエリは無視し、実際のクエリを並べ替え・結合せずに転送します。転送先にはクエリを指定しないでください。',
+    hashHelp:
+      'このモードでは #hash を照合に使いません。転送先に #hash があれば置き換え、なければブラウザーが元の hash を保持します。開いたページ内で #hash だけを変更してもネットワーク転送は発生しません。',
+    targetQuery:
+      '実際のクエリを保持するには、転送先の ?クエリを削除してください。転送先の #hash は指定できます。',
     caseSensitive: 'パスとパラメータの大文字と小文字を区別',
     edit: 'URL リダイレクトを編集',
     exact: 'この URL のみ',
@@ -201,6 +245,16 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     long: 'ブラウザのルールとしては URL が長すぎます。',
   },
   fr: {
+    exactHashHelp:
+      'La correspondance stricte inclut aussi #hash. L’exemple source ne peut pas en contenir : une visite avec hash ne correspond donc pas à ce mode. Activez l’option query/hash dans l’assistant de redirection pour ignorer paramètres et hash lors du filtrage. Le #hash de destination définit la section d’arrivée.',
+    path: 'Ce chemin uniquement (toute requête)',
+    preserveQuery: 'Ignorer paramètres et #hash lors du filtrage ; conserver les paramètres',
+    queryHelp:
+      'Le protocole, l’hôte, le port et le chemin doivent correspondre, avec ou sans ?paramètres. Ceux de l’exemple source sont ignorés ; ceux de la navigation sont transmis sans tri ni fusion. La destination ne doit pas contenir de paramètres.',
+    hashHelp:
+      'Dans ce mode, #hash ne participe pas au filtrage. Un #hash de destination remplace celui d’origine ; sinon, le navigateur le conserve. Changer uniquement #hash dans une page ouverte ne déclenche pas de redirection réseau.',
+    targetQuery:
+      'Retirez les ?paramètres de la destination pour conserver ceux de la navigation. Un #hash de destination est autorisé.',
     caseSensitive: 'Respecter la casse du chemin et des paramètres',
     edit: 'Modifier la redirection',
     exact: 'Cette URL uniquement',
@@ -242,6 +296,16 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     long: 'Ces adresses sont trop longues pour une règle du navigateur.',
   },
   es: {
+    exactHashHelp:
+      'La coincidencia estricta también incluye #hash. El ejemplo de origen no admite hash, por lo que las visitas con hash no coinciden en este modo. Activa la opción query/hash en el asistente de redirección para ignorar parámetros y hash al comparar. El #hash de destino indica la sección de llegada.',
+    path: 'Solo esta ruta (cualquier consulta)',
+    preserveQuery: 'Ignorar parámetros y #hash al comparar; conservar los parámetros',
+    queryHelp:
+      'Deben coincidir el protocolo, el host, el puerto y la ruta, con o sin ?parámetros. Se ignoran los del ejemplo de origen; los de la navegación se conservan sin ordenar ni combinar. El destino no debe contener parámetros.',
+    hashHelp:
+      'En este modo, #hash no interviene en la coincidencia. Un #hash de destino reemplaza al original; si no hay uno, el navegador conserva el original. Cambiar solo #hash dentro de una página abierta no activa una redirección de red.',
+    targetQuery:
+      'Elimina los ?parámetros del destino para conservar los de la navegación. Se permite un #hash de destino.',
     caseSensitive: 'Distinguir mayúsculas en ruta y parámetros',
     edit: 'Editar redirección',
     exact: 'Solo esta URL',

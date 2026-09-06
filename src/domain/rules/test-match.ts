@@ -53,6 +53,20 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
         captures,
       };
     case 'redirect':
+      if (rule.action.preserveQuery) {
+        const networkUrl = candidateUrl.split('#')[0]!;
+        const queryIndex = networkUrl.indexOf('?');
+        const query = queryIndex < 0 ? '' : networkUrl.slice(queryIndex);
+        const fragmentIndex = candidateUrl.indexOf('#');
+        const targetFragmentIndex = rule.action.target.indexOf('#');
+        const fragment =
+          targetFragmentIndex >= 0
+            ? rule.action.target.slice(targetFragmentIndex)
+            : fragmentIndex >= 0
+              ? candidateUrl.slice(fragmentIndex)
+              : '';
+        return { matched: true, result: rule.action.target.split('#')[0]! + query + fragment, captures };
+      }
       if (rule.action.transform) {
         try {
           const target = new URL(candidateUrl);
@@ -64,10 +78,11 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
       }
       return {
         matched: true,
-        result: rule.action.target.replace(
-          /\$(\d+)/g,
-          (_, index: string) => captures[Number(index) - 1] ?? '',
-        ),
+        result:
+          rule.action.target.replace(/\$(\d+)/g, (_, index: string) => captures[Number(index) - 1] ?? '') +
+          (!rule.action.target.includes('#') && candidateUrl.includes('#')
+            ? candidateUrl.slice(candidateUrl.indexOf('#'))
+            : ''),
         captures,
       };
   }

@@ -44,6 +44,7 @@ export const ruleSchema = z.object({
     z.object({
       kind: z.literal('redirect'),
       target: z.string().min(1).max(2_000),
+      preserveQuery: z.boolean().optional(),
       transform: z
         .object({ host: z.string().min(1).max(253) })
         .strict()
@@ -59,7 +60,7 @@ export const ruleSchema = z.object({
     .object({
       source: z.string().max(2_000),
       target: z.string().max(2_000),
-      scope: z.enum(['exact', 'host']),
+      scope: z.enum(['exact', 'path', 'host']),
     })
     .optional(),
   permissionOrigins: z.array(z.string().min(1).max(2_000)).max(100),

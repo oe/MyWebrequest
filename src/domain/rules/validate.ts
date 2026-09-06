@@ -122,6 +122,21 @@ export function validateRule(rule: Rule): ValidationResult {
     const target = rule.action.target.replace(/\$\d+/g, 'capture');
     try {
       const url = new URL(target);
+      if (
+        rule.action.preserveQuery &&
+        (rule.action.transform ||
+          target.split('#')[0]!.includes('?') ||
+          /\$\d/.test(rule.action.target) ||
+          url.username ||
+          url.password)
+      ) {
+        errors.push({
+          field: 'destination',
+          code: 'redirect-url-invalid',
+          message:
+            'To preserve incoming query parameters, use a destination without query parameters, credentials or capture placeholders.',
+        });
+      }
       if (!['http:', 'https:'].includes(url.protocol)) {
         errors.push({
           field: 'destination',
