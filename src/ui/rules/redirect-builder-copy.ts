@@ -39,7 +39,6 @@ type Copy = {
   reset: string;
   invalid: string;
   url: string;
-  fragment: string;
   same: string;
   placeholder: string;
   long: string;
@@ -47,7 +46,7 @@ type Copy = {
 export const redirectBuilderCopy: Record<AppLocale, Copy> = {
   en: {
     exactHashHelp:
-      'Strict URL matching also includes #hash. The original example cannot contain a hash, so visits with a hash do not match this mode. Enable query/hash ignoring in the redirect builder to ignore both query and hash when matching. A destination #hash sets the landing section.',
+      'Exact matching includes the query and #hash in the original URL. Different parameters or hashes do not match. Rules run on full page navigations; changing only #hash within an open page does not trigger a network redirect. The destination is used exactly as entered; if it has no #hash, the original hash is not retained.',
     path: 'Only this path (any query)',
     preserveQuery: 'Ignore query and #hash when matching; keep query parameters',
     queryHelp:
@@ -82,7 +81,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     to: 'Destination URL',
     generated: 'Generated rule',
     scope:
-      'Only this exact address, including its query parameters. Applies when opening a page; other requests are unchanged.',
+      'Only this exact address, including its query parameters and #hash. Applies when opening a page; other requests are unchanged.',
     test: 'URL to test',
     match: 'Will redirect to',
     miss: 'This URL will not redirect',
@@ -92,14 +91,13 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: 'Regenerate from addresses',
     invalid: 'The adjusted pattern is invalid',
     url: 'Enter complete HTTP or HTTPS addresses without a username or password.',
-    fragment: 'Remove the # fragment from the original address; page fragments cannot be matched.',
     same: 'Choose a different destination to avoid a redirect loop.',
     placeholder: 'Enter a destination address without $1-style placeholders.',
     long: 'These addresses are too long for a browser rule.',
   },
   'zh-CN': {
     exactHashHelp:
-      '严格匹配模式也会匹配 #hash。来源示例不支持填写 hash，因此带 hash 的访问不会匹配此模式。若需匹配这类访问，请在跳转向导中开启忽略 query 和 hash 的选项。目标填写的 #hash 用于指定落地位置。',
+      '精确匹配包含原网址的查询参数和 #hash；参数或 hash 不同就不匹配。规则仅在完整页面导航时生效，已打开页面内只改变 #hash 不会触发网络跳转。 跳转到填写的固定目标地址；目标未填写 #hash 时，不保留原 hash。',
     path: '仅此路径（任意查询参数）',
     preserveQuery: '忽略 query 和 #hash 匹配，并保留原查询参数',
     queryHelp:
@@ -130,7 +128,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     from: '原网址',
     to: '目标网址',
     generated: '自动生成的规则',
-    scope: '仅匹配这个完整网址（包含查询参数），只在打开页面时生效，不影响其他请求。',
+    scope: '仅匹配这个完整网址（包含查询参数和 #hash），只在打开页面时生效，不影响其他请求。',
     test: '用这个网址测试',
     match: '将跳转到',
     miss: '这个网址不会跳转',
@@ -140,14 +138,13 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: '按网址重新生成',
     invalid: '调整后的表达式无效',
     url: '请填写完整的 HTTP 或 HTTPS 网址，不要包含用户名和密码。',
-    fragment: '请去掉原网址的 # 锚点；浏览器无法按页面锚点匹配。',
     same: '目标网址不能与原网址相同，以免循环跳转。',
     placeholder: '请填写实际目标网址，不要包含 $1 这类占位符。',
     long: '网址过长，无法生成浏览器规则。',
   },
   ko: {
     exactHashHelp:
-      '정확한 URL 일치는 #hash도 포함합니다. 원본 예시에 hash를 사용할 수 없으므로 hash가 있는 방문은 이 모드와 일치하지 않습니다. 리디렉션 도우미에서 쿼리/hash 무시 옵션을 켜면 쿼리와 hash를 모두 무시하고 일치시킵니다. 대상 #hash는 이동할 위치를 지정합니다.',
+      '정확한 일치는 원본 URL의 쿼리와 #hash를 포함합니다. 매개변수나 hash가 다르면 일치하지 않습니다. 전체 페이지 탐색에만 적용되며 열린 페이지에서 #hash만 변경하면 네트워크 리디렉션이 실행되지 않습니다. 입력한 대상 주소 그대로 이동하며 대상에 #hash가 없으면 원래 hash를 유지하지 않습니다.',
     path: '이 경로만 (모든 쿼리)',
     preserveQuery: '쿼리와 #hash를 무시하고 일치시키며 쿼리 매개변수 유지',
     queryHelp:
@@ -179,7 +176,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     from: '원래 URL',
     to: '대상 URL',
     generated: '생성된 규칙',
-    scope: '쿼리 매개변수를 포함한 정확한 주소만 일치합니다. 페이지를 열 때만 적용됩니다.',
+    scope: '쿼리 매개변수와 #hash를 포함한 정확한 주소만 일치합니다. 페이지를 열 때만 적용됩니다.',
     test: '테스트할 URL',
     match: '이동할 주소',
     miss: '이 URL은 리디렉션되지 않습니다',
@@ -189,14 +186,13 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: '주소에서 다시 생성',
     invalid: '수정한 패턴이 올바르지 않습니다',
     url: '사용자 이름이나 비밀번호 없이 완전한 HTTP 또는 HTTPS 주소를 입력하세요.',
-    fragment: '원래 주소에서 # 조각을 제거하세요. 페이지 조각은 일치시킬 수 없습니다.',
     same: '리디렉션 반복을 피하려면 다른 대상 주소를 선택하세요.',
     placeholder: '$1 같은 자리표시자 없이 대상 주소를 입력하세요.',
     long: '브라우저 규칙으로 사용하기에 주소가 너무 깁니다.',
   },
   ja: {
     exactHashHelp:
-      '完全一致モードでは #hash も照合します。元の例に hash は指定できないため、hash 付きのアクセスはこのモードに一致しません。リダイレクトガイドでクエリ/hash の除外を有効にするとクエリと hash の両方を照合から除外します。転送先の #hash は移動先の位置を指定します。',
+      '完全一致では元の URL のクエリと #hash も照合します。値が異なる場合は一致しません。ページ全体の移動でのみ動作し、開いたページ内で #hash だけを変更してもネットワーク転送は発生しません。 入力した転送先へそのまま移動します。転送先に #hash がなければ、元の hash は保持しません。',
     path: 'このパスのみ（任意のクエリ）',
     preserveQuery: 'クエリと #hash を照合から除外し、クエリを引き継ぐ',
     queryHelp:
@@ -229,7 +225,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     from: '元の URL',
     to: '移動先の URL',
     generated: '生成されたルール',
-    scope: 'クエリを含む完全な URL のみに一致します。ページを開くときだけ適用されます。',
+    scope: 'クエリと #hash を含む完全な URL のみに一致します。ページを開くときだけ適用されます。',
     test: 'テストする URL',
     match: '移動先',
     miss: 'この URL はリダイレクトされません',
@@ -239,14 +235,13 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: 'URL から再生成',
     invalid: '調整したパターンは無効です',
     url: 'ユーザー名やパスワードを含まない完全な HTTP または HTTPS URL を入力してください。',
-    fragment: '元の URL から # フラグメントを削除してください。フラグメントでは照合できません。',
     same: 'ループを防ぐため、別の移動先を指定してください。',
     placeholder: '$1 などのプレースホルダーを含まない移動先を入力してください。',
     long: 'ブラウザのルールとしては URL が長すぎます。',
   },
   fr: {
     exactHashHelp:
-      'La correspondance stricte inclut aussi #hash. L’exemple source ne peut pas en contenir : une visite avec hash ne correspond donc pas à ce mode. Activez l’option query/hash dans l’assistant de redirection pour ignorer paramètres et hash lors du filtrage. Le #hash de destination définit la section d’arrivée.',
+      'La correspondance exacte inclut les paramètres et le #hash de l’URL source. Des valeurs différentes ne correspondent pas. Les règles s’appliquent aux navigations complètes ; changer uniquement #hash dans une page ouverte ne déclenche pas de redirection réseau. La destination est utilisée telle quelle ; sans #hash de destination, le hash d’origine n’est pas conservé.',
     path: 'Ce chemin uniquement (toute requête)',
     preserveQuery: 'Ignorer paramètres et #hash lors du filtrage ; conserver les paramètres',
     queryHelp:
@@ -280,7 +275,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     from: 'URL originale',
     to: 'URL de destination',
     generated: 'Règle générée',
-    scope: 'Cette adresse exacte, paramètres compris, uniquement à l’ouverture d’une page.',
+    scope: 'Cette adresse exacte, paramètres et #hash compris, uniquement à l’ouverture d’une page.',
     test: 'URL à tester',
     match: 'Redirection vers',
     miss: 'Cette URL ne sera pas redirigée',
@@ -290,14 +285,13 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: 'Régénérer depuis les adresses',
     invalid: 'Le motif modifié est invalide',
     url: 'Saisissez des adresses HTTP ou HTTPS complètes, sans identifiant ni mot de passe.',
-    fragment: 'Retirez le fragment # de l’adresse originale ; il ne peut pas servir au filtrage.',
     same: 'Choisissez une destination différente pour éviter une boucle.',
     placeholder: 'Saisissez une destination sans référence de type $1.',
     long: 'Ces adresses sont trop longues pour une règle du navigateur.',
   },
   es: {
     exactHashHelp:
-      'La coincidencia estricta también incluye #hash. El ejemplo de origen no admite hash, por lo que las visitas con hash no coinciden en este modo. Activa la opción query/hash en el asistente de redirección para ignorar parámetros y hash al comparar. El #hash de destino indica la sección de llegada.',
+      'La coincidencia exacta incluye los parámetros y el #hash de la URL original. Si cambian, no coincide. Las reglas actúan en navegaciones completas; cambiar solo #hash en una página abierta no activa una redirección de red. Se usa el destino tal como se introduce; sin #hash de destino, no se conserva el hash original.',
     path: 'Solo esta ruta (cualquier consulta)',
     preserveQuery: 'Ignorar parámetros y #hash al comparar; conservar los parámetros',
     queryHelp:
@@ -330,7 +324,7 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     from: 'URL original',
     to: 'URL de destino',
     generated: 'Regla generada',
-    scope: 'Solo esta dirección exacta, incluidos los parámetros, al abrir una página.',
+    scope: 'Solo esta dirección exacta, incluidos los parámetros y #hash, al abrir una página.',
     test: 'URL para probar',
     match: 'Redirigirá a',
     miss: 'Esta URL no se redirigirá',
@@ -340,7 +334,6 @@ export const redirectBuilderCopy: Record<AppLocale, Copy> = {
     reset: 'Regenerar desde las direcciones',
     invalid: 'El patrón ajustado no es válido',
     url: 'Introduce direcciones HTTP o HTTPS completas, sin usuario ni contraseña.',
-    fragment: 'Quita el fragmento # de la dirección original; no se puede usar para la coincidencia.',
     same: 'Elige otro destino para evitar un bucle.',
     placeholder: 'Introduce un destino sin referencias como $1.',
     long: 'Las direcciones son demasiado largas para una regla del navegador.',

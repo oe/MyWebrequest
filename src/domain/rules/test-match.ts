@@ -78,11 +78,10 @@ export function matchRule(rule: Rule, candidateUrl: string): MatchResult {
       }
       return {
         matched: true,
-        result:
-          rule.action.target.replace(/\$(\d+)/g, (_, index: string) => captures[Number(index) - 1] ?? '') +
-          (!rule.action.target.includes('#') && candidateUrl.includes('#')
-            ? candidateUrl.slice(candidateUrl.indexOf('#'))
-            : ''),
+        result: rule.action.target.replace(
+          /\$(\d+)/g,
+          (_, index: string) => captures[Number(index) - 1] ?? '',
+        ),
         captures,
       };
   }

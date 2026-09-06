@@ -520,6 +520,10 @@ async function captureFirefox(artifact) {
     );
     await command('POST', `/session/${sessionId}/url`, { url: optionsUrl });
     await poll(`document.title`, 'RequestOrbit');
+    await poll(
+      `Array.from(document.querySelectorAll('button[aria-label="Settings"]')).some((button) => button.getClientRects().length > 0)`,
+      true,
+    );
     await clickNative('css selector', 'button[aria-label="Settings"]');
     await poll(`document.body.innerText.includes('Backup & restore')`, true);
     await clickNative('xpath', `//*[@role='menuitem' and normalize-space(.)='Backup & restore']`);

@@ -13,7 +13,7 @@ export default defineConfig({
     // Store screenshots and the standalone documentation website are not part
     // of the extension runtime. Keep both out of AMO's source archive without
     // changing their separately built and checksummed release assets.
-    excludeSources: ['store-assets/**', 'site/**'],
+    excludeSources: ['store-assets/**', 'site/**', 'test-results/**', 'playwright-report/**'],
   },
   vite: () => ({
     plugins: [tailwindcss()],

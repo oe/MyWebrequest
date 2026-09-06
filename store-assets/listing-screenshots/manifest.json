@@ -10,7 +10,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-06T16:13:10.354Z",
+  "generatedAt": "2026-09-06T16:49:53.072Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
@@ -18,7 +18,7 @@
     },
     {
       "path": "store-assets/screenshots/chrome/04-create-redirect.png",
-      "sha256": "1c51bc04e14337e661658d883d60be58ae0cc65f11d252600af2eb613ed4bc20"
+      "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2"
     },
     {
       "path": "store-assets/screenshots/chrome/05-host-scope.png",
@@ -44,7 +44,7 @@
       "source": "store-assets/screenshots/chrome/04-create-redirect.png",
       "headline": "Make links go where you want.",
       "subhead": "Enter two addresses. Preview the result before saving.",
-      "sha256": "37bdbde2f120a50e9786927ac2c28625f3336f37aab6a0a93fc312536076241b",
+      "sha256": "8697d6f298deb178d8561622c721648ffef1522de7c5b10e784c88382b42ebe6",
       "width": 1280,
       "height": 800
     },

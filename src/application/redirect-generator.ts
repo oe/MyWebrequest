@@ -6,7 +6,7 @@ export type RedirectGeneration =
   | { ok: true; rule: Rule; source: string; target: string; hostAvailable: boolean }
   | {
       ok: false;
-      error: 'url' | 'fragment' | 'same' | 'placeholder' | 'long' | 'hostUnavailable' | 'targetQuery';
+      error: 'url' | 'same' | 'placeholder' | 'long' | 'hostUnavailable' | 'targetQuery';
     };
 
 export function generateRedirectRule(
@@ -30,7 +30,6 @@ export function generateRedirectRule(
   } catch {
     return { ok: false, error: 'url' };
   }
-  if (scope !== 'path' && source.href.includes('#')) return { ok: false, error: 'fragment' };
   if (scope === 'path' && target.href.split('#')[0]!.includes('?'))
     return { ok: false, error: 'targetQuery' };
   if (scope === 'path') {
@@ -39,7 +38,9 @@ export function generateRedirectRule(
   }
   const targetWithoutHash = new URL(target.href);
   targetWithoutHash.hash = '';
-  if (source.href === targetWithoutHash.href) return { ok: false, error: 'same' };
+  const sourceWithoutHash = new URL(source.href);
+  sourceWithoutHash.hash = '';
+  if (sourceWithoutHash.href === targetWithoutHash.href) return { ok: false, error: 'same' };
   if (/\$\d/.test(target.href)) return { ok: false, error: 'placeholder' };
   const hostAvailable =
     source.hostname !== target.hostname &&
@@ -47,7 +48,8 @@ export function generateRedirectRule(
     source.port === target.port &&
     source.pathname === target.pathname &&
     source.search === target.search &&
-    !target.href.includes('#') &&
+    source.hash === target.hash &&
+    source.href.includes('#') === target.href.includes('#') &&
     !target.hostname.includes(':');
   if (scope === 'host' && !hostAvailable) return { ok: false, error: 'hostUnavailable' };
   const escaped = source.href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -58,7 +60,7 @@ export function generateRedirectRule(
       : scope === 'path'
         ? { kind: 'regex', value: `^${escaped}(?:\\?[^#]*)?(?:#.*)?$` }
         : /[*^|]/.test(source.href)
-          ? { kind: 'regex', value: `(?-i)^${escaped}$` }
+          ? { kind: 'regex', value: `^${escaped}$` }
           : { kind: 'url-filter', value: `|${source.href}|` };
   const rule: Rule = {
     ...base,
@@ -112,6 +114,13 @@ export function redirectBuilderState(rule: Rule): Rule['redirectBuilder'] | null
   const oldExact = !rule.redirectBuilder && rule.condition.url.kind === 'regex' && hint.scope === 'exact';
   if (
     !oldExact &&
+    !(
+      hint.scope === 'exact' &&
+      rule.condition.url.kind === 'regex' &&
+      expected.condition.url.kind === 'regex' &&
+      rule.condition.url.value === `(?-i)${expected.condition.url.value}` &&
+      rule.condition.isUrlFilterCaseSensitive === true
+    ) &&
     (JSON.stringify(expected.condition.url) !== JSON.stringify(rule.condition.url) ||
       expected.condition.isUrlFilterCaseSensitive !== rule.condition.isUrlFilterCaseSensitive)
   )

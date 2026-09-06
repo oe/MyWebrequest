@@ -45,6 +45,12 @@ wrong browser versions, and archives that do not match `SHA256SUMS`.
 
 ## Evidence log
 
+- 2026-09-07: exact redirect creation now accepts source fragments and compares the complete URL.
+  Six-language guidance distinguishes full navigation from same-document hash changes and explains that
+  fixed destinations do not inherit the source fragment. The preview now follows this native behavior. Hash-only
+  self-redirects remain rejected; the literal-regex fallback uses native case sensitivity for Firefox
+  compatibility, while existing saved regex metadata remains editable. The browser suite has 21 scenarios.
+
 - 2026-09-06: added opt-in single-path redirects that ignore query/fragment when matching, preserve
   incoming query bytes and inherit the incoming fragment unless a destination fragment is supplied.
   Destination queries and self-redirects are rejected. Existing strict URL rules retain their behavior,

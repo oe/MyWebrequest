@@ -47,7 +47,6 @@ describe('automatic redirect generation', () => {
     ['javascript:alert(1)', 'https://b.test', 'url'],
     ['https://user:pass@a.test', 'https://b.test', 'url'],
     ['a.test', 'https://b.test', 'url'],
-    ['https://a.test/#part', 'https://b.test', 'fragment'],
     ['https://a.test', 'https://a.test:443/', 'same'],
     ['https://a.test', 'https://a.test/#part', 'same'],
     ['https://a.test', 'https://b.test/$1', 'placeholder'],
@@ -243,4 +242,55 @@ it('rejects ambiguous destination queries and path-preserving self redirects', (
   expect(
     generateRedirectRule(createRule(), 'https://a.test/page?x=1', 'https://a.test/page#new', 'path'),
   ).toEqual({ ok: false, error: 'same' });
+});
+
+it.each(['#part', '#part*', '#part|', '#'])(
+  'matches literal fragments and round-trips the builder: %s',
+  (hash) => {
+    const result = generateRedirectRule(
+      createRule(),
+      'https://a.test/Page?q=1' + hash,
+      'https://b.test/New#landing',
+    );
+    if (!result.ok) throw new Error('generation failed');
+    expect(matchRule(result.rule, 'https://a.test/Page?q=1' + hash)).toMatchObject({
+      matched: true,
+      result: 'https://b.test/New#landing',
+    });
+    for (const candidate of [
+      'https://a.test/Page?q=1',
+      'https://a.test/Page?q=1#different',
+      'https://a.test/Page?q=2' + hash,
+    ])
+      expect(matchRule(result.rule, candidate).matched).toBe(false);
+    expect(redirectBuilderState(ruleSchema.parse(result.rule) as Rule)).toEqual(result.rule.redirectBuilder);
+    if (result.rule.condition.url.kind === 'regex')
+      expect(result.rule.condition.url.value).not.toContain('(?-i)');
+  },
+);
+
+it('rejects a same-page fragment self redirect and preserves legacy regex builder metadata', () => {
+  expect(generateRedirectRule(createRule(), 'https://a.test/Page#old', 'https://a.test/Page')).toEqual({
+    ok: false,
+    error: 'same',
+  });
+  const generated = generateRedirectRule(createRule(), 'https://a.test/Page?q=*', 'https://b.test/New');
+  if (!generated.ok) throw new Error('generation failed');
+  const legacy = {
+    ...generated.rule,
+    condition: {
+      ...generated.rule.condition,
+      url: { kind: 'regex' as const, value: '(?-i)' + generated.rule.condition.url.value },
+    },
+  };
+  expect(redirectBuilderState(legacy)).toEqual(generated.rule.redirectBuilder);
+});
+
+it('previews fixed destinations without inheriting the source fragment', () => {
+  const result = generateRedirectRule(createRule(), 'https://a.test/Page#old', 'https://b.test/New');
+  if (!result.ok) throw new Error('generation failed');
+  expect(matchRule(result.rule, 'https://a.test/Page#old')).toMatchObject({
+    matched: true,
+    result: 'https://b.test/New',
+  });
 });

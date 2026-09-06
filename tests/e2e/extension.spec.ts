@@ -1759,3 +1759,85 @@ test('one-path redirects retain raw queries and apply explicit or inherited frag
     await rm(fixture.directory, { recursive: true, force: true });
   }
 });
+
+test('exact redirects accept source fragments and ignore same-document hash changes', async () => {
+  let hits = 0;
+  const server = http.createServer((request, response) => {
+    if (request.url?.startsWith('/Page') || request.url?.startsWith('/New')) hits += 1;
+    response.setHeader('content-type', 'text/plain');
+    response.end(request.url);
+  });
+  const port = await listen(server);
+  const fixture = await extensionWithFixtureHostAccess();
+  let closeContext: (() => Promise<void>) | undefined;
+  try {
+    const launched = await launchChromiumExtensionContext(fixture.extensionPath);
+    closeContext = launched.close;
+    const worker = await findExtensionWorker(launched.context);
+    const id = new URL(worker.url()).host;
+    const options = await launched.context.newPage();
+    await options.goto(`chrome-extension://${id}/options.html`);
+    await options.getByRole('button', { name: 'Create redirect', exact: true }).first().click();
+    const dialog = options.getByRole('dialog');
+    const source = `http://localhost:${port}/Page?q=1#old`;
+    const target = `http://127.0.0.1:${port}/New#landing`;
+    await dialog.getByLabel('Original URL', { exact: true }).fill(source);
+    await dialog.getByLabel('Destination URL', { exact: true }).fill(target);
+    await expect(dialog.getByRole('checkbox', { name: /Ignore query/ })).not.toBeChecked();
+    await expect(dialog.getByRole('status')).toContainText(target);
+    await expect(dialog.getByRole('alert')).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Save rule', exact: true }).click();
+    await expect
+      .poll(() => worker.evaluate(async () => (await chrome.declarativeNetRequest.getDynamicRules()).length))
+      .toBe(1);
+    const probe = await launched.context.newPage();
+    await probe.goto(source);
+    await expect(probe).toHaveURL(target);
+    for (const suffix of ['?q=1', '?q=1#other', '?q=2#old']) {
+      const url = `http://localhost:${port}/Page${suffix}`;
+      await probe.goto('about:blank');
+      await probe.goto(url);
+      await expect(probe).toHaveURL(url);
+    }
+    await probe.goto(`http://localhost:${port}/Page?q=1#other`);
+    const before = hits;
+    await probe.evaluate(() => {
+      location.hash = 'old';
+    });
+    await expect(probe).toHaveURL(source);
+    expect(hits).toBe(before);
+    await probe.reload();
+    await expect(probe).toHaveURL(target);
+    await worker.evaluate(async (targetUrl) => {
+      const { requestRulesState } = await chrome.storage.local.get('requestRulesState');
+      const state = requestRulesState as StoredState;
+      const rule = state.rules[state.order[0]!]!;
+      if (rule.action.kind !== 'redirect' || !rule.redirectBuilder)
+        throw new Error('Expected generated redirect');
+      rule.action.target = targetUrl;
+      rule.redirectBuilder.target = targetUrl;
+      await chrome.storage.local.set({ requestRulesState: state });
+    }, target.split('#')[0]!);
+    await expect
+      .poll(() =>
+        worker.evaluate(
+          async () => (await chrome.declarativeNetRequest.getDynamicRules())[0]?.action.redirect?.url,
+        ),
+      )
+      .toBe(target.split('#')[0]);
+    await probe.goto('about:blank');
+    await probe.goto(source);
+    await expect(probe).toHaveURL(target.split('#')[0]!);
+    await options.reload();
+    await options.getByRole('button', { name: 'Edit URL redirect', exact: true }).click();
+    await expect(dialog.getByLabel('Original URL', { exact: true })).toHaveValue(source);
+    await options.evaluate(() => chrome.storage.local.set({ 'ui.locale': 'zh-CN' }));
+    await expect(dialog.getByText(/精确匹配包含原网址的查询参数和 #hash/)).toBeVisible();
+    await expect(dialog.getByRole('status')).toContainText(target.split('#')[0]!);
+    await options.screenshot({ path: '/tmp/requestorbit-exact-hash-zh.png', animations: 'disabled' });
+  } finally {
+    await closeContext?.();
+    await close(server);
+    await rm(fixture.directory, { recursive: true, force: true });
+  }
+});

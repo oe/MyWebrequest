@@ -9,7 +9,7 @@
     {
       "path": "store-assets/screenshots/chrome/04-create-redirect.png",
       "purpose": "Real rules editor UI used in promotional artwork",
-      "sha256": "1c51bc04e14337e661658d883d60be58ae0cc65f11d252600af2eb613ed4bc20"
+      "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2"
     },
     {
       "path": "store-assets/screenshots/chrome/05-host-scope.png",
@@ -21,7 +21,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-06T16:13:11.733Z",
+  "generatedAt": "2026-09-06T16:49:54.217Z",
   "assets": [
     {
       "path": "src/public/icon/16.png",
@@ -68,7 +68,7 @@
     {
       "path": "store-assets/promotional/chrome/small-promo-440x280.png",
       "purpose": "Chrome small promotional tile",
-      "sha256": "81670bcaea5a4e1b927972ed655cd9beba2f9081f7f22ad8f1339d8bb176f630",
+      "sha256": "d4e660b3b7f3d9fda3a857001b0a8b5710e8a8b50ad448ac4892b1f0f7620d32",
       "width": 440,
       "height": 280
     },
@@ -82,7 +82,7 @@
     {
       "path": "store-assets/promotional/edge/small-promo-440x280.png",
       "purpose": "Edge small promotional tile",
-      "sha256": "81670bcaea5a4e1b927972ed655cd9beba2f9081f7f22ad8f1339d8bb176f630",
+      "sha256": "818a11d8211a95c8f27d2b8212e0d5c2ca8fd0b2341c7975f3c9f5d133899f30",
       "width": 440,
       "height": 280
     }
