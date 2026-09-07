@@ -1,3 +1,11 @@
+@font-face {
+  font-family: 'Borel';
+  src: url('/borel-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light dark;
   --ink: #17202b;
@@ -623,6 +631,23 @@ h3 {
 .footer-inner > a {
   justify-self: end;
 }
+.footer-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: center;
+}
+.product-family a {
+  color: var(--ink);
+  font-family: 'Borel', cursive;
+  font-size: 15px;
+  font-weight: 400;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.product-family a:hover {
+  text-decoration: underline;
+}
 .footer-brand {
   color: var(--ink);
   font-size: 13px;
@@ -943,6 +968,7 @@ h3 {
     padding-block: 26px;
   }
   .footer-inner p {
+    text-align: left;
     grid-column: 1 / -1;
     grid-row: 2;
   }
