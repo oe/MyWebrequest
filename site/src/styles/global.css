@@ -628,7 +628,12 @@ h3 {
   color: #738091;
   font-size: 12px;
 }
-.footer-inner > a {
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px 16px;
   justify-self: end;
 }
 .footer-meta {

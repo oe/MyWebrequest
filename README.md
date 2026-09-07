@@ -47,6 +47,11 @@ upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md]
 [PRIVACY.md](PRIVACY.md), and [STORE_LISTING.md](STORE_LISTING.md). Use
 [RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for installed-browser and store certification.
 
+## Support
+
+RequestOrbit is free and open source. If you find it useful, you can
+[support the author](https://forth.ink/donate/). Contributions are optional.
+
 ## Development
 
 Requirements: Node.js 24, pnpm 11, and OpenSSL for the isolated local HTTPS-upgrade fixture.

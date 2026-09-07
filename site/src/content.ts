@@ -110,6 +110,7 @@ type HomeCopy = {
   trustTitle: string;
   trustDescription: string;
   footer: string;
+  supportAuthor: string;
 };
 
 export const homeCopy: Record<Locale, HomeCopy> = {
@@ -162,6 +163,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustDescription:
       'Rules stay in your browser. There is no analytics code and no remote service handling your rules.',
     footer: 'Open source · Manifest V3 · Stored locally',
+    supportAuthor: 'Support the author',
   },
   'zh-CN': {
     metaTitle: 'Chrome、Edge 与 Firefox 请求规则管理器',
@@ -202,6 +204,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustTitle: '隐私无需额外设置',
     trustDescription: '规则只保存在浏览器中。扩展不含数据分析，也不会把规则交给远端服务处理。',
     footer: '开源 · Manifest V3 · 本地存储',
+    supportAuthor: '支持作者',
   },
   ko: {
     metaTitle: 'Chrome, Edge 및 Firefox용 요청 규칙 관리자',
@@ -250,6 +253,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustTitle: '처음부터 개인정보를 보호합니다',
     trustDescription: '규칙은 브라우저에만 저장됩니다. 분석 도구도, 규칙을 처리하는 원격 서비스도 없습니다.',
     footer: '오픈 소스 · Manifest V3 · 브라우저에 저장',
+    supportAuthor: '개발자 후원',
   },
   ja: {
     metaTitle: 'Chrome・Edge・Firefox 向けリクエストルール管理',
@@ -303,6 +307,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustDescription:
       'ルールはブラウザ内だけに保存されます。アクセス解析も、ルールを処理する外部サービスもありません。',
     footer: 'オープンソース · Manifest V3 · ブラウザ内に保存',
+    supportAuthor: '開発者を支援',
   },
   fr: {
     metaTitle: 'Règles de requêtes pour Chrome, Edge et Firefox',
@@ -369,6 +374,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustDescription:
       'Les règles restent dans votre navigateur. Aucun outil d’analyse ni service distant ne les traite.',
     footer: 'Open source · Manifest V3 · Stockage local',
+    supportAuthor: 'Soutenir l’auteur',
   },
   es: {
     metaTitle: 'Reglas de solicitudes para Chrome, Edge y Firefox',
@@ -428,6 +434,7 @@ export const homeCopy: Record<Locale, HomeCopy> = {
     trustDescription:
       'Las reglas permanecen en tu navegador. No hay analítica ni servicios remotos que las procesen.',
     footer: 'Código abierto · Manifest V3 · Guardado local',
+    supportAuthor: 'Apoyar al autor',
   },
 };
 
