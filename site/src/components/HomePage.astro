@@ -27,10 +27,10 @@ const release = releaseCopy[locale];
         <a
           class="button primary"
           data-install-link
-          data-chrome-label={release.chromeInstall}
-          data-chrome-url={`https://chromewebstore.google.com/detail/${browserSupport.chromeLegacyExtensionId}`}
-          href={localizedPath(locale, 'guides/quick-start')}
-          ><span data-install-label>{release.installTitle}</span><ArrowRight
+          data-firefox-label={release.firefoxInstall}
+          data-firefox-url="https://addons.mozilla.org/firefox/addon/requestorbit/"
+          href={`https://chromewebstore.google.com/detail/${browserSupport.chromeStoreExtensionId}`}
+          ><span data-install-label>{release.chromeInstall}</span><ArrowRight
             size={16}
             aria-hidden="true"
           /></a
@@ -116,21 +116,12 @@ const release = releaseCopy[locale];
 </BaseLayout>
 
 <script>
-  const browser = navigator as Navigator & {
-    userAgentData?: { mobile: boolean; brands: { brand: string; version: string }[] };
-  };
-  const desktopChrome = browser.userAgentData
-    ? !browser.userAgentData.mobile &&
-      browser.userAgentData.brands.some(({ brand }) => brand === 'Google Chrome')
-    : /Chrome\//.test(browser.userAgent) &&
-      !/Android|Mobile|Edg\/|OPR\/|SamsungBrowser\//.test(browser.userAgent);
-
-  if (desktopChrome) {
+  if (/Firefox\//.test(navigator.userAgent)) {
     for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-install-link]')) {
       const label = link.querySelector('[data-install-label]');
-      if (label && link.dataset.chromeUrl && link.dataset.chromeLabel) {
-        link.href = link.dataset.chromeUrl;
-        label.textContent = link.dataset.chromeLabel;
+      if (label && link.dataset.firefoxUrl && link.dataset.firefoxLabel) {
+        link.href = link.dataset.firefoxUrl;
+        label.textContent = link.dataset.firefoxLabel;
       }
     }
   }

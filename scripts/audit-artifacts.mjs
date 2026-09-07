@@ -64,13 +64,13 @@ for (const target of targets) {
     if (target === 'chrome') {
       assert.equal(
         manifest.key,
-        browserSupport.chromeLegacyPublicKey,
-        'Chrome must retain its signed V0 identity.',
+        browserSupport.chromeStorePublicKey,
+        'Chrome must retain its verified Web Store identity.',
       );
       assert.equal(
         extensionIdFromPublicKey(manifest.key),
-        browserSupport.chromeLegacyExtensionId,
-        'Chrome public key does not derive the recorded legacy extension ID.',
+        browserSupport.chromeStoreExtensionId,
+        'Chrome public key does not derive the verified Web Store extension ID.',
       );
     } else {
       assert.equal(manifest.key, undefined, 'Edge must not inherit the legacy Chrome identity key.');

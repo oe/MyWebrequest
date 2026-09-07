@@ -228,7 +228,7 @@ async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPat
           manifest_version: 3,
           name: 'My Webrequest legacy upgrade fixture',
           version: browserSupport.chromeLegacyVersion,
-          key: browserSupport.chromeLegacyPublicKey,
+          key: browserSupport.chromeStorePublicKey,
           permissions: ['storage'],
           background: { service_worker: 'legacy-background.js' },
           options_page: 'legacy-options.html',
@@ -957,7 +957,7 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
   const fixture = await legacyUpgradeFixture();
   const userDataDir = join(fixture.directory, 'profile');
   let launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
-  const extensionId = browserSupport.chromeLegacyExtensionId;
+  const extensionId = browserSupport.chromeStoreExtensionId;
 
   try {
     const legacyOptions = await launched.context.newPage();

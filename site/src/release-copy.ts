@@ -3,6 +3,7 @@ import type { Locale } from './content';
 type ReleaseCopy = {
   installTitle: string;
   chromeInstall: string;
+  firefoxInstall: string;
   availability: string;
   minimumLabel: string;
   localTitle: string;
@@ -20,6 +21,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   en: {
     installTitle: 'Install RequestOrbit',
     chromeInstall: 'Install from Chrome Web Store',
+    firefoxInstall: 'Install for Firefox',
     availability: 'Developer preview. Chrome, Edge, and Firefox store installs are not available yet.',
     minimumLabel: 'Minimum versions',
     localTitle: 'Try a local development build',
@@ -40,6 +42,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   'zh-CN': {
     installTitle: '安装 RequestOrbit',
     chromeInstall: '在 Chrome 商店安装',
+    firefoxInstall: '在 Firefox 商店安装',
     availability: '目前为开发预览版，Chrome、Edge 和 Firefox 的商店安装尚未开放。',
     minimumLabel: '最低版本',
     localTitle: '在本地试用开发版',
@@ -58,6 +61,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   ko: {
     installTitle: 'RequestOrbit 설치',
     chromeInstall: 'Chrome 웹 스토어에서 설치',
+    firefoxInstall: 'Firefox에서 설치',
     availability: '개발자 미리보기입니다. Chrome, Edge, Firefox 스토어 설치는 아직 제공되지 않습니다.',
     minimumLabel: '최소 버전',
     localTitle: '로컬 개발 빌드 사용해 보기',
@@ -77,6 +81,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   ja: {
     installTitle: 'RequestOrbit をインストール',
     chromeInstall: 'Chrome ウェブストアからインストール',
+    firefoxInstall: 'Firefox にインストール',
     availability: '開発プレビュー版です。Chrome、Edge、Firefox のストアからはまだインストールできません。',
     minimumLabel: '最低バージョン',
     localTitle: 'ローカルの開発ビルドを試す',
@@ -96,6 +101,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   fr: {
     installTitle: 'Installer RequestOrbit',
     chromeInstall: 'Installer depuis le Chrome Web Store',
+    firefoxInstall: 'Installer pour Firefox',
     availability:
       'Version de développement. L’installation depuis les boutiques Chrome, Edge et Firefox n’est pas encore disponible.',
     minimumLabel: 'Versions minimales',
@@ -117,6 +123,7 @@ export const releaseCopy: Record<Locale, ReleaseCopy> = {
   es: {
     installTitle: 'Instalar RequestOrbit',
     chromeInstall: 'Instalar desde Chrome Web Store',
+    firefoxInstall: 'Instalar para Firefox',
     availability:
       'Versión de desarrollo. La instalación desde las tiendas de Chrome, Edge y Firefox aún no está disponible.',
     minimumLabel: 'Versiones mínimas',

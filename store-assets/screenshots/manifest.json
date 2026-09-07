@@ -6,11 +6,11 @@
   },
   "targets": {
     "chrome": {
-      "sourceArtifact": "request-orbit-1.0.0-alpha.1-chrome.zip",
-      "sourceContentSha256": "5ffcdbb6480828c36452db04d0fd831b5e590b14ff50b97df0e50b8ffb008d94",
+      "sourceArtifact": "request-orbit-1.0.0-chrome.zip",
+      "sourceContentSha256": "cbc9c2c95ef0543838756bd1b87227a97d69c74758ceb66f1a90ffa122b5502c",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-06T16:49:24.277Z",
+      "capturedAt": "2026-09-06T17:16:29.029Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -36,7 +36,7 @@
         {
           "path": "chrome/04-create-redirect.png",
           "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
-          "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2",
+          "sha256": "454ee669dc6afe20c0c4176fa6ace4012d2b41a9aea2fcfc627db7c9b4de4a02",
           "width": 1280,
           "height": 800
         },
@@ -50,7 +50,7 @@
         {
           "path": "chrome/06-test-urls.png",
           "purpose": "Additional matching and non-matching URL previews",
-          "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685",
+          "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9",
           "width": 1280,
           "height": 800
         },
@@ -64,11 +64,11 @@
       ]
     },
     "edge": {
-      "sourceArtifact": "request-orbit-1.0.0-alpha.1-edge.zip",
-      "sourceContentSha256": "4416e290c63ef542d20b2dc21d563b66e192ea40086bf50cbe099294d4a50510",
+      "sourceArtifact": "request-orbit-1.0.0-edge.zip",
+      "sourceContentSha256": "76e8a301b23283de6c6c49f0a937f996268cdc0730639ed1cd09b66d7fecebce",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.66",
-      "capturedAt": "2026-09-06T16:49:33.903Z",
+      "capturedAt": "2026-09-06T17:16:39.962Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -122,11 +122,11 @@
       ]
     },
     "firefox": {
-      "sourceArtifact": "request-orbit-1.0.0-alpha.1-firefox.zip",
+      "sourceArtifact": "request-orbit-1.0.0-firefox.zip",
       "sourceContentSha256": "ca2b3c77a659a04fb4ca89c0f1a5222ffbf5ab00c5c56ca7fc0f127f24e847c8",
       "browserName": "Firefox",
       "browserVersion": "155.0",
-      "capturedAt": "2026-09-06T16:49:44.063Z",
+      "capturedAt": "2026-09-06T17:16:50.232Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",

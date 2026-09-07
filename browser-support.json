@@ -9,5 +9,7 @@
   "edgeLinux64Sha256": "a286734c399d7656305a80ccab314f7db508993df9d7fa6d7dd971284b48efbb",
   "firefoxMinimum": "142.0",
   "geckodriverVersion": "0.37.1",
-  "geckodriverLinux64Sha256": "e815130ea95983e162ae91843b48d3a3ce991735635fce83a647afde21e09f7e"
+  "geckodriverLinux64Sha256": "e815130ea95983e162ae91843b48d3a3ce991735635fce83a647afde21e09f7e",
+  "chromeStoreExtensionId": "ojodgdaaholkmelbddlhnfdgamohijhk",
+  "chromeStorePublicKey": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArrIQd6TeR9ryb+O0I6kD0Fowf2keJjjpCXsqvrgUaeKXIDzCl/GiK39J8/qnVfzUaU4lC7+FpzCxTz5LReVllBrfOATDnsVe7xDq14xiyFLVGl+bcUdIJpKw3DBbavum65qe8BU+AEqJwPMTtOuF1juD/JB4ujclqPUpVl7jMHpnHSje5lWFOAmF2+T/SjEnJ1Lkfc2T0O67Phdffy1y6JEhd6ClEAZCGc35stnkQ+ahTJzTgSbz9Cj50dM0GTNNG8wyGsn6jmpzTgNyZaNbQvG8STXs427xnv2U5QXLPp7FLJtCSOgBe86zpG+J3Qu7TSjIsf0mGFY9ge1Kx98ApwIDAQAB"
 }

@@ -9,7 +9,7 @@
     {
       "path": "store-assets/screenshots/chrome/04-create-redirect.png",
       "purpose": "Real rules editor UI used in promotional artwork",
-      "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2"
+      "sha256": "454ee669dc6afe20c0c4176fa6ace4012d2b41a9aea2fcfc627db7c9b4de4a02"
     },
     {
       "path": "store-assets/screenshots/chrome/05-host-scope.png",
@@ -21,7 +21,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-06T16:49:54.217Z",
+  "generatedAt": "2026-09-06T17:17:46.926Z",
   "assets": [
     {
       "path": "src/public/icon/16.png",

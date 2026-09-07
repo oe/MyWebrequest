@@ -177,7 +177,7 @@ export const test = base.extend<ExtensionFixtures>({
   },
   extensionId: async ({ context }, run) => {
     if (process.env.MWR_BROWSER_TARGET !== 'edge') {
-      await run(browserSupport.chromeLegacyExtensionId);
+      await run(browserSupport.chromeStoreExtensionId);
       return;
     }
     const worker = await findExtensionWorker(context);

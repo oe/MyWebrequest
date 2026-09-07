@@ -13,6 +13,10 @@ without a fabricated browser bar, rotation or cropping. English is the currently
 localized descriptions are available separately below. Additional localized screenshots remain optional
 follow-up work, not evidence already captured.
 
+For Chrome Web Store, use `chromeDescription` as the complete concise description; it already includes
+the rename note. The shared `detailedDescription` and separate `chromeLegacyMigrationNote` remain available
+for other store formats. The six Chrome descriptions were saved as drafts on 2026-09-07.
+
 `listing/<locale>.json` contains paste-ready store metadata for English, Simplified Chinese, Korean,
 Japanese, French, and Spanish. The shared descriptions intentionally contain no browser-specific migration
 claim. Only `chromeLegacyMigrationNote` may be appended to the Chrome listing; it must never be copied to
