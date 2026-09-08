@@ -64,7 +64,8 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
     .poll(() =>
       extensionPage.evaluate(
         async () =>
-          (await chrome.storage.local.get('requestRulesState')).requestRulesState.settings.globallyPaused,
+          ((await chrome.storage.local.get('requestRulesState')).requestRulesState as StoredState).settings
+            .globallyPaused,
       ),
     )
     .toBe(false);

@@ -265,7 +265,9 @@ Storage rules:
 - Persist only JSON-compatible data.
 - Validate on every import and storage-version migration.
 - Use one application command for storage and DNR changes.
-- On update, compile first, apply DNR second, then persist the committed representation; compensate if a later step fails.
+- Routine rule edits and pause/resume are submitted to the background through a typed message. The background serializes commits and rejects a stale caller state.
+- Before applying DNR, write one temporary `requestOrbitPendingCommit` record containing the previous and next states. Apply DNR, save the committed state, then remove the record. Startup completes an interrupted record; a newer external write takes precedence. Failed commits record a rollback intent before compensation.
+- Legacy migration retains its separate state-plus-migration compensation transaction.
 - Keep bounded snapshots for destructive import/migration operations, not routine edits.
 - Never store browsing activity or request contents.
 - Use ISO timestamps for portability; do not derive rule priority from timestamps.
@@ -277,7 +279,9 @@ Storage rules:
 - Treat global variables only as disposable caches.
 - Do not use keepalive timers.
 - Make initialization idempotent so install, update, browser startup, or worker restart can repeat safely.
-- Reconcile stored enabled rules with installed dynamic rules at startup/update.
+- Reconcile stored enabled rules with installed dynamic rules at startup/update. UI opens read a background snapshot; unchanged state skips reconciliation. Permission events invalidate this disposable cache.
+- Compare canonical compiled rules with installed DNR rules and submit only additions, removals, and changes. Never submit an empty update.
+- Read host grants once per batch and cache up to 1,000 browser regex support results. Locale changes refresh toolbar text without rebuilding DNR rules.
 - Record only bounded local diagnostic events without URL/query contents.
 - Surface reconciliation failures in the rule manager.
 
@@ -311,6 +315,8 @@ UI state must be derived from stored rule, grant state, compiler result, and ins
 ## 12. UI architecture
 
 - Shared design tokens and components between popup and options.
+- Rule lists render at most 100 rows per page. Search and filters operate on the complete collection; arrow/Home/End navigation crosses page boundaries.
+- Redirect diagnostics index wildcard literal prefixes and host-transform witnesses before exact matching. Arbitrary regex and unanchored patterns retain the conservative full candidate path; the index must never discard a possible match.
 - Route-level code splitting for options-only migration/settings surfaces.
 - Form state remains local until save; canonical state remains in the application service.
 - A single typed message protocol connects popup/options and the worker.
@@ -348,7 +354,8 @@ UI state must be derived from stored rule, grant state, compiler result, and ins
 The repository runs a Playwright Chromium extension suite in the default quality gate. It launches the
 production `dist/chrome` build in an isolated persistent profile and currently proves clean-install
 permissions, warning/error-free options startup, options/settings navigation, real DNR blocking,
-popup-driven pause/resume synchronization,
+popup-driven pause/resume synchronization, background completion after a popup closes during a delayed save,
+journal recovery after browser restart, no-op DNR write counts, and bounded 4,500-rule list rendering with cross-page keyboard navigation,
 DNR continuity after forced service-worker termination and event-driven restart, a real host-permission-free
 HTTP-to-HTTPS upgrade against an isolated TLS fixture, keyboard switching and persistence for all six locales,
 compact-layout overflow protection, forced-color/reduced-motion fallbacks, keyboard focus restoration, and

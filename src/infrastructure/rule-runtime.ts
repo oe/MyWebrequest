@@ -1,3 +1,4 @@
+import { stateKey } from '@/application/runtime-controller';
 import { updateActionState } from './action-state';
 import { compileDnrRule } from '@/domain/rules/compile-dnr';
 import { createRuleRuntimePlan } from '@/domain/rules/diagnostics';
@@ -43,6 +44,8 @@ function matchPatternCovers(grantedPattern: string, requiredPattern: string): bo
   return required.host === granted.host || required.host.endsWith(`.${granted.host}`);
 }
 
+const regexResults = new WeakMap<object, Map<string, Promise<RegexSupportResult>>>();
+
 export async function checkRuleRegexSupport(rule: Rule): Promise<RegexSupportResult> {
   if (rule.condition.url.kind === 'url-filter') return { isSupported: true };
   if (!hasExtensionRuntime() || !browser.declarativeNetRequest.isRegexSupported) {
@@ -54,10 +57,36 @@ export async function checkRuleRegexSupport(rule: Rule): Promise<RegexSupportRes
       ? wildcardToRegExpSource(rule.condition.url.value)
       : rule.condition.url.value;
   const requireCapturing = rule.action.kind === 'redirect' && /\$[1-9]/.test(rule.action.target);
-  const result = await browser.declarativeNetRequest.isRegexSupported({ regex, requireCapturing });
-  return result.isSupported
-    ? { isSupported: true }
-    : { isSupported: false, reason: result.reason ?? 'unsupportedSyntax' };
+  const api = browser.declarativeNetRequest;
+  let cache = regexResults.get(api);
+  if (!cache) {
+    cache = new Map();
+    regexResults.set(api, cache);
+  }
+  const key = JSON.stringify([regex, requireCapturing]);
+  let result = cache.get(key);
+  if (!result) {
+    result = api
+      .isRegexSupported({ regex, requireCapturing })
+      .then((result) =>
+        result.isSupported
+          ? { isSupported: true }
+          : { isSupported: false, reason: result.reason ?? 'unsupportedSyntax' },
+      );
+    if (cache.size >= 1_000) cache.delete(cache.keys().next().value!);
+    cache.set(key, result);
+    void result.catch(() => cache!.delete(key));
+  }
+  return result;
+}
+
+export async function readPermissionChecker(): Promise<(rule: Rule) => boolean> {
+  if (!hasExtensionRuntime()) return () => true;
+  const granted = (await browser.permissions.getAll()).origins ?? [];
+  return (rule) =>
+    requiredPermissionOrigins(rule).every((origin) =>
+      granted.some((pattern) => matchPatternCovers(pattern, origin)),
+    );
 }
 
 export async function hasRulePermission(rule: Rule): Promise<boolean> {
@@ -98,7 +127,7 @@ async function replaceDynamicRules(state: StoredState): Promise<void> {
   if (!hasExtensionRuntime()) return;
 
   const installedRules = await browser.declarativeNetRequest.getDynamicRules();
-  const removeRuleIds = installedRules.map((rule) => rule.id);
+
   let addRules: Browser.declarativeNetRequest.Rule[] = [];
 
   if (!state.settings.globallyPaused) {
@@ -107,11 +136,13 @@ async function replaceDynamicRules(state: StoredState): Promise<void> {
       const rule = state.rules[id];
       return rule && plan.installableRuleIds.has(id) ? [rule] : [];
     });
+    const needsPermissions = candidates.some((rule) => requiredPermissionOrigins(rule).length > 0);
+    const hasPermission = needsPermissions ? await readPermissionChecker() : () => true;
     const compiled = await Promise.all(
       candidates.map(async (rule) => {
         const regexSupport = await checkRuleRegexSupport(rule);
         if (!regexSupport.isSupported) return null;
-        if (!(await hasRulePermission(rule))) return null;
+        if (!hasPermission(rule)) return null;
         const result = compileDnrRule(rule);
         return result.ok ? (result.rule as Browser.declarativeNetRequest.Rule) : null;
       }),
@@ -119,10 +150,15 @@ async function replaceDynamicRules(state: StoredState): Promise<void> {
     addRules = compiled.filter((rule): rule is Browser.declarativeNetRequest.Rule => rule !== null);
   }
 
-  await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds,
-    addRules,
-  });
+  const installed = new Map(installedRules.map((rule) => [rule.id, stateKey(rule)]));
+  const desired = new Map(addRules.map((rule) => [rule.id, stateKey(rule)]));
+  const removeRuleIds = installedRules
+    .filter((rule) => installed.get(rule.id) !== desired.get(rule.id))
+    .map((rule) => rule.id);
+  addRules = addRules.filter((rule) => installed.get(rule.id) !== desired.get(rule.id));
+  if (removeRuleIds.length || addRules.length) {
+    await browser.declarativeNetRequest.updateDynamicRules({ removeRuleIds, addRules });
+  }
 }
 
 export async function reconcileDynamicRules(state: StoredState): Promise<void> {

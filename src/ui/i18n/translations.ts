@@ -1,6 +1,9 @@
 import type { Messages } from './messages';
 
 const zhCN = {
+  rulePages: '规则分页',
+  previousPage: '上一页',
+  nextPage: '下一页',
   previewPending: '正在检查 URL…',
   previewUnavailable: '无法预览',
   previewTimeout: '预览耗时过长，已停止。请简化匹配规则或缩短测试 URL。',
@@ -385,6 +388,9 @@ const zhCN = {
 } satisfies Messages;
 
 const ko = {
+  rulePages: '규칙 페이지',
+  previousPage: '이전 페이지',
+  nextPage: '다음 페이지',
   previewPending: 'URL 확인 중…',
   previewUnavailable: '미리보기 사용 불가',
   previewTimeout: '미리보기가 너무 오래 걸려 중지되었습니다. 패턴이나 테스트 URL을 줄이세요.',
@@ -787,6 +793,9 @@ const ko = {
 } satisfies Messages;
 
 const ja = {
+  rulePages: 'ルールのページ',
+  previousPage: '前のページ',
+  nextPage: '次のページ',
   previewPending: 'URL を確認中…',
   previewUnavailable: 'プレビューを利用できません',
   previewTimeout: '時間がかかりすぎたため停止しました。パターンやテスト URL を短くしてください。',
@@ -1192,6 +1201,9 @@ const ja = {
 } satisfies Messages;
 
 const fr = {
+  rulePages: 'Pages des règles',
+  previousPage: 'Page précédente',
+  nextPage: 'Page suivante',
   previewPending: 'Vérification de l’URL…',
   previewUnavailable: 'Aperçu indisponible',
   previewTimeout:
@@ -1620,6 +1632,9 @@ const fr = {
 } satisfies Messages;
 
 const es = {
+  rulePages: 'Páginas de reglas',
+  previousPage: 'Página anterior',
+  nextPage: 'Página siguiente',
   previewPending: 'Comprobando URL…',
   previewUnavailable: 'Vista previa no disponible',
   previewTimeout: 'La vista previa tardó demasiado y se detuvo. Simplifica el patrón o acorta la URL.',

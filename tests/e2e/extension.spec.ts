@@ -972,6 +972,14 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
 
     await overlayProductionExtension(fixture.extensionPath);
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
+    // A disk overlay changes the worker URL but leaves Chromium's event routing
+    // registered to the legacy worker. Unload that registration, then relaunch
+    // the command-line fixture to model a fully activated extension update.
+    const upgradedWorker =
+      launched.context.serviceWorkers()[0] ?? (await launched.context.waitForEvent('serviceworker'));
+    await upgradedWorker.evaluate(() => chrome.runtime.reload()).catch(() => undefined);
+    await launched.close();
+    launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
     await expect(options).toHaveTitle('RequestOrbit');
@@ -1205,6 +1213,7 @@ test('backup export supports safe merge, replacement, and recovery', async ({
       recovery: undefined,
     });
 
+  await expect(backupInput).toBeEnabled();
   await backupInput.setInputFiles(backupPath);
   await options.getByRole('button', { name: /Replace all rules/ }).click();
   await expect(options.getByText('Current rules will be replaced', { exact: true })).toBeVisible();

@@ -183,3 +183,43 @@ it('handles a complete quota-sized redirect chain without recursion or false cyc
   rules[4499] = { ...rules[4499]!, action: { kind: 'redirect', target: 'https://chain.example/0' } };
   expect(Object.keys(analyzeRuleState(stateWith(rules)))).toHaveLength(4500);
 });
+
+it.each([
+  { pattern: 'https://one.example/A*', target: 'https://one.example/abc', sensitive: false, cycle: true },
+  { pattern: 'https://one.example/A*', target: 'https://one.example/abc', sensitive: true, cycle: false },
+  { pattern: '*one.example/*', target: 'https://one.example/abc', sensitive: false, cycle: true },
+  {
+    pattern: 'https://one.example/a.b*',
+    target: 'https://one.example/axb',
+    sensitive: false,
+    cycle: false,
+  },
+])(
+  'preserves exact matcher semantics when narrowing wildcard candidates: $pattern / $sensitive',
+  ({ pattern, target, sensitive, cycle }) => {
+    const first: Rule = {
+      ...sampleRules[0]!,
+      id: 'prefix-first',
+      dnrId: 8901,
+      condition: {
+        url: { kind: 'wildcard', value: pattern },
+        isUrlFilterCaseSensitive: sensitive,
+        resourceTypes: ['main_frame'],
+      },
+      action: { kind: 'redirect', target: 'https://two.example/page' },
+    };
+    const second: Rule = {
+      ...sampleRules[0]!,
+      id: 'prefix-second',
+      dnrId: 8902,
+      condition: {
+        url: { kind: 'wildcard', value: 'https://two.example/*' },
+        resourceTypes: ['main_frame'],
+      },
+      action: { kind: 'redirect', target },
+    };
+    const diagnostics = analyzeRuleState(stateWith([first, second]));
+    expect(Boolean(diagnostics[first.id]?.some((item) => item.code === 'redirect-cycle'))).toBe(cycle);
+    expect(Boolean(diagnostics[second.id]?.some((item) => item.code === 'redirect-cycle'))).toBe(cycle);
+  },
+);

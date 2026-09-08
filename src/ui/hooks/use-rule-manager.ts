@@ -11,12 +11,8 @@ import {
   upsertRule,
 } from '@/application/rule-service';
 import type { StarterRuleKind, OtherRuleKind } from '@/application/rule-service';
-import { commitRuleState } from '@/application/rule-transaction';
-import {
-  readRuleRuntimeSnapshot,
-  synchronizeRuleRuntimeSnapshot,
-  type RuleRuntimeSnapshot,
-} from '@/application/rule-runtime-snapshot';
+import { commitRuntimeState, readRuntimeSnapshot } from '@/infrastructure/runtime-client';
+import type { RuleRuntimeSnapshot } from '@/application/rule-runtime-snapshot';
 import { analyzeRuleState, createRuleRuntimePlan, getRuleQuotaUsage } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
 import { deriveRuleStatus, validateRule } from '@/domain/rules/validate';
@@ -29,22 +25,13 @@ import {
 } from '@/infrastructure/rule-import-recovery';
 import {
   checkRuleRegexSupport,
-  getInstalledDynamicRuleIds,
-  hasRulePermission,
-  reconcileDynamicRules,
   requestRulePermission,
   subscribeToPermissionChanges,
 } from '@/infrastructure/rule-runtime';
-import { loadState, saveState, subscribeToState } from '@/infrastructure/rule-store';
+import { loadState, subscribeToState } from '@/infrastructure/rule-store';
 
 type PermissionMap = Record<string, boolean>;
 type InstalledRuleIds = Set<number> | null | undefined;
-
-const runtimeSnapshotPorts = {
-  reconcile: reconcileDynamicRules,
-  hasPermission: hasRulePermission,
-  getInstalledRuleIds: getInstalledDynamicRuleIds,
-};
 
 export function useRuleManager() {
   const [state, setState] = useState<StoredState | null>(null);
@@ -65,7 +52,11 @@ export function useRuleManager() {
   const refreshRuntimeState = useCallback(
     async (nextState: StoredState) => {
       try {
-        applyRuntimeSnapshot(await readRuleRuntimeSnapshot(nextState, runtimeSnapshotPorts));
+        const snapshot = await readRuntimeSnapshot(nextState);
+        if (stateRef.current !== nextState) return;
+        stateRef.current = snapshot.state;
+        setState(snapshot.state);
+        applyRuntimeSnapshot(snapshot);
       } catch (error) {
         console.error('Failed to read extension runtime state.', error);
         setPermissions({});
@@ -76,30 +67,16 @@ export function useRuleManager() {
     [applyRuntimeSnapshot],
   );
 
-  const synchronizeRuntimeState = useCallback(
-    async (nextState: StoredState) => {
-      try {
-        applyRuntimeSnapshot(await synchronizeRuleRuntimeSnapshot(nextState, runtimeSnapshotPorts));
-      } catch (error) {
-        console.error('Failed to reconcile extension runtime state.', error);
-        setPermissions({});
-        setInstalledRuleIds(undefined);
-        setRuntimeError(true);
-      }
-    },
-    [applyRuntimeSnapshot],
-  );
-
   const adoptState = useCallback(
-    async (nextState: StoredState, synchronize = false) => {
+    async (nextState: StoredState) => {
       stateRef.current = nextState;
       setState(nextState);
       setSelectedId((currentId) =>
         currentId && nextState.rules[currentId] ? currentId : (nextState.order[0] ?? null),
       );
-      await (synchronize ? synchronizeRuntimeState(nextState) : refreshRuntimeState(nextState));
+      await refreshRuntimeState(nextState);
     },
-    [refreshRuntimeState, synchronizeRuntimeState],
+    [refreshRuntimeState],
   );
 
   useEffect(() => {
@@ -107,7 +84,7 @@ export function useRuleManager() {
     void Promise.all([loadState(), loadRuleImportRecovery()]).then(async ([loaded, recovery]) => {
       if (cancelled) return;
       setImportRecovery(recovery);
-      await adoptState(loaded, true);
+      await adoptState(loaded);
       if (!cancelled) setLoading(false);
     });
     return () => {
@@ -118,7 +95,7 @@ export function useRuleManager() {
   useEffect(
     () =>
       subscribeToState((nextState) => {
-        void adoptState(nextState, true);
+        void adoptState(nextState);
       }),
     [adoptState],
   );
@@ -126,18 +103,28 @@ export function useRuleManager() {
   useEffect(() => {
     if (!state) return;
     return subscribeToPermissionChanges(() => {
-      void synchronizeRuntimeState(state);
+      void refreshRuntimeState(state);
     });
-  }, [state, synchronizeRuntimeState]);
+  }, [state, refreshRuntimeState]);
 
   const persist = useCallback(
     async (nextState: StoredState) => {
       const previousState = stateRef.current;
       if (!previousState) return;
-      await commitRuleState(previousState, nextState, { reconcile: reconcileDynamicRules, save: saveState });
-      await adoptState(nextState);
+      try {
+        const snapshot = await commitRuntimeState(previousState, nextState);
+        stateRef.current = snapshot.state;
+        setState(snapshot.state);
+        setSelectedId((currentId) =>
+          currentId && snapshot.state.rules[currentId] ? currentId : (snapshot.state.order[0] ?? null),
+        );
+        applyRuntimeSnapshot(snapshot);
+      } catch (error) {
+        await adoptState(await loadState());
+        throw error;
+      }
     },
-    [adoptState],
+    [adoptState, applyRuntimeSnapshot],
   );
 
   const saveRule = useCallback(

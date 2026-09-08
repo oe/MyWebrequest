@@ -1,4 +1,7 @@
 export const en = {
+  rulePages: 'Rule pages',
+  previousPage: 'Previous page',
+  nextPage: 'Next page',
   previewPending: 'Checking URL…',
   previewUnavailable: 'Preview unavailable',
   previewTimeout: 'This preview took too long and was stopped. Simplify the pattern or shorten the test URL.',

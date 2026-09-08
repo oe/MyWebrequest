@@ -14,7 +14,7 @@ function runtime(update: () => Promise<void>) {
   vi.stubGlobal('browser', {
     action,
     permissions: {},
-    declarativeNetRequest: { getDynamicRules: async () => [], updateDynamicRules: update },
+    declarativeNetRequest: { getDynamicRules: async () => [{ id: 123 }], updateDynamicRules: update },
   });
   return action;
 }

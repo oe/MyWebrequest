@@ -238,7 +238,7 @@ describe('rule runtime reconciliation', () => {
 
     await reconcileDynamicRules(stateWith(rule));
 
-    expect(runtime.updateDynamicRules).toHaveBeenCalledWith({ removeRuleIds: [], addRules: [] });
+    expect(runtime.updateDynamicRules).not.toHaveBeenCalled();
   });
 
   it('removes every same-condition priority conflict instead of leaving browser precedence ambiguous', async () => {
@@ -278,5 +278,35 @@ describe('rule runtime reconciliation', () => {
     expect(addRules).toHaveLength(4_500);
     expect(addRules.at(0)?.id).toBe(10_000);
     expect(addRules.at(-1)?.id).toBe(14_499);
+  });
+  it('reads host grants once for a batch and skips an unchanged installed rule', async () => {
+    const base = sampleRules[0]!;
+    const rules = Array.from({ length: 10 }, (_, index) => ({
+      ...base,
+      id: `batch-${index}`,
+      dnrId: 200 + index,
+      condition: {
+        ...base.condition,
+        url: { kind: 'wildcard' as const, value: `https://api.example.com/${index}/*` },
+      },
+    }));
+    const runtime = installBrowserMock({ installedIds: [], permitted: true });
+    await reconcileDynamicRules(stateWith(rules));
+    expect(runtime.getAll).toHaveBeenCalledTimes(1);
+    const added = runtime.updateDynamicRules.mock.calls[0]![0].addRules!;
+    browser.declarativeNetRequest.getDynamicRules = vi.fn(
+      async () => added as Browser.declarativeNetRequest.Rule[],
+    );
+    runtime.updateDynamicRules.mockClear();
+    runtime.isRegexSupported.mockClear();
+    await reconcileDynamicRules(stateWith(rules));
+    expect(runtime.updateDynamicRules).not.toHaveBeenCalled();
+    expect(runtime.isRegexSupported).not.toHaveBeenCalled();
+    const changed = rules.map((rule, index) => (index === 3 ? { ...rule, priority: 99 } : rule));
+    await reconcileDynamicRules(stateWith(changed));
+    expect(runtime.updateDynamicRules).toHaveBeenCalledWith({
+      removeRuleIds: [203],
+      addRules: [expect.objectContaining({ id: 203, priority: 99 })],
+    });
   });
 });

@@ -1,3 +1,4 @@
+import { PrefixIndex } from './prefix-index';
 import type { Rule, StoredState } from './model';
 import { compileUrlMatcher } from './test-match';
 import { validateRule } from './validate';
@@ -59,7 +60,10 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
       rule.action.kind === 'redirect' && !/\$\d+/.test(rule.action.target),
   );
   const exact = new Map<string, string[]>();
-  const other: Array<{ id: string; test: (url: string) => boolean }> = [];
+  type Candidate = { id: string; test: (url: string) => boolean };
+  const other: Candidate[] = [];
+  const sensitive = new PrefixIndex<Candidate>();
+  const insensitive = new PrefixIndex<Candidate>();
   for (const rule of redirects) {
     const { kind, value } = rule.condition.url;
     if (
@@ -72,7 +76,13 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
     } else {
       try {
         const matcher = compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
-        other.push({ id: rule.id, test: (url) => matcher.test(url) });
+        const candidate = { id: rule.id, test: (url: string) => matcher.test(url) };
+        other.push(candidate);
+        const prefix = kind === 'wildcard' ? value.split('*')[0]! : '';
+        // Non-ASCII case folding is left to RE2 to avoid false negatives.
+        const safePrefix = /^[\x20-\x7e]*$/.test(prefix) ? prefix : '';
+        if (rule.condition.isUrlFilterCaseSensitive) sensitive.add(safePrefix, candidate);
+        else insensitive.add(safePrefix.toLowerCase(), candidate);
       } catch {
         // The browser support check rejects unsupported regex syntax before activation.
       }
@@ -88,7 +98,12 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
     if (!matches) {
       matches = [
         ...(exact.get(target.toLowerCase()) ?? []),
-        ...other.filter((candidate) => candidate.test(target)).map((candidate) => candidate.id),
+        ...(/^[\x20-\x7e]*$/.test(target)
+          ? [...sensitive.candidates(target), ...insensitive.candidates(target.toLowerCase())]
+          : other
+        )
+          .filter((candidate) => candidate.test(target))
+          .map((candidate) => candidate.id),
       ];
       destinations.set(target, matches);
     }
@@ -102,6 +117,12 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
     const url = new URL(value.replace(/^\|/, '').replace(/\|$/, ''));
     return [{ id: rule.id, url }];
   });
+  const witnessesByHost = new Map<string, typeof witnesses>();
+  for (const witness of witnesses) {
+    const group = witnessesByHost.get(witness.url.hostname) ?? [];
+    group.push(witness);
+    witnessesByHost.set(witness.url.hostname, group);
+  }
   for (const rule of redirects) {
     if (!rule.action.transform) continue;
     const origin = /^\|(https?:\/\/[^/*^|]+)\//.exec(rule.condition.url.value)?.[1];
@@ -109,8 +130,7 @@ function redirectEdges(rules: Rule[]): Map<string, string[]> {
     const sourceHost = new URL(origin).hostname;
     const matcher = compileUrlMatcher(rule.condition.url, rule.condition.isUrlFilterCaseSensitive);
     const related = new Set(edges.get(rule.id));
-    for (const witness of witnesses) {
-      if (witness.url.hostname !== rule.action.transform.host) continue;
+    for (const witness of witnessesByHost.get(rule.action.transform.host) ?? []) {
       const source = new URL(witness.url.href);
       source.hostname = sourceHost;
       if (matcher.test(source.href)) related.add(witness.id);
