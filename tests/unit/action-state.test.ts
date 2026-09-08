@@ -5,6 +5,7 @@ vi.mock('@/infrastructure/ui-preferences', () => ({ loadLocalePreference: async 
 
 function runtime(update: () => Promise<void>) {
   const action = {
+    setIcon: vi.fn(async () => {}),
     setBadgeText: vi.fn(async () => {}),
     setBadgeBackgroundColor: vi.fn(async () => {}),
     setBadgeTextColor: vi.fn(async () => {}),
@@ -33,9 +34,15 @@ describe('toolbar runtime status', () => {
     expect(action.setBadgeText).not.toHaveBeenCalled();
     complete();
     await applied;
-    expect(action.setBadgeText).toHaveBeenLastCalledWith({ text: 'Ⅱ' });
+    expect(action.setIcon).toHaveBeenLastCalledWith({
+      path: { 16: 'icon/paused-16.png', 32: 'icon/paused-32.png', 48: 'icon/paused-48.png' },
+    });
+    expect(action.setBadgeText).toHaveBeenLastCalledWith({ text: '' });
     expect(action.setTitle).toHaveBeenLastCalledWith({ title: 'RequestOrbit · 所有规则已暂停' });
     await reconcileDynamicRules(createEmptyState());
+    expect(action.setIcon).toHaveBeenLastCalledWith({
+      path: { 16: 'icon/16.png', 32: 'icon/32.png', 48: 'icon/48.png' },
+    });
     expect(action.setBadgeText).toHaveBeenLastCalledWith({ text: '' });
   });
   it('shows an error instead of falsely confirming a failed pause', async () => {

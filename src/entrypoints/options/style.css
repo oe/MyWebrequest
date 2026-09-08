@@ -9,3 +9,18 @@ body,
 body {
   margin: 0;
 }
+
+@font-face {
+  font-family: 'Borel Brand';
+  src: url('../../ui/assets/borel-regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+.publisher-name {
+  font-family: 'Borel Brand', cursive;
+  font-weight: 400;
+  line-height: 1;
+  padding-top: 0.4em;
+}

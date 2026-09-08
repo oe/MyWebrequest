@@ -46,7 +46,7 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
   const popup = await context.newPage();
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
   await popup.getByRole('switch', { name: 'Pause all rules' }).click();
-  await expect.poll(() => extensionPage.evaluate(() => chrome.action.getBadgeText({}))).toBe('Ⅱ');
+  await expect.poll(() => extensionPage.evaluate(() => chrome.action.getBadgeText({}))).toBe('');
   await expect
     .poll(() => extensionPage.evaluate(() => chrome.declarativeNetRequest.getDynamicRules()))
     .toEqual([]);
@@ -59,15 +59,37 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
   await reopened.goto(`chrome-extension://${extensionId}/popup.html`);
   await expect(reopened.getByRole('switch', { name: 'Pause all rules' })).toBeChecked();
   await reopened.getByRole('switch', { name: 'Pause all rules' }).click();
+  await expect.poll(() => extensionPage.evaluate(() => chrome.action.getTitle({}))).toBe('RequestOrbit');
+  await expect
+    .poll(() =>
+      extensionPage.evaluate(
+        async () =>
+          (await chrome.storage.local.get('requestRulesState')).requestRulesState.settings.globallyPaused,
+      ),
+    )
+    .toBe(false);
+  await expect
+    .poll(() =>
+      extensionPage.evaluate(async () => (await chrome.declarativeNetRequest.getDynamicRules()).length),
+    )
+    .toBe(1);
   await expect.poll(() => extensionPage.evaluate(() => chrome.action.getBadgeText({}))).toBe('');
   await reopened.close();
   await extensionPage
     .getByRole('button', { name: 'Settings', exact: true })
     .filter({ visible: true })
     .click();
-  const forth = extensionPage.getByRole('menuitem', { name: 'forth.ink' });
+  const forth = extensionPage.getByRole('menuitem', { name: 'by frothink' });
   await expect(forth).toHaveAttribute('href', 'https://forth.ink/');
   await expect(forth).toHaveAttribute('target', '_blank');
+  await expect
+    .poll(() =>
+      forth.locator('.publisher-name').evaluate(async (element) => {
+        await document.fonts.load('16px "Borel Brand"', 'frothink');
+        return getComputedStyle(element).fontFamily;
+      }),
+    )
+    .toContain('Borel Brand');
   await extensionPage.screenshot({ path: `${evidence}/settings.png`, animations: 'disabled' });
   await context.route('https://forth.ink/', (route) =>
     route.fulfill({ body: '<title>forth.ink link probe</title>' }),
@@ -82,7 +104,7 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
     .getByRole('button', { name: 'Settings', exact: true })
     .filter({ visible: true })
     .click();
-  await expect(extensionPage.getByRole('menuitem', { name: 'forth.ink' })).toBeVisible();
+  await expect(extensionPage.getByRole('menuitem', { name: 'by frothink' })).toBeVisible();
   await extensionPage.screenshot({ path: `${evidence}/settings-narrow.png`, animations: 'disabled' });
   expect(await extensionPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(errors).toEqual([]);
@@ -101,11 +123,13 @@ test('toolbar pause restores after a full browser restart', async () => {
       (value) => chrome.storage.local.set({ requestRulesState: value, 'ui.locale': 'zh-CN' }),
       state,
     );
-    await expect.poll(() => worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('Ⅱ');
+    await expect
+      .poll(() => worker.evaluate(() => chrome.action.getTitle({})))
+      .toBe('RequestOrbit · 所有规则已暂停');
     await launched.close();
     launched = await launchChromiumExtensionContext(extensionPath, false, profile);
     worker = await findExtensionWorker(launched.context);
-    await expect.poll(() => worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('Ⅱ');
+    await expect.poll(() => worker.evaluate(() => chrome.action.getBadgeText({}))).toBe('');
     await expect
       .poll(() => worker.evaluate(() => chrome.action.getTitle({})))
       .toBe('RequestOrbit · 所有规则已暂停');

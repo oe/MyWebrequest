@@ -7,7 +7,6 @@ import {
   DatabaseBackupIcon,
   ExternalLinkIcon,
   SettingsIcon,
-  GlobeIcon,
 } from 'lucide-react';
 
 import { Badge } from '@/ui/components/badge';
@@ -98,8 +97,8 @@ export function SettingsMenu({
           <DropdownMenuGroup>
             <DropdownMenuItem asChild>
               <a href="https://forth.ink/" target="_blank" rel="noopener noreferrer">
-                <GlobeIcon />
-                forth.ink
+                <span className="text-muted-foreground">by</span>
+                <span className="publisher-name">frothink</span>
                 <ExternalLinkIcon className="ml-auto size-3 text-muted-foreground" />
               </a>
             </DropdownMenuItem>
