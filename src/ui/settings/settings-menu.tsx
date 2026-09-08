@@ -7,6 +7,7 @@ import {
   DatabaseBackupIcon,
   ExternalLinkIcon,
   SettingsIcon,
+  GlobeIcon,
 } from 'lucide-react';
 
 import { Badge } from '@/ui/components/badge';
@@ -18,6 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/ui/components/dropdown-menu';
 import { useI18n } from '@/ui/i18n';
 import { helpUrl } from '@/ui/help-links';
@@ -91,6 +93,16 @@ export function SettingsMenu({
                 ) : null}
               </DropdownMenuItem>
             ) : null}
+          </DropdownMenuGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            <DropdownMenuItem asChild>
+              <a href="https://forth.ink/" target="_blank" rel="noopener noreferrer">
+                <GlobeIcon />
+                forth.ink
+                <ExternalLinkIcon className="ml-auto size-3 text-muted-foreground" />
+              </a>
+            </DropdownMenuItem>
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

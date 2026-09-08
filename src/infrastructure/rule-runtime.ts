@@ -1,3 +1,4 @@
+import { updateActionState } from './action-state';
 import { compileDnrRule } from '@/domain/rules/compile-dnr';
 import { createRuleRuntimePlan } from '@/domain/rules/diagnostics';
 import type { Rule, StoredState } from '@/domain/rules/model';
@@ -125,12 +126,19 @@ async function replaceDynamicRules(state: StoredState): Promise<void> {
 }
 
 export async function reconcileDynamicRules(state: StoredState): Promise<void> {
+  const apply = async () => {
+    try {
+      await replaceDynamicRules(state);
+      await updateActionState(state.settings.globallyPaused ? 'paused' : 'active');
+    } catch (error) {
+      await updateActionState('error');
+      throw error;
+    }
+  };
   if (typeof navigator === 'undefined' || !navigator.locks) {
-    await replaceDynamicRules(state);
+    await apply();
     return;
   }
 
-  await navigator.locks.request('mywebrequest-dnr-reconcile', async () => {
-    await replaceDynamicRules(state);
-  });
+  await navigator.locks.request('mywebrequest-dnr-reconcile', apply);
 }

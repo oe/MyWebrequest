@@ -1,10 +1,14 @@
+import { updateActionState } from '@/infrastructure/action-state';
 import { supportsLegacyMigration } from '@/infrastructure/browser-capabilities';
 import { createReconciliationScheduler } from '@/application/reconciliation-scheduler';
 import { reconcileDynamicRules } from '@/infrastructure/rule-runtime';
 import { loadState, RULES_STORAGE_KEY } from '@/infrastructure/rule-store';
 
 async function reconcile(): Promise<void> {
-  const state = await loadState();
+  const state = await loadState().catch(async (error: unknown) => {
+    await updateActionState('error');
+    throw error;
+  });
   await reconcileDynamicRules(state);
 }
 
@@ -28,7 +32,7 @@ export default defineBackground(() => {
   browser.runtime.onStartup.addListener(scheduler.schedule);
 
   browser.storage.onChanged.addListener((changes, areaName) => {
-    if (areaName === 'local' && changes[RULES_STORAGE_KEY]) scheduler.schedule();
+    if (areaName === 'local' && (changes[RULES_STORAGE_KEY] || changes['ui.locale'])) scheduler.schedule();
   });
 
   browser.permissions.onAdded.addListener(scheduler.schedule);
