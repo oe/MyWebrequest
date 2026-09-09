@@ -216,6 +216,9 @@ async function extensionWithFixtureHostAccess(): Promise<{
   return { directory, extensionPath };
 }
 
+// Keep the worker URL stable across the disk-overlay fixture upgrade. Changing
+// it leaves stale event routing on newer Chromium; runtime.reload/unregister is
+// not a portable substitute for extension update activation on Chromium 121.
 async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPath: string }> {
   const directory = await mkdtemp(join(tmpdir(), 'my-webrequest-upgrade-e2e-'));
   const extensionPath = join(directory, 'extension');
@@ -230,17 +233,14 @@ async function legacyUpgradeFixture(): Promise<{ directory: string; extensionPat
           version: browserSupport.chromeLegacyVersion,
           key: browserSupport.chromeStorePublicKey,
           permissions: ['storage'],
-          background: { service_worker: 'legacy-background.js' },
+          background: { service_worker: 'background.js' },
           options_page: 'legacy-options.html',
         },
         null,
         2,
       )}\n`,
     ),
-    writeFile(
-      join(extensionPath, 'legacy-background.js'),
-      'chrome.runtime.onInstalled.addListener(() => {});\n',
-    ),
+    writeFile(join(extensionPath, 'background.js'), 'chrome.runtime.onInstalled.addListener(() => {});\n'),
     writeFile(
       join(extensionPath, 'legacy-options.html'),
       '<!doctype html><html><body><h1>Legacy fixture</h1></body></html>\n',
@@ -971,16 +971,6 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     await launched.close();
 
     await overlayProductionExtension(fixture.extensionPath);
-    launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
-    // A disk overlay changes the worker URL but leaves Chromium's event routing
-    // registered to the legacy worker. Unload that registration, then relaunch
-    // the command-line fixture to model a fully activated extension update.
-    // runtime.reload() can disable a command-line extension in Chrome 121;
-    // unregister only the obsolete worker and preserve the extension installation.
-    const upgradedWorker =
-      launched.context.serviceWorkers()[0] ?? (await launched.context.waitForEvent('serviceworker'));
-    expect(await upgradedWorker.evaluate('self.registration.unregister()')).toBe(true);
-    await launched.close();
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
     const options = await launched.context.newPage();
     await options.goto(`chrome-extension://${extensionId}/options.html`);
