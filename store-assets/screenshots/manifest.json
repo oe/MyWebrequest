@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "request-orbit-1.0.0-chrome.zip",
-      "sourceContentSha256": "382fa7699f66cf5ce94175c9d033362ab28c8dfeb5779295b497ec5c613c5e07",
+      "sourceContentSha256": "bc31bc296f2229d73117c4c71eb17539dcfa3cfb5e6e8fc089e85d4977854faf",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-09T05:46:13.494Z",
+      "capturedAt": "2026-09-09T14:15:25.343Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -36,28 +36,28 @@
         {
           "path": "chrome/04-create-redirect.png",
           "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
-          "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2",
+          "sha256": "a039bfbb3e8be9a4b54ef3f64987877eb727544e64c5f4b1675fd60861cd3910",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/05-host-scope.png",
           "purpose": "Host-only replacement preserves paths and queries within the original origin",
-          "sha256": "0e291459d805185b6aa7ffba1e556f640439ae588891b57dcf7cea169feef59d",
+          "sha256": "fd6574c0060fbbdaf626b77418bd0a101cbabdd080bf414f319f9656d70ee497",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/06-test-urls.png",
           "purpose": "Additional matching and non-matching URL previews",
-          "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685",
+          "sha256": "a69f42440ffe9bd75205ca59acc2c980e49d9d5294248237d4ad3d27a370a4e5",
           "width": 1280,
           "height": 800
         },
         {
           "path": "chrome/07-edit-redirect.png",
           "purpose": "Saved disabled host redirect in the simple editor with creation actions",
-          "sha256": "bf07b4fee4301231a725888a93346ada825df354eb263c3876948b0c3d57054c",
+          "sha256": "1836ff22a79d6eff62f6d92d67afe8ed94a6f212033a4eb83e41047137778935",
           "width": 1280,
           "height": 800
         }
@@ -65,10 +65,10 @@
     },
     "edge": {
       "sourceArtifact": "request-orbit-1.0.0-edge.zip",
-      "sourceContentSha256": "925b54c5b483764d29a7db0a0d2b663d266ddacaba6ff9ea1abb083946b29d11",
+      "sourceContentSha256": "ca04826bc1fa08f7cd57dccd4f8da44ace382fc5bb0bbbc5a396f3e29f69cace",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.66",
-      "capturedAt": "2026-09-09T05:46:22.228Z",
+      "capturedAt": "2026-09-09T14:15:34.738Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -108,7 +108,7 @@
         {
           "path": "edge/06-test-urls.png",
           "purpose": "Additional matching and non-matching URL previews",
-          "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9",
+          "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685",
           "width": 1280,
           "height": 800
         },
@@ -123,10 +123,10 @@
     },
     "firefox": {
       "sourceArtifact": "request-orbit-1.0.0-firefox.zip",
-      "sourceContentSha256": "fed4340064f79a37f3f021c6de2ba23242366c6aeeee462ac8ae9f1c693979b4",
+      "sourceContentSha256": "804d5eadcce7027050e8e686c5622cb0d672b1897c91ef6c492e285b99d11076",
       "browserName": "Firefox",
       "browserVersion": "155.0.1",
-      "capturedAt": "2026-09-09T05:46:32.294Z",
+      "capturedAt": "2026-09-09T14:16:12.428Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",

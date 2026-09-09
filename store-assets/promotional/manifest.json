@@ -9,19 +9,19 @@
     {
       "path": "store-assets/screenshots/chrome/04-create-redirect.png",
       "purpose": "Real rules editor UI used in promotional artwork",
-      "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2"
+      "sha256": "a039bfbb3e8be9a4b54ef3f64987877eb727544e64c5f4b1675fd60861cd3910"
     },
     {
       "path": "store-assets/screenshots/chrome/05-host-scope.png",
       "purpose": "Real permission UI used in marquee artwork",
-      "sha256": "0e291459d805185b6aa7ffba1e556f640439ae588891b57dcf7cea169feef59d"
+      "sha256": "fd6574c0060fbbdaf626b77418bd0a101cbabdd080bf414f319f9656d70ee497"
     }
   ],
   "generatedWith": {
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-09T05:46:33.626Z",
+  "generatedAt": "2026-09-09T14:16:13.938Z",
   "assets": [
     {
       "path": "src/public/icon/16.png",
@@ -68,21 +68,21 @@
     {
       "path": "store-assets/promotional/chrome/small-promo-440x280.png",
       "purpose": "Chrome small promotional tile",
-      "sha256": "d4e660b3b7f3d9fda3a857001b0a8b5710e8a8b50ad448ac4892b1f0f7620d32",
+      "sha256": "74da0e7a59722525209fe56cf857f9bbaf161de0c3c90693746996f820c5f28a",
       "width": 440,
       "height": 280
     },
     {
       "path": "store-assets/promotional/chrome/marquee-promo-1400x560.png",
       "purpose": "Chrome marquee promotional tile",
-      "sha256": "4606ca7ea59d5354a517e47d5c54e399ff5dfa73f14e146255b109874aab6e0b",
+      "sha256": "1b24d4e80adf447b72cb448b4f97baea7447532d8c731f62bfcd3d8e845248dd",
       "width": 1400,
       "height": 560
     },
     {
       "path": "store-assets/promotional/edge/small-promo-440x280.png",
       "purpose": "Edge small promotional tile",
-      "sha256": "818a11d8211a95c8f27d2b8212e0d5c2ca8fd0b2341c7975f3c9f5d133899f30",
+      "sha256": "3c5077418f6b7e2db613bf73aa652500e0340b59b2bdc0ee88c4858b5ad224ea",
       "width": 440,
       "height": 280
     }

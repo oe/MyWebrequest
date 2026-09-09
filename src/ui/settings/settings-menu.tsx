@@ -98,7 +98,7 @@ export function SettingsMenu({
             <DropdownMenuItem asChild>
               <a href="https://forth.ink/" target="_blank" rel="noopener noreferrer">
                 <span className="text-muted-foreground">by</span>
-                <span className="publisher-name">frothink</span>
+                <span className="publisher-name">forthink</span>
                 <ExternalLinkIcon className="ml-auto size-3 text-muted-foreground" />
               </a>
             </DropdownMenuItem>

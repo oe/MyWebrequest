@@ -80,13 +80,13 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
     .getByRole('button', { name: 'Settings', exact: true })
     .filter({ visible: true })
     .click();
-  const forth = extensionPage.getByRole('menuitem', { name: 'by frothink' });
+  const forth = extensionPage.getByRole('menuitem', { name: 'by forthink' });
   await expect(forth).toHaveAttribute('href', 'https://forth.ink/');
   await expect(forth).toHaveAttribute('target', '_blank');
   await expect
     .poll(() =>
       forth.locator('.publisher-name').evaluate(async (element) => {
-        await document.fonts.load('16px "Borel Brand"', 'frothink');
+        await document.fonts.load('16px "Borel Brand"', 'forthink');
         return getComputedStyle(element).fontFamily;
       }),
     )
@@ -105,7 +105,7 @@ test('popup pause persists in toolbar and settings expose forth.ink', async ({
     .getByRole('button', { name: 'Settings', exact: true })
     .filter({ visible: true })
     .click();
-  await expect(extensionPage.getByRole('menuitem', { name: 'by frothink' })).toBeVisible();
+  await expect(extensionPage.getByRole('menuitem', { name: 'by forthink' })).toBeVisible();
   await extensionPage.screenshot({ path: `${evidence}/settings-narrow.png`, animations: 'disabled' });
   expect(await extensionPage.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   expect(errors).toEqual([]);
