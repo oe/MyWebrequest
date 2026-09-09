@@ -27,38 +27,38 @@ async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
 
 // Older external Chromium can start a worker before Playwright attaches over
 // CDP and never expose that target as a Worker. Restart only that extension's
-// worker through CDP, then wake it through the real runtime message handler.
-// This runs before tests install counters or inject faults.
+// worker through CDP. This also works before any extension page is opened and
+// runs before tests install counters or inject faults.
 async function recoverUnobservedWorker(context: BrowserContext, extensionId?: string): Promise<void> {
-  const page = context.pages().find((candidate) => {
-    const url = candidate.url();
-    return extensionId
-      ? url.startsWith(`chrome-extension://${extensionId}/`)
-      : url.startsWith('chrome-extension://');
-  });
-  if (!page) return;
-  const origin = new URL(page.url()).host;
+  const existing = context.pages()[0];
+  const page = existing ?? (await context.newPage());
   const session = await context.newCDPSession(page);
   try {
-    const version = await new Promise<{ versionId: string } | undefined>((resolve, reject) => {
-      const timer = setTimeout(() => resolve(undefined), 3_000);
-      session.on('ServiceWorker.workerVersionUpdated', ({ versions }) => {
-        const candidate = versions.find((item) => item.scriptURL.startsWith(`chrome-extension://${origin}/`));
-        if (!candidate) return;
-        clearTimeout(timer);
-        resolve({ versionId: candidate.versionId });
-      });
-      void session.send('ServiceWorker.enable').catch((error: unknown) => {
-        clearTimeout(timer);
-        reject(error);
-      });
-    });
-    if (version) await session.send('ServiceWorker.stopWorker', version);
-    await page.evaluate(() =>
-      chrome.runtime.sendMessage({ type: 'requestorbit.runtime.v1', operation: 'snapshot' }),
+    const version = await new Promise<{ versionId: string; scriptURL: string } | undefined>(
+      (resolve, reject) => {
+        const timer = setTimeout(() => resolve(undefined), 3_000);
+        session.on('ServiceWorker.workerVersionUpdated', ({ versions }) => {
+          const candidate = versions.find((item) =>
+            item.scriptURL.startsWith(
+              extensionId ? `chrome-extension://${extensionId}/` : 'chrome-extension://',
+            ),
+          );
+          if (!candidate) return;
+          clearTimeout(timer);
+          resolve({ versionId: candidate.versionId, scriptURL: candidate.scriptURL });
+        });
+        void session.send('ServiceWorker.enable').catch((error: unknown) => {
+          clearTimeout(timer);
+          reject(error);
+        });
+      },
     );
+    if (!version) return;
+    await session.send('ServiceWorker.stopWorker', { versionId: version.versionId });
+    await session.send('ServiceWorker.startWorker', { scopeURL: new URL('.', version.scriptURL).href });
   } finally {
     await session.detach();
+    if (!existing) await page.close();
   }
 }
 
