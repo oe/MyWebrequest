@@ -4,7 +4,7 @@ A local-first browser extension for creating, testing, and managing request rule
 uses Manifest V3, WXT, React, TypeScript, Tailwind CSS, and shadcn's default `radix-nova` style with a
 restrained translucent material layer.
 
-The active release objective and milestone gates are documented in [GOAL.md](GOAL.md).
+Start with the [documentation index](docs/README.md) for product, architecture, migration, and release guidance.
 
 ## Implemented baseline
 
@@ -41,11 +41,10 @@ The active release objective and milestone gates are documented in [GOAL.md](GOA
 - Disabled starter-rule onboarding plus a six-language Astro 7 product and help site with tested Redirect
   recipes and a legacy breaking-change/alternative guide
 
-The current stable-browser matrix and Firefox 142 floor are certified. Chrome 121, Edge 121, signed legacy
-upgrade, and store-portal acceptance remain release gates. See [PRODUCT_SPEC.md](PRODUCT_SPEC.md),
-[ARCHITECTURE.md](ARCHITECTURE.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md), [MIGRATION.md](MIGRATION.md),
-[PRIVACY.md](PRIVACY.md), and [STORE_LISTING.md](STORE_LISTING.md). Use
-[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md) for installed-browser and store certification.
+Chrome, Edge, and Firefox have build targets and historical runtime verification. Historical passes do
+not certify the current commit or newly built archives. The [release checklist](docs/release/RELEASE_CHECKLIST.md)
+owns candidate acceptance, including browser floors, signed legacy upgrade, artifact provenance, CI, and
+store approval. See the [browser policy](docs/release/BROWSER_SUPPORT.md) and [privacy statement](PRIVACY.md).
 
 ## Support
 

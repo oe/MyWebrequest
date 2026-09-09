@@ -2,7 +2,7 @@
 
 Status: Implemented and regression-tested; signed-store upgrade validation pending
 Last updated: 2026-09-06
-Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
+Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [DESIGN_BRIEF.md](archive/DESIGN_BRIEF.md)
 
 ## 1. Migration promise
 

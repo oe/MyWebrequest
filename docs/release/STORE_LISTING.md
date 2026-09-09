@@ -39,7 +39,7 @@ release.
 
 ## Permission disclosure
 
-The listing must use the explanations in [PRIVACY.md](PRIVACY.md) verbatim in meaning. Screenshots must
+The listing must use the explanations in [PRIVACY.md](../../PRIVACY.md) verbatim in meaning. Screenshots must
 show the actual rule manager, permission explanation, and backup entry point from each browser's exact
 checksummed release artifact. A migration review image is Chrome-only and should be added only when it helps
 existing Chrome users. Do not claim Chrome, Edge, or Firefox support until that browser's installed-extension
@@ -51,5 +51,5 @@ Edge uses its own 440x280 copy. Do not substitute an unrelated symbol or upload 
 promotional artwork.
 
 The listing and promotional PNGs were refreshed from the current archives on 2026-09-06 and passed
-the local provenance audit. They remain unsubmitted. See [store-assets/REFRESH_BRIEF.md](store-assets/REFRESH_BRIEF.md)
+the local provenance audit. They remain unsubmitted. See [store-assets/REFRESH_BRIEF.md](../../store-assets/REFRESH_BRIEF.md)
 for the story and remaining localization work. Re-run the audit against the final archives before uploading.

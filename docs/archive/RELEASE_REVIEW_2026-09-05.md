@@ -1,5 +1,7 @@
 # 发布复核：暂不发布
 
+> Historical snapshot, archived 2026-09-09. Statements and results apply only to the original review or candidate; they are not current requirements or release certification. See the [documentation index](../README.md) for maintained guidance.
+
 日期：2026-09-05。审查基线为本地 `becf259`，工作区开始时干净；本轮另准备了商店文案与图片更新要求。
 本报告不等同于当前安装包的真机签字，不代表已上传、推送或部署。
 
@@ -35,7 +37,7 @@
 
 ## 素材已准备到哪一步
 
-已准备 [五图分镜与拍摄要求](store-assets/REFRESH_BRIEF.md)，六语言商店主文案和扩展简介已同步定位。
+已准备 [五图分镜与拍摄要求](../../store-assets/REFRESH_BRIEF.md)，六语言商店主文案和扩展简介已同步定位。
 实际 PNG 尚未更新，现有截图、轮播、宣传图与官网图仍是旧素材。
 下一步必须采集当前真实 UI；不能仅修改旧图的版本、时间或哈希来让审计通过。
 

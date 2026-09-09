@@ -3,7 +3,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 const root = process.cwd();
-const listing = readFileSync(join(root, 'STORE_LISTING.md'), 'utf8');
+const listing = readFileSync(join(root, 'docs/release/STORE_LISTING.md'), 'utf8');
 const privacy = readFileSync(join(root, 'PRIVACY.md'), 'utf8');
 const localeRoot = join(root, 'src/public/_locales');
 const listingLocaleRoot = join(root, 'store-assets/listing');

@@ -1,5 +1,7 @@
 # 普通用户 URL 重定向体验评估
 
+> Historical snapshot, archived 2026-09-09. Statements and results apply only to the original review or candidate; they are not current requirements or release certification. See the [documentation index](../README.md) for maintained guidance.
+
 日期：2026-09-05
 
 实施进展：已增加两网址创建与编辑、精确／整站范围选择、原生域名替换和多个可编辑测试网址。只有两网址仅主机名不同时提供整站替换，限定原协议、主机名和端口，保留路径及参数。简单规则再次打开显示范围与跳转说明；手写规则可借助网址示例生成候选，比较后应用到草稿，再走现有保存流程。新建表单默认启用，用户可关闭后保存为禁用；启用保存复用权限和冲突检查。普通精确匹配不使用正则；包含过滤器特殊字符时回退正则以保持语义。下表保留改动前的评估；路径范围、更多日常模板及普通用户实测仍待后续完成。
@@ -23,10 +25,10 @@
 
 代码依据：
 
-- [默认规则和 API 示例](src/application/rule-service.ts)：`createRule()` 默认 `block`；`redirect-local` 默认 `xmlhttprequest`、`app.example.com` 和 `localhost:3000/v1/$1`。
-- [规则编辑器](src/ui/rules/rule-editor.tsx)：字段依次包含名称、匹配语法、资源类型、动作，再出现重定向目标。
-- [URL 预览](src/domain/rules/test-match.ts)：验证规则与 URL 模式，未模拟真实请求的资源类型、来源及其他规则。
-- [工具栏弹窗](src/ui/surfaces/popup-app.tsx)：当前只保留页面 origin，调用通用的默认拦截规则工厂，无法直接以完整当前网址创建跳转。
+- [默认规则和 API 示例](../../src/application/rule-service.ts)：`createRule()` 默认 `block`；`redirect-local` 默认 `xmlhttprequest`、`app.example.com` 和 `localhost:3000/v1/$1`。
+- [规则编辑器](../../src/ui/rules/rule-editor.tsx)：字段依次包含名称、匹配语法、资源类型、动作，再出现重定向目标。
+- [URL 预览](../../src/domain/rules/test-match.ts)：验证规则与 URL 模式，未模拟真实请求的资源类型、来源及其他规则。
+- [工具栏弹窗](../../src/ui/surfaces/popup-app.tsx)：当前只保留页面 origin，调用通用的默认拦截规则工厂，无法直接以完整当前网址创建跳转。
 
 ## 建议先交付的一轮
 

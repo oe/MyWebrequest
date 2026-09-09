@@ -1,15 +1,16 @@
 # RequestOrbit Product Specification
 
-Status: Approved baseline; implementation in progress
-Last updated: 2026-09-04
+Status: Maintained product requirements; release acceptance is tracked separately
+Last updated: 2026-09-09
 Owners: Product and engineering
-Related documents: [GOAL.md](GOAL.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md),
-[DESIGN_BRIEF.md](DESIGN_BRIEF.md)
+Related documents: [Release checklist](release/RELEASE_CHECKLIST.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md),
+[DESIGN_BRIEF.md](archive/DESIGN_BRIEF.md)
 
 ## 1. Product definition
 
-RequestOrbit is a local-first browser extension for developers and advanced users who need to create,
-test, enable, and manage request-handling rules without editing raw extension manifests or DNR JSON.
+RequestOrbit is a local-first browser extension for people who want to choose where URLs lead.
+The primary workflow creates and edits redirects using an original URL, a destination URL, and a clear scope.
+Request headers, regex, and other request-handling controls remain advanced capabilities.
 
 The extension has one purpose:
 
@@ -24,9 +25,8 @@ identify the legacy Chrome release or compatibility identifiers that cannot safe
 
 ### Primary users
 
-- Front-end and full-stack developers testing redirects or request behavior.
-- QA and support engineers reproducing site-specific networking conditions.
-- Advanced users maintaining a small number of persistent URL rules.
+- People maintaining personal URL redirects without learning matching syntax.
+- Advanced users who also need persistent blocking, HTTPS upgrades, or request-header rules.
 
 ### Primary jobs
 
@@ -175,7 +175,10 @@ identify the legacy Chrome release or compatibility identifiers that cannot safe
 
 ### Rule editor
 
-- Use a Basic mode for URL filter, resource type, and common actions.
+- Lead with a two-address redirect builder for creation and recognizable existing redirects.
+- Offer exact URL, single-path query-preserving, and host replacement scopes with eligibility checks.
+- New redirect forms default to Enabled; saving uses the normal permission and conflict checks.
+- Keep URL filters, resource types, and other actions available in the advanced editor.
 - Use an Advanced section for regex, initiator domains, methods, and priority.
 - Display required permissions before save/enable.
 - Keep test input and result visible while editing.
@@ -238,4 +241,16 @@ V1 is complete only when:
 - Do not add a side panel until a validated workflow requires persistent in-page UI.
 - Do not add sync or telemetry without a new product/privacy review.
 - Visual direction selected: the split-pane rule-manager structure with shadcn's default
-  `radix-nova` visual language, neutral palette, Geist typography, and restrained semantic color.
+  `radix-nova` visual language, neutral palette, system-font typography, and restrained semantic color.
+
+## 11. Delivery contracts
+
+These constraints consolidate the former V1 goal; its original milestone plan is [archived](archive/GOAL.md).
+
+- Stored rules, granted permissions, installed DNR rules, and displayed state must converge after edits, startup, and worker restart.
+- Maintain one current rule model; accept legacy formats only at migration and import boundaries.
+- Preserve every legacy item as a converted rule or exportable record without silently broadening or enabling it. See [migration](MIGRATION.md) for compatibility details.
+- Cover English, Simplified Chinese, Korean, Japanese, French, and Spanish; fail CI for missing release-locale strings and use `Intl` for localized values.
+- Keep help routes and onboarding examples validated, with disabled starter rules and clear permission explanations.
+- Run the quality gate on Node 24 and produce reproducible artifacts. Browser claims require installed-extension evidence and applicable store validation.
+- Track unresolved browser floors, signed legacy upgrade, artifact provenance, CI, and portal acceptance in the [release checklist](release/RELEASE_CHECKLIST.md). Store submission is a separate authorized operation.

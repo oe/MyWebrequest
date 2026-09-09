@@ -1,8 +1,10 @@
 # RequestOrbit Design Brief
 
+> Historical snapshot, archived 2026-09-09. Statements and results apply only to the original review or candidate; they are not current requirements or release certification. See the [documentation index](../README.md) for maintained guidance.
+
 Status: Direction selected and implemented as the V1 UI baseline  
 Last updated: 2026-08-31  
-Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md), [MIGRATION.md](MIGRATION.md)
+Related documents: [PRODUCT_SPEC.md](../PRODUCT_SPEC.md), [ARCHITECTURE.md](../ARCHITECTURE.md), [MIGRATION.md](../MIGRATION.md)
 
 ## 1. Design target
 

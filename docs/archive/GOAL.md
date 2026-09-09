@@ -1,10 +1,12 @@
 # RequestOrbit V1 Goal
 
+> Historical snapshot, archived 2026-09-09. Statements and results apply only to the original review or candidate; they are not current requirements or release certification. See the [documentation index](../README.md) for maintained guidance.
+
 Status: Active delivery goal  
 Last updated: 2026-09-03
-Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [ARCHITECTURE.md](ARCHITECTURE.md),
-[MIGRATION.md](MIGRATION.md), [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md),
-[RELEASE_CHECKLIST.md](RELEASE_CHECKLIST.md)
+Related documents: [PRODUCT_SPEC.md](../PRODUCT_SPEC.md), [ARCHITECTURE.md](../ARCHITECTURE.md),
+[MIGRATION.md](../MIGRATION.md), [BROWSER_SUPPORT.md](../release/BROWSER_SUPPORT.md),
+[RELEASE_CHECKLIST.md](../release/RELEASE_CHECKLIST.md)
 
 ## Outcome
 

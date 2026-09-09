@@ -1,8 +1,8 @@
-# RequestOrbit 2 Architecture
+# RequestOrbit Architecture
 
 Status: Approved implementation baseline  
-Last updated: 2026-09-01  
-Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.md), [DESIGN_BRIEF.md](DESIGN_BRIEF.md)
+Last updated: 2026-09-09  
+Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.md), [DESIGN_BRIEF.md](archive/DESIGN_BRIEF.md)
 
 ## 1. Architectural goals
 
@@ -33,65 +33,29 @@ Related documents: [PRODUCT_SPEC.md](PRODUCT_SPEC.md), [MIGRATION.md](MIGRATION.
 Exact dependency versions are pinned in the committed lockfile and upgraded only through the complete
 quality gate. `latest` ranges are not permitted.
 
-## 3. Repository target shape
+## 3. Repository layout
+
+Paths below are relative to the repository root.
 
 ```text
 src/
-  entrypoints/
-    background.ts
-    popup/
-      index.html
-      main.tsx
-      style.css
-    options/
-      index.html
-      main.tsx
-      style.css
-  domain/
-    rules/
-      model.ts
-      schema.ts
-      validate.ts
-      compile-dnr.ts
-      conflicts.ts
-      test-match.ts
-    migration/
-      legacy-schema.ts
-      parse-legacy.ts
-      classify.ts
-  application/
-    rule-service.ts
-    permission-service.ts
-    migration-service.ts
-    transfer-service.ts
-  infrastructure/
-    chrome-dnr.ts
-    chrome-storage.ts
-    chrome-permissions.ts
-    legacy-local-storage.ts
-  ui/
-    components/
-    hooks/
-    rules/
-    surfaces/
-      options-app.tsx
-      popup-app.tsx
-    styles.css
-  public/
-    _locales/
-    icon/
+  entrypoints/       # Extension bootstrap and page entrypoints
+  domain/           # Rule model, validation, matching, DNR, migration
+  application/      # Rule services, runtime controller, transactions, recovery
+  infrastructure/   # Browser runtime, storage, messaging, preferences
+  ui/               # Components, hooks, rule editor, popup and options
+  public/           # Manifest locales, icons, licenses
+site/               # Static product and help website
+scripts/            # Build, audit, browser verification, asset tools
 tests/
   fixtures/
   unit/
-  integration/
   e2e/
-site/
-  src/
-    assets/
-    components/
-    layouts/
-    pages/
-    styles/
+docs/               # Maintained product, architecture and migration guidance
+  release/          # Browser policy, release gates and store listing
+  archive/          # Dated plans and verification records
+store-assets/       # Artwork sources, localized listings and provenance
+patches/            # Dependency patches used by pnpm
 ```
 
 WXT uses `src/` as its source root. Entrypoints contain only browser/page bootstrap adapters; UI composition,
@@ -170,7 +134,7 @@ for unbounded initiator access.
 WXT generates the manifest from a browser-aware function. Firefox MV3 additionally declares a stable
 Gecko extension ID and `data_collection_permissions.required: ["none"]`; the latter truthfully reflects
 the local-only architecture and is required for new AMO submissions. Chrome and Edge share the Chromium
-manifest shape. See [BROWSER_SUPPORT.md](BROWSER_SUPPORT.md) for release gates.
+manifest shape. See [BROWSER_SUPPORT.md](release/BROWSER_SUPPORT.md) for release gates.
 
 Rules:
 

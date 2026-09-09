@@ -1,5 +1,7 @@
 # Runtime optimization verification — 2026-09-08
 
+> Historical snapshot, archived 2026-09-09. Statements and results apply only to the original review or candidate; they are not current requirements or release certification. See the [documentation index](../README.md) for maintained guidance.
+
 The background now owns routine rule commits, records a temporary recovery intent before changing DNR,
 and completes interrupted commits after restart. A lost response channel is resolved by reading the
 committed outcome; the client does not blindly replay the write. Concurrent stale writes are rejected.
