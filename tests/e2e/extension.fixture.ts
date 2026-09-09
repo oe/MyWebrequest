@@ -25,6 +25,43 @@ async function isMyWebrequestWorker(worker: Worker): Promise<boolean> {
   return worker.evaluate(() => chrome.runtime?.getManifest().name === 'RequestOrbit').catch(() => false);
 }
 
+// Older external Chromium can start a worker before Playwright attaches over
+// CDP and never expose that target as a Worker. Restart only that extension's
+// worker through CDP, then wake it through the real runtime message handler.
+// This runs before tests install counters or inject faults.
+async function recoverUnobservedWorker(context: BrowserContext, extensionId?: string): Promise<void> {
+  const page = context.pages().find((candidate) => {
+    const url = candidate.url();
+    return extensionId
+      ? url.startsWith(`chrome-extension://${extensionId}/`)
+      : url.startsWith('chrome-extension://');
+  });
+  if (!page) return;
+  const origin = new URL(page.url()).host;
+  const session = await context.newCDPSession(page);
+  try {
+    const version = await new Promise<{ versionId: string } | undefined>((resolve, reject) => {
+      const timer = setTimeout(() => resolve(undefined), 3_000);
+      session.on('ServiceWorker.workerVersionUpdated', ({ versions }) => {
+        const candidate = versions.find((item) => item.scriptURL.startsWith(`chrome-extension://${origin}/`));
+        if (!candidate) return;
+        clearTimeout(timer);
+        resolve({ versionId: candidate.versionId });
+      });
+      void session.send('ServiceWorker.enable').catch((error: unknown) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
+    if (version) await session.send('ServiceWorker.stopWorker', version);
+    await page.evaluate(() =>
+      chrome.runtime.sendMessage({ type: 'requestorbit.runtime.v1', operation: 'snapshot' }),
+    );
+  } finally {
+    await session.detach();
+  }
+}
+
 export async function findExtensionWorker(
   context: BrowserContext,
   expectedExtensionId?: string,
@@ -34,9 +71,15 @@ export async function findExtensionWorker(
       ? Promise.resolve(new URL(worker.url()).host === expectedExtensionId)
       : isMyWebrequestWorker(worker);
   const deadline = Date.now() + 30_000;
+  let recovered = false;
   while (Date.now() < deadline) {
     for (const worker of context.serviceWorkers()) {
       if (await matches(worker)) return worker;
+    }
+    if (!recovered && process.env.MWR_CHROMIUM_EXECUTABLE_PATH) {
+      recovered = true;
+      await recoverUnobservedWorker(context, expectedExtensionId);
+      continue;
     }
     const remaining = deadline - Date.now();
     if (remaining <= 0) break;
