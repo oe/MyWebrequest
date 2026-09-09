@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "request-orbit-1.0.0-chrome.zip",
-      "sourceContentSha256": "3ad62d76d3dd54efede57d462eb60cb01d0be6771e213ba8e25279fcedc7b29f",
+      "sourceContentSha256": "382fa7699f66cf5ce94175c9d033362ab28c8dfeb5779295b497ec5c613c5e07",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-09T04:52:00.270Z",
+      "capturedAt": "2026-09-09T05:46:13.494Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -36,7 +36,7 @@
         {
           "path": "chrome/04-create-redirect.png",
           "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
-          "sha256": "454ee669dc6afe20c0c4176fa6ace4012d2b41a9aea2fcfc627db7c9b4de4a02",
+          "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2",
           "width": 1280,
           "height": 800
         },
@@ -65,10 +65,10 @@
     },
     "edge": {
       "sourceArtifact": "request-orbit-1.0.0-edge.zip",
-      "sourceContentSha256": "8fac032623881a39e16c780d8e1e3a1a172fc2b063af823e9baf4052b27997b5",
+      "sourceContentSha256": "925b54c5b483764d29a7db0a0d2b663d266ddacaba6ff9ea1abb083946b29d11",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.66",
-      "capturedAt": "2026-09-09T04:52:09.395Z",
+      "capturedAt": "2026-09-09T05:46:22.228Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -94,7 +94,7 @@
         {
           "path": "edge/04-create-redirect.png",
           "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
-          "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2",
+          "sha256": "454ee669dc6afe20c0c4176fa6ace4012d2b41a9aea2fcfc627db7c9b4de4a02",
           "width": 1280,
           "height": 800
         },
@@ -123,10 +123,10 @@
     },
     "firefox": {
       "sourceArtifact": "request-orbit-1.0.0-firefox.zip",
-      "sourceContentSha256": "49bba0fba7fa200a4ad9ab1016f3ecbaaa4be37bab4bfa11e96f9e69a6359d1b",
+      "sourceContentSha256": "fed4340064f79a37f3f021c6de2ba23242366c6aeeee462ac8ae9f1c693979b4",
       "browserName": "Firefox",
       "browserVersion": "155.0.1",
-      "capturedAt": "2026-09-09T04:52:19.734Z",
+      "capturedAt": "2026-09-09T05:46:32.294Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",

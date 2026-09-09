@@ -595,10 +595,20 @@ test('appearance follows the system and stays synchronized across extension surf
   await expect(options.locator('html')).not.toHaveClass(/dark/);
 
   const popup = await context.newPage();
+  await popup.setViewportSize({ width: 380, height: 440 });
   await popup.emulateMedia({ colorScheme: 'dark' });
   await popup.goto(`chrome-extension://${extensionId}/popup.html`);
   await expect(popup.locator('html')).toHaveAttribute('data-theme', 'light');
   await popup.getByRole('button', { name: 'Appearance', exact: true }).click();
+  const themeItems = popup.getByRole('menuitemradio');
+  await expect(themeItems).toHaveCount(3);
+  const rowHeights = await themeItems.evaluateAll((items) =>
+    items.map((item) => (item as HTMLElement).offsetHeight),
+  );
+  expect(new Set(rowHeights).size).toBe(1);
+  const menuBounds = await popup.getByRole('menu').boundingBox();
+  expect(menuBounds!.x).toBeGreaterThanOrEqual(8);
+  expect(menuBounds!.x + menuBounds!.width).toBeLessThanOrEqual(372);
   await popup.getByRole('menuitemradio', { name: 'Dark', exact: true }).click();
 
   await expect(popup.locator('html')).toHaveAttribute('data-theme', 'dark');

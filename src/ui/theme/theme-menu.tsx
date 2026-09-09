@@ -40,7 +40,12 @@ function ThemeChoices({ inset = false }: { inset?: boolean }) {
       {choices.map((choice) => {
         const Icon = choice.icon;
         return (
-          <DropdownMenuRadioItem key={choice.value} value={choice.value} inset={inset}>
+          <DropdownMenuRadioItem
+            key={choice.value}
+            value={choice.value}
+            inset={inset}
+            className="whitespace-nowrap"
+          >
             <Icon />
             {t(choice.label)}
           </DropdownMenuRadioItem>
@@ -74,7 +79,11 @@ export function ThemeMenu({ variant = 'standalone' }: { variant?: 'standalone' |
           <PreferenceIcon preference={preference} />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-40">
+      <DropdownMenuContent
+        align="end"
+        collisionPadding={8}
+        className="w-max max-w-[calc(100vw-1rem)] min-w-48"
+      >
         <DropdownMenuLabel>{t('theme')}</DropdownMenuLabel>
         <ThemeChoices />
       </DropdownMenuContent>
