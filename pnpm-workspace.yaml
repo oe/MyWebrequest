@@ -14,5 +14,9 @@ auditConfig:
     # ICNS, JXL, and HEIF entries that could otherwise stall the parser.
     - GHSA-w3rx-r6r6-pgpr
     - GHSA-5p2g-fcmc-qvqq
+    # adm-zip has no published fix yet. The patch rejects existing destination
+    # symlinks; the security gate tests every extraction API before auditing.
+    - GHSA-vwc7-r8mq-g2x9
 patchedDependencies:
+  adm-zip@0.6.0: patches/adm-zip@0.6.0.patch
   image-size@2.0.2: patches/image-size@2.0.2.patch

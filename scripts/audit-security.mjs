@@ -5,15 +5,21 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 await import('./verify-image-size-patch.mjs');
+await import('./verify-adm-zip-patch.mjs');
 
 const root = process.cwd();
-const expectedAdvisories = new Set(['GHSA-5p2g-fcmc-qvqq', 'GHSA-w3rx-r6r6-pgpr']);
+const advisoryPackages = new Map([
+  ['GHSA-5p2g-fcmc-qvqq', ['image-size', '2.0.2', 'high']],
+  ['GHSA-w3rx-r6r6-pgpr', ['image-size', '2.0.2', 'high']],
+  ['GHSA-vwc7-r8mq-g2x9', ['adm-zip', '0.6.0', 'moderate']],
+]);
+const expectedAdvisories = new Set(advisoryPackages.keys());
 const workspaceSource = await readFile(join(root, 'pnpm-workspace.yaml'), 'utf8');
 const configuredIgnores = new Set(workspaceSource.match(/GHSA-[a-z0-9-]+/g) ?? []);
 assert.deepEqual(
   [...configuredIgnores].sort(),
   [...expectedAdvisories].sort(),
-  'The audit allowlist must contain only the two locally patched image-size advisories.',
+  'The audit allowlist must contain only the explicitly verified local dependency patches.',
 );
 
 function withoutAuditAllowlist(source) {
@@ -59,7 +65,7 @@ try {
     assert.deepEqual(report.metadata?.vulnerabilities, {
       info: 0,
       low: 0,
-      moderate: 0,
+      moderate: 1,
       high: 2,
       critical: 0,
     });
@@ -73,12 +79,13 @@ try {
     });
   }
   for (const advisory of advisories) {
-    assert.equal(advisory.module_name, 'image-size');
-    assert.equal(advisory.severity, 'high');
+    const [name, version, severity] = advisoryPackages.get(advisory.github_advisory_id);
+    assert.equal(advisory.module_name, name);
+    assert.equal(advisory.severity, severity);
     assert.ok(advisory.findings?.length > 0, `${advisory.github_advisory_id} has no dependency path.`);
     assert.ok(
       advisory.findings.every(
-        (finding) => finding.version === '2.0.2' && finding.dev === true && finding.bundled === false,
+        (finding) => finding.version === version && finding.dev === true && finding.bundled === false,
       ),
       `${advisory.github_advisory_id} escaped the expected patched build-only dependency boundary.`,
     );
@@ -86,8 +93,8 @@ try {
 
   console.log(
     registryReportsKnownAdvisories
-      ? 'Unignored audit contains only the two exact build-time image-size advisories covered by the verified local patch.'
-      : 'The registry currently reports a clean lockfile; the image-size parser hardening remains verified.',
+      ? 'Unignored audit contains only the exact build-time advisories covered by verified local patches.'
+      : 'The registry currently reports a clean lockfile; local dependency patches remain verified.',
   );
 } finally {
   await rm(auditRoot, { recursive: true, force: true });

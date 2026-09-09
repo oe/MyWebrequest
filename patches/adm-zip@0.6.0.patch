@@ -1,0 +1,63 @@
+diff --git a/adm-zip.js b/adm-zip.js
+index d62438b99ad2c8abb1c29506a87c36fd63573683..17cb630a8af5968b117436ad9eff6121ca2656ac 100644
+--- a/adm-zip.js
++++ b/adm-zip.js
+@@ -835,6 +835,15 @@ module.exports = function (/**String*/ input, /** object */ options) {
+             const getPath = (entry) => sanitize(targetPath, pth.normalize(canonical(entry.entryName)));
+             const getError = (msg, file) => new Error(msg + ': "' + file + '"');
+ 
++            // Fail through the callback/Promise contract before asynchronous work
++            // starts; sanitize rejects destination symlinks for every entry.
++            try {
++                _zip.entries.forEach(getPath);
++            } catch (error) {
++                callback(error);
++                return;
++            }
++
+             // separate directories from files
+             const dirEntries = [];
+             const fileEntries = [];
+diff --git a/util/utils.js b/util/utils.js
+index 8b8efaed31d64a4aa456d4b0905fac2599805ffe..eac7d14d95aeb6471be42358992ea8ac78de1461 100644
+--- a/util/utils.js
++++ b/util/utils.js
+@@ -337,6 +337,25 @@ Utils.findLast = function (arr, callback) {
+     return void 0;
+ };
+ 
++// Reject pre-existing destination links, including dangling links and directory
++// components. Callers must still use private extraction directories: filesystem
++// path checks cannot exclude concurrent replacement of parent directories.
++function assertNoDestinationLinks(root, destination) {
++    const parts = pth.relative(root, destination).split(pth.sep).filter(Boolean);
++    let current = root;
++    for (let i = -1; i < parts.length; i++) {
++        if (i >= 0) current = pth.join(current, parts[i]);
++        try {
++            if (fsystem.lstatSync(current).isSymbolicLink()) {
++                throw new Error("Refusing ZIP extraction through symbolic link: " + current);
++            }
++        } catch (error) {
++            if (error.code !== "ENOENT") throw error;
++        }
++    }
++    return destination;
++}
++
+ // make absolute paths taking prefix as root folder
+ Utils.sanitize = function (/*string*/ prefix, /*string*/ name) {
+     prefix = pth.resolve(pth.normalize(prefix));
+@@ -344,10 +363,10 @@ Utils.sanitize = function (/*string*/ prefix, /*string*/ name) {
+     for (var i = 0, l = parts.length; i < l; i++) {
+         var path = pth.normalize(pth.join(prefix, parts.slice(i, l).join(pth.sep)));
+         if (path === prefix || path.startsWith(prefix + pth.sep)) {
+-            return path;
++            return assertNoDestinationLinks(prefix, path);
+         }
+     }
+-    return pth.normalize(pth.join(prefix, pth.basename(name)));
++    return assertNoDestinationLinks(prefix, pth.normalize(pth.join(prefix, pth.basename(name))));
+ };
+ 
+ // converts buffer, Uint8Array, string types to buffer

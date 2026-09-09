@@ -10,7 +10,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-06T17:17:48.475Z",
+  "generatedAt": "2026-09-09T04:52:41.040Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
@@ -26,7 +26,7 @@
     },
     {
       "path": "store-assets/screenshots/chrome/06-test-urls.png",
-      "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9"
+      "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685"
     },
     {
       "path": "store-assets/screenshots/chrome/07-edit-redirect.png",
@@ -64,7 +64,7 @@
       "source": "store-assets/screenshots/chrome/06-test-urls.png",
       "headline": "Test before you save.",
       "subhead": "Try more URLs and see which ones redirect.",
-      "sha256": "9451fa8f2970ef7405a50deb3843ef456ac9e2f4ae2009bcba81aceb5cc342b9",
+      "sha256": "4edc934bf9611e4a12b35287bcb0a7b0ca115519ff806d32f0afd114472a226a",
       "width": 1280,
       "height": 800
     },

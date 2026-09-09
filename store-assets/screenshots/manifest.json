@@ -7,10 +7,10 @@
   "targets": {
     "chrome": {
       "sourceArtifact": "request-orbit-1.0.0-chrome.zip",
-      "sourceContentSha256": "cbc9c2c95ef0543838756bd1b87227a97d69c74758ceb66f1a90ffa122b5502c",
+      "sourceContentSha256": "3ad62d76d3dd54efede57d462eb60cb01d0be6771e213ba8e25279fcedc7b29f",
       "browserName": "Chromium",
       "browserVersion": "151.0.7922.34",
-      "capturedAt": "2026-09-06T17:16:29.029Z",
+      "capturedAt": "2026-09-09T04:52:00.270Z",
       "files": [
         {
           "path": "chrome/01-rules-overview.png",
@@ -50,7 +50,7 @@
         {
           "path": "chrome/06-test-urls.png",
           "purpose": "Additional matching and non-matching URL previews",
-          "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9",
+          "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685",
           "width": 1280,
           "height": 800
         },
@@ -65,10 +65,10 @@
     },
     "edge": {
       "sourceArtifact": "request-orbit-1.0.0-edge.zip",
-      "sourceContentSha256": "76e8a301b23283de6c6c49f0a937f996268cdc0730639ed1cd09b66d7fecebce",
+      "sourceContentSha256": "8fac032623881a39e16c780d8e1e3a1a172fc2b063af823e9baf4052b27997b5",
       "browserName": "Microsoft Edge",
       "browserVersion": "152.0.4191.66",
-      "capturedAt": "2026-09-06T17:16:39.962Z",
+      "capturedAt": "2026-09-09T04:52:09.395Z",
       "files": [
         {
           "path": "edge/01-rules-overview.png",
@@ -94,7 +94,7 @@
         {
           "path": "edge/04-create-redirect.png",
           "purpose": "Two-address redirect creation with default Enabled and exact URL preview",
-          "sha256": "454ee669dc6afe20c0c4176fa6ace4012d2b41a9aea2fcfc627db7c9b4de4a02",
+          "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2",
           "width": 1280,
           "height": 800
         },
@@ -108,7 +108,7 @@
         {
           "path": "edge/06-test-urls.png",
           "purpose": "Additional matching and non-matching URL previews",
-          "sha256": "da5ba46cc1666038a9cafe1dfcb4d868cdbe26a93eddf1598f1b8d7f40acd685",
+          "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9",
           "width": 1280,
           "height": 800
         },
@@ -123,10 +123,10 @@
     },
     "firefox": {
       "sourceArtifact": "request-orbit-1.0.0-firefox.zip",
-      "sourceContentSha256": "ca2b3c77a659a04fb4ca89c0f1a5222ffbf5ab00c5c56ca7fc0f127f24e847c8",
+      "sourceContentSha256": "49bba0fba7fa200a4ad9ab1016f3ecbaaa4be37bab4bfa11e96f9e69a6359d1b",
       "browserName": "Firefox",
-      "browserVersion": "155.0",
-      "capturedAt": "2026-09-06T17:16:50.232Z",
+      "browserVersion": "155.0.1",
+      "capturedAt": "2026-09-09T04:52:19.734Z",
       "files": [
         {
           "path": "firefox/01-rules-overview.png",
