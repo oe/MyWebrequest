@@ -975,9 +975,11 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     // A disk overlay changes the worker URL but leaves Chromium's event routing
     // registered to the legacy worker. Unload that registration, then relaunch
     // the command-line fixture to model a fully activated extension update.
+    // runtime.reload() can disable a command-line extension in Chrome 121;
+    // unregister only the obsolete worker and preserve the extension installation.
     const upgradedWorker =
       launched.context.serviceWorkers()[0] ?? (await launched.context.waitForEvent('serviceworker'));
-    await upgradedWorker.evaluate(() => chrome.runtime.reload()).catch(() => undefined);
+    expect(await upgradedWorker.evaluate('self.registration.unregister()')).toBe(true);
     await launched.close();
     launched = await launchChromiumExtensionContext(fixture.extensionPath, false, userDataDir);
     const options = await launched.context.newPage();
