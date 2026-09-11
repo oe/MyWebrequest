@@ -10,7 +10,7 @@
     "browserName": "Chromium",
     "browserVersion": "151.0.7922.34"
   },
-  "generatedAt": "2026-09-09T14:16:15.714Z",
+  "generatedAt": "2026-09-11T14:13:32.085Z",
   "sources": [
     {
       "path": "store-assets/brand/app-icon.svg",
@@ -18,19 +18,19 @@
     },
     {
       "path": "store-assets/screenshots/chrome/04-create-redirect.png",
-      "sha256": "a039bfbb3e8be9a4b54ef3f64987877eb727544e64c5f4b1675fd60861cd3910"
+      "sha256": "30117ccf464d73eeeeb089a8a2dea8e0ce0102166386936726e5997bcd3b1ea2"
     },
     {
       "path": "store-assets/screenshots/chrome/05-host-scope.png",
-      "sha256": "fd6574c0060fbbdaf626b77418bd0a101cbabdd080bf414f319f9656d70ee497"
+      "sha256": "0e291459d805185b6aa7ffba1e556f640439ae588891b57dcf7cea169feef59d"
     },
     {
       "path": "store-assets/screenshots/chrome/06-test-urls.png",
-      "sha256": "a69f42440ffe9bd75205ca59acc2c980e49d9d5294248237d4ad3d27a370a4e5"
+      "sha256": "d4c4479732c1357bc1995a2116298f8f0d526973a00ee8391f754615afb3e0c9"
     },
     {
       "path": "store-assets/screenshots/chrome/07-edit-redirect.png",
-      "sha256": "1836ff22a79d6eff62f6d92d67afe8ed94a6f212033a4eb83e41047137778935"
+      "sha256": "bf07b4fee4301231a725888a93346ada825df354eb263c3876948b0c3d57054c"
     },
     {
       "path": "store-assets/screenshots/chrome/03-backup-restore.png",
@@ -44,7 +44,7 @@
       "source": "store-assets/screenshots/chrome/04-create-redirect.png",
       "headline": "Make links go where you want.",
       "subhead": "Enter two addresses. Preview the result before saving.",
-      "sha256": "071cca3551ed70e3733fcafecbe14df88da1f4edceab1eb896896ea912149ce8",
+      "sha256": "8697d6f298deb178d8561622c721648ffef1522de7c5b10e784c88382b42ebe6",
       "width": 1280,
       "height": 800
     },
@@ -54,7 +54,7 @@
       "source": "store-assets/screenshots/chrome/05-host-scope.png",
       "headline": "One URL or the whole site.",
       "subhead": "Replace the host. Keep paths, queries, protocol, and port.",
-      "sha256": "a3e2430e8dce4f591501f0b8193a2292c15bb31de3732bdbb3ef2bcc66f956ec",
+      "sha256": "01f6d45c41634b1f5085b7a8e768e986ac9653db5aa6b7ad4deea6b582c0b6ea",
       "width": 1280,
       "height": 800
     },
@@ -64,7 +64,7 @@
       "source": "store-assets/screenshots/chrome/06-test-urls.png",
       "headline": "Test before you save.",
       "subhead": "Try more URLs and see which ones redirect.",
-      "sha256": "d6ad4cf475c1dc0a272c55dda9b5454441b53e2dfbd3a781d57088faef074dcc",
+      "sha256": "9451fa8f2970ef7405a50deb3843ef456ac9e2f4ae2009bcba81aceb5cc342b9",
       "width": 1280,
       "height": 800
     },
@@ -74,7 +74,7 @@
       "source": "store-assets/screenshots/chrome/07-edit-redirect.png",
       "headline": "Change your redirects anytime.",
       "subhead": "Reopen the simple editor. Save disabled or apply with permission.",
-      "sha256": "5ae289a22819ae2fc047756755e07e2d1e8951844f3972dfa8bce235139eb740",
+      "sha256": "ff120e6ae3ccd3c6b748567b65f271a2d0692cbd2b5121db5c87b794f6bfef2b",
       "width": 1280,
       "height": 800
     },

@@ -11,6 +11,7 @@ import { promisify } from 'node:util';
 
 import type { BrowserContext, Page, Worker } from '@playwright/test';
 import browserSupport from '../../browser-support.json' with { type: 'json' };
+import packageManifest from '../../package.json' with { type: 'json' };
 import type { StoredMigration } from '@/application/migration-apply';
 import { parseRuleBackup } from '@/application/rule-backup';
 import type { Rule, StoredState } from '@/domain/rules/model';
@@ -1014,7 +1015,7 @@ test('same-ID V0.12.11 upgrade preserves storage.sync and stages migration', asy
     await expect(guide).toBeVisible();
     await guide.getByRole('button', { name: 'Review and back up old rules' }).click();
     await expect(options.getByRole('heading', { name: 'Legacy migration' })).toBeVisible();
-    expect(await options.evaluate(() => chrome.runtime.getManifest().version)).toBe('1.0.0');
+    expect(await options.evaluate(() => chrome.runtime.getManifest().version)).toBe(packageManifest.version);
     await expect(options.getByRole('button', { name: 'Legacy migration' })).toBeVisible();
     expect(
       await options.evaluate(() => JSON.parse(localStorage.getItem('future-local-key') ?? 'null')),
